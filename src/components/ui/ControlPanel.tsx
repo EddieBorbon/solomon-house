@@ -1,0 +1,88 @@
+'use client';
+
+import { useWorldStore } from '../../state/useWorldStore';
+
+export function ControlPanel() {
+  const { addObject, objects, selectedObjectId, selectObject } = useWorldStore();
+
+  const handleAddCube = () => {
+    // Añadir cubo en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('cube', [x, 0.5, z]);
+  };
+
+  const handleAddSphere = () => {
+    // Añadir esfera en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('sphere', [x, 0.5, z]);
+  };
+
+  const handleClearSelection = () => {
+    selectObject(null);
+  };
+
+  return (
+    <div className="fixed top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 z-50 min-w-[280px]">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        🎵 Casa de Salomon
+      </h3>
+      
+      {/* Botones de creación */}
+      <div className="space-y-3 mb-4">
+        <button
+          onClick={handleAddCube}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🎲</span>
+          <span>Añadir Cubo</span>
+        </button>
+        
+        <button
+          onClick={handleAddSphere}
+          className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🔵</span>
+          <span>Añadir Esfera</span>
+        </button>
+      </div>
+
+      {/* Información del estado */}
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Total objetos:</span>
+          <span className="font-medium text-gray-800">{objects.length}</span>
+        </div>
+        
+        <div className="flex justify-between">
+          <span className="text-gray-600">Seleccionado:</span>
+          <span className="font-medium text-gray-800">
+            {selectedObjectId ? 'Sí' : 'No'}
+          </span>
+        </div>
+      </div>
+
+      {/* Botón para limpiar selección */}
+      {selectedObjectId && (
+        <button
+          onClick={handleClearSelection}
+          className="w-full mt-3 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+        >
+          Limpiar Selección
+        </button>
+      )}
+
+      {/* Instrucciones */}
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+        <p className="text-xs text-blue-700">
+          💡 <strong>Controles:</strong><br/>
+          • Click izquierdo: Rotar cámara<br/>
+          • Scroll: Zoom<br/>
+          • Click derecho: Pan<br/>
+          • Click en objetos: Seleccionar
+        </p>
+      </div>
+    </div>
+  );
+}
