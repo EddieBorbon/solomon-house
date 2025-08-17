@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
+import { type AudioParams } from '../hooks/useObjectAudio';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere';
@@ -11,7 +12,7 @@ export interface SoundObject {
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
-  audioParams: Record<string, any>;
+  audioParams: AudioParams;
   isSelected: boolean;
 }
 
@@ -31,7 +32,7 @@ export interface WorldActions {
 }
 
 // Parámetros por defecto para cada tipo de objeto
-const getDefaultAudioParams = (type: SoundObjectType): Record<string, any> => {
+const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
   switch (type) {
     case 'cube':
       return {
