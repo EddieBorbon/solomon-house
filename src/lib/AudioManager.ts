@@ -15,6 +15,8 @@ export interface AudioParams {
   // Nuevos parámetros para MembraneSynth
   pitchDecay?: number;
   octaves?: number;
+  // Campo de duración para todos los objetos (Infinity para duración infinita)
+  duration?: number;
 }
 
 // Tipos para las fuentes de sonido
@@ -143,9 +145,9 @@ export class AudioManager {
           },
           envelope: { 
             attack: 0.001, 
-            decay: 0.4, 
+            decay: 0.2, 
             sustain: 0.01, 
-            release: 1.4 
+            release: 0.3 
           },
         });
       } else {
@@ -234,10 +236,35 @@ export class AudioManager {
       // Aplicar TODOS los parámetros antes de iniciar
       this.updateSoundParams(id, params);
       
-      // Iniciar el sonido en el tiempo actual del contexto de audio
-      source.synth.triggerAttack(params.frequency, Tone.now());
+      // Usar triggerAttackRelease con duración configurada o triggerAttack para duración infinita
+      const duration = params.duration;
+      
+      if (duration === Infinity) {
+        // Duración infinita - usar triggerAttack para sonido continuo
+        (source.synth as any).triggerAttack(params.frequency, Tone.now());
+        console.log(`🎵 Sonido iniciado para ${id} con frecuencia ${params.frequency}Hz (duración infinita)`);
+      } else {
+        // Duración finita - usar triggerAttackRelease o fallback
+        const actualDuration = duration || 2.0; // Duración por defecto de 2 segundos
+        
+        try {
+          // Intentar usar triggerAttackRelease si está disponible
+          if (typeof (source.synth as any).triggerAttackRelease === 'function') {
+            (source.synth as any).triggerAttackRelease(params.frequency, actualDuration, Tone.now());
+            console.log(`🎵 Sonido iniciado para ${id} con frecuencia ${params.frequency}Hz y duración ${actualDuration}s`);
+          } else {
+            // Fallback para sintetizadores que no soportan triggerAttackRelease
+            source.synth.triggerAttack(params.frequency, Tone.now());
+            console.log(`🎵 Sonido iniciado para ${id} con frecuencia ${params.frequency}Hz (duración indefinida)`);
+          }
+        } catch (error) {
+          // Si triggerAttackRelease falla, usar el método estándar
+          source.synth.triggerAttack(params.frequency, Tone.now());
+          console.log(`🎵 Sonido iniciado para ${id} con frecuencia ${params.frequency}Hz (fallback)`);
+        }
+      }
+      
       this.playingSounds.add(id); // Marcar como sonando
-      console.log(`🎵 Sonido iniciado para ${id} con frecuencia ${params.frequency}Hz`);
     } catch (error) {
       console.error(`❌ Error al iniciar sonido para ${id}:`, error);
     }
@@ -279,15 +306,30 @@ export class AudioManager {
       // Aplicar parámetros antes de disparar
       this.updateSoundParams(id, params);
       
-      // Para MembraneSynth, usar triggerAttack sin release ya que la envolvente define la duración
-      if ('pitchDecay' in source.synth) {
-        // Es un MembraneSynth
-        (source.synth as Tone.MembraneSynth).triggerAttack(params.frequency, Tone.now());
-        console.log(`🥁 Nota percusiva disparada para ${id} con frecuencia ${params.frequency}Hz`);
+      // Para todos los sintetizadores, usar triggerAttackRelease con duración configurada o triggerAttack para duración infinita
+      const duration = params.duration;
+      
+      if (duration === Infinity) {
+        // Duración infinita - usar triggerAttack para sonido continuo
+        (source.synth as any).triggerAttack(params.frequency, Tone.now());
+        console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz (duración infinita)`);
+      } else if ('triggerAttackRelease' in source.synth) {
+        // Duración finita - usar triggerAttackRelease
+        const actualDuration = duration || 0.5; // Usar duración configurada o 0.5 por defecto
+        (source.synth as any).triggerAttackRelease(params.frequency, actualDuration, Tone.now());
+        console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz y duración ${actualDuration}s`);
       } else {
-        // Para otros sintetizadores, usar el método estándar
-        source.synth.triggerAttack(params.frequency, Tone.now());
-        console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz`);
+        // Fallback para sintetizadores que no soportan triggerAttackRelease
+        try {
+          (source.synth as any).triggerAttack(params.frequency, Tone.now());
+          console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz (duración indefinida)`);
+        } catch (fallbackError) {
+          console.warn(`⚠️ Fallback falló para ${id}, usando método alternativo`);
+          // Último recurso: intentar con triggerAttack en el sintetizador principal
+          if (typeof (source.synth as any).triggerAttack === 'function') {
+            (source.synth as any).triggerAttack(params.frequency, Tone.now());
+          }
+        }
       }
     } catch (error) {
       console.error(`❌ Error al disparar nota para ${id}:`, error);

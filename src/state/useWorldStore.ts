@@ -42,43 +42,47 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'cube':
       return {
         frequency: 220,
-        volume: 0.05, // Volumen más bajo para síntesis AM
+        volume: 0.1, // Volumen estándar (se mostrará como 10%)
         waveform: 'sine', // Forma de onda de la portadora
         harmonicity: 1.5,
         modulationWaveform: 'square', // Forma de onda de la moduladora
+        duration: 2.0, // Duración de 2 segundos para sonidos continuos
       };
     case 'sphere':
       return {
         frequency: 300,
-        volume: 0.8,
+        volume: 0.1, // Volumen estándar (se mostrará como 10%)
         waveform: 'sine',
         modulationWaveform: 'sine',
         harmonicity: 2, // Ratio de octava
         modulationIndex: 10, // Valor alto para un timbre rico y metálico
+        duration: 1.5, // Duración de 1.5 segundos
       };
     case 'cylinder':
       return {
         frequency: 220,
-        volume: 0.8,
+        volume: 0.1, // Volumen estándar (se mostrará como 10%)
         waveform: 'triangle',
         waveform2: 'sine', // La segunda voz puede ser diferente
         harmonicity: 1.5,
         vibratoAmount: 0.2,
         vibratoRate: 5,
+        duration: 3.0, // Duración de 3 segundos para efectos de vibrato
       };
     case 'cone':
       return {
         frequency: 50, // Frecuencia baja para un bombo
-        volume: 1.0,   // Volumen alto
+        volume: 0.1,   // Volumen estándar (se mostrará como 10%)
         waveform: 'sine',
         pitchDecay: 0.05,
         octaves: 10,
+        duration: 0.5, // Duración corta para sonidos percusivos
       };
     default:
       return {
         frequency: 330,
         waveform: 'sine',
-        volume: 0.06, // Volumen ajustado al nuevo rango
+        volume: 0.1, // Volumen estándar (se mostrará como 10%)
       };
   }
 };
@@ -182,13 +186,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       
       // Controlar el audio en el AudioManager
       if (updatedObject) {
-        // Ignorar el tipo 'cone' ya que es percusivo
-        if (updatedObject.type !== 'cone') {
-          if (updatedObject.audioEnabled) {
-            audioManager.startSound(id, updatedObject.audioParams);
-          } else {
-            audioManager.stopSound(id);
-          }
+        if (updatedObject.audioEnabled) {
+          // Para todos los tipos, usar triggerObjectNote con duración configurada
+          audioManager.triggerNoteAttack(id, updatedObject.audioParams);
+        } else {
+          // Detener el sonido si está sonando
+          audioManager.stopSound(id);
         }
       }
       

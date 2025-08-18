@@ -7,6 +7,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
+import { SoundCone } from '../sound-objects/SoundCone';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -20,10 +21,13 @@ interface SoundObjectContainerProps {
 
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
+    const { triggerObjectNote } = useWorldStore();
+    
     const handleClick = useCallback((event: any) => {
       event.stopPropagation();
       onSelect(object.id);
-    }, [object.id, onSelect]);
+      triggerObjectNote(object.id);
+    }, [object.id, onSelect, triggerObjectNote]);
 
     return (
       <group
@@ -42,6 +46,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
           />
         ) : object.type === 'sphere' ? (
           <SoundSphere
@@ -53,6 +58,16 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
           />
         ) : object.type === 'cylinder' ? (
           <SoundCylinder
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'cone' ? (
+          <SoundCone
             id={object.id}
             position={[0, 0, 0]}
             rotation={[0, 0, 0]}
@@ -110,6 +125,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     selectObject(id);
   }, [selectObject]);
 
+  // Función para manejar clic en el espacio vacío
+  const handleBackgroundClick = useCallback((event: any) => {
+    // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
+    if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry.type === 'PlaneGeometry') {
+      selectObject(null);
+    }
+  }, [selectObject]);
+
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
     if (orbitControlsRef.current) {
@@ -131,6 +154,16 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   return (
     <>
+      {/* Plano invisible para capturar clics en el espacio vacío */}
+      <mesh 
+        position={[0, -10, 0]} 
+        rotation={[-Math.PI / 2, 0, 0]}
+        onClick={handleBackgroundClick}
+      >
+        <planeGeometry args={[100, 100]} />
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
+
       {/* Renderizado de objetos del mundo */}
       {objects.map((obj) => {
         console.log(`🎯 Renderizando objeto: ${obj.type} en posición [${obj.position.join(', ')}]`);

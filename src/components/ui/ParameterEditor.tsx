@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { type AudioParams } from '../../lib/AudioManager';
 
 export function ParameterEditor() {
-  const { objects, selectedObjectId, updateObject, toggleObjectAudio, removeObject } = useWorldStore();
+  const { objects, selectedObjectId, updateObject, removeObject } = useWorldStore();
 
   // Encontrar el objeto seleccionado
   const selectedObject = useMemo(() => {
@@ -37,7 +37,7 @@ export function ParameterEditor() {
   if (!selectedObject) {
     return (
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm">
+        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-full flex items-center justify-center">
               <span className="text-2xl">🎯</span>
@@ -56,14 +56,16 @@ export function ParameterEditor() {
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm">
+      <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
         {/* Header con información del objeto */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className={`w-4 h-4 rounded ${
                 selectedObject.type === 'cube' ? 'bg-blue-500' : 
-                selectedObject.type === 'sphere' ? 'bg-purple-500' : 'bg-green-500'
+                selectedObject.type === 'sphere' ? 'bg-purple-500' : 
+                selectedObject.type === 'cylinder' ? 'bg-green-500' :
+                selectedObject.type === 'cone' ? 'bg-orange-500' : 'bg-gray-500'
               }`} />
               <h3 className="text-lg font-semibold text-white">
                 Editor de Parámetros
@@ -89,50 +91,33 @@ export function ParameterEditor() {
 
         {/* Control de activación de audio */}
         <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
-          {selectedObject.type === 'cone' ? (
-            // Para objetos percusivos (cone), mostrar mensaje informativo
-            <div className="text-center">
-              <div className="w-8 h-8 mx-auto mb-2 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-lg">🥁</span>
-              </div>
-              <span className="text-sm font-medium text-gray-300">
-                Instrumento Percusivo
+          <div className="text-center">
+            <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
+              selectedObject.type === 'cone' ? 'bg-orange-500' :
+              selectedObject.type === 'cube' ? 'bg-blue-500' :
+              selectedObject.type === 'sphere' ? 'bg-purple-500' :
+              selectedObject.type === 'cylinder' ? 'bg-green-500' : 'bg-gray-500'
+            }`}>
+              <span className="text-lg">
+                {selectedObject.type === 'cone' ? '🥁' :
+                 selectedObject.type === 'cube' ? '🔷' :
+                 selectedObject.type === 'sphere' ? '🔮' :
+                 selectedObject.type === 'cylinder' ? '🔶' : '❓'}
               </span>
-              <p className="text-xs text-gray-400 mt-1">
-                Haz clic en el objeto para tocar
-              </p>
             </div>
-          ) : (
-            // Para otros tipos, mostrar control de activación
-            <>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-4 h-4 rounded-full ${
-                    selectedObject.audioEnabled ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <span className="text-sm font-medium text-gray-300">
-                    Audio {selectedObject.audioEnabled ? 'Activado' : 'Desactivado'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => toggleObjectAudio(selectedObject.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    selectedObject.audioEnabled
-                      ? 'bg-red-600 hover:bg-red-700 text-white'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  }`}
-                >
-                  {selectedObject.audioEnabled ? 'Desactivar' : 'Activar'}
-                </button>
-              </div>
-              <p className="text-xs text-gray-400 mt-2">
-                {selectedObject.audioEnabled 
-                  ? 'El objeto está reproduciendo sonido continuamente'
-                  : 'Haz clic en "Activar" para que el objeto comience a sonar'
-                }
-              </p>
-            </>
-          )}
+                         <span className="text-sm font-medium text-gray-300">
+               {selectedObject.type === 'cone' ? 'MembraneSynth' :
+                selectedObject.type === 'cube' ? 'Síntesis AM' :
+                selectedObject.type === 'sphere' ? 'Síntesis FM' :
+                selectedObject.type === 'cylinder' ? 'DuoSynth' : 'Objeto de Sonido'}
+             </span>
+            <p className="text-xs text-gray-400 mt-1">
+              Haz clic en el objeto para tocar
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Duración configurable: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}s
+            </p>
+          </div>
         </div>
 
         {/* Controles de parámetros */}
@@ -178,6 +163,59 @@ export function ParameterEditor() {
               <option value="triangle">Triangular</option>
             </select>
           </div>
+
+                     {/* Duración */}
+           <div>
+             <label className="block text-sm font-medium text-gray-300 mb-2">
+               Duración (segundos)
+             </label>
+             <div className="flex items-center gap-3">
+               <input
+                 type="number"
+                 min="0.1"
+                 max="60"
+                 step="0.1"
+                 value={selectedObject.audioParams.duration === Infinity ? '' : (selectedObject.audioParams.duration || 1.0)}
+                 onChange={(e) => {
+                   const value = e.target.value;
+                   if (value === '') {
+                     handleParamChange('duration', Infinity);
+                   } else {
+                     handleParamChange('duration', Number(value));
+                   }
+                 }}
+                 placeholder="∞"
+                 className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
+               />
+               <button
+                 onClick={() => {
+                   const currentDuration = selectedObject.audioParams.duration;
+                   if (currentDuration === Infinity) {
+                     handleParamChange('duration', 2.0);
+                   } else {
+                     handleParamChange('duration', Infinity);
+                   }
+                 }}
+                 className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                 title={selectedObject.audioParams.duration === Infinity ? "Cambiar a duración finita" : "Cambiar a duración infinita"}
+               >
+                 {selectedObject.audioParams.duration === Infinity ? '⏱️' : '∞'}
+               </button>
+               <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                 {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
+               </span>
+             </div>
+             <div className="flex justify-between text-xs text-gray-500 mt-1">
+               <span>0.1s</span>
+               <span>∞ (continuo)</span>
+             </div>
+             <p className="text-xs text-gray-400 mt-1">
+               {selectedObject.audioParams.duration === Infinity 
+                 ? 'Sonido continuo - haz clic en el objeto para detener'
+                 : 'Sonido con duración finita - se detiene automáticamente'
+               }
+             </p>
+           </div>
 
           {/* Controles específicos para MembraneSynth (cono) */}
           {selectedObject.type === 'cone' && (
@@ -467,42 +505,34 @@ export function ParameterEditor() {
             </>
           )}
 
-          {/* Volumen - Movido al final */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Volumen
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value={selectedObject.type === 'cylinder' 
-                  ? Math.round(selectedObject.audioParams.volume * 100)
-                  : Math.round(selectedObject.audioParams.volume * 1000)
-                }
-                onChange={(e) => {
-                  const percentage = Number(e.target.value);
-                  const actualValue = selectedObject.type === 'cylinder' 
-                    ? percentage / 100 
-                    : percentage / 1000;
-                  handleParamChange('volume', actualValue);
-                }}
-                className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-              />
-              <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                {selectedObject.type === 'cylinder' 
-                  ? `${Math.round(selectedObject.audioParams.volume * 100)}%`
-                  : `${Math.round(selectedObject.audioParams.volume * 1000)}%`
-                }
-              </span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>0%</span>
-              <span>100%</span>
-            </div>
-          </div>
+                     {/* Volumen - Movido al final */}
+           <div>
+             <label className="block text-sm font-medium text-gray-300 mb-2">
+               Volumen
+             </label>
+             <div className="flex items-center gap-3">
+               <input
+                 type="range"
+                 min="0"
+                 max="100"
+                 step="1"
+                 value={Math.round(selectedObject.audioParams.volume * 100)}
+                 onChange={(e) => {
+                   const percentage = Number(e.target.value);
+                   const actualValue = percentage / 100; // Convertir de 0-100 a 0-1
+                   handleParamChange('volume', actualValue);
+                 }}
+                 className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+               />
+               <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                 {Math.round(selectedObject.audioParams.volume * 100)}%
+               </span>
+             </div>
+             <div className="flex justify-between text-xs text-gray-500 mt-1">
+               <span>0%</span>
+               <span>100%</span>
+             </div>
+           </div>
         </div>
 
         {/* Información adicional */}

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, Group } from 'three';
+import { Mesh, Group, MeshStandardMaterial, Color } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundCubeProps {
@@ -12,6 +12,14 @@ interface SoundCubeProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
+  audioParams: {
+    frequency: number;
+    volume: number;
+    waveform: OscillatorType;
+    harmonicity?: number;
+    modulationWaveform?: OscillatorType;
+    duration?: number;
+  };
 }
 
 export const SoundCube = forwardRef<Group, SoundCubeProps>(({
@@ -21,19 +29,55 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   scale,
   isSelected,
   audioEnabled,
+  audioParams,
 }, ref) => {
   const meshRef = useRef<Mesh>(null);
+  const materialRef = useRef<MeshStandardMaterial>(null);
+  const energyRef = useRef(0); // Para la animación de clic
+  const { selectObject, triggerObjectNote } = useWorldStore();
 
-  // Animación del cubo cuando está reproduciendo sonido
-  useFrame((state) => {
-    if (meshRef.current && audioEnabled) {
-      // Hacer que el cubo "respire" cuando está sonando
-      const time = state.clock.elapsedTime;
-      const breathingScale = 1 + Math.sin(time * 4) * 0.1;
-      meshRef.current.scale.setScalar(breathingScale);
+  const handleClick = (event: any) => {
+    event.stopPropagation();
+    selectObject(id);
+    triggerObjectNote(id);
+    
+    // Activar la animación de clic
+    energyRef.current = 1;
+  };
+
+  // Animación del cubo cuando se hace clic
+  useFrame((state, delta) => {
+    if (!meshRef.current || !materialRef.current || !audioParams) return;
+
+    // Decaer la energía del clic
+    if (energyRef.current > 0) {
+      // Calcular la velocidad de decaimiento basada en la duración del sonido
+      const duration = audioParams?.duration;
+      let decayRate = 0.9; // Decaimiento por defecto
       
-      // Rotación sutil cuando está sonando
-      meshRef.current.rotation.y += 0.01;
+      if (duration && duration !== Infinity) {
+        // Ajustar la velocidad de decaimiento para que coincida con la duración del sonido
+        decayRate = Math.pow(0.1, delta / duration);
+      }
+      
+      energyRef.current *= decayRate;
+      
+      // Aplicar la energía como escala pulsante
+      const pulseScale = 1 + energyRef.current * 0.2;
+      meshRef.current.scale.set(pulseScale, pulseScale, pulseScale);
+      
+      // Cambiar el color basado en la energía (azul intenso a azul suave)
+      const intensity = energyRef.current;
+      const blueColor = new Color(0.3, 0.8 + intensity * 0.2, 0.8 + intensity * 0.2);
+      materialRef.current.color.copy(blueColor);
+      
+      // Emisión basada en la energía
+      materialRef.current.emissiveIntensity = intensity * 0.3;
+    } else {
+      // Resetear a valores por defecto
+      meshRef.current.scale.set(scale[0], scale[1], scale[2]);
+      materialRef.current.color.setHex(0x4ecdc4); // Azul por defecto
+      materialRef.current.emissiveIntensity = 0;
     }
   });
 
@@ -44,26 +88,29 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
         ref={meshRef}
         castShadow
         receiveShadow
+        onClick={handleClick}
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial
-          color={isSelected ? '#ff6b6b' : '#4ecdc4'}
+          ref={materialRef}
+          color="#4ecdc4"
           transparent
           opacity={0.8}
           roughness={0.3}
           metalness={0.1}
+          emissive="#000000"
+          emissiveIntensity={0}
         />
       </mesh>
 
-      {/* Wireframe cuando está seleccionado */}
+      {/* Indicador de selección sin wireframe */}
       {isSelected && (
         <mesh>
           <boxGeometry args={[1.05, 1.05, 1.05]} />
           <meshBasicMaterial
             color="#ffd93d"
-            wireframe
             transparent
-            opacity={0.8}
+            opacity={0.3}
           />
         </mesh>
       )}
