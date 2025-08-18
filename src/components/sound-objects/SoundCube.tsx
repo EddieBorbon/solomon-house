@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh } from 'three';
-import { useObjectAudio, type AudioParams } from '../../hooks/useObjectAudio';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundCubeProps {
@@ -11,8 +10,8 @@ interface SoundCubeProps {
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
-  audioParams: AudioParams;
   isSelected: boolean;
+  audioEnabled: boolean;
 }
 
 export function SoundCube({
@@ -20,20 +19,14 @@ export function SoundCube({
   position,
   rotation,
   scale,
-  audioParams,
   isSelected,
+  audioEnabled,
 }: SoundCubeProps) {
   const meshRef = useRef<Mesh>(null);
-  const { updateParams, isPlaying, triggerAttack, triggerRelease } = useObjectAudio('cube', audioParams);
-
-  // Actualizar parámetros de audio cuando cambien
-  useEffect(() => {
-    updateParams(audioParams);
-  }, [audioParams, updateParams]);
 
   // Animación del cubo cuando está reproduciendo sonido
   useFrame((state) => {
-    if (meshRef.current && isPlaying) {
+    if (meshRef.current && audioEnabled) {
       // Hacer que el cubo "respire" cuando está sonando
       const time = state.clock.elapsedTime;
       const breathingScale = 1 + Math.sin(time * 4) * 0.1;
@@ -95,7 +88,7 @@ export function SoundCube({
       )}
 
       {/* Indicador de estado de audio */}
-      {isPlaying && (
+      {audioEnabled && (
         <mesh position={[0, 1.5, 0]}>
           <sphereGeometry args={[0.15, 8, 6]} />
           <meshStandardMaterial
@@ -123,16 +116,13 @@ export function SoundCube({
         <mesh
           onClick={(e) => {
             e.stopPropagation();
-            if (isPlaying) {
-              triggerRelease();
-            } else {
-              triggerAttack();
-            }
+            // Toggle del estado de audio usando la acción del store
+            useWorldStore.getState().toggleObjectAudio(id);
           }}
         >
           <boxGeometry args={[1.5, 0.3, 0.1]} />
           <meshBasicMaterial
-            color={isPlaying ? '#ff4757' : '#2ed573'}
+            color={audioEnabled ? '#ff4757' : '#2ed573'}
             transparent
             opacity={0.9}
           />

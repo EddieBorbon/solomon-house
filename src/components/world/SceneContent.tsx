@@ -1,8 +1,6 @@
 'use client';
 
 import { useWorldStore } from '../../state/useWorldStore';
-import { useRef } from 'react';
-import { Mesh } from 'three';
 import { SoundCube } from '../sound-objects/SoundCube';
 
 export function SceneContent() {
@@ -32,8 +30,8 @@ export function SceneContent() {
                 position={obj.position}
                 rotation={obj.rotation}
                 scale={obj.scale}
-                audioParams={obj.audioParams}
                 isSelected={obj.isSelected}
+                audioEnabled={obj.audioEnabled}
               />
             ) : (
               <group position={obj.position}>

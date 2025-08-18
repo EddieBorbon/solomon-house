@@ -6,6 +6,7 @@ import { ControlPanel } from '../components/ui/ControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { WorldInfo } from '../components/ui/WorldInfo';
 import { FPSDisplay } from '../components/ui/FPSDisplay';
+import { AudioInitializer } from '../components/ui/AudioInitializer';
 
 export default function Home() {
   return (
@@ -21,6 +22,9 @@ export default function Home() {
       
       {/* Display de FPS */}
       <FPSDisplay />
+      
+      {/* Inicializador de Audio */}
+      <AudioInitializer />
       
       {/* Escena 3D */}
       <Suspense 

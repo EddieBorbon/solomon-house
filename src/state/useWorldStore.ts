@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
-import { type AudioParams } from '../hooks/useObjectAudio';
+import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere';
@@ -14,6 +14,7 @@ export interface SoundObject {
   scale: [number, number, number];
   audioParams: AudioParams;
   isSelected: boolean;
+  audioEnabled: boolean;
 }
 
 // Estado del mundo 3D
@@ -28,6 +29,7 @@ export interface WorldActions {
   removeObject: (id: string) => void;
   selectObject: (id: string | null) => void;
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
+  toggleObjectAudio: (id: string) => void;
   clearAllObjects: () => void;
 }
 
@@ -39,24 +41,18 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 220,
         waveform: 'sine',
         volume: 0.5,
-        reverb: 0.3,
-        delay: 0.1,
       };
     case 'sphere':
       return {
         frequency: 440,
         waveform: 'triangle',
         volume: 0.7,
-        reverb: 0.5,
-        delay: 0.2,
       };
     default:
       return {
         frequency: 330,
         waveform: 'sine',
         volume: 0.6,
-        reverb: 0.4,
-        delay: 0.15,
       };
   }
 };
@@ -77,15 +73,27 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       scale: [1, 1, 1],
       audioParams: getDefaultAudioParams(type),
       isSelected: false,
+      audioEnabled: false,
     };
 
     set((state) => ({
       objects: [...state.objects, newObject],
     }));
+
+    // Crear la fuente de sonido en el AudioManager
+    audioManager.createSoundSource(
+      newObject.id,
+      newObject.type,
+      newObject.audioParams,
+      newObject.position
+    );
   },
 
   // Acción para eliminar un objeto
   removeObject: (id: string) => {
+    // Eliminar la fuente de sonido del AudioManager antes de eliminar el objeto
+    audioManager.removeSoundSource(id);
+
     set((state) => ({
       objects: state.objects.filter((obj) => obj.id !== id),
       selectedObjectId: state.selectedObjectId === id ? null : state.selectedObjectId,
@@ -105,11 +113,57 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acción para actualizar un objeto
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => {
+    console.log(`🔄 Store: Actualizando objeto ${id} con:`, updates);
+    
+    // Primero, actualiza el estado de Zustand
     set((state) => ({
       objects: state.objects.map((obj) =>
         obj.id === id ? { ...obj, ...updates } : obj
       ),
     }));
+
+    // --- CAMBIO CLAVE: Usar get() para leer el estado DESPUÉS de la actualización ---
+    const updatedObjects = get().objects;
+    const updatedObject = updatedObjects.find(obj => obj.id === id);
+
+    if (updatedObject) {
+      // Ahora, comunica los cambios al AudioManager con el estado más reciente
+      if (updates.position) {
+        console.log(`📍 Store: Actualizando posición para ${id}`);
+        audioManager.updateSoundPosition(id, updatedObject.position);
+      }
+      // Se comprueba si 'audioParams' está en el objeto 'updates' original
+      // para no enviar actualizaciones innecesarias.
+      if (updates.audioParams) {
+        console.log(`🎵 Store: Actualizando parámetros de audio para ${id}:`, updatedObject.audioParams);
+        audioManager.updateSoundParams(id, updatedObject.audioParams);
+      }
+    }
+  },
+
+  // Acción para activar/desactivar el audio de un objeto
+  toggleObjectAudio: (id: string) => {
+    set((state) => {
+      const updatedObjects = state.objects.map((obj) =>
+        obj.id === id ? { ...obj, audioEnabled: !obj.audioEnabled } : obj
+      );
+      
+      // Encontrar el objeto actualizado
+      const updatedObject = updatedObjects.find(obj => obj.id === id);
+      
+      // Controlar el audio en el AudioManager
+      if (updatedObject) {
+        if (updatedObject.audioEnabled) {
+          audioManager.startSound(id, updatedObject.audioParams);
+        } else {
+          audioManager.stopSound(id);
+        }
+      }
+      
+      return {
+        objects: updatedObjects,
+      };
+    });
   },
 
   // Acción para limpiar todos los objetos

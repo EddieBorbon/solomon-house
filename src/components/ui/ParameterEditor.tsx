@@ -2,10 +2,10 @@
 
 import { useWorldStore } from '../../state/useWorldStore';
 import { useMemo } from 'react';
-import { type AudioParams } from '../../hooks/useObjectAudio';
+import { type AudioParams } from '../../lib/AudioManager';
 
 export function ParameterEditor() {
-  const { objects, selectedObjectId, updateObject } = useWorldStore();
+  const { objects, selectedObjectId, updateObject, toggleObjectAudio } = useWorldStore();
 
   // Encontrar el objeto seleccionado
   const selectedObject = useMemo(() => {
@@ -16,10 +16,15 @@ export function ParameterEditor() {
   const handleParamChange = (param: keyof AudioParams, value: number | string) => {
     if (!selectedObject) return;
 
+    console.log(`🎛️ UI: Cambiando parámetro ${param} a: ${value}`);
+    console.log(`🎛️ UI: Objeto seleccionado:`, selectedObject);
+
     const newAudioParams = {
       ...selectedObject.audioParams,
       [param]: value,
     };
+
+    console.log(`🎛️ UI: Nuevos parámetros de audio:`, newAudioParams);
 
     updateObject(selectedObject.id, {
       audioParams: newAudioParams,
@@ -54,18 +59,61 @@ export function ParameterEditor() {
       <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm">
         {/* Header con información del objeto */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div className={`w-4 h-4 rounded ${
-              selectedObject.type === 'cube' ? 'bg-blue-500' : 'bg-purple-500'
-            }`} />
-            <h3 className="text-lg font-semibold text-white">
-              Editor de Parámetros
-            </h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-4 h-4 rounded ${
+                selectedObject.type === 'cube' ? 'bg-blue-500' : 'bg-purple-500'
+              }`} />
+              <h3 className="text-lg font-semibold text-white">
+                Editor de Parámetros
+              </h3>
+            </div>
+            <button
+              onClick={() => {
+                if (confirm('¿Estás seguro de que quieres eliminar este objeto?')) {
+                  removeObject(selectedObject.id);
+                }
+              }}
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors duration-200"
+              title="Eliminar objeto"
+            >
+              🗑️
+            </button>
           </div>
           <div className="text-sm text-gray-400">
             <p>Objeto: <span className="text-white">{selectedObject.type}</span></p>
             <p>ID: <span className="text-white font-mono text-xs">{selectedObject.id.slice(0, 8)}...</span></p>
           </div>
+        </div>
+
+        {/* Control de activación de audio */}
+        <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`w-4 h-4 rounded-full ${
+                selectedObject.audioEnabled ? 'bg-green-500' : 'bg-red-500'
+              }`} />
+              <span className="text-sm font-medium text-gray-300">
+                Audio {selectedObject.audioEnabled ? 'Activado' : 'Desactivado'}
+              </span>
+            </div>
+            <button
+              onClick={() => toggleObjectAudio(selectedObject.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                selectedObject.audioEnabled
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
+            >
+              {selectedObject.audioEnabled ? 'Desactivar' : 'Activar'}
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            {selectedObject.audioEnabled 
+              ? 'El objeto está reproduciendo sonido continuamente'
+              : 'Haz clic en "Activar" para que el objeto comience a sonar'
+            }
+          </p>
         </div>
 
         {/* Controles de parámetros */}
@@ -112,56 +160,6 @@ export function ParameterEditor() {
               />
               <span className="text-white font-mono text-sm min-w-[4rem] text-right">
                 {Math.round(selectedObject.audioParams.volume * 100)}%
-              </span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>0%</span>
-              <span>100%</span>
-            </div>
-          </div>
-
-          {/* Reverb */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Reverb
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={selectedObject.audioParams.reverb}
-                onChange={(e) => handleParamChange('reverb', Number(e.target.value))}
-                className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-              />
-              <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                {Math.round(selectedObject.audioParams.reverb * 100)}%
-              </span>
-            </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>0%</span>
-              <span>100%</span>
-            </div>
-          </div>
-
-          {/* Delay */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Delay
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={selectedObject.audioParams.delay}
-                onChange={(e) => handleParamChange('delay', Number(e.target.value))}
-                className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-              />
-              <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                {Math.round(selectedObject.audioParams.delay * 100)}%
               </span>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">
