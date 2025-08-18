@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stats, Environment } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
 import { Suspense } from 'react';
 
@@ -44,9 +44,6 @@ export function Experience() {
           dampingFactor={0.05}
           enableDamping={true}
         />
-
-        {/* Estadísticas de rendimiento */}
-        <Stats />
 
         {/* Iluminación básica */}
         <ambientLight intensity={0.4} />

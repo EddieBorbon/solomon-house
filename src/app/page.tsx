@@ -5,7 +5,6 @@ import { Experience } from '../components/world/Experience';
 import { ControlPanel } from '../components/ui/ControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { WorldInfo } from '../components/ui/WorldInfo';
-import { FPSDisplay } from '../components/ui/FPSDisplay';
 import { AudioInitializer } from '../components/ui/AudioInitializer';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -27,9 +26,6 @@ export default function Home() {
       
       {/* Panel de control */}
       <ControlPanel />
-      
-      {/* Display de FPS */}
-      <FPSDisplay />
       
       {/* Inicializador de Audio */}
       <AudioInitializer />

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -51,6 +51,16 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 440,
         waveform: 'triangle',
         volume: 0.07, // Volumen ajustado al nuevo rango
+      };
+    case 'cylinder':
+      return {
+        frequency: 220,
+        volume: 0.8,
+        waveform: 'triangle',
+        waveform2: 'sine', // La segunda voz puede ser diferente
+        harmonicity: 1.5,
+        vibratoAmount: 0.2,
+        vibratoRate: 5,
       };
     default:
       return {

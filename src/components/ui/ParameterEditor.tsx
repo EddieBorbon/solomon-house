@@ -62,7 +62,8 @@ export function ParameterEditor() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className={`w-4 h-4 rounded ${
-                selectedObject.type === 'cube' ? 'bg-blue-500' : 'bg-purple-500'
+                selectedObject.type === 'cube' ? 'bg-blue-500' : 
+                selectedObject.type === 'sphere' ? 'bg-purple-500' : 'bg-green-500'
               }`} />
               <h3 className="text-lg font-semibold text-white">
                 Editor de Parámetros
@@ -207,6 +208,120 @@ export function ParameterEditor() {
             </>
           )}
 
+          {/* Controles específicos para DuoSynth (cilindro) */}
+          {selectedObject.type === 'cylinder' && (
+            <>
+              {/* Harmonicity (Desafinación) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Harmonicity (Desafinación)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="4"
+                    step="0.01"
+                    value={selectedObject.audioParams.harmonicity || 1.5}
+                    onChange={(e) => handleParamChange('harmonicity', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {selectedObject.audioParams.harmonicity || 1.5}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0.5</span>
+                  <span>4</span>
+                </div>
+              </div>
+
+              {/* Velocidad de Vibrato */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Velocidad de Vibrato
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    step="0.1"
+                    value={selectedObject.audioParams.vibratoRate || 5}
+                    onChange={(e) => handleParamChange('vibratoRate', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {selectedObject.audioParams.vibratoRate || 5}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>1 Hz</span>
+                  <span>20 Hz</span>
+                </div>
+              </div>
+
+              {/* Cantidad de Vibrato */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Cantidad de Vibrato
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    value={selectedObject.audioParams.vibratoAmount || 0.2}
+                    onChange={(e) => handleParamChange('vibratoAmount', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {Math.round((selectedObject.audioParams.vibratoAmount || 0.2) * 100)}%
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              {/* Forma de Onda (Voz 1) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Forma de Onda (Voz 1)
+                </label>
+                <select
+                  value={selectedObject.audioParams.waveform}
+                  onChange={(e) => handleParamChange('waveform', e.target.value as OscillatorType)}
+                  className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                >
+                  <option value="sine">Seno</option>
+                  <option value="square">Cuadrada</option>
+                  <option value="sawtooth">Sierra</option>
+                  <option value="triangle">Triangular</option>
+                </select>
+              </div>
+
+              {/* Forma de Onda (Voz 2) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Forma de Onda (Voz 2)
+                </label>
+                <select
+                  value={selectedObject.audioParams.waveform2 || 'sine'}
+                  onChange={(e) => handleParamChange('waveform2', e.target.value as OscillatorType)}
+                  className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                >
+                  <option value="sine">Seno</option>
+                  <option value="square">Cuadrada</option>
+                  <option value="sawtooth">Sierra</option>
+                  <option value="triangle">Triangular</option>
+                </select>
+              </div>
+            </>
+          )}
+
           {/* Volumen - Movido al final */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -215,20 +330,23 @@ export function ParameterEditor() {
             <div className="flex items-center gap-3">
               <input
                 type="range"
-                min="0"
-                max="0.1"
-                step="0.001"
+                min={selectedObject.type === 'cylinder' ? "0" : "0"}
+                max={selectedObject.type === 'cylinder' ? "1" : "0.1"}
+                step={selectedObject.type === 'cylinder' ? "0.01" : "0.001"}
                 value={selectedObject.audioParams.volume}
                 onChange={(e) => handleParamChange('volume', Number(e.target.value))}
                 className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
               />
               <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                {Math.round(selectedObject.audioParams.volume * 1000) / 10}%
+                {selectedObject.type === 'cylinder' 
+                  ? `${Math.round(selectedObject.audioParams.volume * 100)}%`
+                  : `${Math.round(selectedObject.audioParams.volume * 1000) / 10}%`
+                }
               </span>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>0%</span>
-              <span>10%</span>
+              <span>{selectedObject.type === 'cylinder' ? '100%' : '10%'}</span>
             </div>
           </div>
         </div>

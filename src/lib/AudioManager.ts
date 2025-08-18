@@ -97,7 +97,7 @@ export class AudioManager {
         });
         
         // Configurar la amplitud inicial de la portadora para síntesis AM
-        synth.oscillator.volume.setValueAtTime(Tone.gainToDb(params.volume || 0.05), Tone.now());
+        (synth as Tone.AMSynth).oscillator.volume.setValueAtTime(Tone.gainToDb(params.volume || 0.05), Tone.now());
       } else if (type === 'sphere') {
         // sphere
         synth = new Tone.FMSynth({
@@ -124,6 +124,9 @@ export class AudioManager {
             oscillator: { type: params.waveform2 || 'sine' } 
           },
         });
+      } else {
+        // Fallback por defecto
+        synth = new Tone.AMSynth();
       }
 
       // Crear panner 3D
@@ -140,7 +143,14 @@ export class AudioManager {
 
       // Configurar parámetros iniciales - asegurar frecuencia segura
       const safeFrequency = Math.max(params.frequency, 20);
-      synth.oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
+      
+      // Configurar frecuencia según el tipo de sintetizador
+      if (type === 'cube' || type === 'sphere') {
+        (synth as Tone.AMSynth | Tone.FMSynth).oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
+      } else if (type === 'cylinder') {
+        // Para DuoSynth, la frecuencia se configura en el sintetizador principal
+        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+      }
 
       // Almacenar en el Map
       this.soundSources.set(id, {
@@ -255,7 +265,15 @@ export class AudioManager {
       // Actualizar tipo de onda si cambia
       if (params.waveform !== undefined) {
         console.log(`🎵 Forma de onda: ${params.waveform}`);
-        source.synth.oscillator.type = params.waveform;
+        
+        // Manejar según el tipo de sintetizador
+        if ('oscillator' in source.synth) {
+          // AMSynth o FMSynth
+          (source.synth as Tone.AMSynth | Tone.FMSynth).oscillator.type = params.waveform;
+        } else if ('voice0' in source.synth) {
+          // DuoSynth
+          (source.synth as Tone.DuoSynth).voice0.oscillator.type = params.waveform;
+        }
         console.log(`🎵 Forma de onda aplicada en tiempo real para ${id}`);
       }
 
@@ -271,6 +289,36 @@ export class AudioManager {
         console.log(`🎵 Forma de onda de modulación: ${params.modulationWaveform}`);
         (source.synth as Tone.AMSynth).modulation.type = params.modulationWaveform;
         console.log(`🎵 Forma de onda de modulación aplicada en tiempo real para ${id}`);
+      }
+
+      // Actualizar parámetros específicos del DuoSynth
+      if ('voice0' in source.synth) {
+        // Es un DuoSynth
+        const duoSynth = source.synth as Tone.DuoSynth;
+        
+        // Actualizar harmonicity
+        if (params.harmonicity !== undefined) {
+          console.log(`🎵 Harmonicity (DuoSynth): ${params.harmonicity}`);
+          duoSynth.harmonicity.rampTo(params.harmonicity, 0.05);
+        }
+        
+        // Actualizar vibratoAmount
+        if (params.vibratoAmount !== undefined) {
+          console.log(`🎵 Vibrato Amount: ${params.vibratoAmount}`);
+          duoSynth.vibratoAmount.rampTo(params.vibratoAmount, 0.05);
+        }
+        
+        // Actualizar vibratoRate
+        if (params.vibratoRate !== undefined) {
+          console.log(`🎵 Vibrato Rate: ${params.vibratoRate}`);
+          duoSynth.vibratoRate.rampTo(params.vibratoRate, 0.05);
+        }
+        
+        // Actualizar waveform2 (segunda voz)
+        if (params.waveform2 !== undefined) {
+          console.log(`🎵 Forma de onda (Voz 2): ${params.waveform2}`);
+          duoSynth.voice1.oscillator.type = params.waveform2;
+        }
       }
 
       // Actualizar volumen si cambia

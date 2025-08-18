@@ -3,7 +3,7 @@
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function ControlPanel() {
-  const { addObject, objects, selectedObjectId, selectObject } = useWorldStore();
+  const { addObject } = useWorldStore();
 
   const handleAddCube = () => {
     // Añadir cubo en posición aleatoria
@@ -19,14 +19,19 @@ export function ControlPanel() {
     addObject('sphere', [x, 0.5, z]);
   };
 
-  const handleClearSelection = () => {
-    selectObject(null);
+  const handleAddCylinder = () => {
+    // Añadir cilindro en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('cylinder', [x, 0.5, z]);
   };
+
+
 
   return (
     <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-        🎵 Controles
+        ➕ Añadir objeto
       </h3>
       
       {/* Botones de creación */}
@@ -35,8 +40,8 @@ export function ControlPanel() {
           onClick={handleAddCube}
           className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
         >
-          <span>🎲</span>
-          <span>Añadir Cubo</span>
+          <span>⬜</span>
+          <span>Cubo</span>
         </button>
         
         <button
@@ -44,34 +49,21 @@ export function ControlPanel() {
           className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
         >
           <span>🔵</span>
-          <span>Añadir Esfera</span>
+          <span>Esfera</span>
         </button>
-      </div>
-
-      {/* Información del estado */}
-      <div className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <span className="text-gray-300">Total objetos:</span>
-          <span className="font-medium text-white">{objects.length}</span>
-        </div>
         
-        <div className="flex justify-between">
-          <span className="text-gray-300">Seleccionado:</span>
-          <span className="font-medium text-white">
-            {selectedObjectId ? 'Sí' : 'No'}
-          </span>
-        </div>
+        <button
+          onClick={handleAddCylinder}
+          className="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🔶</span>
+          <span>Cilindro</span>
+        </button>
       </div>
 
-      {/* Botón para limpiar selección */}
-      {selectedObjectId && (
-        <button
-          onClick={handleClearSelection}
-          className="w-full mt-3 px-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
-        >
-          Limpiar Selección
-        </button>
-      )}
+
+
+
 
       {/* Instrucciones */}
       <div className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">

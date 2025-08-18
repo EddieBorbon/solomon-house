@@ -5,6 +5,7 @@ import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { SoundCube } from '../sound-objects/SoundCube';
+import { SoundCylinder } from '../sound-objects/SoundCylinder';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -41,7 +42,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
           />
-        ) : (
+        ) : object.type === 'sphere' ? (
           <group>
             <mesh 
               castShadow
@@ -71,7 +72,17 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
 
             {/* Etiqueta del objeto - ELIMINADA */}
           </group>
-        )}
+        ) : object.type === 'cylinder' ? (
+          <SoundCylinder
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+          />
+        ) : null}
       </group>
     );
   }
