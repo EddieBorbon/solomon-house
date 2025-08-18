@@ -91,9 +91,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   
   // Crear un Map de refs para cada objeto
   const objectRefs = useMemo(() => {
-    const refs = new Map<string, React.RefObject<Group>>();
+    const refs = new Map<string, React.RefObject<Group | null>>();
     objects.forEach(obj => {
-      refs.set(obj.id, React.createRef<Group>());
+      refs.set(obj.id, React.createRef<Group | null>());
     });
     return refs;
   }, [objects]);
@@ -164,21 +164,30 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         );
       })}
 
-      {/* TransformControls para el objeto seleccionado */}
-      {selectedObjectId && objectRefs.has(selectedObjectId) && (
-        <TransformControls
-          object={objectRefs.get(selectedObjectId)?.current || undefined}
-          mode={transformMode}
-          onObjectChange={(e: any) => {
-            if (e?.target?.object) {
-              handleTransformChange(selectedObjectId, e.target.object);
-            }
-          }}
-          onMouseDown={handleTransformStart}
-          onMouseUp={handleTransformEnd}
-          size={0.75}
-        />
-      )}
+            {/* TransformControls para el objeto seleccionado */}
+      {selectedObjectId && (() => {
+        const selectedObject = objects.find(obj => obj.id === selectedObjectId);
+        if (!selectedObject) return null;
+        
+        return (
+          <TransformControls
+            key={`${selectedObjectId}-${transformMode}`}
+            object={objectRefs.get(selectedObjectId)?.current || undefined}
+            mode={transformMode}
+            position={selectedObject.position}
+            rotation={selectedObject.rotation}
+            scale={selectedObject.scale}
+            onObjectChange={(e: any) => {
+              if (e?.target?.object) {
+                handleTransformChange(selectedObjectId, e.target.object);
+              }
+            }}
+            onMouseDown={handleTransformStart}
+            onMouseUp={handleTransformEnd}
+            size={0.75}
+          />
+        );
+      })()}
 
       {/* Mensaje cuando no hay objetos */}
       {objects.length === 0 && (

@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { type AudioParams } from '../../lib/AudioManager';
 
 export function ParameterEditor() {
-  const { objects, selectedObjectId, updateObject, toggleObjectAudio } = useWorldStore();
+  const { objects, selectedObjectId, updateObject, toggleObjectAudio, removeObject } = useWorldStore();
 
   // Encontrar el objeto seleccionado
   const selectedObject = useMemo(() => {
