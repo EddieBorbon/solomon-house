@@ -33,6 +33,10 @@ export interface WorldActions {
   toggleObjectAudio: (id: string) => void;
   triggerObjectNote: (id: string) => void;
   triggerObjectPercussion: (id: string) => void;
+  // Nuevas acciones para interacción universal
+  triggerObjectAttackRelease: (id: string) => void;
+  startObjectGate: (id: string) => void;
+  stopObjectGate: (id: string) => void;
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
 }
@@ -345,6 +349,45 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       } else {
         // Para otros objetos percusivos, usar triggerNoteAttack
         audioManager.triggerNoteAttack(id, object.audioParams);
+      }
+    }
+  },
+
+  // Acción para disparar una nota con duración específica (clic corto)
+  triggerObjectAttackRelease: (id: string) => {
+    const state = get();
+    const object = state.objects.find(obj => obj.id === id);
+    
+    if (object) {
+      console.log(`🎵 Disparando nota con duración para ${id}`);
+      audioManager.triggerAttackRelease(id, object.audioParams);
+    }
+  },
+
+  // Acción para iniciar el gate (clic sostenido)
+  startObjectGate: (id: string) => {
+    const state = get();
+    const object = state.objects.find(obj => obj.id === id);
+    
+    if (object) {
+      console.log(`🎵 Iniciando gate para ${id}`);
+      // Solo iniciar gate si no está en modo de sonido continuo
+      if (!object.audioEnabled) {
+        audioManager.startSound(id, object.audioParams);
+      }
+    }
+  },
+
+  // Acción para detener el gate (liberar clic)
+  stopObjectGate: (id: string) => {
+    const state = get();
+    const object = state.objects.find(obj => obj.id === id);
+    
+    if (object) {
+      console.log(`🎵 Deteniendo gate para ${id}`);
+      // Solo detener gate si no está en modo de sonido continuo
+      if (!object.audioEnabled) {
+        audioManager.stopSound(id);
       }
     }
   },

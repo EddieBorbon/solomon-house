@@ -20,28 +20,54 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { 
+      selectObject, 
+      triggerObjectAttackRelease, 
+      startObjectGate, 
+      stopObjectGate 
+    } = useWorldStore();
     
     // Crear geometría de esfera con más detalle
     const sphereGeometry = useMemo(() => {
       return new THREE.SphereGeometry(0.7, 32, 32);
     }, []);
 
-    // Función para manejar clic y disparar nota
+    // Manejador para clic corto (trigger)
     const handleClick = (event: any) => {
       event.stopPropagation();
       selectObject(id);
-      triggerObjectNote(id);
+      triggerObjectAttackRelease(id);
       
       // Activar la animación de clic
       energyRef.current = 1;
     };
 
-    // Animación del clic y efectos de audio
+    // Manejador para clic sostenido (gate)
+    const handlePointerDown = (event: any) => {
+      event.stopPropagation();
+      startObjectGate(id);
+      
+      // Activar la animación de gate
+      energyRef.current = 1;
+    };
+
+    // Manejador para liberar clic sostenido
+    const handlePointerUp = (event: any) => {
+      event.stopPropagation();
+      stopObjectGate(id);
+    };
+
+    // Manejador para cuando el puntero sale del objeto
+    const handlePointerLeave = (event: any) => {
+      event.stopPropagation();
+      stopObjectGate(id);
+    };
+
+    // Animación del clic/gate y efectos de audio
     useFrame((state, delta) => {
       if (!meshRef.current || !materialRef.current || !audioParams) return;
 
-      // Decaer la energía del clic
+      // Decaer la energía del clic/gate
       if (energyRef.current > 0) {
         // Calcular la velocidad de decaimiento basada en la duración del sonido
         const duration = audioParams?.duration;
@@ -99,7 +125,14 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     return (
       <group ref={ref} position={position}>
         {/* Esfera principal */}
-        <mesh ref={meshRef} geometry={sphereGeometry} onClick={handleClick}>
+        <mesh 
+          ref={meshRef} 
+          geometry={sphereGeometry} 
+          onClick={handleClick}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerLeave}
+        >
           <meshStandardMaterial
             ref={materialRef}
             color="#8b5cf6" // Color morado base

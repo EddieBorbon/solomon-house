@@ -133,6 +133,16 @@ export function ParameterEditor() {
                selectedObject.type === 'spiral' ? 'Sampler' : 'Objeto de Sonido'}
             </span>
             
+            {/* Texto informativo sobre modos de interacción universal */}
+            <div className="mt-3 p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
+              <h4 className="text-sm font-semibold text-blue-300 mb-2">🎮 Modos de Interacción</h4>
+              <div className="space-y-1 text-xs text-blue-200">
+                <p>• <strong>Clic corto:</strong> Toca una nota con duración configurable</p>
+                <p>• <strong>Clic sostenido:</strong> Mantén presionado para sonido continuo (gate)</p>
+                <p>• <strong>Botón de audio:</strong> Activa/desactiva el sonido permanente</p>
+              </div>
+            </div>
+            
                          {/* Texto informativo específico para cada tipo */}
              {selectedObject.type === 'pyramid' ? (
                <div className="mt-2">
@@ -198,6 +208,29 @@ export function ParameterEditor() {
                 </p>
               </div>
             )}
+            
+            {/* Botón de activación/desactivación de audio */}
+            <div className="mt-4">
+              <button
+                onClick={() => {
+                  const { toggleObjectAudio } = useWorldStore.getState();
+                  toggleObjectAudio(selectedObject.id);
+                }}
+                className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+                  selectedObject.audioEnabled
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-600 hover:bg-gray-700 text-gray-200'
+                }`}
+              >
+                {selectedObject.audioEnabled ? '🔊 Sonido Activado' : '🔇 Activar Sonido Continuo'}
+              </button>
+              <p className="text-xs text-gray-400 mt-1 text-center">
+                {selectedObject.audioEnabled 
+                  ? 'El objeto reproduce sonido continuamente. Haz clic para desactivar.'
+                  : 'Activa el sonido continuo del objeto. Haz clic para activar.'
+                }
+              </p>
+            </div>
           </div>
         </div>
 
