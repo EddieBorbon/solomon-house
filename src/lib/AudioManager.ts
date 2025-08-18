@@ -539,6 +539,28 @@ export class AudioManager {
         }
       }
       
+      // Para sintetizadores de fallback (cuando el Sampler no pudo cargar)
+      if ((source.synth as any)._isFallback) {
+        console.log(`🌀 Usando sintetizador de fallback para espiral`);
+        const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
+        const duration = params.duration || 0.5;
+        
+        // Reproducir cada nota del acorde
+        notes.forEach((note: string, index: number) => {
+          const frequency = this.getNoteFrequency(note);
+          const delay = index * 0.1; // Pequeño delay entre notas para efecto de acorde
+          setTimeout(() => {
+            try {
+              (source.synth as any).triggerAttackRelease(frequency, duration, Tone.now());
+              console.log(`🎵 Nota de fallback disparada para ${id}: ${note} (${frequency}Hz) con duración ${duration}s`);
+            } catch (error) {
+              console.warn(`⚠️ Error al disparar nota de fallback:`, error);
+            }
+          }, delay * 1000);
+        });
+        return;
+      }
+      
       // Para PluckSynth, usar triggerAttack sin triggerRelease ya que decae naturalmente
       if (source.synth instanceof Tone.PluckSynth) {
         console.log(`🔄 Usando triggerAttack para PluckSynth (torus)`);
