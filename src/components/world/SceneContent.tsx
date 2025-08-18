@@ -5,6 +5,7 @@ import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { SoundCube } from '../sound-objects/SoundCube';
+import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
 
 interface SceneContentProps {
@@ -43,35 +44,13 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             audioEnabled={object.audioEnabled}
           />
         ) : object.type === 'sphere' ? (
-          <group>
-            <mesh 
-              castShadow
-              receiveShadow
-            >
-              <sphereGeometry args={[0.7, 16, 16]} />
-              <meshStandardMaterial 
-                color={object.isSelected ? '#ff6b6b' : '#a29bfe'} 
-                transparent 
-                opacity={0.8}
-                roughness={0.2}
-                metalness={0.3}
-              />
-            </mesh>
-            
-            {/* Indicador de selección */}
-            {object.isSelected && (
-              <mesh position={[0, 1.5, 0]}>
-                <sphereGeometry args={[0.2, 8, 6]} />
-                <meshStandardMaterial 
-                  color="#ffd93d" 
-                  emissive="#ffd93d" 
-                  emissiveIntensity={0.5} 
-                />
-              </mesh>
-            )}
-
-            {/* Etiqueta del objeto - ELIMINADA */}
-          </group>
+          <SoundSphere
+            id={object.id}
+            position={[0, 0, 0]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+          />
         ) : object.type === 'cylinder' ? (
           <SoundCylinder
             id={object.id}

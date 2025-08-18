@@ -89,32 +89,50 @@ export function ParameterEditor() {
 
         {/* Control de activación de audio */}
         <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-4 h-4 rounded-full ${
-                selectedObject.audioEnabled ? 'bg-green-500' : 'bg-red-500'
-              }`} />
+          {selectedObject.type === 'cone' ? (
+            // Para objetos percusivos (cone), mostrar mensaje informativo
+            <div className="text-center">
+              <div className="w-8 h-8 mx-auto mb-2 bg-orange-500 rounded-full flex items-center justify-center">
+                <span className="text-lg">🥁</span>
+              </div>
               <span className="text-sm font-medium text-gray-300">
-                Audio {selectedObject.audioEnabled ? 'Activado' : 'Desactivado'}
+                Instrumento Percusivo
               </span>
+              <p className="text-xs text-gray-400 mt-1">
+                Haz clic en el objeto para tocar
+              </p>
             </div>
-            <button
-              onClick={() => toggleObjectAudio(selectedObject.id)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                selectedObject.audioEnabled
-                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
-            >
-              {selectedObject.audioEnabled ? 'Desactivar' : 'Activar'}
-            </button>
-          </div>
-          <p className="text-xs text-gray-400 mt-2">
-            {selectedObject.audioEnabled 
-              ? 'El objeto está reproduciendo sonido continuamente'
-              : 'Haz clic en "Activar" para que el objeto comience a sonar'
-            }
-          </p>
+          ) : (
+            // Para otros tipos, mostrar control de activación
+            <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-4 h-4 rounded-full ${
+                    selectedObject.audioEnabled ? 'bg-green-500' : 'bg-red-500'
+                  }`} />
+                  <span className="text-sm font-medium text-gray-300">
+                    Audio {selectedObject.audioEnabled ? 'Activado' : 'Desactivado'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => toggleObjectAudio(selectedObject.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    selectedObject.audioEnabled
+                      ? 'bg-red-600 hover:bg-red-700 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  {selectedObject.audioEnabled ? 'Desactivar' : 'Activar'}
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                {selectedObject.audioEnabled 
+                  ? 'El objeto está reproduciendo sonido continuamente'
+                  : 'Haz clic en "Activar" para que el objeto comience a sonar'
+                }
+              </p>
+            </>
+          )}
         </div>
 
         {/* Controles de parámetros */}
@@ -122,13 +140,13 @@ export function ParameterEditor() {
           {/* Frecuencia */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Frecuencia (Hz)
+              {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
             </label>
             <div className="flex items-center gap-3">
               <input
                 type="range"
-                min="20"
-                max="2000"
+                min={selectedObject.type === 'cone' ? '20' : '20'}
+                max={selectedObject.type === 'cone' ? '200' : '2000'}
                 step="1"
                 value={selectedObject.audioParams.frequency}
                 onChange={(e) => handleParamChange('frequency', Number(e.target.value))}
@@ -139,15 +157,15 @@ export function ParameterEditor() {
               </span>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>20 Hz</span>
-              <span>2000 Hz</span>
+              <span>{selectedObject.type === 'cone' ? '20 Hz' : '20 Hz'}</span>
+              <span>{selectedObject.type === 'cone' ? '200 Hz' : '2000 Hz'}</span>
             </div>
           </div>
 
           {/* Forma de Onda (Portadora) */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Forma de Onda (Portadora)
+              Forma de Onda
             </label>
             <select
               value={selectedObject.audioParams.waveform}
@@ -160,6 +178,61 @@ export function ParameterEditor() {
               <option value="triangle">Triangular</option>
             </select>
           </div>
+
+          {/* Controles específicos para MembraneSynth (cono) */}
+          {selectedObject.type === 'cone' && (
+            <>
+              {/* Pitch Decay */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Pitch Decay (Caída de Tono)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0.01"
+                    max="0.5"
+                    step="0.01"
+                    value={selectedObject.audioParams.pitchDecay || 0.05}
+                    onChange={(e) => handleParamChange('pitchDecay', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {(selectedObject.audioParams.pitchDecay || 0.05).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0.01</span>
+                  <span>0.5</span>
+                </div>
+              </div>
+
+              {/* Octaves */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Octaves (Impacto)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="20"
+                    step="0.1"
+                    value={selectedObject.audioParams.octaves || 10}
+                    onChange={(e) => handleParamChange('octaves', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {(selectedObject.audioParams.octaves || 10).toFixed(1)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0.5</span>
+                  <span>20</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Controles específicos para AMSynth (cubo) */}
           {selectedObject.type === 'cube' && (
@@ -196,6 +269,78 @@ export function ParameterEditor() {
                 </label>
                 <select
                   value={selectedObject.audioParams.modulationWaveform || 'square'}
+                  onChange={(e) => handleParamChange('modulationWaveform', e.target.value as OscillatorType)}
+                  className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                >
+                  <option value="sine">Seno</option>
+                  <option value="square">Cuadrada</option>
+                  <option value="sawtooth">Sierra</option>
+                  <option value="triangle">Triangular</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {/* Controles específicos para FMSynth (esfera) */}
+          {selectedObject.type === 'sphere' && (
+            <>
+              {/* Harmonicity */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Harmonicity
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="8"
+                    step="0.01"
+                    value={selectedObject.audioParams.harmonicity || 2}
+                    onChange={(e) => handleParamChange('harmonicity', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {selectedObject.audioParams.harmonicity || 2}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>0.5</span>
+                  <span>8</span>
+                </div>
+              </div>
+
+              {/* Modulation Index (Timbre) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Modulation Index (Timbre)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="40"
+                    step="0.1"
+                    value={selectedObject.audioParams.modulationIndex || 10}
+                    onChange={(e) => handleParamChange('modulationIndex', Number(e.target.value))}
+                    className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    {selectedObject.audioParams.modulationIndex || 10}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>1</span>
+                  <span>40</span>
+                </div>
+              </div>
+
+              {/* Forma de Onda (Moduladora) */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Forma de Onda (Moduladora)
+                </label>
+                <select
+                  value={selectedObject.audioParams.modulationWaveform || 'sine'}
                   onChange={(e) => handleParamChange('modulationWaveform', e.target.value as OscillatorType)}
                   className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
                 >
@@ -330,23 +475,32 @@ export function ParameterEditor() {
             <div className="flex items-center gap-3">
               <input
                 type="range"
-                min={selectedObject.type === 'cylinder' ? "0" : "0"}
-                max={selectedObject.type === 'cylinder' ? "1" : "0.1"}
-                step={selectedObject.type === 'cylinder' ? "0.01" : "0.001"}
-                value={selectedObject.audioParams.volume}
-                onChange={(e) => handleParamChange('volume', Number(e.target.value))}
+                min="0"
+                max="100"
+                step="1"
+                value={selectedObject.type === 'cylinder' 
+                  ? Math.round(selectedObject.audioParams.volume * 100)
+                  : Math.round(selectedObject.audioParams.volume * 1000)
+                }
+                onChange={(e) => {
+                  const percentage = Number(e.target.value);
+                  const actualValue = selectedObject.type === 'cylinder' 
+                    ? percentage / 100 
+                    : percentage / 1000;
+                  handleParamChange('volume', actualValue);
+                }}
                 className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
               />
               <span className="text-white font-mono text-sm min-w-[4rem] text-right">
                 {selectedObject.type === 'cylinder' 
                   ? `${Math.round(selectedObject.audioParams.volume * 100)}%`
-                  : `${Math.round(selectedObject.audioParams.volume * 1000) / 10}%`
+                  : `${Math.round(selectedObject.audioParams.volume * 1000)}%`
                 }
               </span>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">
               <span>0%</span>
-              <span>{selectedObject.type === 'cylinder' ? '100%' : '10%'}</span>
+              <span>100%</span>
             </div>
           </div>
         </div>

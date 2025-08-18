@@ -7,18 +7,22 @@ export interface AudioParams {
   volume: number;
   harmonicity?: number;
   modulationWaveform?: OscillatorType;
+  modulationIndex?: number; // Nuevo parámetro para FMSynth
   // Nuevos parámetros para DuoSynth
   waveform2?: OscillatorType;
   vibratoAmount?: number;
   vibratoRate?: number;
+  // Nuevos parámetros para MembraneSynth
+  pitchDecay?: number;
+  octaves?: number;
 }
 
 // Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone';
 
 // Estructura de una fuente de sonido
 interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth;
+  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth;
   panner: Tone.Panner3D;
 }
 
@@ -77,7 +81,7 @@ export class AudioManager {
       console.log(`🎵 Creando fuente de sonido ${id} de tipo ${type}`);
 
       // Crear el sintetizador apropiado según el tipo
-      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth;
+      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth;
       
       if (type === 'cube') {
         synth = new Tone.AMSynth({
@@ -99,16 +103,21 @@ export class AudioManager {
         // Configurar la amplitud inicial de la portadora para síntesis AM
         (synth as Tone.AMSynth).oscillator.volume.setValueAtTime(Tone.gainToDb(params.volume || 0.05), Tone.now());
       } else if (type === 'sphere') {
-        // sphere
+        // sphere - FMSynth con configuración completa
         synth = new Tone.FMSynth({
+          harmonicity: params.harmonicity || 2,
+          modulationIndex: params.modulationIndex || 10,
           oscillator: {
             type: params.waveform,
           },
+          modulation: {
+            type: params.modulationWaveform || 'sine',
+          },
           envelope: {
-            attack: 0.1,
-            decay: 0.2,
-            sustain: 0.8,
-            release: 0.5, // Release más largo para un fade-out suave
+            attack: 0.01,
+            decay: 0.1,
+            sustain: 0.5,
+            release: 1.0,
           },
         });
       } else if (type === 'cylinder') {
@@ -122,6 +131,21 @@ export class AudioManager {
           },
           voice1: { 
             oscillator: { type: params.waveform2 || 'sine' } 
+          },
+        });
+      } else if (type === 'cone') {
+        // cone - MembraneSynth para sonidos percusivos
+        synth = new Tone.MembraneSynth({
+          pitchDecay: params.pitchDecay || 0.05,
+          octaves: params.octaves || 10,
+          oscillator: { 
+            type: params.waveform || 'sine' 
+          },
+          envelope: { 
+            attack: 0.001, 
+            decay: 0.4, 
+            sustain: 0.01, 
+            release: 1.4 
           },
         });
       } else {
@@ -149,6 +173,9 @@ export class AudioManager {
         (synth as Tone.AMSynth | Tone.FMSynth).oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
       } else if (type === 'cylinder') {
         // Para DuoSynth, la frecuencia se configura en el sintetizador principal
+        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+      } else if (type === 'cone') {
+        // Para MembraneSynth, la frecuencia se configura en el sintetizador principal
         synth.frequency.setValueAtTime(safeFrequency, Tone.now());
       }
 
@@ -238,6 +265,35 @@ export class AudioManager {
     }
   }
 
+  /**
+   * Dispara una nota percusiva (especialmente para MembraneSynth)
+   */
+  public triggerNoteAttack(id: string, params: AudioParams): void {
+    const source = this.soundSources.get(id);
+    if (!source) {
+      console.log(`🎵 Fuente de sonido ${id} no encontrada`);
+      return;
+    }
+
+    try {
+      // Aplicar parámetros antes de disparar
+      this.updateSoundParams(id, params);
+      
+      // Para MembraneSynth, usar triggerAttack sin release ya que la envolvente define la duración
+      if ('pitchDecay' in source.synth) {
+        // Es un MembraneSynth
+        (source.synth as Tone.MembraneSynth).triggerAttack(params.frequency, Tone.now());
+        console.log(`🥁 Nota percusiva disparada para ${id} con frecuencia ${params.frequency}Hz`);
+      } else {
+        // Para otros sintetizadores, usar el método estándar
+        source.synth.triggerAttack(params.frequency, Tone.now());
+        console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz`);
+      }
+    } catch (error) {
+      console.error(`❌ Error al disparar nota para ${id}:`, error);
+    }
+  }
+
     /**
    * Actualiza los parámetros de sonido de una fuente
    */
@@ -268,8 +324,8 @@ export class AudioManager {
         
         // Manejar según el tipo de sintetizador
         if ('oscillator' in source.synth) {
-          // AMSynth o FMSynth
-          (source.synth as Tone.AMSynth | Tone.FMSynth).oscillator.type = params.waveform;
+          // AMSynth, FMSynth o MembraneSynth
+          (source.synth as Tone.AMSynth | Tone.FMSynth | Tone.MembraneSynth).oscillator.type = params.waveform;
         } else if ('voice0' in source.synth) {
           // DuoSynth
           (source.synth as Tone.DuoSynth).voice0.oscillator.type = params.waveform;
@@ -277,17 +333,24 @@ export class AudioManager {
         console.log(`🎵 Forma de onda aplicada en tiempo real para ${id}`);
       }
 
-      // Actualizar harmonicity si cambia (solo para AMSynth)
+      // Actualizar harmonicity si cambia (para AMSynth y FMSynth)
       if (params.harmonicity !== undefined && 'harmonicity' in source.synth) {
         console.log(`🎵 Harmonicity: ${params.harmonicity}`);
-        (source.synth as Tone.AMSynth).harmonicity.rampTo(params.harmonicity, 0.05);
+        (source.synth as Tone.AMSynth | Tone.FMSynth).harmonicity.rampTo(params.harmonicity, 0.05);
         console.log(`🎵 Harmonicity aplicado en tiempo real para ${id}`);
       }
 
-      // Actualizar forma de onda de modulación si cambia (solo para AMSynth)
+      // Actualizar modulationIndex si cambia (solo para FMSynth)
+      if (params.modulationIndex !== undefined && 'modulationIndex' in source.synth) {
+        console.log(`🎵 Modulation Index: ${params.modulationIndex}`);
+        (source.synth as Tone.FMSynth).modulationIndex.rampTo(params.modulationIndex, 0.05);
+        console.log(`🎵 Modulation Index aplicado en tiempo real para ${id}`);
+      }
+
+      // Actualizar forma de onda de modulación si cambia (para AMSynth y FMSynth)
       if (params.modulationWaveform !== undefined && 'modulation' in source.synth) {
         console.log(`🎵 Forma de onda de modulación: ${params.modulationWaveform}`);
-        (source.synth as Tone.AMSynth).modulation.type = params.modulationWaveform;
+        (source.synth as Tone.AMSynth | Tone.FMSynth).modulation.type = params.modulationWaveform;
         console.log(`🎵 Forma de onda de modulación aplicada en tiempo real para ${id}`);
       }
 
@@ -318,6 +381,24 @@ export class AudioManager {
         if (params.waveform2 !== undefined) {
           console.log(`🎵 Forma de onda (Voz 2): ${params.waveform2}`);
           duoSynth.voice1.oscillator.type = params.waveform2;
+        }
+      }
+
+      // Actualizar parámetros específicos del MembraneSynth
+      if ('pitchDecay' in source.synth) {
+        // Es un MembraneSynth
+        const membraneSynth = source.synth as Tone.MembraneSynth;
+        
+        // Actualizar pitchDecay
+        if (params.pitchDecay !== undefined) {
+          console.log(`🥁 Pitch Decay: ${params.pitchDecay}`);
+          membraneSynth.pitchDecay = params.pitchDecay;
+        }
+        
+        // Actualizar octaves
+        if (params.octaves !== undefined) {
+          console.log(`🥁 Octaves: ${params.octaves}`);
+          membraneSynth.octaves = params.octaves;
         }
       }
 

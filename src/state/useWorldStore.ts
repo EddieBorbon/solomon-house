@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -31,6 +31,7 @@ export interface WorldActions {
   selectObject: (id: string | null) => void;
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
   toggleObjectAudio: (id: string) => void;
+  triggerObjectNote: (id: string) => void;
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
 }
@@ -48,9 +49,12 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
       };
     case 'sphere':
       return {
-        frequency: 440,
-        waveform: 'triangle',
-        volume: 0.07, // Volumen ajustado al nuevo rango
+        frequency: 300,
+        volume: 0.8,
+        waveform: 'sine',
+        modulationWaveform: 'sine',
+        harmonicity: 2, // Ratio de octava
+        modulationIndex: 10, // Valor alto para un timbre rico y metálico
       };
     case 'cylinder':
       return {
@@ -61,6 +65,14 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         harmonicity: 1.5,
         vibratoAmount: 0.2,
         vibratoRate: 5,
+      };
+    case 'cone':
+      return {
+        frequency: 50, // Frecuencia baja para un bombo
+        volume: 1.0,   // Volumen alto
+        waveform: 'sine',
+        pitchDecay: 0.05,
+        octaves: 10,
       };
     default:
       return {
@@ -170,10 +182,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       
       // Controlar el audio en el AudioManager
       if (updatedObject) {
-        if (updatedObject.audioEnabled) {
-          audioManager.startSound(id, updatedObject.audioParams);
-        } else {
-          audioManager.stopSound(id);
+        // Ignorar el tipo 'cone' ya que es percusivo
+        if (updatedObject.type !== 'cone') {
+          if (updatedObject.audioEnabled) {
+            audioManager.startSound(id, updatedObject.audioParams);
+          } else {
+            audioManager.stopSound(id);
+          }
         }
       }
       
@@ -181,6 +196,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         objects: updatedObjects,
       };
     });
+  },
+
+  // Acción para disparar una nota percusiva
+  triggerObjectNote: (id: string) => {
+    const state = get();
+    const object = state.objects.find(obj => obj.id === id);
+    
+    if (object) {
+      console.log(`🥁 Disparando nota percusiva para ${id}`);
+      audioManager.triggerNoteAttack(id, object.audioParams);
+    }
   },
 
   // Acción para limpiar todos los objetos

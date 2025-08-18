@@ -26,7 +26,12 @@ export function ControlPanel() {
     addObject('cylinder', [x, 0.5, z]);
   };
 
-
+  const handleAddCone = () => {
+    // Añadir cono en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('cone', [x, 0.5, z]);
+  };
 
   return (
     <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
@@ -46,7 +51,7 @@ export function ControlPanel() {
         
         <button
           onClick={handleAddSphere}
-          className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+          className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2"
         >
           <span>🔵</span>
           <span>Esfera</span>
@@ -58,6 +63,14 @@ export function ControlPanel() {
         >
           <span>🔶</span>
           <span>Cilindro</span>
+        </button>
+        
+        <button
+          onClick={handleAddCone}
+          className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🥁</span>
+          <span>Cono</span>
         </button>
       </div>
 
