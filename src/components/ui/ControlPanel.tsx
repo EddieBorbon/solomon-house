@@ -33,6 +33,20 @@ export function ControlPanel() {
     addObject('cone', [x, 0.5, z]);
   };
 
+  const handleAddPyramid = () => {
+    // Añadir pirámide en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('pyramid', [x, 0.5, z]);
+  };
+
+  const handleAddIcosahedron = () => {
+    // Añadir icosaedro en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('icosahedron', [x, 0.5, z]);
+  };
+
   return (
     <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
@@ -71,6 +85,22 @@ export function ControlPanel() {
         >
           <span>🥁</span>
           <span>Cono</span>
+        </button>
+        
+        <button
+          onClick={handleAddPyramid}
+          className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🔺</span>
+          <span>Pirámide</span>
+        </button>
+        
+        <button
+          onClick={handleAddIcosahedron}
+          className="w-full px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🔶</span>
+          <span>Icosaedro</span>
         </button>
       </div>
 

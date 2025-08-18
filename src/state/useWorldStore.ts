@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -78,6 +78,36 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         octaves: 10,
         duration: 0.5, // Duración corta para sonidos percusivos
       };
+    case 'pyramid':
+      return {
+        frequency: 110,
+        volume: 0.9,
+        waveform: 'sawtooth',
+        // Envolvente de Amplitud (corta y percusiva)
+        ampAttack: 0.01,
+        ampDecay: 0.2,
+        ampSustain: 0.1,
+        ampRelease: 0.5,
+        // Envolvente de Filtro (un "pluck" rápido)
+        filterAttack: 0.005,
+        filterDecay: 0.1,
+        filterSustain: 0.05,
+        filterRelease: 0.2,
+        filterBaseFreq: 200,
+        filterOctaves: 4,
+        filterQ: 2,
+      };
+    case 'icosahedron':
+      return {
+        frequency: 200,
+        volume: 0.8,
+        waveform: 'sine',
+        harmonicity: 5.1,
+        modulationIndex: 32,
+        resonance: 4000,
+        octaves: 1.5,
+        duration: 0.5, // Duración corta para sonidos percusivos metálicos
+      };
     default:
       return {
         frequency: 330,
@@ -107,17 +137,25 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       audioEnabled: false,
     };
 
+    console.log(`➕ Creando objeto ${type} con parámetros:`, newObject.audioParams);
+    console.log(`➕ Llamando a audioManager.createSoundSource para ${type}`);
+
     set((state) => ({
       objects: [...state.objects, newObject],
     }));
 
     // Crear la fuente de sonido en el AudioManager
-    audioManager.createSoundSource(
-      newObject.id,
-      newObject.type,
-      newObject.audioParams,
-      newObject.position
-    );
+    try {
+      audioManager.createSoundSource(
+        newObject.id,
+        newObject.type,
+        newObject.audioParams,
+        newObject.position
+      );
+      console.log(`✅ createSoundSource completado para ${type}`);
+    } catch (error) {
+      console.error(`❌ Error en createSoundSource para ${type}:`, error);
+    }
   },
 
   // Acción para eliminar un objeto
@@ -175,21 +213,37 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   // Acción para activar/desactivar el audio de un objeto
-  toggleObjectAudio: (id: string) => {
+  toggleObjectAudio: (id: string, forceState?: boolean) => {
+    console.log(`🎵 toggleObjectAudio llamado para ${id} con forceState:`, forceState);
+    
     set((state) => {
+      const currentObject = state.objects.find(obj => obj.id === id);
+      if (!currentObject) {
+        console.log(`🎵 Objeto ${id} no encontrado`);
+        return state;
+      }
+      
+      // Determinar el nuevo estado: si forceState está definido, usarlo; si no, hacer toggle
+      const newAudioEnabled = forceState !== undefined ? forceState : !currentObject.audioEnabled;
+      
       const updatedObjects = state.objects.map((obj) =>
-        obj.id === id ? { ...obj, audioEnabled: !obj.audioEnabled } : obj
+        obj.id === id ? { ...obj, audioEnabled: newAudioEnabled } : obj
       );
       
       // Encontrar el objeto actualizado
       const updatedObject = updatedObjects.find(obj => obj.id === id);
       
+      console.log(`🎵 Objeto actualizado:`, updatedObject);
+      console.log(`🎵 Estado de audio:`, updatedObject?.audioEnabled);
+      
       // Controlar el audio en el AudioManager
       if (updatedObject) {
         if (updatedObject.audioEnabled) {
-          // Para todos los tipos, usar triggerObjectNote con duración configurada
-          audioManager.triggerNoteAttack(id, updatedObject.audioParams);
+          console.log(`🎵 Activando audio para ${id}`);
+          // Para todos los tipos, usar startSound para sonido continuo
+          audioManager.startSound(id, updatedObject.audioParams);
         } else {
+          console.log(`🎵 Desactivando audio para ${id}`);
           // Detener el sonido si está sonando
           audioManager.stopSound(id);
         }

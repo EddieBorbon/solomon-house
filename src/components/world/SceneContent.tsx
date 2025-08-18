@@ -8,6 +8,8 @@ import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
 import { SoundCone } from '../sound-objects/SoundCone';
+import { SoundPyramid } from '../sound-objects/SoundPyramid';
+import { SoundIcosahedron } from '../sound-objects/SoundIcosahedron';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -21,13 +23,29 @@ interface SoundObjectContainerProps {
 
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
-    const { triggerObjectNote } = useWorldStore();
+    const { triggerObjectNote, toggleObjectAudio } = useWorldStore();
     
     const handleClick = useCallback((event: any) => {
       event.stopPropagation();
       onSelect(object.id);
-      triggerObjectNote(object.id);
-    }, [object.id, onSelect, triggerObjectNote]);
+      
+      // Para pirámides, solo selección (el audio se maneja con onPointerDown/onPointerUp)
+      if (object.type === 'pyramid') {
+        // No hacer nada de audio aquí, se maneja en el componente SoundPyramid
+        return;
+      }
+      
+      // Para conos, activar/desactivar el audio
+      if (object.type === 'cone') {
+        toggleObjectAudio(object.id);
+      } else if (object.type === 'icosahedron') {
+        // Para icosaedros, solo disparar la nota (sonido percusivo)
+        triggerObjectNote(object.id);
+      } else {
+        // Para otros objetos, solo disparar la nota
+        triggerObjectNote(object.id);
+      }
+    }, [object.id, onSelect, triggerObjectNote, toggleObjectAudio, object.type]);
 
     return (
       <group
@@ -74,6 +92,24 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'pyramid' ? (
+          <SoundPyramid
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+          />
+        ) : object.type === 'icosahedron' ? (
+          <SoundIcosahedron
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
             audioParams={object.audioParams}
           />
         ) : null}
