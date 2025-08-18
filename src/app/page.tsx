@@ -3,16 +3,20 @@
 import { Suspense } from 'react';
 import { Experience } from '../components/world/Experience';
 import { ControlPanel } from '../components/ui/ControlPanel';
-import { DebugPanel } from '../components/ui/DebugPanel';
+import { ParameterEditor } from '../components/ui/ParameterEditor';
+import { WorldInfo } from '../components/ui/WorldInfo';
 
 export default function Home() {
   return (
     <div className="w-full h-screen relative">
-      {/* Panel de control flotante */}
-      <ControlPanel />
+      {/* Editor de parámetros */}
+      <ParameterEditor />
       
-      {/* Panel de debug */}
-      <DebugPanel />
+      {/* Información del mundo */}
+      <WorldInfo />
+      
+      {/* Panel de control */}
+      <ControlPanel />
       
       {/* Escena 3D */}
       <Suspense 

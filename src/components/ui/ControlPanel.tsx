@@ -24,9 +24,9 @@ export function ControlPanel() {
   };
 
   return (
-    <div className="fixed top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 z-50 min-w-[280px]">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-        🎵 Casa de Salomon
+    <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
+      <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+        🎵 Controles
       </h3>
       
       {/* Botones de creación */}
@@ -51,13 +51,13 @@ export function ControlPanel() {
       {/* Información del estado */}
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
-          <span className="text-gray-600">Total objetos:</span>
-          <span className="font-medium text-gray-800">{objects.length}</span>
+          <span className="text-gray-300">Total objetos:</span>
+          <span className="font-medium text-white">{objects.length}</span>
         </div>
         
         <div className="flex justify-between">
-          <span className="text-gray-600">Seleccionado:</span>
-          <span className="font-medium text-gray-800">
+          <span className="text-gray-300">Seleccionado:</span>
+          <span className="font-medium text-white">
             {selectedObjectId ? 'Sí' : 'No'}
           </span>
         </div>
@@ -67,15 +67,15 @@ export function ControlPanel() {
       {selectedObjectId && (
         <button
           onClick={handleClearSelection}
-          className="w-full mt-3 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+          className="w-full mt-3 px-3 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
         >
           Limpiar Selección
         </button>
       )}
 
       {/* Instrucciones */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-        <p className="text-xs text-blue-700">
+      <div className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
+        <p className="text-xs text-gray-300">
           💡 <strong>Controles:</strong><br/>
           • Click izquierdo: Rotar cámara<br/>
           • Scroll: Zoom<br/>
