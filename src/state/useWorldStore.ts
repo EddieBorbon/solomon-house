@@ -21,6 +21,7 @@ export interface SoundObject {
 export interface WorldState {
   objects: SoundObject[];
   selectedObjectId: string | null;
+  transformMode: 'translate' | 'rotate' | 'scale';
 }
 
 // Acciones disponibles en el store
@@ -31,6 +32,7 @@ export interface WorldActions {
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
   toggleObjectAudio: (id: string) => void;
   clearAllObjects: () => void;
+  setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
 }
 
 // Parámetros por defecto para cada tipo de objeto
@@ -62,6 +64,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Estado inicial
   objects: [],
   selectedObjectId: null,
+  transformMode: 'translate',
 
   // Acción para añadir un nuevo objeto
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
@@ -108,6 +111,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         isSelected: obj.id === id,
       })),
       selectedObjectId: id,
+      // Resetear el modo de transformación si no hay objeto seleccionado
+      transformMode: id === null ? 'translate' : state.transformMode,
     }));
   },
 
@@ -172,5 +177,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       objects: [],
       selectedObjectId: null,
     });
+  },
+
+  // Acción para establecer el modo de transformación
+  setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => {
+    set({ transformMode: mode });
   },
 }));

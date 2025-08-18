@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
+import { Mesh, Group } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundCubeProps {
@@ -14,14 +14,14 @@ interface SoundCubeProps {
   audioEnabled: boolean;
 }
 
-export function SoundCube({
+export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   id,
   position,
   rotation,
   scale,
   isSelected,
   audioEnabled,
-}: SoundCubeProps) {
+}, ref) => {
   const meshRef = useRef<Mesh>(null);
 
   // Animación del cubo cuando está reproduciendo sonido
@@ -37,30 +37,11 @@ export function SoundCube({
     }
   });
 
-  const handleClick = () => {
-    useWorldStore.getState().selectObject(id);
-  };
-
-  const handlePointerEnter = () => {
-    if (meshRef.current) {
-      meshRef.current.scale.setScalar(1.1);
-    }
-  };
-
-  const handlePointerLeave = () => {
-    if (meshRef.current) {
-      meshRef.current.scale.setScalar(1);
-    }
-  };
-
   return (
-    <group position={position} rotation={rotation} scale={scale}>
+    <group ref={ref} position={position} rotation={rotation} scale={scale}>
       {/* Cubo principal */}
       <mesh
         ref={meshRef}
-        onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
         castShadow
         receiveShadow
       >
@@ -130,4 +111,6 @@ export function SoundCube({
       </group>
     </group>
   );
-}
+});
+
+SoundCube.displayName = 'SoundCube';

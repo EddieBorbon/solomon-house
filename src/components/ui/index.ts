@@ -4,3 +4,4 @@ export { AudioTestPanel } from './AudioTestPanel';
 export { ParameterEditor } from './ParameterEditor';
 export { WorldInfo } from './WorldInfo';
 export { FPSDisplay } from './FPSDisplay';
+export { TransformToolbar } from './TransformToolbar';

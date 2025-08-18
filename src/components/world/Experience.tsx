@@ -1,11 +1,14 @@
 'use client';
 
+import React, { useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stats, Environment } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
 import { Suspense } from 'react';
 
 export function Experience() {
+  const orbitControlsRef = useRef<any>(null);
+
   return (
     <div className="w-full h-screen">
       <Canvas
@@ -32,6 +35,7 @@ export function Experience() {
       >
         {/* Controles de cámara */}
         <OrbitControls 
+          ref={orbitControlsRef}
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
@@ -68,7 +72,7 @@ export function Experience() {
         </Suspense>
 
         {/* Contenido principal de la escena */}
-        <SceneContent />
+        <SceneContent orbitControlsRef={orbitControlsRef} />
       </Canvas>
     </div>
   );

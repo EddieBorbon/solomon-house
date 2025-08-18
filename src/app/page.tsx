@@ -7,10 +7,18 @@ import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { WorldInfo } from '../components/ui/WorldInfo';
 import { FPSDisplay } from '../components/ui/FPSDisplay';
 import { AudioInitializer } from '../components/ui/AudioInitializer';
+import { TransformToolbar } from '../components/ui/TransformToolbar';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 export default function Home() {
+  // Hook para atajos de teclado
+  useKeyboardShortcuts();
+
   return (
     <div className="w-full h-screen relative">
+      {/* Barra de herramientas de transformación */}
+      <TransformToolbar />
+      
       {/* Editor de parámetros */}
       <ParameterEditor />
       
@@ -35,7 +43,7 @@ export default function Home() {
               <h2 className="text-xl font-semibold text-gray-700">
                 Cargando Mundo 3D...
               </h2>
-              <p className="text-gray-500 mt-2">Inicializando Casa de Salomon</p>
+              <p className="text-gray-700 mt-2">Inicializando Casa de Salomon</p>
             </div>
           </div>
         }
