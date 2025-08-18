@@ -28,6 +28,18 @@ export function useKeyboardShortcuts() {
           event.preventDefault();
           selectObject(null);
           break;
+        // Controles de cámara WASD
+        case 'w':
+        case 'a':
+        case 's':
+        case 'd':
+        case 'q':
+        case 'e':
+        case 'shift':
+        case ' ':
+          event.preventDefault();
+          // Los controles de cámara se manejan en el componente Experience
+          break;
       }
     };
 

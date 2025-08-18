@@ -108,6 +108,20 @@ export function ControlPanel() {
               </div>
             </div>
 
+            {/* Controles de teclado WASD */}
+            <div className="p-3 bg-green-900/20 border border-green-700/50 rounded-lg">
+              <h4 className="text-sm font-semibold text-green-300 mb-2">⌨️ Controles WASD</h4>
+              <div className="space-y-1 text-xs text-green-200">
+                <p>• <strong>W:</strong> Mover hacia adelante</p>
+                <p>• <strong>S:</strong> Mover hacia atrás</p>
+                <p>• <strong>A:</strong> Mover a la izquierda</p>
+                <p>• <strong>D:</strong> Mover a la derecha</p>
+                <p>• <strong>Q:</strong> Mover hacia abajo</p>
+                <p>• <strong>E:</strong> Mover hacia arriba</p>
+                <p>• <strong>Shift:</strong> Movimiento rápido</p>
+              </div>
+            </div>
+
             {/* Modos de interacción */}
             <div className="p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
               <h4 className="text-sm font-semibold text-blue-300 mb-2">🎮 Modos de Interacción</h4>

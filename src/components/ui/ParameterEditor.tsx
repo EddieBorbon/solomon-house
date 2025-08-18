@@ -300,41 +300,22 @@ export function ParameterEditor() {
                                                                   handleParamChange('duration', Number(value));
                                                                 }
                                                               }}
-                                                              placeholder="∞"
+                                                              placeholder="1.0"
                                                               className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
                                                             />
-                                                            <button
-                                                              onClick={() => {
-                                                                const currentDuration = selectedObject.audioParams.duration;
-                                                                if (currentDuration === Infinity) {
-                                                                  handleParamChange('duration', 2.0);
-                                                                } else {
-                                                                  handleParamChange('duration', Infinity);
-                                                                }
-                                                              }}
-                                                              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                                                              title={selectedObject.audioParams.duration === Infinity ? "Cambiar a duración finita" : "Cambiar a duración infinita"}
-                                                            >
-                                                              {selectedObject.audioParams.duration === Infinity ? '⏱️' : '∞'}
-                                                            </button>
+
                                                             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
                                                               {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
                                                             </span>
                                                           </div>
                                                           <div className="flex justify-between text-xs text-gray-500 mt-1">
                                                             <span>0.1s</span>
-                                                            <span>∞ (continuo)</span>
+                                                            <span>60s</span>
                                                           </div>
                                                           <p className="text-xs text-gray-400 mt-1">
                                                             {selectedObject.audioParams.duration === Infinity 
-                                                              ? (selectedObject.type === 'pyramid' 
-                                                                  ? 'Sonido continuo - haz clic en el objeto para activar/desactivar'
-                                                                  : 'Sonido continuo - haz clic en el objeto para detener'
-                                                                )
-                                                              : (selectedObject.type === 'pyramid'
-                                                                  ? 'Sonido de gate - mantén presionado el clic para tocar'
-                                                                  : 'Sonido con duración finita - se detiene automáticamente'
-                                                                )
+                                                              ? 'Sonido continuo - usa el botón "Activar Sonido Continuo" para controlar'
+                                                              : 'Sonido con duración finita - se detiene automáticamente'
                                                             }
                                                           </p>
                                                         </div>

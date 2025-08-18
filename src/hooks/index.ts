@@ -1,3 +1,2 @@
-export { useObjectAudio, type AudioParams } from './useObjectAudio';
-export { useAudioContext } from './useAudioContext';
 export { useKeyboardShortcuts } from './useKeyboardShortcuts';
+export { useCameraControls } from './useCameraControls';
