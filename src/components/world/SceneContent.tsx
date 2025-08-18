@@ -13,6 +13,7 @@ import { SoundIcosahedron } from '../sound-objects/SoundIcosahedron';
 import { SoundPlane } from '../sound-objects/SoundPlane';
 import { SoundTorus } from '../sound-objects/SoundTorus';
 import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
+import { SoundSpiral } from '../sound-objects/SoundSpiral';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -47,6 +48,9 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
       } else if (object.type === 'dodecahedronRing') {
         // Para anillos de dodecaedros, activar/desactivar el audio (sonido continuo)
         toggleObjectAudio(object.id);
+      } else if (object.type === 'spiral') {
+        // Para espirales, disparar la nota (sonido percusivo)
+        triggerObjectNote(object.id);
       } else {
         // Para otros objetos, solo disparar la nota
         triggerObjectNote(object.id);
@@ -142,6 +146,15 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             position={[0, 0, 0]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'spiral' ? (
+          <SoundSpiral
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
             audioParams={object.audioParams}
           />
         ) : null}

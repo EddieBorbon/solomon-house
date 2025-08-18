@@ -13,10 +13,10 @@ export function ParameterEditor() {
   }, [objects, selectedObjectId]);
 
   // Función para actualizar un parámetro específico
-  const handleParamChange = (param: keyof AudioParams, value: number | string | string[]) => {
+  const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
     if (!selectedObject) return;
 
-    console.log(`🎛️ UI: Cambiando parámetro ${param} a: ${value}`);
+    console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
     console.log(`🎛️ UI: Objeto seleccionado:`, selectedObject);
 
     const newAudioParams = {
@@ -30,7 +30,7 @@ export function ParameterEditor() {
       audioParams: newAudioParams,
     });
 
-    console.log(`🎵 Parámetro ${param} actualizado a: ${value}`);
+    console.log(`🎵 Parámetro ${param} actualizado a:`, value);
   };
 
   // Si no hay objeto seleccionado, mostrar mensaje
@@ -67,7 +67,10 @@ export function ParameterEditor() {
                 selectedObject.type === 'cylinder' ? 'bg-green-500' :
                 selectedObject.type === 'cone' ? 'bg-orange-500' :
                 selectedObject.type === 'pyramid' ? 'bg-red-500' :
-                selectedObject.type === 'icosahedron' ? 'bg-indigo-500' : 'bg-gray-500'
+                selectedObject.type === 'icosahedron' ? 'bg-indigo-500' :
+                selectedObject.type === 'torus' ? 'bg-cyan-500' :
+                selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' :
+                selectedObject.type === 'spiral' ? 'bg-cyan-500' : 'bg-gray-500'
               }`} />
               <h3 className="text-lg font-semibold text-white">
                 Editor de Parámetros
@@ -102,7 +105,8 @@ export function ParameterEditor() {
               selectedObject.type === 'pyramid' ? 'bg-red-500' :
               selectedObject.type === 'icosahedron' ? 'bg-indigo-500' :
               selectedObject.type === 'torus' ? 'bg-cyan-500' : 
-              selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' : 'bg-gray-500'
+              selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' :
+              selectedObject.type === 'spiral' ? 'bg-cyan-500' : 'bg-gray-500'
             }`}>
               <span className="text-lg">
                 {selectedObject.type === 'cone' ? '🥁' :
@@ -112,7 +116,8 @@ export function ParameterEditor() {
                  selectedObject.type === 'pyramid' ? '🔺' :
                  selectedObject.type === 'icosahedron' ? '🔶' :
                  selectedObject.type === 'torus' ? '🔄' : 
-                 selectedObject.type === 'dodecahedronRing' ? '🔷' : '❓'}
+                 selectedObject.type === 'dodecahedronRing' ? '🔷' :
+                 selectedObject.type === 'spiral' ? '🌀' : '❓'}
               </span>
             </div>
             <span className="text-sm font-medium text-gray-300">
@@ -124,7 +129,8 @@ export function ParameterEditor() {
                selectedObject.type === 'icosahedron' ? 'MetalSynth' :
                selectedObject.type === 'plane' ? 'NoiseSynth' :
                selectedObject.type === 'torus' ? 'PluckSynth' : 
-               selectedObject.type === 'dodecahedronRing' ? 'PolySynth' : 'Objeto de Sonido'}
+               selectedObject.type === 'dodecahedronRing' ? 'PolySynth' :
+               selectedObject.type === 'spiral' ? 'Sampler' : 'Objeto de Sonido'}
             </span>
             
                          {/* Texto informativo específico para cada tipo */}
@@ -173,6 +179,15 @@ export function ParameterEditor() {
                    Instrumento polifónico para acordes
                  </p>
                </div>
+             ) : selectedObject.type === 'spiral' ? (
+               <div className="mt-2">
+                 <p className="text-xs text-gray-400 mt-1">
+                   Haz clic en el objeto para tocar
+                 </p>
+                 <p className="text-xs text-gray-400 mt-1">
+                   Sampler percusivo polifónico
+                 </p>
+               </div>
              ) : (
               <div className="mt-2">
                 <p className="text-xs text-gray-400 mt-1">
@@ -188,8 +203,8 @@ export function ParameterEditor() {
 
                 {/* Controles de parámetros */}
         <div className="space-y-4">
-          {/* Frecuencia - Para todos los objetos */}
-          {(
+          {/* Frecuencia - Para todos los objetos excepto spiral */}
+          {selectedObject.type !== 'spiral' && (
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
@@ -220,81 +235,85 @@ export function ParameterEditor() {
             </div>
           )}
 
-          {/* Forma de Onda (Portadora) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Forma de Onda
-            </label>
-            <select
-              value={selectedObject.audioParams.waveform}
-              onChange={(e) => handleParamChange('waveform', e.target.value as OscillatorType)}
-              className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
-            >
-              <option value="sine">Seno</option>
-              <option value="square">Cuadrada</option>
-              <option value="sawtooth">Sierra</option>
-              <option value="triangle">Triangular</option>
-            </select>
-          </div>
-
-                                                      {/* Duración */}
+          {/* Forma de Onda (Portadora) - Para todos los objetos excepto spiral */}
+          {selectedObject.type !== 'spiral' && (
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Duración (segundos)
+                Forma de Onda
               </label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="0.1"
-                  max="60"
-                  step="0.1"
-                  value={selectedObject.audioParams.duration === Infinity ? '' : (selectedObject.audioParams.duration || 1.0)}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') {
-                      handleParamChange('duration', Infinity);
-                    } else {
-                      handleParamChange('duration', Number(value));
-                    }
-                  }}
-                  placeholder="∞"
-                  className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
-                />
-                <button
-                  onClick={() => {
-                    const currentDuration = selectedObject.audioParams.duration;
-                    if (currentDuration === Infinity) {
-                      handleParamChange('duration', 2.0);
-                    } else {
-                      handleParamChange('duration', Infinity);
-                    }
-                  }}
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
-                  title={selectedObject.audioParams.duration === Infinity ? "Cambiar a duración finita" : "Cambiar a duración infinita"}
-                >
-                  {selectedObject.audioParams.duration === Infinity ? '⏱️' : '∞'}
-                </button>
-                <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
-                </span>
-              </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>0.1s</span>
-                <span>∞ (continuo)</span>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">
-                {selectedObject.audioParams.duration === Infinity 
-                  ? (selectedObject.type === 'pyramid' 
-                      ? 'Sonido continuo - haz clic en el objeto para activar/desactivar'
-                      : 'Sonido continuo - haz clic en el objeto para detener'
-                    )
-                  : (selectedObject.type === 'pyramid'
-                      ? 'Sonido de gate - mantén presionado el clic para tocar'
-                      : 'Sonido con duración finita - se detiene automáticamente'
-                    )
-                }
-              </p>
+              <select
+                value={selectedObject.audioParams.waveform}
+                onChange={(e) => handleParamChange('waveform', e.target.value as OscillatorType)}
+                className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+              >
+                <option value="sine">Seno</option>
+                <option value="square">Cuadrada</option>
+                <option value="sawtooth">Sierra</option>
+                <option value="triangle">Triangular</option>
+              </select>
             </div>
+          )}
+
+                                                      {/* Duración - Para todos los objetos excepto spiral */}
+                                                      {selectedObject.type !== 'spiral' && (
+                                                        <div>
+                                                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Duración (segundos)
+                                                          </label>
+                                                          <div className="flex items-center gap-3">
+                                                            <input
+                                                              type="number"
+                                                              min="0.1"
+                                                              max="60"
+                                                              step="0.1"
+                                                              value={selectedObject.audioParams.duration === Infinity ? '' : (selectedObject.audioParams.duration || 1.0)}
+                                                              onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (value === '') {
+                                                                  handleParamChange('duration', Infinity);
+                                                                } else {
+                                                                  handleParamChange('duration', Number(value));
+                                                                }
+                                                              }}
+                                                              placeholder="∞"
+                                                              className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
+                                                            />
+                                                            <button
+                                                              onClick={() => {
+                                                                const currentDuration = selectedObject.audioParams.duration;
+                                                                if (currentDuration === Infinity) {
+                                                                  handleParamChange('duration', 2.0);
+                                                                } else {
+                                                                  handleParamChange('duration', Infinity);
+                                                                }
+                                                              }}
+                                                              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                                                              title={selectedObject.audioParams.duration === Infinity ? "Cambiar a duración finita" : "Cambiar a duración infinita"}
+                                                            >
+                                                              {selectedObject.audioParams.duration === Infinity ? '⏱️' : '∞'}
+                                                            </button>
+                                                            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                                                              {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
+                                                            </span>
+                                                          </div>
+                                                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                                            <span>0.1s</span>
+                                                            <span>∞ (continuo)</span>
+                                                          </div>
+                                                          <p className="text-xs text-gray-400 mt-1">
+                                                            {selectedObject.audioParams.duration === Infinity 
+                                                              ? (selectedObject.type === 'pyramid' 
+                                                                  ? 'Sonido continuo - haz clic en el objeto para activar/desactivar'
+                                                                  : 'Sonido continuo - haz clic en el objeto para detener'
+                                                                )
+                                                              : (selectedObject.type === 'pyramid'
+                                                                  ? 'Sonido de gate - mantén presionado el clic para tocar'
+                                                                  : 'Sonido con duración finita - se detiene automáticamente'
+                                                                )
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      )}
 
           {/* Controles específicos para MembraneSynth (cono) */}
           {selectedObject.type === 'cone' && (
@@ -1374,7 +1393,132 @@ export function ParameterEditor() {
             </>
           )}
 
-                     {/* Volumen - Movido al final */}
+          {/* Controles específicos para Sampler (spiral) */}
+          {selectedObject.type === 'spiral' && (
+            <>
+              {/* Sección: Parámetros del Sampler */}
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
+                  🌀 Parámetros del Sampler
+                </h4>
+                
+                {/* Attack */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Attack (Ataque)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={selectedObject.audioParams.attack || 0.1}
+                      onChange={(e) => handleParamChange('attack', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.attack || 0.1).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0s</span>
+                    <span>1s</span>
+                  </div>
+                </div>
+
+                {/* Release */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Release (Liberación)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="2"
+                      step="0.01"
+                      value={selectedObject.audioParams.release || 1.0}
+                      onChange={(e) => handleParamChange('release', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.release || 1.0).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0s</span>
+                    <span>2s</span>
+                  </div>
+                </div>
+
+                {/* Curva de Envolvente */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Curva de Envolvente
+                  </label>
+                  <select
+                    value={selectedObject.audioParams.curve || 'exponential'}
+                    onChange={(e) => handleParamChange('curve', e.target.value as 'linear' | 'exponential')}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="linear">Linear</option>
+                    <option value="exponential">Exponencial</option>
+                  </select>
+                </div>
+
+                {/* Set de Samples */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Set de Samples
+                  </label>
+                  <select
+                    value={selectedObject.audioParams.baseUrl || '/samples/piano/'}
+                    onChange={(e) => {
+                      const baseUrl = e.target.value;
+                      const urlMap: { [key: string]: Record<string, string> } = {
+                        '/samples/piano/': {
+                          C4: "C4.mp3",
+                          "D#4": "Ds4.mp3",
+                          "F#4": "Fs4.mp3",
+                          A4: "A4.mp3",
+                        },
+                        '/samples/guitar/': {
+                          C4: "guitar_C4.mp3",
+                          "D#4": "guitar_Ds4.mp3",
+                          "F#4": "guitar_Fs4.mp3",
+                          A4: "guitar_A4.mp3",
+                        },
+                        '/samples/synth/': {
+                          C4: "synth_C4.mp3",
+                          "D#4": "synth_Ds4.mp3",
+                          "F#4": "synth_Fs4.mp3",
+                          A4: "synth_A4.mp3",
+                        }
+                      };
+                      const urls = urlMap[baseUrl] || urlMap['/samples/piano/'];
+                      handleParamChange('baseUrl', baseUrl);
+                      handleParamChange('urls', urls);
+                    }}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  >
+                    <option value="/samples/piano/">Piano</option>
+                    <option value="/samples/guitar/">Guitarra</option>
+                    <option value="/samples/synth/">Sintetizador</option>
+                  </select>
+                </div>
+
+                {/* Mensaje informativo */}
+                <div className="p-3 bg-cyan-900/20 border border-cyan-700/50 rounded-lg">
+                  <p className="text-xs text-cyan-300 text-center">
+                    💡 Haz clic en el objeto para tocar el sample
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Volumen - Movido al final */}
            <div>
              <label className="block text-sm font-medium text-gray-300 mb-2">
                Volumen

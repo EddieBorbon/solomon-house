@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
@@ -10,20 +10,7 @@ type EnvironmentPreset = 'sunset' | 'dawn' | 'night' | 'warehouse' | 'forest' | 
 
 export function Experience() {
   const orbitControlsRef = useRef<any>(null);
-  const [environmentPreset, setEnvironmentPreset] = useState<EnvironmentPreset>('sunset');
-
-  // Escuchar cambios de environment desde el ControlPanel
-  useEffect(() => {
-    const handleEnvironmentChange = (event: CustomEvent<EnvironmentPreset>) => {
-      setEnvironmentPreset(event.detail);
-    };
-
-    window.addEventListener('environmentChange', handleEnvironmentChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('environmentChange', handleEnvironmentChange as EventListener);
-    };
-  }, []);
+  const [environmentPreset] = useState<EnvironmentPreset>('forest');
 
   return (
     <div className="w-full h-screen">

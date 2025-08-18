@@ -1,20 +1,9 @@
 'use client';
 
 import { useWorldStore } from '../../state/useWorldStore';
-import { useState } from 'react';
-
-type EnvironmentPreset = 'sunset' | 'dawn' | 'night' | 'warehouse' | 'forest' | 'apartment' | 'studio' | 'city' | 'lobby' | 'park';
 
 export function ControlPanel() {
   const { addObject } = useWorldStore();
-  const [environmentPreset, setEnvironmentPreset] = useState<EnvironmentPreset>('sunset');
-
-  // Función para cambiar el environment
-  const handleEnvironmentChange = (preset: EnvironmentPreset) => {
-    setEnvironmentPreset(preset);
-    // Emitir un evento personalizado para que Experience.tsx lo escuche
-    window.dispatchEvent(new CustomEvent('environmentChange', { detail: preset }));
-  };
 
   const handleAddCube = () => {
     // Añadir cubo en posición aleatoria
@@ -77,6 +66,13 @@ export function ControlPanel() {
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
     addObject('dodecahedronRing', [x, 0.5, z]);
+  };
+
+  const handleAddSpiral = () => {
+    // Añadir espiral de samples en posición aleatoria
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addObject('spiral', [x, 0.5, z]);
   };
 
   return (
@@ -158,78 +154,19 @@ export function ControlPanel() {
           <span>🔷</span>
           <span>Anillo de Dodecaedros</span>
         </button>
+
+        <button
+          onClick={handleAddSpiral}
+          className="w-full px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2"
+        >
+          <span>🌀</span>
+          <span>Espiral de Samples</span>
+        </button>
       </div>
 
 
 
 
-
-      {/* Selector de Environment */}
-      <div className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">
-        <h4 className="text-sm font-medium text-white mb-2">🌍 Environment</h4>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => handleEnvironmentChange('sunset')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'sunset' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Sunset
-          </button>
-          <button
-            onClick={() => handleEnvironmentChange('dawn')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'dawn' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Dawn
-          </button>
-          <button
-            onClick={() => handleEnvironmentChange('night')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'night' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Night
-          </button>
-          <button
-            onClick={() => handleEnvironmentChange('warehouse')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'warehouse' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Warehouse
-          </button>
-          <button
-            onClick={() => handleEnvironmentChange('forest')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'forest' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Forest
-          </button>
-          <button
-            onClick={() => handleEnvironmentChange('apartment')}
-            className={`px-3 py-2 text-xs rounded ${
-              environmentPreset === 'apartment' 
-                ? 'bg-orange-500 text-white' 
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            Apartment
-          </button>
-        </div>
-      </div>
 
       {/* Instrucciones */}
       <div className="mt-4 p-3 bg-gray-800/50 rounded-lg border border-gray-600">

@@ -43,14 +43,19 @@ export interface AudioParams {
   polyphony?: number;
   chord?: string[];
   release?: number;
+  // Nuevos parámetros para Sampler (spiral)
+  urls?: Record<string, string>;
+  baseUrl?: string;
+  curve?: 'linear' | 'exponential';
+  notes?: string | string[];
 }
 
 // Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
 // Estructura de una fuente de sonido
 interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth;
+  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
   panner: Tone.Panner3D;
 }
 
@@ -111,7 +116,7 @@ export class AudioManager {
       console.log(`🎵 Creando fuente de sonido ${id} de tipo ${type}`);
 
       // Crear el sintetizador apropiado según el tipo
-      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth;
+      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
       
       if (type === 'cube') {
         synth = new Tone.AMSynth({
@@ -269,6 +274,44 @@ export class AudioManager {
         });
         
         console.log('✅ PolySynth creado exitosamente para anillo de dodecaedros');
+      } else if (type === 'spiral') {
+        // spiral - Sampler para reproducción de samples de audio
+        console.log('🌀 Creando Sampler para espiral con parámetros:', params);
+        
+        // Intentar crear el Sampler con manejo de errores
+        try {
+          synth = new Tone.Sampler({
+            urls: params.urls || { C4: 'C4.mp3' },
+            baseUrl: params.baseUrl || '/samples/piano/',
+            release: params.release || 1.0,
+            attack: params.attack || 0.1,
+            onload: () => {
+              console.log(`🌀 Samples para ${id} cargados exitosamente.`);
+            },
+            onerror: (error) => {
+              console.warn(`⚠️ Error al cargar samples para ${id}:`, error);
+              console.log(`🌀 Usando fallback de sintetizador para ${id}`);
+            }
+          });
+          console.log('✅ Sampler creado exitosamente para espiral');
+        } catch (samplerError) {
+          console.warn(`⚠️ Error al crear Sampler para ${id}, usando fallback:`, samplerError);
+          // Fallback a un sintetizador básico si el Sampler falla
+          synth = new Tone.AMSynth({
+            harmonicity: 1.5,
+            oscillator: { type: 'sine' },
+            envelope: {
+              attack: params.attack || 0.1,
+              decay: 0.2,
+              sustain: 0.8,
+              release: params.release || 1.0,
+            }
+          });
+          console.log('✅ Fallback AMSynth creado para espiral');
+          
+          // Marcar que este objeto usa fallback para futuras referencias
+          (synth as any)._isFallback = true;
+        }
       } else {
         // Fallback por defecto
         synth = new Tone.AMSynth();
@@ -313,6 +356,9 @@ export class AudioManager {
       } else if (type === 'dodecahedronRing') {
         // Para PolySynth, no se configura frecuencia individual ya que usa acordes
         console.log('🔷 PolySynth no requiere configuración de frecuencia individual');
+      } else if (type === 'spiral') {
+        // Para Sampler, no se configura frecuencia ya que usa notas musicales
+        console.log('🌀 Sampler no requiere configuración de frecuencia individual');
       }
 
       // Almacenar en el Map
@@ -454,7 +500,7 @@ export class AudioManager {
   }
 
   /**
-   * Dispara una nota percusiva (especialmente para MembraneSynth)
+   * Dispara una nota percusiva (especialmente para MembraneSynth y Sampler)
    */
   public triggerNoteAttack(id: string, params: AudioParams): void {
     console.log(`🎵 triggerNoteAttack llamado para ${id}`);
@@ -472,6 +518,26 @@ export class AudioManager {
       
       // Aplicar parámetros antes de disparar
       this.updateSoundParams(id, params);
+      
+      // Para Sampler, usar triggerAttackRelease con notas y duración
+      if (source.synth instanceof Tone.Sampler) {
+        console.log(`🌀 Usando triggerAttackRelease para Sampler (spiral)`);
+        try {
+          const notes = params.notes || ["C4"];
+          const duration = params.duration || 1.0;
+          source.synth.triggerAttackRelease(notes, duration, Tone.now());
+          console.log(`🎵 Notas disparadas para ${id}: ${notes} con duración ${duration}s`);
+          return;
+        } catch (samplerError) {
+          console.warn(`⚠️ Sampler falló, usando fallback de sintetizador:`, samplerError);
+          // Si el Sampler falla, usar el fallback como un sintetizador normal
+          const duration = params.duration || 0.5;
+          const frequency = this.getNoteFrequency(params.notes?.[0] || "C4");
+          (source.synth as any).triggerAttackRelease(frequency, duration, Tone.now());
+          console.log(`🎵 Fallback disparado para ${id} con frecuencia ${frequency}Hz y duración ${duration}s`);
+          return;
+        }
+      }
       
       // Para PluckSynth, usar triggerAttack sin triggerRelease ya que decae naturalmente
       if (source.synth instanceof Tone.PluckSynth) {
@@ -851,6 +917,37 @@ export class AudioManager {
           }
         }
 
+      // Actualizar parámetros específicos del Sampler
+      if (source.synth instanceof Tone.Sampler) {
+        // Es un Sampler
+        const sampler = source.synth as Tone.Sampler;
+        
+        // Actualizar attack
+        if (params.attack !== undefined) {
+          console.log(`🌀 Attack: ${params.attack}`);
+          // El Sampler hereda de Synth, por lo que tiene envelope
+          if ('envelope' in sampler && sampler.envelope) {
+            (sampler as any).envelope.attack = params.attack;
+          }
+        }
+        
+        // Actualizar release
+        if (params.release !== undefined) {
+          console.log(`🌀 Release: ${params.release}`);
+          if ('envelope' in sampler && sampler.envelope) {
+            (sampler as any).envelope.release = params.release;
+          }
+        }
+        
+        // Actualizar curve
+        if (params.curve !== undefined) {
+          console.log(`🌀 Curve: ${params.curve}`);
+          if ('envelope' in sampler && sampler.envelope) {
+            (sampler as any).envelope.curve = params.curve;
+          }
+        }
+      }
+
       // Actualizar volumen si cambia
       if (params.volume !== undefined) {
         console.log(`🎵 Volumen: ${params.volume}`);
@@ -928,6 +1025,23 @@ export class AudioManager {
       soundSourcesCount: this.soundSources.size,
       soundSourceIds: Array.from(this.soundSources.keys()),
     };
+  }
+
+  // Helper para convertir nota a frecuencia (ejemplo: "A4" -> 440Hz)
+  private getNoteFrequency(note: string): number {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const noteName = note.replace(/[0-9]/g, '');
+    const octave = parseInt(note[note.length - 1]) || 4;
+    const noteIndex = notes.indexOf(noteName);
+    
+    if (noteIndex === -1) {
+      console.warn(`⚠️ Nota no reconocida: ${note}, usando C4 por defecto`);
+      return 261.63; // C4
+    }
+    
+    // Calcular frecuencia usando la fórmula A4 = 440Hz como referencia
+    const semitonesFromA4 = (octave - 4) * 12 + (noteIndex - 9); // A es el índice 9
+    return 440 * Math.pow(2, semitonesFromA4 / 12);
   }
 
   // Helper para convertir frecuencia a nota (ejemplo: 440Hz -> "A4")

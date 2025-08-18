@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -142,6 +142,26 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         harmonicity: 1,
         modulationIndex: 2,
         modulationWaveform: 'triangle',
+      };
+    case 'spiral':
+      return {
+        volume: 0.9,
+        attack: 0.1,
+        release: 1.0,
+        curve: 'exponential',
+        notes: ["C4", "E4", "G4"], // Toca un acorde de C Mayor por defecto
+        duration: 1,
+        // Mapeo de samples
+        urls: {
+          C4: "C4.mp3",
+          "D#4": "Ds4.mp3",
+          "F#4": "Fs4.mp3",
+          A4: "A4.mp3",
+        },
+        baseUrl: "/samples/piano/", // La ruta a nuestra carpeta de samples
+        // Campos requeridos por AudioParams
+        frequency: 0, // No se usa en Sampler
+        waveform: 'sine', // No se usa en Sampler
       };
     default:
       return {
