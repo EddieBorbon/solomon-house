@@ -100,13 +100,13 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
           <meshStandardMaterial
             ref={materialRef}
             color="#ff6b35"
-            metalness={0.2}
-            roughness={0.6}
+            metalness={0.3}
+            roughness={0.35}
             transparent
-            opacity={0.9}
+            opacity={0.95}
             emissive="#000000"
             emissiveIntensity={0}
-            toneMapped={false}
+            envMapIntensity={1.0}
           />
         </mesh>
 

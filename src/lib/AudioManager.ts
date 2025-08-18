@@ -29,16 +29,28 @@ export interface AudioParams {
   filterQ?: number;
   // Nuevos parámetros para MetalSynth (icosahedron)
   resonance?: number;
+  // Nuevos parámetros para NoiseSynth (plane)
+  noiseType?: 'white' | 'pink' | 'brown';
+  attack?: number;
+  decay?: number;
+  sustain?: number;
+  // Nuevos parámetros para PluckSynth (torus)
+  attackNoise?: number;
+  dampening?: number;
   // Campo de duración para todos los objetos (Infinity para duración infinita)
   duration?: number;
+  // Nuevos parámetros para PolySynth (dodecahedronRing)
+  polyphony?: number;
+  chord?: string[];
+  release?: number;
 }
 
 // Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing';
 
 // Estructura de una fuente de sonido
 interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth;
+  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth;
   panner: Tone.Panner3D;
 }
 
@@ -99,7 +111,7 @@ export class AudioManager {
       console.log(`🎵 Creando fuente de sonido ${id} de tipo ${type}`);
 
       // Crear el sintetizador apropiado según el tipo
-      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth;
+      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth;
       
       if (type === 'cube') {
         synth = new Tone.AMSynth({
@@ -208,6 +220,55 @@ export class AudioManager {
           octaves: params.octaves || 1.5,
         });
         console.log('✅ MetalSynth creado exitosamente para icosaedro');
+      } else if (type === 'plane') {
+        // plane - NoiseSynth para sonidos de ruido percusivos
+        console.log('🟦 Creando NoiseSynth para plano con parámetros:', params);
+        synth = new Tone.NoiseSynth({
+          noise: { 
+            type: params.noiseType || 'white' 
+          },
+          envelope: { 
+            attack: params.attack || 0.001, 
+            decay: params.decay || 0.1, 
+            sustain: params.sustain || 0, 
+            release: 0.1 
+          },
+        });
+        console.log('✅ NoiseSynth creado exitosamente para plano');
+      } else if (type === 'torus') {
+        // torus - PluckSynth para sonidos de cuerdas
+        console.log('🔄 Creando PluckSynth para toroide con parámetros:', params);
+        synth = new Tone.PluckSynth({
+          attackNoise: params.attackNoise || 1,
+          dampening: params.dampening || 4000,
+          resonance: params.resonance || 0.9,
+        });
+        console.log('✅ PluckSynth creado exitosamente para toroide');
+      } else if (type === 'dodecahedronRing') {
+        // dodecahedronRing - PolySynth para acordes polifónicos
+        console.log('🔷 Creando PolySynth para anillo de dodecaedros con parámetros:', params);
+        synth = new Tone.PolySynth({
+          maxPolyphony: params.polyphony || 4,
+          voice: Tone.FMSynth,
+          options: {
+            harmonicity: params.harmonicity || 1,
+            modulationIndex: params.modulationIndex || 2,
+            oscillator: {
+              type: params.waveform || 'sine',
+            },
+            modulation: {
+              type: params.modulationWaveform || 'triangle',
+            },
+            envelope: {
+              attack: params.attack || 1.5,
+              decay: 0.1,
+              sustain: 1.0,
+              release: params.release || 2.0,
+            },
+          },
+        });
+        
+        console.log('✅ PolySynth creado exitosamente para anillo de dodecaedros');
       } else {
         // Fallback por defecto
         synth = new Tone.AMSynth();
@@ -233,16 +294,25 @@ export class AudioManager {
         (synth as Tone.AMSynth | Tone.FMSynth).oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
       } else if (type === 'cylinder') {
         // Para DuoSynth, la frecuencia se configura en el sintetizador principal
-        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+        (synth as Tone.DuoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
       } else if (type === 'cone') {
         // Para MembraneSynth, la frecuencia se configura en el sintetizador principal
-        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+        (synth as Tone.MembraneSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
       } else if (type === 'pyramid') {
         // Para MonoSynth, la frecuencia se configura en el sintetizador principal
-        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+        (synth as Tone.MonoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
       } else if (type === 'icosahedron') {
         // Para MetalSynth, la frecuencia se configura en el sintetizador principal
-        synth.frequency.setValueAtTime(safeFrequency, Tone.now());
+        (synth as Tone.MetalSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
+      } else if (type === 'plane') {
+        // Para NoiseSynth, no se configura frecuencia ya que genera ruido
+        console.log('🟦 NoiseSynth no requiere configuración de frecuencia');
+      } else if (type === 'torus') {
+        // Para PluckSynth, la frecuencia se configura en el sintetizador principal
+        (synth as Tone.PluckSynth).toFrequency(safeFrequency);
+      } else if (type === 'dodecahedronRing') {
+        // Para PolySynth, no se configura frecuencia individual ya que usa acordes
+        console.log('🔷 PolySynth no requiere configuración de frecuencia individual');
       }
 
       // Almacenar en el Map
@@ -270,7 +340,7 @@ export class AudioManager {
     try {
       // Detener el sonido si está sonando
       if (this.playingSounds.has(id)) {
-        source.synth.triggerRelease();
+        source.synth.triggerRelease(Tone.now());
       }
 
       // Limpiar recursos
@@ -301,6 +371,26 @@ export class AudioManager {
       
       // Aplicar TODOS los parámetros antes de iniciar
       this.updateSoundParams(id, params);
+      
+      // Para PolySynth, usar triggerAttack con acordes
+      if (source.synth instanceof Tone.PolySynth) {
+        // Generar acorde basado en la frecuencia base si está disponible
+        let chord = params.chord || ["C4", "E4", "G4"];
+        
+        // Si hay frecuencia base, transponer el acorde
+        if (params.frequency && params.frequency > 0) {
+          // Convertir frecuencia a nota más cercana
+          const baseNote = this.frequencyToNote(params.frequency);
+          chord = this.generateChordFromBase(baseNote, params.chord || ["C4", "E4", "G4"]);
+          console.log(`🔷 Transponiendo acorde de ${params.chord || ["C4", "E4", "G4"]} a ${chord} basado en frecuencia ${params.frequency}Hz (nota base: ${baseNote})`);
+        }
+        
+        console.log(`🔷 Disparando acorde para PolySynth:`, chord);
+        source.synth.triggerAttack(chord, Tone.now());
+        console.log(`🎵 Acorde iniciado para ${id}:`, chord);
+        this.playingSounds.add(id);
+        return;
+      }
       
       // Para MonoSynth y otros sintetizadores, usar triggerAttack para sonido continuo
       // El triggerRelease se llamará cuando se detenga el sonido
@@ -341,6 +431,15 @@ export class AudioManager {
     try {
       console.log(`🎵 stopSound llamado para ${id} - Deteniendo sonido`);
       
+      // Para PolySynth, usar releaseAll para detener todas las voces
+      if (source.synth instanceof Tone.PolySynth) {
+        console.log(`🔷 Deteniendo todas las voces del PolySynth`);
+        source.synth.releaseAll(Tone.now());
+        this.playingSounds.delete(id);
+        console.log(`🎵 Todas las voces detenidas para ${id}`);
+        return;
+      }
+      
       // triggerRelease inicia la fase de 'release' de la envolvente.
       // El sintetizador se encargará de detener el oscilador cuando la envolvente llegue a cero.
       source.synth.triggerRelease(Tone.now());
@@ -374,7 +473,15 @@ export class AudioManager {
       // Aplicar parámetros antes de disparar
       this.updateSoundParams(id, params);
       
-      // Para todos los sintetizadores, usar triggerAttackRelease con duración configurada o triggerAttack para duración infinita
+      // Para PluckSynth, usar triggerAttack sin triggerRelease ya que decae naturalmente
+      if (source.synth instanceof Tone.PluckSynth) {
+        console.log(`🔄 Usando triggerAttack para PluckSynth (torus)`);
+        source.synth.triggerAttack(params.frequency, Tone.now());
+        console.log(`🎵 Nota disparada para ${id} con frecuencia ${params.frequency}Hz (decae naturalmente)`);
+        return;
+      }
+      
+      // Para todos los demás sintetizadores, usar triggerAttackRelease con duración configurada o triggerAttack para duración infinita
       const duration = params.duration;
       
       if (duration === Infinity) {
@@ -410,6 +517,40 @@ export class AudioManager {
     }
   }
 
+  /**
+   * Dispara un ataque de ruido (especialmente para NoiseSynth)
+   */
+  public triggerNoiseAttack(id: string, params: AudioParams): void {
+    console.log(`🎵 triggerNoiseAttack llamado para ${id}`);
+    
+    const source = this.soundSources.get(id);
+    if (!source) {
+      console.log(`🎵 Fuente de sonido ${id} no encontrada`);
+      return;
+    }
+
+    try {
+      console.log(`🎵 Disparando ruido para ${id} con parámetros:`, params);
+      console.log(`🎵 Tipo de sintetizador:`, source.synth.constructor.name);
+      
+      // Aplicar parámetros antes de disparar
+      this.updateSoundParams(id, params);
+      
+      // Para NoiseSynth, usar triggerAttackRelease con duración
+      if (source.synth instanceof Tone.NoiseSynth) {
+        const duration = params.duration || 0.1; // Duración por defecto para ruido
+        console.log(`🎵 Usando triggerAttackRelease para NoiseSynth con duración ${duration}s`);
+        source.synth.triggerAttackRelease(duration, Tone.now());
+        console.log(`🎵 Ruido disparado para ${id} con duración ${duration}s`);
+      } else {
+        console.warn(`⚠️ triggerNoiseAttack llamado en sintetizador que no es NoiseSynth:`, source.synth.constructor.name);
+      }
+    } catch (error) {
+      console.error(`❌ Error al disparar ruido para ${id}:`, error);
+      console.error(`❌ Stack trace:`, error instanceof Error ? error.stack : 'No disponible');
+    }
+  }
+
     /**
    * Actualiza los parámetros de sonido de una fuente
    */
@@ -423,15 +564,87 @@ export class AudioManager {
     try {
       console.log(`🔧 Actualizando parámetros para ${id}:`, params);
 
+      // Actualizar parámetros específicos del PolySynth
+      if (source.synth instanceof Tone.PolySynth) {
+        console.log(`🔷 Actualizando parámetros del PolySynth`);
+        
+        // Actualizar polyphony si cambia
+        if (params.polyphony !== undefined) {
+          console.log(`🔷 Polyphony: ${params.polyphony}`);
+          source.synth.maxPolyphony = params.polyphony;
+        }
+        
+        // Actualizar parámetros de las voces FMSynth
+        if (params.harmonicity !== undefined || params.modulationIndex !== undefined || 
+            params.attack !== undefined || params.release !== undefined) {
+          const voiceOptions: any = {};
+          
+          if (params.harmonicity !== undefined) {
+            voiceOptions.harmonicity = params.harmonicity;
+          }
+          if (params.modulationIndex !== undefined) {
+            voiceOptions.modulationIndex = params.modulationIndex;
+          }
+          if (params.attack !== undefined || params.release !== undefined) {
+            voiceOptions.envelope = {};
+            if (params.attack !== undefined) {
+              voiceOptions.envelope.attack = params.attack;
+            }
+            if (params.release !== undefined) {
+              voiceOptions.envelope.release = params.release;
+            }
+          }
+          
+          console.log(`🔷 Aplicando opciones de voz:`, voiceOptions);
+          source.synth.set(voiceOptions);
+        }
+        
+        // Para PolySynth, no necesitamos configurar frecuencia individual
+        console.log(`🔷 Parámetros del PolySynth actualizados`);
+      }
+
       // Actualizar frecuencia si cambia - usar rampTo en la señal de frecuencia del sintetizador
-      if (params.frequency !== undefined) {
+      if (params.frequency !== undefined && !(source.synth instanceof Tone.PolySynth)) {
         // Asegurar que la frecuencia sea al menos 20Hz (límite inferior del oído humano)
         const safeFrequency = Math.max(params.frequency, 20);
         console.log(`🎵 Frecuencia: ${params.frequency}Hz -> ${safeFrequency}Hz`);
         
-        // --- CAMBIO CLAVE: Usar rampTo en la señal de frecuencia del sintetizador ---
-        source.synth.frequency.rampTo(safeFrequency, 0.05);
-        console.log(`🎵 Frecuencia aplicada en tiempo real para ${id}`);
+        // Verificar si el sintetizador tiene la propiedad frequency (NoiseSynth no la tiene)
+        if ('frequency' in source.synth && source.synth.frequency) {
+          // --- CAMBIO CLAVE: Usar rampTo en la señal de frecuencia del sintetizador ---
+          source.synth.frequency.rampTo(safeFrequency, 0.05);
+          console.log(`🎵 Frecuencia aplicada en tiempo real para ${id}`);
+        } else if (source.synth instanceof Tone.PluckSynth) {
+          // Para PluckSynth, usar toFrequency
+          (source.synth as Tone.PluckSynth).toFrequency(safeFrequency);
+          console.log(`🎵 Frecuencia aplicada en tiempo real para ${id} (PluckSynth)`);
+        } else {
+          console.log(`🎵 Sintetizador ${source.synth.constructor.name} no tiene propiedad frequency`);
+        }
+      }
+
+      // Actualizar parámetros específicos del PluckSynth (torus)
+      if (source.synth instanceof Tone.PluckSynth) {
+        // Es un PluckSynth
+        const pluckSynth = source.synth as Tone.PluckSynth;
+        
+        // Actualizar attackNoise
+        if (params.attackNoise !== undefined) {
+          console.log(`🔄 Attack Noise: ${params.attackNoise}`);
+          pluckSynth.attackNoise = params.attackNoise;
+        }
+        
+        // Actualizar dampening
+        if (params.dampening !== undefined) {
+          console.log(`🔄 Dampening: ${params.dampening}`);
+          pluckSynth.dampening = params.dampening;
+        }
+        
+        // Actualizar resonance
+        if (params.resonance !== undefined) {
+          console.log(`🔄 Resonance: ${params.resonance}`);
+          pluckSynth.resonance = params.resonance;
+        }
       }
 
       // Actualizar tipo de onda si cambia
@@ -453,7 +666,12 @@ export class AudioManager {
       if (params.harmonicity !== undefined && 'harmonicity' in source.synth) {
         console.log(`🎵 Harmonicity: ${params.harmonicity}`);
         try {
-          (source.synth as Tone.AMSynth | Tone.FMSynth | Tone.MetalSynth).harmonicity.rampTo(params.harmonicity, 0.05);
+          const harmonicity = (source.synth as Tone.AMSynth | Tone.FMSynth | Tone.MetalSynth).harmonicity;
+          if (typeof harmonicity === 'object' && 'rampTo' in harmonicity) {
+            harmonicity.rampTo(params.harmonicity, 0.05);
+          } else {
+            (source.synth as any).harmonicity = params.harmonicity;
+          }
         } catch (error) {
           console.log(`🎵 Harmonicity rampTo no disponible, usando valor directo`);
           // Para MetalSynth, algunas propiedades pueden ser de solo lectura
@@ -465,7 +683,12 @@ export class AudioManager {
       if (params.modulationIndex !== undefined && 'modulationIndex' in source.synth) {
         console.log(`🎵 Modulation Index: ${params.modulationIndex}`);
         try {
-          (source.synth as Tone.FMSynth | Tone.MetalSynth).modulationIndex.rampTo(params.modulationIndex, 0.05);
+          const modulationIndex = (source.synth as Tone.FMSynth | Tone.MetalSynth).modulationIndex;
+          if (typeof modulationIndex === 'object' && 'rampTo' in modulationIndex) {
+            modulationIndex.rampTo(params.modulationIndex, 0.05);
+          } else {
+            (source.synth as any).modulationIndex = params.modulationIndex;
+          }
         } catch (error) {
           console.log(`🎵 Modulation Index rampTo no disponible, usando valor directo`);
           // Para MetalSynth, algunas propiedades pueden ser de solo lectura
@@ -602,6 +825,32 @@ export class AudioManager {
           }
         }
 
+        // Actualizar parámetros específicos del NoiseSynth
+        if (source.synth instanceof Tone.NoiseSynth) {
+          // Es un NoiseSynth
+          const noiseSynth = source.synth as Tone.NoiseSynth;
+          
+          // Actualizar tipo de ruido
+          if (params.noiseType !== undefined) {
+            console.log(`🟦 Tipo de ruido: ${params.noiseType}`);
+            noiseSynth.noise.type = params.noiseType;
+          }
+          
+          // Actualizar envolvente
+          if (params.attack !== undefined) {
+            console.log(`🟦 Attack: ${params.attack}`);
+            noiseSynth.envelope.attack = params.attack;
+          }
+          if (params.decay !== undefined) {
+            console.log(`🟦 Decay: ${params.decay}`);
+            noiseSynth.envelope.decay = params.decay;
+          }
+          if (params.sustain !== undefined) {
+            console.log(`🟦 Sustain: ${params.sustain}`);
+            noiseSynth.envelope.sustain = params.sustain;
+          }
+        }
+
       // Actualizar volumen si cambia
       if (params.volume !== undefined) {
         console.log(`🎵 Volumen: ${params.volume}`);
@@ -679,6 +928,27 @@ export class AudioManager {
       soundSourcesCount: this.soundSources.size,
       soundSourceIds: Array.from(this.soundSources.keys()),
     };
+  }
+
+  // Helper para convertir frecuencia a nota (ejemplo: 440Hz -> "A4")
+  private frequencyToNote(frequency: number): string {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const octave = Math.floor(Math.log2(frequency / 440) / 12) + 4; // 440Hz es A4
+    const noteIndex = Math.round(12 * Math.log2(frequency / 440)) % 12;
+    return notes[noteIndex] + octave;
+  }
+
+  // Helper para generar acordes basados en una nota base
+  private generateChordFromBase(baseNote: string, chord: string[]): string[] {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
+    const chordNotes = chord.map(note => {
+      const noteName = note.replace(/[0-9]/g, '');
+      const noteIndex = notes.indexOf(noteName);
+      const semitoneDiff = noteIndex - baseNoteIndex;
+      return notes[(semitoneDiff + 12) % 12] + (parseInt(note[note.length - 1]) + 1); // Asegurar octava correcta
+    });
+    return chordNotes;
   }
 }
 

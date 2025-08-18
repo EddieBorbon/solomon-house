@@ -4,3 +4,6 @@ export { SoundCylinder } from './SoundCylinder';
 export { SoundCone } from './SoundCone';
 export { SoundPyramid } from './SoundPyramid';
 export { SoundIcosahedron } from './SoundIcosahedron';
+export { SoundPlane } from './SoundPlane';
+export { SoundTorus } from './SoundTorus';
+export { SoundDodecahedronRing } from './SoundDodecahedronRing';

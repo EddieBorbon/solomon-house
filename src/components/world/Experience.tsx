@@ -1,13 +1,29 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
 import { Suspense } from 'react';
 
+type EnvironmentPreset = 'sunset' | 'dawn' | 'night' | 'warehouse' | 'forest' | 'apartment' | 'studio' | 'city' | 'lobby' | 'park';
+
 export function Experience() {
   const orbitControlsRef = useRef<any>(null);
+  const [environmentPreset, setEnvironmentPreset] = useState<EnvironmentPreset>('sunset');
+
+  // Escuchar cambios de environment desde el ControlPanel
+  useEffect(() => {
+    const handleEnvironmentChange = (event: CustomEvent<EnvironmentPreset>) => {
+      setEnvironmentPreset(event.detail);
+    };
+
+    window.addEventListener('environmentChange', handleEnvironmentChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('environmentChange', handleEnvironmentChange as EventListener);
+    };
+  }, []);
 
   return (
     <div className="w-full h-screen">
@@ -31,6 +47,9 @@ export function Experience() {
           gl.setClearColor('#f0f0f0', 1);
           gl.shadowMap.enabled = true;
           gl.shadowMap.type = 2; // PCFSoftShadowMap
+          gl.toneMapping = 2; // ACESFilmicToneMapping
+          gl.toneMappingExposure = 1.2;
+          gl.outputColorSpace = 'srgb';
         }}
       >
         {/* Controles de cámara */}
@@ -46,18 +65,32 @@ export function Experience() {
         />
 
         {/* Iluminación básica */}
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={0.3} />
         <directionalLight
           position={[10, 10, 5]}
-          intensity={1}
+          intensity={1.2}
           castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
           shadow-camera-far={50}
           shadow-camera-left={-10}
           shadow-camera-right={10}
           shadow-camera-top={10}
           shadow-camera-bottom={-10}
+        />
+        
+        {/* Luz adicional para mejor iluminación */}
+        <directionalLight
+          position={[-5, 8, -5]}
+          intensity={0.8}
+          castShadow
+        />
+        
+        {/* Luz de relleno para suavizar sombras */}
+        <hemisphereLight
+          intensity={0.2}
+          groundColor="#404040"
+          color="#ffffff"
         />
 
         {/* Grid helper para referencia visual */}
@@ -65,7 +98,7 @@ export function Experience() {
 
         {/* Ambiente de iluminación */}
         <Suspense fallback={null}>
-          <Environment preset="sunset" />
+          <Environment preset={environmentPreset} />
         </Suspense>
 
         {/* Contenido principal de la escena */}

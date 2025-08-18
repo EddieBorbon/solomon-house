@@ -61,13 +61,7 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
 
     return (
       <group ref={ref} position={position} rotation={rotation}>
-        {/* Indicador de selección */}
-        {isSelected && (
-          <mesh position={[0, 1.2, 0]}>
-            <ringGeometry args={[0.8, 1.0, 32]} />
-            <meshBasicMaterial color="#60a5fa" transparent opacity={0.8} />
-          </mesh>
-        )}
+
         
         {/* Icosaedro principal */}
         <mesh
@@ -85,9 +79,10 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
           <meshStandardMaterial
             color={isSelected ? "#818cf8" : "#6366f1"}
             metalness={0.9}
-            roughness={0.1}
+            roughness={0.05}
             emissive={isSelected ? "#4338ca" : "#1e1b4b"}
             emissiveIntensity={isSelected ? 0.3 : 0.1}
+            envMapIntensity={1.5}
           />
         </mesh>
         

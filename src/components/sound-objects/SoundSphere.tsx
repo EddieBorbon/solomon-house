@@ -103,12 +103,13 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
           <meshStandardMaterial
             ref={materialRef}
             color="#8b5cf6" // Color morado base
-            metalness={0.1}
-            roughness={0.2}
+            metalness={0.2}
+            roughness={0.15}
             transparent
-            opacity={0.9}
+            opacity={0.95}
             emissive="#4c1d95"
             emissiveIntensity={audioEnabled ? 0.3 : 0}
+            envMapIntensity={1.2}
           />
         </mesh>
 

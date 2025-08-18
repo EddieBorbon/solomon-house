@@ -10,6 +10,9 @@ import { SoundCylinder } from '../sound-objects/SoundCylinder';
 import { SoundCone } from '../sound-objects/SoundCone';
 import { SoundPyramid } from '../sound-objects/SoundPyramid';
 import { SoundIcosahedron } from '../sound-objects/SoundIcosahedron';
+import { SoundPlane } from '../sound-objects/SoundPlane';
+import { SoundTorus } from '../sound-objects/SoundTorus';
+import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -38,9 +41,12 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
       // Para conos, activar/desactivar el audio
       if (object.type === 'cone') {
         toggleObjectAudio(object.id);
-      } else if (object.type === 'icosahedron') {
-        // Para icosaedros, solo disparar la nota (sonido percusivo)
+      } else if (object.type === 'icosahedron' || object.type === 'plane' || object.type === 'torus') {
+        // Para icosaedros, planos y toroides, solo disparar la nota (sonido percusivo)
         triggerObjectNote(object.id);
+      } else if (object.type === 'dodecahedronRing') {
+        // Para anillos de dodecaedros, activar/desactivar el audio (sonido continuo)
+        toggleObjectAudio(object.id);
       } else {
         // Para otros objetos, solo disparar la nota
         triggerObjectNote(object.id);
@@ -110,6 +116,32 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'plane' ? (
+          <SoundPlane
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'torus' ? (
+          <SoundTorus
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioParams={object.audioParams}
+          />
+        ) : object.type === 'dodecahedronRing' ? (
+          <SoundDodecahedronRing
+            id={object.id}
+            position={[0, 0, 0]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
             audioParams={object.audioParams}
           />
         ) : null}

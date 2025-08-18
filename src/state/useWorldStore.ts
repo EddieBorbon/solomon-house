@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -32,6 +32,7 @@ export interface WorldActions {
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
   toggleObjectAudio: (id: string) => void;
   triggerObjectNote: (id: string) => void;
+  triggerObjectPercussion: (id: string) => void;
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
 }
@@ -107,6 +108,40 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         resonance: 4000,
         octaves: 1.5,
         duration: 0.5, // Duración corta para sonidos percusivos metálicos
+      };
+    case 'plane':
+      return {
+        frequency: 0, // NoiseSynth no usa frecuencia
+        volume: 0.7,
+        waveform: 'sine', // No se usa en NoiseSynth pero es requerido por AudioParams
+        noiseType: 'white',
+        attack: 0.001,
+        decay: 0.1,
+        sustain: 0,
+        duration: 0.1, // Duración del golpe
+      };
+    case 'torus':
+      return {
+        frequency: 440,
+        volume: 0.9,
+        waveform: 'sine', // No se usa en PluckSynth pero es requerido por AudioParams
+        attackNoise: 1,
+        dampening: 4000,
+        resonance: 0.9,
+      };
+    case 'dodecahedronRing':
+      return {
+        frequency: 220, // Frecuencia base A3 para transponer acordes
+        volume: 0.7,
+        waveform: 'sine',
+        polyphony: 4,
+        chord: ["C4", "E4", "G4", "B4"], // Un acorde de Cmaj7
+        attack: 1.5, // Ataque lento
+        release: 2.0, // Liberación larga
+        // Parámetros para las voces de FMSynth
+        harmonicity: 1,
+        modulationIndex: 2,
+        modulationWaveform: 'triangle',
       };
     default:
       return {
@@ -223,6 +258,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         return state;
       }
       
+      // Ignorar los tipos percusivos ya que no necesitan toggle de audio
+      if (currentObject.type === 'plane' || currentObject.type === 'torus') {
+        console.log(`🎵 Objeto ${id} es de tipo '${currentObject.type}', ignorando toggleObjectAudio`);
+        return state;
+      }
+      
+      // Para dodecahedronRing, usar startSound/stopSound como sonido continuo
+      if (currentObject.type === 'dodecahedronRing') {
+        console.log(`🔷 Objeto ${id} es de tipo 'dodecahedronRing', usando startSound/stopSound`);
+      }
+      
       // Determinar el nuevo estado: si forceState está definido, usarlo; si no, hacer toggle
       const newAudioEnabled = forceState !== undefined ? forceState : !currentObject.audioEnabled;
       
@@ -263,6 +309,23 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     if (object) {
       console.log(`🥁 Disparando nota percusiva para ${id}`);
       audioManager.triggerNoteAttack(id, object.audioParams);
+    }
+  },
+
+  // Acción para disparar un objeto percusivo (especialmente para 'plane')
+  triggerObjectPercussion: (id: string) => {
+    const state = get();
+    const object = state.objects.find(obj => obj.id === id);
+    
+    if (object) {
+      console.log(`🥁 Disparando objeto percusivo para ${id}`);
+      if (object.type === 'plane') {
+        // Para objetos 'plane', usar triggerNoiseAttack
+        audioManager.triggerNoiseAttack(id, object.audioParams);
+      } else {
+        // Para otros objetos percusivos, usar triggerNoteAttack
+        audioManager.triggerNoteAttack(id, object.audioParams);
+      }
     }
   },
 

@@ -13,7 +13,7 @@ export function ParameterEditor() {
   }, [objects, selectedObjectId]);
 
   // Función para actualizar un parámetro específico
-  const handleParamChange = (param: keyof AudioParams, value: number | string) => {
+  const handleParamChange = (param: keyof AudioParams, value: number | string | string[]) => {
     if (!selectedObject) return;
 
     console.log(`🎛️ UI: Cambiando parámetro ${param} a: ${value}`);
@@ -100,7 +100,9 @@ export function ParameterEditor() {
               selectedObject.type === 'sphere' ? 'bg-purple-500' :
               selectedObject.type === 'cylinder' ? 'bg-green-500' :
               selectedObject.type === 'pyramid' ? 'bg-red-500' :
-              selectedObject.type === 'icosahedron' ? 'bg-indigo-500' : 'bg-gray-500'
+              selectedObject.type === 'icosahedron' ? 'bg-indigo-500' :
+              selectedObject.type === 'torus' ? 'bg-cyan-500' : 
+              selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' : 'bg-gray-500'
             }`}>
               <span className="text-lg">
                 {selectedObject.type === 'cone' ? '🥁' :
@@ -108,7 +110,9 @@ export function ParameterEditor() {
                  selectedObject.type === 'sphere' ? '🔮' :
                  selectedObject.type === 'cylinder' ? '🔶' :
                  selectedObject.type === 'pyramid' ? '🔺' :
-                 selectedObject.type === 'icosahedron' ? '🔶' : '❓'}
+                 selectedObject.type === 'icosahedron' ? '🔶' :
+                 selectedObject.type === 'torus' ? '🔄' : 
+                 selectedObject.type === 'dodecahedronRing' ? '🔷' : '❓'}
               </span>
             </div>
             <span className="text-sm font-medium text-gray-300">
@@ -117,7 +121,10 @@ export function ParameterEditor() {
                selectedObject.type === 'sphere' ? 'Síntesis FM' :
                selectedObject.type === 'cylinder' ? 'DuoSynth' :
                selectedObject.type === 'pyramid' ? 'MonoSynth' :
-               selectedObject.type === 'icosahedron' ? 'MetalSynth' : 'Objeto de Sonido'}
+               selectedObject.type === 'icosahedron' ? 'MetalSynth' :
+               selectedObject.type === 'plane' ? 'NoiseSynth' :
+               selectedObject.type === 'torus' ? 'PluckSynth' : 
+               selectedObject.type === 'dodecahedronRing' ? 'PolySynth' : 'Objeto de Sonido'}
             </span>
             
                          {/* Texto informativo específico para cada tipo */}
@@ -139,6 +146,33 @@ export function ParameterEditor() {
                    Sonido percusivo metálico
                  </p>
                </div>
+             ) : selectedObject.type === 'plane' ? (
+               <div className="mt-2">
+                 <p className="text-xs text-gray-400 mt-1">
+                   Haz clic en el objeto para tocar
+                 </p>
+                 <p className="text-xs text-gray-400 mt-1">
+                   Generador de ruido percusivo
+                 </p>
+               </div>
+             ) : selectedObject.type === 'torus' ? (
+               <div className="mt-2">
+                 <p className="text-xs text-gray-400 mt-1">
+                   Haz clic en el objeto para tocar
+                 </p>
+                 <p className="text-xs text-gray-400 mt-1">
+                   Instrumento de cuerdas percusivo
+                 </p>
+               </div>
+             ) : selectedObject.type === 'dodecahedronRing' ? (
+               <div className="mt-2">
+                 <p className="text-xs text-gray-400 mt-1">
+                   Haz clic para activar/desactivar el acorde continuo
+                 </p>
+                 <p className="text-xs text-gray-400 mt-1">
+                   Instrumento polifónico para acordes
+                 </p>
+               </div>
              ) : (
               <div className="mt-2">
                 <p className="text-xs text-gray-400 mt-1">
@@ -152,32 +186,39 @@ export function ParameterEditor() {
           </div>
         </div>
 
-        {/* Controles de parámetros */}
+                {/* Controles de parámetros */}
         <div className="space-y-4">
-          {/* Frecuencia */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
-            </label>
-            <div className="flex items-center gap-3">
-                          <input
-              type="range"
-              min={selectedObject.type === 'cone' ? '20' : selectedObject.type === 'icosahedron' ? '50' : '20'}
-              max={selectedObject.type === 'cone' ? '200' : selectedObject.type === 'icosahedron' ? '1200' : '2000'}
-              step="1"
-              value={selectedObject.audioParams.frequency}
-              onChange={(e) => handleParamChange('frequency', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {selectedObject.audioParams.frequency}
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>{selectedObject.type === 'cone' ? '20 Hz' : selectedObject.type === 'icosahedron' ? '50 Hz' : '20 Hz'}</span>
-            <span>{selectedObject.type === 'cone' ? '200 Hz' : selectedObject.type === 'icosahedron' ? '1200 Hz' : '2000 Hz'}</span>
-          </div>
-          </div>
+          {/* Frecuencia - Para todos los objetos */}
+          {(
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={selectedObject.type === 'cone' ? '20' : selectedObject.type === 'icosahedron' ? '50' : selectedObject.type === 'dodecahedronRing' ? '55' : '20'}
+                  max={selectedObject.type === 'cone' ? '200' : selectedObject.type === 'icosahedron' ? '1200' : selectedObject.type === 'dodecahedronRing' ? '880' : '2000'}
+                  step="1"
+                  value={selectedObject.audioParams.frequency}
+                  onChange={(e) => handleParamChange('frequency', Number(e.target.value))}
+                  className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                />
+                <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                  {selectedObject.audioParams.frequency}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{selectedObject.type === 'cone' ? '20 Hz' : selectedObject.type === 'icosahedron' ? '50 Hz' : selectedObject.type === 'dodecahedronRing' ? '55 Hz (A1)' : '20 Hz'}</span>
+                <span>{selectedObject.type === 'cone' ? '200 Hz' : selectedObject.type === 'icosahedron' ? '1200 Hz' : selectedObject.type === 'dodecahedronRing' ? '880 Hz (A5)' : '2000 Hz'}</span>
+              </div>
+              {selectedObject.type === 'dodecahedronRing' && (
+                <p className="text-xs text-pink-400 mt-1">
+                  💡 La frecuencia base transpone el acorde completo
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Forma de Onda (Portadora) */}
           <div>
@@ -943,6 +984,390 @@ export function ParameterEditor() {
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
                     <span>0</span>
                     <span>8</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Controles específicos para NoiseSynth (plano) */}
+          {selectedObject.type === 'plane' && (
+            <>
+              {/* Sección: Parámetros del NoiseSynth */}
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+                  🟦 Parámetros del NoiseSynth
+                </h4>
+                
+                {/* Tipo de Ruido */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Tipo de Ruido
+                  </label>
+                  <select
+                    value={selectedObject.audioParams.noiseType || 'white'}
+                    onChange={(e) => handleParamChange('noiseType', e.target.value as 'white' | 'pink' | 'brown')}
+                    className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                  >
+                    <option value="white">Blanco (Ruido completo)</option>
+                    <option value="pink">Rosa (Ruido suave)</option>
+                    <option value="brown">Marrón (Ruido bajo)</option>
+                  </select>
+                </div>
+
+                {/* Duración del Golpe */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Duración del Golpe (segundos)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.01"
+                      max="1"
+                      step="0.01"
+                      value={selectedObject.audioParams.duration || 0.1}
+                      onChange={(e) => handleParamChange('duration', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.duration || 0.1).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.01s</span>
+                    <span>1s</span>
+                  </div>
+                </div>
+
+                {/* Attack */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Attack (Ataque)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.001"
+                      max="0.5"
+                      step="0.001"
+                      value={selectedObject.audioParams.attack || 0.001}
+                      onChange={(e) => handleParamChange('attack', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.attack || 0.001).toFixed(3)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.001s</span>
+                    <span>0.5s</span>
+                  </div>
+                </div>
+
+                {/* Decay */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Decay (Caída)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.01"
+                      max="1"
+                      step="0.01"
+                      value={selectedObject.audioParams.decay || 0.1}
+                      onChange={(e) => handleParamChange('decay', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.decay || 0.1).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.01s</span>
+                    <span>1s</span>
+                  </div>
+                </div>
+
+                {/* Sustain */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Sustain (Sostenido)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={selectedObject.audioParams.sustain || 0}
+                      onChange={(e) => handleParamChange('sustain', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {Math.round((selectedObject.audioParams.sustain || 0) * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0%</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Controles específicos para PluckSynth (torus) */}
+          {selectedObject.type === 'torus' && (
+            <>
+              {/* Sección: Parámetros del PluckSynth */}
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
+                  🔄 Parámetros del PluckSynth
+                </h4>
+                
+                {/* Attack Noise */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Attack Noise (Ruido de Ataque)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="20"
+                      step="0.1"
+                      value={selectedObject.audioParams.attackNoise || 1}
+                      onChange={(e) => handleParamChange('attackNoise', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.attackNoise || 1).toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.1</span>
+                    <span>20</span>
+                  </div>
+                </div>
+
+                {/* Dampening */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Dampening (Amortiguación)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="500"
+                      max="7000"
+                      step="100"
+                      value={selectedObject.audioParams.dampening || 4000}
+                      onChange={(e) => handleParamChange('dampening', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {selectedObject.audioParams.dampening || 4000}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>500</span>
+                    <span>7000</span>
+                  </div>
+                </div>
+
+                {/* Resonance */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Resonance (Sustain)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.99"
+                      step="0.01"
+                      value={selectedObject.audioParams.resonance || 0.9}
+                      onChange={(e) => handleParamChange('resonance', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {Math.round((selectedObject.audioParams.resonance || 0.9) * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0%</span>
+                    <span>99%</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Controles específicos para PolySynth (dodecahedronRing) */}
+          {selectedObject.type === 'dodecahedronRing' && (
+            <>
+              {/* Sección: Parámetros del PolySynth */}
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-semibold text-pink-400 mb-3 flex items-center gap-2">
+                  🔷 Parámetros del PolySynth
+                </h4>
+                
+                {/* Polifonía */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Polifonía (Número de Voces)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="1"
+                      max="8"
+                      step="1"
+                      value={selectedObject.audioParams.polyphony || 4}
+                      onChange={(e) => handleParamChange('polyphony', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {selectedObject.audioParams.polyphony || 4}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1</span>
+                    <span>8</span>
+                  </div>
+                </div>
+
+                {/* Tipo de Acorde */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Tipo de Acorde
+                  </label>
+                  <select
+                    value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4"])}
+                    onChange={(e) => {
+                      const chordMap: { [key: string]: string[] } = {
+                        '["C4","E4","G4"]': ["C4", "E4", "G4"], // Mayor
+                        '["C4","Eb4","G4"]': ["C4", "Eb4", "G4"], // Menor
+                        '["C4","E4","G4","B4"]': ["C4", "E4", "G4", "B4"], // Mayor 7
+                        '["C4","Eb4","G4","Bb4"]': ["C4", "Eb4", "G4", "Bb4"], // Menor 7
+                        '["C4","F4","G4"]': ["C4", "F4", "G4"], // Suspendido 2
+                        '["C4","D4","G4"]': ["C4", "D4", "G4"], // Suspendido 4
+                        '["C4","E4","G4","Bb4"]': ["C4", "E4", "G4", "Bb4"], // Dominante 7
+                      };
+                      const selectedChord = chordMap[e.target.value] || ["C4", "E4", "G4"];
+                      handleParamChange('chord', selectedChord);
+                    }}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value='["C4","E4","G4"]'>Mayor (C-E-G)</option>
+                    <option value='["C4","Eb4","G4"]'>Menor (C-Eb-G)</option>
+                    <option value='["C4","E4","G4","B4"]'>Mayor 7 (C-E-G-B)</option>
+                    <option value='["C4","Eb4","G4","Bb4"]'>Menor 7 (C-Eb-G-Bb)</option>
+                    <option value='["C4","F4","G4"]'>Suspendido 2 (C-F-G)</option>
+                    <option value='["C4","D4","G4"]'>Suspendido 4 (C-D-G)</option>
+                    <option value='["C4","E4","G4","Bb4"]'>Dominante 7 (C-E-G-Bb)</option>
+                  </select>
+                </div>
+
+                {/* Attack */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Attack (Ataque)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="3.0"
+                      step="0.1"
+                      value={selectedObject.audioParams.attack || 1.5}
+                      onChange={(e) => handleParamChange('attack', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.attack || 1.5).toFixed(1)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.1s</span>
+                    <span>3.0s</span>
+                  </div>
+                </div>
+
+                {/* Release */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Release (Liberación)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="4.0"
+                      step="0.1"
+                      value={selectedObject.audioParams.release || 2.0}
+                      onChange={(e) => handleParamChange('release', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.release || 2.0).toFixed(1)}s
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.5s</span>
+                    <span>4.0s</span>
+                  </div>
+                </div>
+
+                {/* Harmonicity */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Harmonicity (Armonicidad)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="4.0"
+                      step="0.1"
+                      value={selectedObject.audioParams.harmonicity || 1}
+                      onChange={(e) => handleParamChange('harmonicity', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.harmonicity || 1).toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.1</span>
+                    <span>4.0</span>
+                  </div>
+                </div>
+
+                {/* Modulation Index */}
+                <div className="mb-3">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Modulation Index (Índice de Modulación)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="10.0"
+                      step="0.1"
+                      value={selectedObject.audioParams.modulationIndex || 2}
+                      onChange={(e) => handleParamChange('modulationIndex', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {(selectedObject.audioParams.modulationIndex || 2).toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.1</span>
+                    <span>10.0</span>
                   </div>
                 </div>
               </div>

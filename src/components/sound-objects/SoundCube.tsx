@@ -95,11 +95,12 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
           ref={materialRef}
           color="#4ecdc4"
           transparent
-          opacity={0.8}
-          roughness={0.3}
-          metalness={0.1}
+          opacity={0.9}
+          roughness={0.2}
+          metalness={0.3}
           emissive="#000000"
           emissiveIntensity={0}
+          envMapIntensity={1.0}
         />
       </mesh>
 

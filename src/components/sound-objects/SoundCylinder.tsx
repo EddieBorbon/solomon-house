@@ -177,13 +177,13 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           <meshStandardMaterial
             ref={materialRef}
             color="#22c55e"
-            metalness={0.3}
-            roughness={0.4}
+            metalness={0.4}
+            roughness={0.25}
             transparent
-            opacity={0.9}
+            opacity={0.95}
             emissive="#000000"
             emissiveIntensity={0}
-            toneMapped={false}
+            envMapIntensity={1.1}
           />
         </mesh>
 
