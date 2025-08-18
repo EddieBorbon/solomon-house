@@ -41,20 +41,22 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'cube':
       return {
         frequency: 220,
-        waveform: 'sine',
-        volume: 0.5,
+        volume: 0.05, // Volumen más bajo para síntesis AM
+        waveform: 'sine', // Forma de onda de la portadora
+        harmonicity: 1.5,
+        modulationWaveform: 'square', // Forma de onda de la moduladora
       };
     case 'sphere':
       return {
         frequency: 440,
         waveform: 'triangle',
-        volume: 0.7,
+        volume: 0.07, // Volumen ajustado al nuevo rango
       };
     default:
       return {
         frequency: 330,
         waveform: 'sine',
-        volume: 0.6,
+        volume: 0.06, // Volumen ajustado al nuevo rango
       };
   }
 };

@@ -69,13 +69,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
               </mesh>
             )}
 
-            {/* Etiqueta del objeto */}
-            <group position={[0, -1.2, 0]}>
-              <mesh>
-                <planeGeometry args={[2, 0.5]} />
-                <meshBasicMaterial color="#000000" transparent opacity={0.7} />
-              </mesh>
-            </group>
+            {/* Etiqueta del objeto - ELIMINADA */}
           </group>
         )}
       </group>

@@ -80,35 +80,7 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
         </mesh>
       )}
 
-      {/* Etiqueta del objeto */}
-      <group position={[0, -1.2, 0]}>
-        <mesh>
-          <planeGeometry args={[2, 0.5]} />
-          <meshBasicMaterial
-            color="#000000"
-            transparent
-            opacity={0.7}
-          />
-        </mesh>
-      </group>
-
-      {/* Botón de prueba de audio */}
-      <group position={[0, -2.5, 0]}>
-        <mesh
-          onClick={(e) => {
-            e.stopPropagation();
-            // Toggle del estado de audio usando la acción del store
-            useWorldStore.getState().toggleObjectAudio(id);
-          }}
-        >
-          <boxGeometry args={[1.5, 0.3, 0.1]} />
-          <meshBasicMaterial
-            color={audioEnabled ? '#ff4757' : '#2ed573'}
-            transparent
-            opacity={0.9}
-          />
-        </mesh>
-      </group>
+      {/* Switch de audio - ELIMINADO */}
     </group>
   );
 });

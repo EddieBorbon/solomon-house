@@ -5,14 +5,20 @@ export interface AudioParams {
   frequency: number;
   waveform: OscillatorType;
   volume: number;
+  harmonicity?: number;
+  modulationWaveform?: OscillatorType;
+  // Nuevos parámetros para DuoSynth
+  waveform2?: OscillatorType;
+  vibratoAmount?: number;
+  vibratoRate?: number;
 }
 
 // Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder';
 
 // Estructura de una fuente de sonido
 interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth;
+  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth;
   panner: Tone.Panner3D;
 }
 
@@ -71,12 +77,16 @@ export class AudioManager {
       console.log(`🎵 Creando fuente de sonido ${id} de tipo ${type}`);
 
       // Crear el sintetizador apropiado según el tipo
-      let synth: Tone.AMSynth | Tone.FMSynth;
+      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth;
       
       if (type === 'cube') {
         synth = new Tone.AMSynth({
+          harmonicity: params.harmonicity || 1.5,
           oscillator: {
             type: params.waveform,
+          },
+          modulation: {
+            type: params.modulationWaveform || 'square',
           },
           envelope: {
             attack: 0.1,
@@ -85,7 +95,10 @@ export class AudioManager {
             release: 0.5, // Release más largo para un fade-out suave
           },
         });
-      } else {
+        
+        // Configurar la amplitud inicial de la portadora para síntesis AM
+        synth.oscillator.volume.setValueAtTime(Tone.gainToDb(params.volume || 0.05), Tone.now());
+      } else if (type === 'sphere') {
         // sphere
         synth = new Tone.FMSynth({
           oscillator: {
@@ -96,6 +109,19 @@ export class AudioManager {
             decay: 0.2,
             sustain: 0.8,
             release: 0.5, // Release más largo para un fade-out suave
+          },
+        });
+      } else if (type === 'cylinder') {
+        // cylinder - DuoSynth
+        synth = new Tone.DuoSynth({
+          harmonicity: params.harmonicity || 1.5,
+          vibratoAmount: params.vibratoAmount || 0.2,
+          vibratoRate: params.vibratoRate || 5,
+          voice0: { 
+            oscillator: { type: params.waveform || 'triangle' } 
+          },
+          voice1: { 
+            oscillator: { type: params.waveform2 || 'sine' } 
           },
         });
       }
@@ -233,13 +259,37 @@ export class AudioManager {
         console.log(`🎵 Forma de onda aplicada en tiempo real para ${id}`);
       }
 
+      // Actualizar harmonicity si cambia (solo para AMSynth)
+      if (params.harmonicity !== undefined && 'harmonicity' in source.synth) {
+        console.log(`🎵 Harmonicity: ${params.harmonicity}`);
+        (source.synth as Tone.AMSynth).harmonicity.rampTo(params.harmonicity, 0.05);
+        console.log(`🎵 Harmonicity aplicado en tiempo real para ${id}`);
+      }
+
+      // Actualizar forma de onda de modulación si cambia (solo para AMSynth)
+      if (params.modulationWaveform !== undefined && 'modulation' in source.synth) {
+        console.log(`🎵 Forma de onda de modulación: ${params.modulationWaveform}`);
+        (source.synth as Tone.AMSynth).modulation.type = params.modulationWaveform;
+        console.log(`🎵 Forma de onda de modulación aplicada en tiempo real para ${id}`);
+      }
+
       // Actualizar volumen si cambia
       if (params.volume !== undefined) {
         console.log(`🎵 Volumen: ${params.volume}`);
-        // Convertir volumen (0-1) a decibeles y aplicar con transición suave
-        const dbValue = params.volume > 0 ? Tone.gainToDb(params.volume) : -Infinity;
+        
+        // Para síntesis AM, el volumen debe controlar tanto la amplitud como el volumen general
+        if ('modulation' in source.synth) {
+          // Es un AMSynth - aplicar volumen a la amplitud de la portadora
+          const amplitudeValue = params.volume;
+          (source.synth as Tone.AMSynth).oscillator.volume.rampTo(Tone.gainToDb(amplitudeValue), 0.05);
+          console.log(`🎵 Amplitud de portadora aplicada en tiempo real para ${id}: ${amplitudeValue}`);
+        }
+        
+        // Aplicar volumen general al sintetizador (control de salida)
+        // El rango 0-0.1 se mapea a -Infinity a -20dB para mejor control
+        const dbValue = params.volume > 0 ? Tone.gainToDb(params.volume * 10) : -Infinity;
         source.synth.volume.rampTo(dbValue, 0.05);
-        console.log(`🎵 Volumen aplicado en tiempo real para ${id}: ${params.volume} -> ${dbValue}dB`);
+        console.log(`🎵 Volumen general aplicado en tiempo real para ${id}: ${params.volume} -> ${dbValue}dB`);
       }
 
       console.log(`✅ Parámetros actualizados para ${id}`);
