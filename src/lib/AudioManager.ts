@@ -54,18 +54,18 @@ export interface AudioParams {
 // Tipos para las fuentes de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
-// Estructura de una fuente de sonido (REESTRUCTURADA)
+// Estructura de una fuente de sonido (REFACTORIZADA para Doble Espacialización)
 interface SoundSource {
   synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
-  effectSends: Map<string, Tone.Gain>; // Envíos a los efectos globales
-  panner: Tone.Panner3D; // El panner 3D para espacialización
-  dryWetMix: Tone.Gain; // Nodo para la señal "seca" (sin efectos)
+  panner: Tone.Panner3D; // Panner 3D para la señal seca (posición del objeto sonoro)
+  splitter: Tone.Split; // Splitter para dividir la señal del sintetizador
+  wetGain: Tone.Gain; // Control de volumen para la señal que va al efecto
 }
 
 export class AudioManager {
   private static instance: AudioManager;
   private soundSources: Map<string, SoundSource> = new Map();
-  private globalEffects: Map<string, Tone.Phaser | any> = new Map(); // Efectos globales
+  private globalEffects: Map<string, { effectNode: Tone.Phaser | any, panner: Tone.Panner3D }> = new Map(); // Efectos globales con panners independientes
   private isContextStarted: boolean = false;
   private playingSounds: Set<string> = new Set(); // Rastrear qué sonidos están activos
   private lastListenerPosition: string = ''; // Para reducir logs del listener
@@ -83,39 +83,44 @@ export class AudioManager {
   }
 
   /**
-   * Crea un efecto global (Phaser por ahora)
+   * Crea un efecto global con espacialización independiente
    */
-  public createGlobalEffect(effectId: string, type: 'phaser'): void {
+  public createGlobalEffect(effectId: string, type: 'phaser', position: [number, number, number]): void {
     try {
-      let effect: Tone.Phaser | any;
+      let effectNode: Tone.Phaser | any;
       
       if (type === 'phaser') {
-        effect = new Tone.Phaser({
+        effectNode = new Tone.Phaser({
           frequency: 0.5,
           octaves: 2.2,
           baseFrequency: 1000,
         });
         
-        // Conectar el efecto directamente a la salida (no al panner)
-        effect.toDestination();
-        
         console.log(`🎛️ Efecto global ${type} creado con ID: ${effectId}`);
       }
       
-      if (effect) {
-        this.globalEffects.set(effectId, effect);
-        console.log(`✅ Efecto global ${effectId} añadido al AudioManager`);
-        
-        // Configurar envíos para todas las fuentes de sonido existentes
-        this.soundSources.forEach((source, soundId) => {
-          const send = new Tone.Gain(0); // Inicialmente sin envío
-          // Conectar synth -> send -> panner -> efecto para mantener espacialización
-          source.synth.connect(send); // Conectar synth al send
-          send.connect(source.panner); // Conectar send al panner para mantener espacialización
-          source.panner.connect(effect); // Conectar panner al efecto global
-          source.effectSends.set(effectId, send);
-          console.log(`🎛️ Send configurado para efecto ${effectId} en fuente ${soundId} con espacialización preservada`);
+      if (effectNode) {
+        // Crear panner 3D independiente para el efecto
+        const effectPanner = new Tone.Panner3D({
+          positionX: position[0],
+          positionY: position[1],
+          positionZ: position[2],
+          panningModel: 'HRTF',
+          distanceModel: 'inverse',
+          refDistance: 1,
+          maxDistance: 100,
+          rolloffFactor: 2,
+          coneInnerAngle: 360,
+          coneOuterAngle: 360,
+          coneOuterGain: 0,
         });
+        
+        // Conectar efecto -> panner -> destination
+        effectNode.chain(effectPanner, Tone.Destination);
+        
+        // Almacenar tanto el nodo del efecto como su panner
+        this.globalEffects.set(effectId, { effectNode, panner: effectPanner });
+        console.log(`✅ Efecto global ${effectId} añadido al AudioManager con panner en posición [${position.join(', ')}]`);
       }
     } catch (error) {
       console.error(`❌ Error al crear efecto global ${effectId}:`, error);
@@ -125,7 +130,7 @@ export class AudioManager {
   /**
    * Obtiene un efecto global por ID
    */
-  public getGlobalEffect(effectId: string): Tone.Phaser | any | undefined {
+  public getGlobalEffect(effectId: string): { effectNode: Tone.Phaser | any, panner: Tone.Panner3D } | undefined {
     return this.globalEffects.get(effectId);
   }
 
@@ -133,26 +138,27 @@ export class AudioManager {
    * Actualiza los parámetros de un efecto global
    */
   public updateGlobalEffect(effectId: string, params: any): void {
-    const effect = this.globalEffects.get(effectId);
-    if (!effect) {
+    const effectData = this.globalEffects.get(effectId);
+    if (!effectData) {
       console.log(`🎛️ Efecto global ${effectId} no encontrado`);
       return;
     }
 
     try {
-      if (effect instanceof Tone.Phaser) {
+      const { effectNode } = effectData;
+      if (effectNode instanceof Tone.Phaser) {
         if (params.frequency !== undefined) {
-          effect.frequency.rampTo(params.frequency, 0.1);
+          effectNode.frequency.rampTo(params.frequency, 0.1);
         }
         if (params.octaves !== undefined) {
-          effect.octaves = params.octaves;
+          effectNode.octaves = params.octaves;
         }
         if (params.baseFrequency !== undefined) {
           // Manejar tanto string como objeto Frequency
-          if (typeof effect.baseFrequency === 'object' && 'rampTo' in effect.baseFrequency) {
-            (effect.baseFrequency as any).rampTo(params.baseFrequency, 0.1);
+          if (typeof effectNode.baseFrequency === 'object' && 'rampTo' in effectNode.baseFrequency) {
+            (effectNode.baseFrequency as any).rampTo(params.baseFrequency, 0.1);
           } else {
-            effect.baseFrequency = params.baseFrequency;
+            effectNode.baseFrequency = params.baseFrequency;
           }
         }
         console.log(`✅ Parámetros del efecto ${effectId} actualizados:`, params);
@@ -166,10 +172,12 @@ export class AudioManager {
    * Elimina un efecto global
    */
   public removeGlobalEffect(effectId: string): void {
-    const effect = this.globalEffects.get(effectId);
-    if (effect) {
+    const effectData = this.globalEffects.get(effectId);
+    if (effectData) {
       try {
-        effect.dispose();
+        const { effectNode, panner } = effectData;
+        effectNode.dispose();
+        panner.dispose();
         this.globalEffects.delete(effectId);
         console.log(`✅ Efecto global ${effectId} eliminado`);
       } catch (error) {
@@ -179,7 +187,7 @@ export class AudioManager {
   }
 
   /**
-   * Controla la cantidad de señal enviada a un efecto específico
+   * Controla la cantidad de señal enviada a un efecto específico (REFACTORIZADO para Doble Espacialización)
    */
   public setEffectSendAmount(soundSourceId: string, effectId: string, amount: number): void {
     const source = this.soundSources.get(soundSourceId);
@@ -188,28 +196,40 @@ export class AudioManager {
       return;
     }
 
-    const send = source.effectSends.get(effectId);
-    if (!send) {
-      console.log(`🎛️ Send para efecto ${effectId} no encontrado en ${soundSourceId}`);
+    const effectData = this.globalEffects.get(effectId);
+    if (!effectData) {
+      console.log(`🎛️ Efecto global ${effectId} no encontrado`);
       return;
     }
 
     try {
-      // Ajustar el envío al efecto (mantiene espacialización)
-      send.gain.rampTo(amount, 0.1);
+      const { effectNode } = effectData;
       
-      // Cuando amount = 1 (dentro de zona): silenciar señal seca completamente
-      // Cuando amount = 0 (fuera de zona): solo señal seca
-      // Cuando amount = 0.5: mezcla 50/50
-      const dryAmount = amount === 1 ? 0 : (amount === 0 ? 1 : Math.max(0, 1 - amount));
-      source.dryWetMix.gain.rampTo(dryAmount, 0.1);
-      
-      // Solo loggear cambios significativos en el send amount (cada 0.1 unidades)
-      const currentSendAmount = Math.round(amount * 10) / 10;
-      const key = `${soundSourceId}-${effectId}`;
-      if (this.lastSendAmounts.get(key) !== currentSendAmount) {
-        this.lastSendAmounts.set(key, currentSendAmount);
-        console.log(`🎛️ Send amount para ${soundSourceId} -> ${effectId}: ${amount.toFixed(2)} (dry: ${dryAmount.toFixed(2)}, espacialización preservada)`);
+      if (amount > 0) {
+        // Conectar la señal húmeda al efecto y ajustar volumen
+        source.wetGain.connect(effectNode);
+        source.wetGain.gain.rampTo(amount, 0.5);
+        
+        // Solo loggear cambios significativos en el send amount (cada 0.1 unidades)
+        const currentSendAmount = Math.round(amount * 10) / 10;
+        const key = `${soundSourceId}-${effectId}`;
+        if (this.lastSendAmounts.get(key) !== currentSendAmount) {
+          this.lastSendAmounts.set(key, currentSendAmount);
+          console.log(`🎛️ Doble Espacialización: ${soundSourceId} -> ${effectId} | Wet: ${amount.toFixed(2)} | Conectado`);
+        }
+      } else {
+        // Desconectar la señal húmeda del efecto
+        source.wetGain.gain.rampTo(0, 0.5);
+        
+        // Programar la desconexión después de que el volumen haya bajado para evitar clics
+        Tone.Draw.schedule(() => {
+          try {
+            source.wetGain.disconnect(effectNode);
+            console.log(`🎛️ Doble Espacialización: ${soundSourceId} -> ${effectId} | Desconectado`);
+          } catch (error) {
+            console.warn(`⚠️ Error al desconectar:`, error);
+          }
+        }, Tone.now() + 0.5);
       }
     } catch (error) {
       console.error(`❌ Error al ajustar send amount:`, error);
@@ -457,12 +477,12 @@ export class AudioManager {
         synth = new Tone.AMSynth();
       }
 
-      // --- NUEVA ARQUITECTURA DE CADENA DE AUDIO CON ESPACIALIZACIÓN 3D ---
+      // --- ARQUITECTURA REFACTORIZADA: DOBLE ESPACIALIZACIÓN INDEPENDIENTE ---
       
-      // 1. Crear el nodo de mezcla seca/húmeda
-      const dryWetMix = new Tone.Gain(1);
+      // 1. Crear splitter para dividir la señal del sintetizador
+      const splitter = new Tone.Split(2);
       
-      // 2. Crear panner 3D con configuración mejorada para espacialización 3D
+      // 2. Crear panner 3D para la señal seca (posición del objeto sonoro)
       const panner = new Tone.Panner3D({
         positionX: position[0],
         positionY: position[1],
@@ -486,29 +506,25 @@ export class AudioManager {
         rolloffFactor: panner.rolloffFactor
       });
 
-      // 3. Conectar la cadena seca: synth -> dryWetMix -> panner -> destination
-      synth.chain(dryWetMix, panner, Tone.Destination);
+      // 3. Crear control de volumen para la señal húmeda (inicialmente silenciada)
+      const wetGain = new Tone.Gain(0);
 
-      // 4. Crear envíos a efectos globales
-      const effectSends = new Map<string, Tone.Gain>();
-      
-      // Iterar sobre los efectos globales existentes y crear sends
-      this.globalEffects.forEach((effect, effectId) => {
-        const send = new Tone.Gain(0); // Inicialmente sin envío
-        // Conectar synth -> send -> panner -> efecto para mantener espacialización
-        synth.connect(send); // Conectar synth al send
-        send.connect(panner); // Conectar send al panner para mantener espacialización
-        panner.connect(effect); // Conectar panner al efecto global
-        effectSends.set(effectId, send);
-        console.log(`🎛️ Send creado para efecto ${effectId} en ${id} con espacialización preservada (inicialmente silenciado)`);
-      });
+      // 4. ENRUTAMIENTO DE LA SEÑAL SECA (DRY): synth -> splitter -> panner -> Destination
+      // La señal seca mantiene la espacialización 3D desde la posición del objeto sonoro
+      synth.chain(splitter);
+      splitter.chain(panner, Tone.Destination);
+
+      // 5. ENRUTAMIENTO DE LA SEÑAL HÚMEDA (WET): synth -> wetGain
+      // La señal húmeda se conectará dinámicamente a los efectos según sea necesario
+      synth.connect(wetGain);
+      // NOTA: wetGain se conectará dinámicamente a los efectos en setEffectSendAmount
 
       // Almacenar en el Map con la nueva estructura
       this.soundSources.set(id, {
         synth,
-        effectSends,
         panner,
-        dryWetMix,
+        splitter,
+        wetGain,
       });
 
       // Configurar parámetros iniciales - asegurar frecuencia segura
@@ -568,8 +584,8 @@ export class AudioManager {
       // Limpiar recursos
       source.synth.dispose();
       source.panner.dispose();
-      source.dryWetMix.dispose(); // Disponer el nodo de mezcla seca
-      source.effectSends.forEach(send => send.dispose()); // Disponer los envíos a efectos
+      source.splitter.dispose(); // Disponer el splitter
+      source.wetGain.dispose(); // Disponer el control de volumen húmedo
 
       // Eliminar del Map y limpiar el estado
       this.soundSources.delete(id);
@@ -1323,6 +1339,26 @@ export class AudioManager {
       if (error instanceof Error) {
         console.error(`❌ Stack trace:`, error.stack);
       }
+    }
+  }
+
+  /**
+   * Actualiza la posición 3D de una zona de efecto
+   */
+  public updateEffectZonePosition(id: string, position: [number, number, number]): void {
+    const effectData = this.globalEffects.get(id);
+    if (!effectData) {
+      console.log(`🎛️ Efecto global ${id} no encontrado`);
+      return;
+    }
+
+    try {
+      // Actualizar la posición del panner del efecto
+      effectData.panner.setPosition(position[0], position[1], position[2]);
+      
+      console.log(`✅ Posición de zona de efecto ${id} actualizada: [${position.join(', ')}]`);
+    } catch (error) {
+      console.error(`❌ Error al actualizar posición de zona de efecto ${id}:`, error);
     }
   }
 

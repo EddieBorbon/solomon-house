@@ -17,36 +17,92 @@ export function useEffectZoneDetection() {
 
     // Iterar sobre cada objeto sonoro
     objects.forEach((soundObject) => {
+      // Rastrear si el objeto está dentro de alguna zona
+      let isInsideAnyZone = false;
+      
       // Iterar sobre cada zona de efecto
       effectZones.forEach((effectZone) => {
-        // Crear esfera de colisión para la zona de efecto
-        const zoneRadius = effectZone.scale[0]; // Usar el primer componente de scale como radio
-        const zoneSphere = new THREE.Sphere(
-          new THREE.Vector3(...effectZone.position),
-          zoneRadius
-        );
+        // DETECCIÓN DE COLISIÓN MEJORADA CON BOX3
+        let isInside = false;
+        let effectAmount = 0.0;
 
-        // Crear punto para la posición del objeto sonoro
-        const objectPoint = new THREE.Vector3(...soundObject.position);
-
-        // Calcular distancia entre el objeto y el centro de la zona
-        const distance = zoneSphere.center.distanceTo(objectPoint);
-
-        // Verificar si el objeto está dentro de la zona
-        const isInside = distance <= zoneRadius;
-
-        if (shouldDebug) {
-          console.log(`🎛️ Debug zona: ${effectZone.id} | Objeto: ${soundObject.id} | Distancia: ${distance.toFixed(2)} | Radio: ${zoneRadius} | Dentro: ${isInside}`);
+        if (effectZone.shape === 'sphere') {
+          // Para zonas esféricas: usar Sphere con radio basado en scale
+          const zoneRadius = effectZone.scale[0];
+          const zoneCenter = new THREE.Vector3(...effectZone.position);
+          const objectPoint = new THREE.Vector3(...soundObject.position);
+          
+          const distance = zoneCenter.distanceTo(objectPoint);
+          isInside = distance <= zoneRadius;
+          
+          // CALCULAR AMOUNT VARIABLE para transiciones suaves
+          if (isInside) {
+            // El amount varía de 1 (centro) a 0 (borde)
+            effectAmount = Math.max(0, Math.min(1, 1 - (distance / zoneRadius)));
+            isInsideAnyZone = true; // Marcar que está dentro de al menos una zona
+          }
+          
+        } else if (effectZone.shape === 'cube') {
+          // Para zonas cúbicas: usar Box3 con rotación y escala
+          const zoneSize = effectZone.scale[0]; // Asumir escala uniforme
+          const zoneBox = new THREE.Box3();
+          
+          // Crear geometría de caja centrada en la posición de la zona
+          zoneBox.setFromCenterAndSize(
+            new THREE.Vector3(...effectZone.position),
+            new THREE.Vector3(zoneSize, zoneSize, zoneSize)
+          );
+          
+          // Aplicar rotación si es necesaria
+          if (effectZone.rotation && (effectZone.rotation[0] !== 0 || effectZone.rotation[1] !== 0 || effectZone.rotation[2] !== 0)) {
+            const rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeRotationFromEuler(new THREE.Euler(...effectZone.rotation));
+            zoneBox.applyMatrix4(rotationMatrix);
+          }
+          
+          const objectPoint = new THREE.Vector3(...soundObject.position);
+          isInside = zoneBox.containsPoint(objectPoint);
+          
+          // Para cajas, calcular amount basado en la distancia al centro
+          if (isInside) {
+            const zoneCenter = new THREE.Vector3(...effectZone.position);
+            const distance = zoneCenter.distanceTo(objectPoint);
+            const maxDistance = zoneSize * 0.5; // Radio desde el centro al borde
+            effectAmount = Math.max(0, Math.min(1, 1 - (distance / maxDistance)));
+            isInsideAnyZone = true; // Marcar que está dentro de al menos una zona
+          }
         }
 
+        if (shouldDebug) {
+          const zoneType = effectZone.shape;
+          const zoneRadius = effectZone.scale[0];
+          const objectPoint = new THREE.Vector3(...soundObject.position);
+          const zoneCenter = new THREE.Vector3(...effectZone.position);
+          const distance = zoneCenter.distanceTo(objectPoint);
+          
+          console.log(`🎛️ Debug zona ${zoneType}: ${effectZone.id} | Objeto: ${soundObject.id} | Distancia: ${distance.toFixed(2)} | Radio: ${zoneRadius} | Dentro: ${isInside} | Amount: ${effectAmount.toFixed(2)}`);
+        }
+
+        // APLICAR EFECTO CON AMOUNT VARIABLE para transiciones suaves
         if (isInside) {
-          // Objeto está dentro de la zona - aplicar efecto completo (solo señal con efecto)
-          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 1.0);
+          // Objeto está dentro de la zona - aplicar efecto con amount variable
+          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, effectAmount);
         } else {
-          // Objeto está fuera de la zona - remover efecto (solo señal seca)
+          // Objeto está fuera de la zona - remover efecto completamente
           audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
         }
       });
+
+      // IMPORTANTE: Si el objeto no está dentro de ninguna zona, asegurar que todos los efectos estén desconectados
+      if (!isInsideAnyZone && effectZones.length > 0) {
+        effectZones.forEach((effectZone) => {
+          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
+        });
+        
+        if (shouldDebug) {
+          console.log(`🎛️ Objeto ${soundObject.id} no está en ninguna zona - todos los efectos desconectados`);
+        }
+      }
     });
 
     if (shouldDebug) {

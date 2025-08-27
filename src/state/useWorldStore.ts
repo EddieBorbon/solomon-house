@@ -480,10 +480,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
     console.log(`➕ Creando zona de efecto ${type} en posición:`, newEffectZone.position);
     
-    // Crear el efecto global en el AudioManager
+    // Crear el efecto global en el AudioManager con la posición inicial
     try {
-      audioManager.createGlobalEffect(newEffectZone.id, type);
-      console.log(`✅ Efecto global creado para zona ${newEffectZone.id}`);
+      audioManager.createGlobalEffect(newEffectZone.id, type, newEffectZone.position);
+      console.log(`✅ Efecto global creado para zona ${newEffectZone.id} en posición [${newEffectZone.position.join(', ')}]`);
     } catch (error) {
       console.error(`❌ Error al crear efecto global:`, error);
     }
@@ -495,6 +495,16 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
     console.log(`🔄 Store: Actualizando zona de efecto ${id} con:`, updates);
+    
+    // Si se actualiza la posición, actualizar también en el AudioManager
+    if (updates.position) {
+      try {
+        audioManager.updateEffectZonePosition(id, updates.position);
+        console.log(`✅ Posición de zona de efecto ${id} actualizada en AudioManager: [${updates.position.join(', ')}]`);
+      } catch (error) {
+        console.error(`❌ Error al actualizar posición de zona de efecto:`, error);
+      }
+    }
     
     // Si se actualizan los parámetros del efecto, actualizar también en el AudioManager
     if (updates.effectParams) {
