@@ -30,7 +30,7 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Crear geometría de cilindro con más detalle
     const cylinderGeometry = useMemo(() => {
@@ -40,7 +40,7 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
     // Función para manejar clic y disparar nota
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de clic

@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Box, Group } from '@react-three/drei';
+import { Box } from '@react-three/drei';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import * as THREE from 'three';
@@ -18,7 +18,7 @@ interface SoundSpiralProps {
 
 export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
   ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectNote } = useWorldStore();
     const groupRef = useRef<THREE.Group>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
@@ -50,7 +50,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
     // Manejar clic en el objeto
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Efecto visual de pulso

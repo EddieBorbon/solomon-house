@@ -16,7 +16,7 @@ interface SoundTorusProps {
 
 export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
   ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);
@@ -37,7 +37,7 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
     // Función para manejar el clic
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de vibración

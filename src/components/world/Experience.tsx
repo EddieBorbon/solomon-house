@@ -7,16 +7,38 @@ import { SceneContent } from './SceneContent';
 import { Suspense } from 'react';
 import { useCameraControls } from '../../hooks/useCameraControls';
 import * as THREE from 'three';
+import { useAudioListener } from '../../hooks/useAudioListener';
+import { audioManager } from '../../lib/AudioManager';
 
 type EnvironmentPreset = 'forest' | 'sunset' | 'dawn' | 'night' | 'warehouse' | 'apartment' | 'studio' | 'city' | 'park' | 'lobby';
 
-// Componente interno para manejar los controles de cámara
+// Componente interno para manejar los controles de cámara y audio espacializado
 function CameraController({ orbitControlsRef }: { orbitControlsRef: React.RefObject<any> }) {
   const { updateCameraPosition } = useCameraControls(null, orbitControlsRef.current);
+  
+  // Inicializar la espacialización de audio
+  useAudioListener();
+
+  // Vector para almacenar la dirección de la cámara (evitar recrearlo en cada frame)
+  const forwardVector = useRef(new THREE.Vector3());
 
   useFrame(({ camera }) => {
     if (orbitControlsRef.current) {
       updateCameraPosition(camera, orbitControlsRef.current);
+    }
+
+    // --- NUEVA FUNCIONALIDAD: Actualizar listener de audio en tiempo real ---
+    try {
+      // Obtener la posición actual de la cámara
+      const position = camera.position;
+      
+      // Calcular el vector "hacia adelante" de la cámara
+      camera.getWorldDirection(forwardVector.current);
+      
+      // Actualizar el listener de audio con la nueva posición y orientación
+      audioManager.updateListener(position, forwardVector.current);
+    } catch (error) {
+      console.error('❌ Error al actualizar listener de audio:', error);
     }
   });
 

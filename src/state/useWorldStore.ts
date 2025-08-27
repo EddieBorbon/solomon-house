@@ -17,18 +17,38 @@ export interface SoundObject {
   audioEnabled: boolean;
 }
 
+// Interfaz para una zona de efecto
+export interface EffectZone {
+  id: string;
+  type: 'phaser';
+  shape: 'sphere' | 'cube';
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  isSelected: boolean;
+  isLocked: boolean;
+  // Parámetros específicos del efecto
+  effectParams: {
+    frequency: number;
+    octaves: number;
+    baseFrequency: number;
+  };
+}
+
 // Estado del mundo 3D
 export interface WorldState {
   objects: SoundObject[];
-  selectedObjectId: string | null;
+  effectZones: EffectZone[]; // Nuevo array para zonas de efectos
+  selectedEntityId: string | null; // Renombrado de selectedObjectId para ser más genérico
   transformMode: 'translate' | 'rotate' | 'scale';
+  isEditingEffectZone: boolean; // Nuevo estado para indicar cuando se está editando una zona de efectos
 }
 
 // Acciones disponibles en el store
 export interface WorldActions {
   addObject: (type: SoundObjectType, position: [number, number, number]) => void;
   removeObject: (id: string) => void;
-  selectObject: (id: string | null) => void;
+  selectEntity: (id: string | null) => void; // Renombrado de selectObject para ser más genérico
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
   toggleObjectAudio: (id: string) => void;
   triggerObjectNote: (id: string) => void;
@@ -39,6 +59,13 @@ export interface WorldActions {
   stopObjectGate: (id: string) => void;
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
+  // Nuevas acciones para zonas de efectos
+  addEffectZone: (type: 'phaser', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
+  updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
+  removeEffectZone: (id: string) => void;
+  toggleLockEffectZone: (id: string) => void;
+  // Nuevas acciones para controlar la edición de zonas de efectos
+  setEditingEffectZone: (isEditing: boolean) => void;
 }
 
 // Parámetros por defecto para cada tipo de objeto
@@ -180,8 +207,10 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
 export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Estado inicial
   objects: [],
-  selectedObjectId: null,
+  effectZones: [],
+  selectedEntityId: null,
   transformMode: 'translate',
+  isEditingEffectZone: false,
 
   // Acción para añadir un nuevo objeto
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
@@ -224,19 +253,23 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
     set((state) => ({
       objects: state.objects.filter((obj) => obj.id !== id),
-      selectedObjectId: state.selectedObjectId === id ? null : state.selectedObjectId,
+      selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
     }));
   },
 
-  // Acción para seleccionar un objeto
-  selectObject: (id: string | null) => {
+  // Acción para seleccionar una entidad (objeto sonoro o zona de efecto)
+  selectEntity: (id: string | null) => {
     set((state) => ({
       objects: state.objects.map((obj) => ({
         ...obj,
         isSelected: obj.id === id,
       })),
-      selectedObjectId: id,
-      // Resetear el modo de transformación si no hay objeto seleccionado
+      effectZones: state.effectZones.map((zone) => ({
+        ...zone,
+        isSelected: zone.id === id,
+      })),
+      selectedEntityId: id,
+      // Resetear el modo de transformación si no hay entidad seleccionada
       transformMode: id === null ? 'translate' : state.transformMode,
     }));
   },
@@ -310,8 +343,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       if (updatedObject) {
         if (updatedObject.audioEnabled) {
           console.log(`🎵 Activando audio para ${id}`);
-          // Para todos los tipos, usar startSound para sonido continuo
-          audioManager.startSound(id, updatedObject.audioParams);
+          // Para todos los tipos, usar startContinuousSound para sonido continuo
+          audioManager.startContinuousSound(id, updatedObject.audioParams);
         } else {
           console.log(`🎵 Desactivando audio para ${id}`);
           // Detener el sonido si está sonando
@@ -331,6 +364,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const object = state.objects.find(obj => obj.id === id);
     
     if (object) {
+      // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
+      if (object.audioEnabled) {
+        console.log(`🥁 Objeto ${id} tiene sonido continuo activo, ignorando nota percusiva`);
+        return;
+      }
+      
       console.log(`🥁 Disparando nota percusiva para ${id}`);
       audioManager.triggerNoteAttack(id, object.audioParams);
     }
@@ -342,6 +381,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const object = state.objects.find(obj => obj.id === id);
     
     if (object) {
+      // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
+      if (object.audioEnabled) {
+        console.log(`🥁 Objeto ${id} tiene sonido continuo activo, ignorando objeto percusivo`);
+        return;
+      }
+      
       console.log(`🥁 Disparando objeto percusivo para ${id}`);
       if (object.type === 'plane') {
         // Para objetos 'plane', usar triggerNoiseAttack
@@ -359,6 +404,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const object = state.objects.find(obj => obj.id === id);
     
     if (object) {
+      // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
+      if (object.audioEnabled) {
+        console.log(`🎵 Objeto ${id} tiene sonido continuo activo, ignorando clic`);
+        return;
+      }
+      
       console.log(`🎵 Disparando nota con duración para ${id}`);
       audioManager.triggerAttackRelease(id, object.audioParams);
     }
@@ -374,6 +425,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       // Solo iniciar gate si no está en modo de sonido continuo
       if (!object.audioEnabled) {
         audioManager.startSound(id, object.audioParams);
+      } else {
+        console.log(`🎵 Objeto ${id} tiene sonido continuo activo, ignorando gate`);
       }
     }
   },
@@ -388,6 +441,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       // Solo detener gate si no está en modo de sonido continuo
       if (!object.audioEnabled) {
         audioManager.stopSound(id);
+      } else {
+        console.log(`🎵 Objeto ${id} tiene sonido continuo activo, ignorando stop gate`);
       }
     }
   },
@@ -396,12 +451,93 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   clearAllObjects: () => {
     set({
       objects: [],
-      selectedObjectId: null,
+      selectedEntityId: null,
     });
   },
 
   // Acción para establecer el modo de transformación
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => {
     set({ transformMode: mode });
+  },
+
+  // Nuevas acciones para zonas de efectos
+  addEffectZone: (type: 'phaser', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+    const newEffectZone: EffectZone = {
+      id: uuidv4(),
+      type,
+      shape,
+      position,
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1],
+      isSelected: false,
+      isLocked: false,
+      effectParams: {
+        frequency: 1000, // Valor por defecto
+        octaves: 2,
+        baseFrequency: 1000,
+      },
+    };
+
+    console.log(`➕ Creando zona de efecto ${type} en posición:`, newEffectZone.position);
+    
+    // Crear el efecto global en el AudioManager
+    try {
+      audioManager.createGlobalEffect(newEffectZone.id, type);
+      console.log(`✅ Efecto global creado para zona ${newEffectZone.id}`);
+    } catch (error) {
+      console.error(`❌ Error al crear efecto global:`, error);
+    }
+    
+    set((state) => ({
+      effectZones: [...state.effectZones, newEffectZone],
+    }));
+  },
+
+  updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
+    console.log(`🔄 Store: Actualizando zona de efecto ${id} con:`, updates);
+    
+    // Si se actualizan los parámetros del efecto, actualizar también en el AudioManager
+    if (updates.effectParams) {
+      try {
+        audioManager.updateGlobalEffect(id, updates.effectParams);
+        console.log(`✅ Parámetros del efecto global actualizados para zona ${id}`);
+      } catch (error) {
+        console.error(`❌ Error al actualizar efecto global:`, error);
+      }
+    }
+    
+    set((state) => ({
+      effectZones: state.effectZones.map((zone) =>
+        zone.id === id ? { ...zone, ...updates } : zone
+      ),
+    }));
+  },
+
+  removeEffectZone: (id: string) => {
+    // Eliminar el efecto global del AudioManager
+    try {
+      audioManager.removeGlobalEffect(id);
+      console.log(`✅ Efecto global eliminado para zona ${id}`);
+    } catch (error) {
+      console.error(`❌ Error al eliminar efecto global:`, error);
+    }
+    
+    set((state) => ({
+      effectZones: state.effectZones.filter((zone) => zone.id !== id),
+      selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
+    }));
+  },
+
+  toggleLockEffectZone: (id: string) => {
+    set((state) => ({
+      effectZones: state.effectZones.map((zone) =>
+        zone.id === id ? { ...zone, isLocked: !zone.isLocked } : zone
+      ),
+    }));
+  },
+
+  // Nuevas acciones para controlar la edición de zonas de efectos
+  setEditingEffectZone: (isEditing: boolean) => {
+    set({ isEditingEffectZone: isEditing });
   },
 }));

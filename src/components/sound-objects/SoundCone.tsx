@@ -28,7 +28,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo
     
-    const { triggerObjectNote, selectObject } = useWorldStore();
+    const { triggerObjectNote, selectEntity } = useWorldStore();
 
     // Animación del golpe percusivo
     useFrame((state, delta) => {
@@ -70,7 +70,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     // Función para manejar el clic y disparar la nota percusiva
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de golpe

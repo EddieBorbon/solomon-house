@@ -1,4 +1,5 @@
 import * as Tone from 'tone';
+import * as THREE from 'three';
 
 // Tipos para los parámetros de audio
 export interface AudioParams {
@@ -53,17 +54,22 @@ export interface AudioParams {
 // Tipos para las fuentes de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
-// Estructura de una fuente de sonido
+// Estructura de una fuente de sonido (REESTRUCTURADA)
 interface SoundSource {
   synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
-  panner: Tone.Panner3D;
+  effectSends: Map<string, Tone.Gain>; // Envíos a los efectos globales
+  panner: Tone.Panner3D; // El panner 3D para espacialización
+  dryWetMix: Tone.Gain; // Nodo para la señal "seca" (sin efectos)
 }
 
 export class AudioManager {
   private static instance: AudioManager;
   private soundSources: Map<string, SoundSource> = new Map();
+  private globalEffects: Map<string, Tone.Phaser | any> = new Map(); // Efectos globales
   private isContextStarted: boolean = false;
   private playingSounds: Set<string> = new Set(); // Rastrear qué sonidos están activos
+  private lastListenerPosition: string = ''; // Para reducir logs del listener
+  private lastSendAmounts: Map<string, number> = new Map(); // Para reducir logs de send amounts
 
   private constructor() {
     // Constructor privado para Singleton
@@ -74,6 +80,140 @@ export class AudioManager {
       AudioManager.instance = new AudioManager();
     }
     return AudioManager.instance;
+  }
+
+  /**
+   * Crea un efecto global (Phaser por ahora)
+   */
+  public createGlobalEffect(effectId: string, type: 'phaser'): void {
+    try {
+      let effect: Tone.Phaser | any;
+      
+      if (type === 'phaser') {
+        effect = new Tone.Phaser({
+          frequency: 0.5,
+          octaves: 2.2,
+          baseFrequency: 1000,
+        });
+        
+        // Conectar el efecto directamente a la salida (no al panner)
+        effect.toDestination();
+        
+        console.log(`🎛️ Efecto global ${type} creado con ID: ${effectId}`);
+      }
+      
+      if (effect) {
+        this.globalEffects.set(effectId, effect);
+        console.log(`✅ Efecto global ${effectId} añadido al AudioManager`);
+        
+        // Configurar envíos para todas las fuentes de sonido existentes
+        this.soundSources.forEach((source, soundId) => {
+          const send = new Tone.Gain(0); // Inicialmente sin envío
+          // Conectar synth -> send -> panner -> efecto para mantener espacialización
+          source.synth.connect(send); // Conectar synth al send
+          send.connect(source.panner); // Conectar send al panner para mantener espacialización
+          source.panner.connect(effect); // Conectar panner al efecto global
+          source.effectSends.set(effectId, send);
+          console.log(`🎛️ Send configurado para efecto ${effectId} en fuente ${soundId} con espacialización preservada`);
+        });
+      }
+    } catch (error) {
+      console.error(`❌ Error al crear efecto global ${effectId}:`, error);
+    }
+  }
+
+  /**
+   * Obtiene un efecto global por ID
+   */
+  public getGlobalEffect(effectId: string): Tone.Phaser | any | undefined {
+    return this.globalEffects.get(effectId);
+  }
+
+  /**
+   * Actualiza los parámetros de un efecto global
+   */
+  public updateGlobalEffect(effectId: string, params: any): void {
+    const effect = this.globalEffects.get(effectId);
+    if (!effect) {
+      console.log(`🎛️ Efecto global ${effectId} no encontrado`);
+      return;
+    }
+
+    try {
+      if (effect instanceof Tone.Phaser) {
+        if (params.frequency !== undefined) {
+          effect.frequency.rampTo(params.frequency, 0.1);
+        }
+        if (params.octaves !== undefined) {
+          effect.octaves = params.octaves;
+        }
+        if (params.baseFrequency !== undefined) {
+          // Manejar tanto string como objeto Frequency
+          if (typeof effect.baseFrequency === 'object' && 'rampTo' in effect.baseFrequency) {
+            (effect.baseFrequency as any).rampTo(params.baseFrequency, 0.1);
+          } else {
+            effect.baseFrequency = params.baseFrequency;
+          }
+        }
+        console.log(`✅ Parámetros del efecto ${effectId} actualizados:`, params);
+      }
+    } catch (error) {
+      console.error(`❌ Error al actualizar efecto global ${effectId}:`, error);
+    }
+  }
+
+  /**
+   * Elimina un efecto global
+   */
+  public removeGlobalEffect(effectId: string): void {
+    const effect = this.globalEffects.get(effectId);
+    if (effect) {
+      try {
+        effect.dispose();
+        this.globalEffects.delete(effectId);
+        console.log(`✅ Efecto global ${effectId} eliminado`);
+      } catch (error) {
+        console.error(`❌ Error al eliminar efecto global ${effectId}:`, error);
+      }
+    }
+  }
+
+  /**
+   * Controla la cantidad de señal enviada a un efecto específico
+   */
+  public setEffectSendAmount(soundSourceId: string, effectId: string, amount: number): void {
+    const source = this.soundSources.get(soundSourceId);
+    if (!source) {
+      console.log(`🎵 Fuente de sonido ${soundSourceId} no encontrada`);
+      return;
+    }
+
+    const send = source.effectSends.get(effectId);
+    if (!send) {
+      console.log(`🎛️ Send para efecto ${effectId} no encontrado en ${soundSourceId}`);
+      return;
+    }
+
+    try {
+      // Ajustar el envío al efecto (mantiene espacialización)
+      send.gain.rampTo(amount, 0.1);
+      
+      // Cuando amount = 1 (dentro de zona): silenciar señal seca completamente
+      // Cuando amount = 0 (fuera de zona): solo señal seca
+      // Cuando amount = 0.5: mezcla 50/50
+      const dryAmount = amount === 1 ? 0 : (amount === 0 ? 1 : Math.max(0, 1 - amount));
+      source.dryWetMix.gain.rampTo(dryAmount, 0.1);
+      
+      // Solo loggear cambios significativos en el send amount (cada 0.1 unidades)
+      const currentSendAmount = Math.round(amount * 10) / 10;
+      const key = `${soundSourceId}-${effectId}`;
+      if (this.lastSendAmounts.get(key) !== currentSendAmount) {
+        this.lastSendAmounts.set(key, currentSendAmount);
+        console.log(`🎛️ Send amount para ${soundSourceId} -> ${effectId}: ${amount.toFixed(2)} (dry: ${dryAmount.toFixed(2)}, espacialización preservada)`);
+      }
+    } catch (error) {
+      console.error(`❌ Error al ajustar send amount:`, error);
+    }
   }
 
   /**
@@ -96,7 +236,7 @@ export class AudioManager {
   }
 
   /**
-   * Crea una nueva fuente de sonido
+   * Crea una nueva fuente de sonido (REFACTORIZADA)
    */
   public createSoundSource(
     id: string, 
@@ -317,17 +457,59 @@ export class AudioManager {
         synth = new Tone.AMSynth();
       }
 
-      // Crear panner 3D
+      // --- NUEVA ARQUITECTURA DE CADENA DE AUDIO CON ESPACIALIZACIÓN 3D ---
+      
+      // 1. Crear el nodo de mezcla seca/húmeda
+      const dryWetMix = new Tone.Gain(1);
+      
+      // 2. Crear panner 3D con configuración mejorada para espacialización 3D
       const panner = new Tone.Panner3D({
         positionX: position[0],
         positionY: position[1],
         positionZ: position[2],
-        rolloffFactor: 1,
+        panningModel: 'HRTF', // Usar HRTF para mejor espacialización 3D
+        distanceModel: 'inverse',
+        refDistance: 1,
         maxDistance: 100,
+        rolloffFactor: 2, // Atenuación más pronunciada con la distancia
+        coneInnerAngle: 360, // Ángulo interno del cono (360 = omnidireccional)
+        coneOuterAngle: 360, // Ángulo externo del cono
+        coneOuterGain: 0, // Ganancia fuera del cono
       });
 
-      // Conectar la cadena de audio: synth -> panner -> destination
-      synth.chain(panner, Tone.Destination);
+      console.log(`🎵 Panner3D creado para ${id} en posición [${position.join(', ')}]`);
+      console.log(`🎵 Configuración del Panner3D:`, {
+        panningModel: panner.panningModel,
+        distanceModel: panner.distanceModel,
+        refDistance: panner.refDistance,
+        maxDistance: panner.maxDistance,
+        rolloffFactor: panner.rolloffFactor
+      });
+
+      // 3. Conectar la cadena seca: synth -> dryWetMix -> panner -> destination
+      synth.chain(dryWetMix, panner, Tone.Destination);
+
+      // 4. Crear envíos a efectos globales
+      const effectSends = new Map<string, Tone.Gain>();
+      
+      // Iterar sobre los efectos globales existentes y crear sends
+      this.globalEffects.forEach((effect, effectId) => {
+        const send = new Tone.Gain(0); // Inicialmente sin envío
+        // Conectar synth -> send -> panner -> efecto para mantener espacialización
+        synth.connect(send); // Conectar synth al send
+        send.connect(panner); // Conectar send al panner para mantener espacialización
+        panner.connect(effect); // Conectar panner al efecto global
+        effectSends.set(effectId, send);
+        console.log(`🎛️ Send creado para efecto ${effectId} en ${id} con espacialización preservada (inicialmente silenciado)`);
+      });
+
+      // Almacenar en el Map con la nueva estructura
+      this.soundSources.set(id, {
+        synth,
+        effectSends,
+        panner,
+        dryWetMix,
+      });
 
       // Configurar parámetros iniciales - asegurar frecuencia segura
       const safeFrequency = Math.max(params.frequency, 20);
@@ -361,13 +543,7 @@ export class AudioManager {
         console.log('🌀 Sampler no requiere configuración de frecuencia individual');
       }
 
-      // Almacenar en el Map
-      this.soundSources.set(id, {
-        synth,
-        panner,
-      });
-
-      console.log(`✅ Fuente de sonido ${id} creada exitosamente`);
+      console.log(`✅ Fuente de sonido ${id} creada exitosamente con nueva arquitectura`);
     } catch (error) {
       console.error(`❌ Error al crear fuente de sonido ${id}:`, error);
     }
@@ -392,6 +568,8 @@ export class AudioManager {
       // Limpiar recursos
       source.synth.dispose();
       source.panner.dispose();
+      source.dryWetMix.dispose(); // Disponer el nodo de mezcla seca
+      source.effectSends.forEach(send => send.dispose()); // Disponer los envíos a efectos
 
       // Eliminar del Map y limpiar el estado
       this.soundSources.delete(id);
@@ -403,7 +581,68 @@ export class AudioManager {
   }
 
   /**
-   * Inicia el sonido de una fuente
+   * Inicia el sonido continuo de una fuente (completamente independiente de las interacciones de clic)
+   */
+  public startContinuousSound(id: string, params: AudioParams): void {
+    const source = this.soundSources.get(id);
+    if (!source || this.playingSounds.has(id)) {
+      console.log(`🎵 Fuente de sonido ${id} no encontrada o ya está sonando`);
+      return;
+    }
+
+    try {
+      console.log(`🎵 startContinuousSound llamado para ${id} con frecuencia ${params.frequency}Hz`);
+      
+      // Aplicar TODOS los parámetros antes de iniciar
+      this.updateSoundParams(id, params);
+      
+      // Para PolySynth, usar triggerAttack con acordes (sonido continuo)
+      if (source.synth instanceof Tone.PolySynth) {
+        // Generar acorde basado en la frecuencia base si está disponible
+        let chord = params.chord || ["C4", "E4", "G4"];
+        
+        // Si hay frecuencia base, transponer el acorde
+        if (params.frequency && params.frequency > 0) {
+          // Convertir frecuencia a nota más cercana
+          const baseNote = this.frequencyToNote(params.frequency);
+          chord = this.generateChordFromBase(baseNote, params.chord || ["C4", "E4", "G4"]);
+          console.log(`🔷 Transponiendo acorde de ${params.chord || ["C4", "E4", "G4"]} a ${chord} basado en frecuencia ${params.frequency}Hz (nota base: ${baseNote})`);
+        }
+        
+        console.log(`🔷 Disparando acorde continuo para PolySynth:`, chord);
+        source.synth.triggerAttack(chord, this.getUniqueStartTime());
+        console.log(`🎵 Acorde continuo iniciado para ${id}:`, chord);
+        this.playingSounds.add(id);
+        return;
+      }
+      
+      // Para todos los demás sintetizadores, usar triggerAttack para sonido continuo
+      // NO usar triggerAttackRelease aquí, solo triggerAttack para mantener el sonido
+      try {
+        (source.synth as any).triggerAttack(params.frequency, this.getUniqueStartTime());
+        console.log(`🎵 Sonido continuo iniciado para ${id} con frecuencia ${params.frequency}Hz (CONTINUO)`);
+        this.playingSounds.add(id); // Marcar como sonando
+      } catch (error) {
+        console.error(`❌ Error al llamar triggerAttack para ${id}:`, error);
+        // Fallback: intentar con triggerAttackRelease si está disponible
+        if ('triggerAttackRelease' in source.synth) {
+          try {
+            const fallbackDuration = 0.5; // Duración corta como fallback
+            (source.synth as any).triggerAttackRelease(params.frequency, fallbackDuration, this.getUniqueStartTime());
+            console.log(`🎵 Sonido iniciado para ${id} con fallback triggerAttackRelease`);
+            this.playingSounds.add(id);
+          } catch (fallbackError) {
+            console.error(`❌ Fallback también falló para ${id}:`, fallbackError);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`❌ Error al iniciar sonido continuo para ${id}:`, error);
+    }
+  }
+
+  /**
+   * Inicia el sonido de una fuente (para gate y sonidos temporales)
    */
   public startSound(id: string, params: AudioParams): void {
     const source = this.soundSources.get(id);
@@ -1098,10 +1337,63 @@ export class AudioManager {
     }
 
     try {
+      // Actualizar la posición del panner
       source.panner.setPosition(position[0], position[1], position[2]);
+      
       console.log(`✅ Posición actualizada para ${id}: [${position.join(', ')}]`);
+      
+      // Log adicional para debuggear la espacialización
+      console.log(`🎵 Estado del panner para ${id}:`, {
+        position: position,
+        panningModel: source.panner.panningModel,
+        distanceModel: source.panner.distanceModel,
+        refDistance: source.panner.refDistance,
+        maxDistance: source.panner.maxDistance,
+        rolloffFactor: source.panner.rolloffFactor,
+        coneInnerAngle: source.panner.coneInnerAngle,
+        coneOuterAngle: source.panner.coneOuterAngle,
+        coneOuterGain: source.panner.coneOuterGain
+      });
+      
+      // Verificar que la posición se haya actualizado correctamente
+      console.log(`🎵 Panner3D ${id} configurado para espacialización 3D`);
     } catch (error) {
       console.error(`❌ Error al actualizar posición para ${id}:`, error);
+    }
+  }
+
+  /**
+   * Actualiza la posición y orientación del oyente global de Tone.js
+   */
+  public updateListener(position: THREE.Vector3, forward: THREE.Vector3): void {
+    try {
+      // Actualizar la posición del oyente
+      Tone.Listener.positionX.value = position.x;
+      Tone.Listener.positionY.value = position.y;
+      Tone.Listener.positionZ.value = position.z;
+      
+      // Actualizar la orientación del oyente (hacia dónde mira)
+      Tone.Listener.forwardX.value = forward.x;
+      Tone.Listener.forwardY.value = forward.y;
+      Tone.Listener.forwardZ.value = forward.z;
+      
+      // Configurar el vector "arriba" del oyente (normalmente Y positivo)
+      Tone.Listener.upX.value = 0;
+      Tone.Listener.upY.value = 1;
+      Tone.Listener.upZ.value = 0;
+      
+      // Solo loggear cambios significativos en la posición (cada 0.5 unidades)
+      const currentPos = `${Math.round(position.x * 2) / 2},${Math.round(position.y * 2) / 2},${Math.round(position.z * 2) / 2}`;
+      if (this.lastListenerPosition !== currentPos) {
+        this.lastListenerPosition = currentPos;
+        console.log(`🎧 Listener actualizado:`, {
+          position: [position.x, position.y, position.z],
+          forward: [forward.x, forward.y, forward.z],
+          up: [0, 1, 0]
+        });
+      }
+    } catch (error) {
+      console.error(`❌ Error al actualizar listener:`, error);
     }
   }
 
@@ -1174,6 +1466,11 @@ export class AudioManager {
       return notes[(semitoneDiff + 12) % 12] + (parseInt(note[note.length - 1]) + 1); // Asegurar octava correcta
     });
     return chordNotes;
+  }
+
+  // Helper para obtener un tiempo único para el triggerAttack de sonidos continuos
+  private getUniqueStartTime(): number {
+    return Tone.now() + 0.001; // Añadir un pequeño offset para evitar conflictos
   }
 }
 

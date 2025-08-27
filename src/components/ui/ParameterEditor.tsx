@@ -3,38 +3,96 @@
 import { useWorldStore } from '../../state/useWorldStore';
 import { useMemo } from 'react';
 import { type AudioParams } from '../../lib/AudioManager';
+import React from 'react';
 
 export function ParameterEditor() {
-  const { objects, selectedObjectId, updateObject, removeObject } = useWorldStore();
+  const { 
+    objects, 
+    effectZones, 
+    selectedEntityId, 
+    updateObject, 
+    updateEffectZone, 
+    removeObject, 
+    removeEffectZone, 
+    toggleLockEffectZone,
+    setEditingEffectZone 
+  } = useWorldStore();
 
-  // Encontrar el objeto seleccionado
-  const selectedObject = useMemo(() => {
-    return objects.find(obj => obj.id === selectedObjectId);
-  }, [objects, selectedObjectId]);
+  // Encontrar la entidad seleccionada (objeto sonoro o zona de efecto)
+  const selectedEntity = useMemo(() => {
+    if (!selectedEntityId) return null;
+    
+    // Buscar en objetos sonoros
+    const soundObject = objects.find(obj => obj.id === selectedEntityId);
+    if (soundObject) return { type: 'soundObject', data: soundObject };
+    
+    // Buscar en zonas de efectos
+    const effectZone = effectZones.find(zone => zone.id === selectedEntityId);
+    if (effectZone) return { type: 'effectZone', data: effectZone };
+    
+    return null;
+  }, [objects, effectZones, selectedEntityId]);
 
-  // Función para actualizar un parámetro específico
+  // Efecto para activar/desactivar el estado de edición de zona de efectos
+  React.useEffect(() => {
+    if (selectedEntity?.type === 'effectZone') {
+      setEditingEffectZone(true);
+      console.log('🎛️ Editor de zona de efectos abierto - OrbitControls deshabilitados');
+    } else {
+      setEditingEffectZone(false);
+      console.log('🎛️ Editor de zona de efectos cerrado - OrbitControls habilitados');
+    }
+
+    // Cleanup: desactivar el estado cuando se desmonte el componente
+    return () => {
+      setEditingEffectZone(false);
+      console.log('🎛️ Editor de zona de efectos desmontado - OrbitControls habilitados');
+    };
+  }, [selectedEntity?.type, setEditingEffectZone]);
+
+  // Función para actualizar un parámetro específico de objeto sonoro
   const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
-    if (!selectedObject) return;
+    if (!selectedEntity || selectedEntity.type !== 'soundObject') return;
 
+    const soundObject = selectedEntity.data as any; // Type assertion para objeto sonoro
     console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
-    console.log(`🎛️ UI: Objeto seleccionado:`, selectedObject);
+    console.log(`🎛️ UI: Objeto seleccionado:`, soundObject);
 
     const newAudioParams = {
-      ...selectedObject.audioParams,
+      ...soundObject.audioParams,
       [param]: value,
     };
 
     console.log(`🎛️ UI: Nuevos parámetros de audio:`, newAudioParams);
 
-    updateObject(selectedObject.id, {
+    updateObject(soundObject.id, {
       audioParams: newAudioParams,
     });
 
     console.log(`🎵 Parámetro ${param} actualizado a:`, value);
   };
 
-  // Si no hay objeto seleccionado, mostrar mensaje
-  if (!selectedObject) {
+  // Función para actualizar parámetros de zona de efecto
+  const handleEffectParamChange = (param: string, value: number) => {
+    if (!selectedEntity || selectedEntity.type !== 'effectZone') return;
+
+    const effectZone = selectedEntity.data as any; // Type assertion para zona de efecto
+    console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
+
+    const newEffectParams = {
+      ...effectZone.effectParams,
+      [param]: value,
+    };
+
+    updateEffectZone(effectZone.id, {
+      effectParams: newEffectParams,
+    });
+
+    console.log(`🎛️ Parámetro de efecto ${param} actualizado a:`, value);
+  };
+
+  // Si no hay entidad seleccionada, mostrar mensaje
+  if (!selectedEntity) {
     return (
       <div className="fixed top-4 right-4 z-50">
         <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
@@ -43,10 +101,10 @@ export function ParameterEditor() {
               <span className="text-2xl">🎯</span>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">
-              No hay objeto seleccionado
+              No hay entidad seleccionada
             </h3>
             <p className="text-gray-400 text-sm">
-              Haz clic en un objeto en el mundo 3D para seleccionarlo y editar sus parámetros de audio.
+              Haz clic en un objeto sonoro o zona de efecto en el mundo 3D para seleccionarlo y editar sus parámetros.
             </p>
           </div>
         </div>
@@ -54,6 +112,202 @@ export function ParameterEditor() {
     );
   }
 
+  // Renderizar controles según el tipo de entidad seleccionada
+  if (selectedEntity.type === 'effectZone') {
+    const zone = selectedEntity.data as any; // Type assertion para zona de efecto
+    
+    return (
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
+          {/* Header con información de la zona de efecto */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-4 h-4 rounded bg-purple-500" />
+                <h3 className="text-lg font-semibold text-white">
+                  Editor de Zona de Efecto
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm('¿Estás seguro de que quieres eliminar esta zona de efecto?')) {
+                    removeEffectZone(zone.id);
+                  }
+                }}
+                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors duration-200"
+                title="Eliminar zona de efecto"
+              >
+                🗑️
+              </button>
+            </div>
+            <div className="text-sm text-gray-400">
+              <p>Tipo: <span className="text-white">{zone.type}</span></p>
+              <p>Forma: <span className="text-white capitalize">{zone.shape}</span></p>
+              <p>ID: <span className="text-white font-mono text-xs">{zone.id.slice(0, 8)}...</span></p>
+            </div>
+          </div>
+
+          {/* Control de bloqueo */}
+          <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
+            <div className="text-center">
+              <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
+                zone.isLocked ? 'bg-red-500' : 'bg-purple-500'
+              }`}>
+                <span className="text-lg">
+                  {zone.isLocked ? '🔒' : '🔓'}
+                </span>
+              </div>
+              <span className="text-sm font-medium text-gray-300">
+                {zone.isLocked ? 'Zona Bloqueada' : 'Zona Desbloqueada'}
+              </span>
+              
+              <div className="mt-4">
+                <button
+                  onClick={() => toggleLockEffectZone(zone.id)}
+                  className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+                    zone.isLocked
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'bg-red-600 hover:bg-red-700 text-white'
+                  }`}
+                >
+                  {zone.isLocked ? '🔓 Desbloquear Zona' : '🔒 Bloquear Zona'}
+                </button>
+                <p className="text-xs text-gray-400 mt-1 text-center">
+                  {zone.isLocked 
+                    ? 'La zona está protegida contra cambios. Haz clic para desbloquear.'
+                    : 'La zona puede ser modificada. Haz clic para bloquear.'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Controles de parámetros del Phaser */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
+              🎛️ Parámetros del Phaser
+            </h4>
+            
+            {/* Frecuencia de modulación */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Frecuencia de Modulación (Hz)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0.1"
+                  max="10"
+                  step="0.1"
+                  value={zone.effectParams.frequency}
+                  onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
+                  className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  disabled={zone.isLocked}
+                />
+                <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                  {zone.effectParams.frequency}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0.1 Hz</span>
+                <span>10 Hz</span>
+              </div>
+            </div>
+
+            {/* Octavas */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Octavas
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0.1"
+                  max="8"
+                  step="0.1"
+                  value={zone.effectParams.octaves}
+                  onChange={(e) => handleEffectParamChange('octaves', Number(e.target.value))}
+                  className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  disabled={zone.isLocked}
+                />
+                <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                  {zone.effectParams.octaves}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>0.1</span>
+                <span>8</span>
+              </div>
+            </div>
+
+            {/* Frecuencia base */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Frecuencia Base (Hz)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="20"
+                  max="20000"
+                  step="10"
+                  value={zone.effectParams.baseFrequency}
+                  onChange={(e) => handleEffectParamChange('baseFrequency', Number(e.target.value))}
+                  className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                  disabled={zone.isLocked}
+                />
+                <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                  {zone.effectParams.baseFrequency}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>20 Hz</span>
+                <span>20 kHz</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Selector de forma */}
+          <div className="mt-6 space-y-4">
+            <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
+              🔷 Cambiar Forma
+            </h4>
+            <div className="grid grid-cols-2 gap-2">
+              {(['sphere', 'cube'] as const).map((shape) => (
+                <button
+                  key={shape}
+                  onClick={() => updateEffectZone(zone.id, { shape })}
+                  disabled={zone.isLocked}
+                  className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                    zone.shape === shape
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  {shape === 'sphere' && '🔵'}
+                  {shape === 'cube' && '🟦'}
+                  <span className="ml-1 capitalize">{shape}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Información adicional */}
+          <div className="mt-6 pt-4 border-t border-gray-700">
+            <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg">
+              <p className="text-xs text-purple-300 text-center">
+                💡 Los objetos sonoros dentro de esta zona se procesarán automáticamente con el efecto Phaser
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Renderizar controles para objeto sonoro (código existente)
+  const selectedObject = selectedEntity.data as any; // Type assertion para objeto sonoro
+  
   return (
     <div className="fixed top-4 right-4 z-50">
       <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
@@ -193,34 +447,37 @@ export function ParameterEditor() {
              ) : (
               <div className="mt-2">
                 <p className="text-xs text-gray-400 mt-1">
-                  Haz clic en el objeto para tocar
+                  Control de Sonido Continuo
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Duración configurable: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}s
+                  Duración: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}s
                 </p>
               </div>
             )}
             
             {/* Botón de activación/desactivación de audio */}
             <div className="mt-4">
-              <button
-                onClick={() => {
-                  const { toggleObjectAudio } = useWorldStore.getState();
-                  toggleObjectAudio(selectedObject.id);
-                }}
-                className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                  selectedObject.audioEnabled
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-gray-600 hover:bg-gray-700 text-gray-200'
-                }`}
-              >
-                {selectedObject.audioEnabled ? '🔊 Sonido Activado' : '🔇 Activar Sonido Continuo'}
-              </button>
-              <p className="text-xs text-gray-400 mt-1 text-center">
-                {selectedObject.audioEnabled 
-                  ? 'El objeto reproduce sonido continuamente. Haz clic para desactivar.'
-                  : 'Activa el sonido continuo del objeto. Haz clic para activar.'
-                }
+                             <button
+                 onClick={() => {
+                   const { toggleObjectAudio } = useWorldStore.getState();
+                   toggleObjectAudio(selectedObject.id);
+                 }}
+                 className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+                   selectedObject.audioEnabled
+                     ? 'bg-red-600 hover:bg-red-700 text-white'
+                     : 'bg-green-600 hover:bg-green-700 text-white'
+                 }`}
+               >
+                 {selectedObject.audioEnabled ? '🔇 Desactivar Sonido Continuo' : '🔊 Activar Sonido Continuo'}
+               </button>
+               <p className="text-xs text-gray-400 mt-1 text-center">
+                 {selectedObject.audioEnabled 
+                   ? 'Sonido continuo activado. Haz clic para desactivar.'
+                   : 'Sonido continuo desactivado. Haz clic para activar.'
+                 }
+               </p>
+              <p className="text-xs text-blue-400 mt-2 text-center">
+                💡 El botón controla el sonido continuo. Para sonidos cortos, haz clic en el objeto 3D.
               </p>
             </div>
           </div>

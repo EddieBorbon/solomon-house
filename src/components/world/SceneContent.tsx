@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -14,6 +14,8 @@ import { SoundPlane } from '../sound-objects/SoundPlane';
 import { SoundTorus } from '../sound-objects/SoundTorus';
 import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
 import { SoundSpiral } from '../sound-objects/SoundSpiral';
+import { EffectZone } from './EffectZone';
+import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<any>;
@@ -167,19 +169,41 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
 
 // Componente principal de la escena
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
-  const { objects, selectedObjectId, transformMode, updateObject, selectObject } = useWorldStore();
+  const { 
+    objects, 
+    effectZones, 
+    selectedEntityId, 
+    transformMode, 
+    updateObject, 
+    updateEffectZone, 
+    selectEntity, 
+    isEditingEffectZone,
+    setTransformMode,
+    setEditingEffectZone
+  } = useWorldStore();
   
-  // Crear un Map de refs para cada objeto
-  const objectRefs = useMemo(() => {
+  // Usar el hook de detección de zonas de efectos
+  useEffectZoneDetection();
+  
+  // Crear un Map de refs para cada objeto y zona de efecto
+  const entityRefs = useMemo(() => {
     const refs = new Map<string, React.RefObject<Group | null>>();
+    
+    // Refs para objetos sonoros
     objects.forEach(obj => {
       refs.set(obj.id, React.createRef<Group | null>());
     });
+    
+    // Refs para zonas de efectos
+    effectZones.forEach(zone => {
+      refs.set(zone.id, React.createRef<Group | null>());
+    });
+    
     return refs;
-  }, [objects]);
+  }, [objects, effectZones]);
 
   // Función para manejar cambios en las transformaciones
-  const handleTransformChange = useCallback((objectId: string, newTransform: any) => {
+  const handleTransformChange = useCallback((entityId: string, newTransform: any) => {
     if (newTransform) {
       const updates: any = {};
       
@@ -196,23 +220,31 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
       
       if (Object.keys(updates).length > 0) {
-        updateObject(objectId, updates);
+        // Determinar si es un objeto sonoro o una zona de efecto
+        const isSoundObject = objects.some(obj => obj.id === entityId);
+        const isEffectZone = effectZones.some(zone => zone.id === entityId);
+        
+        if (isSoundObject) {
+          updateObject(entityId, updates);
+        } else if (isEffectZone) {
+          updateEffectZone(entityId, updates);
+        }
       }
     }
-  }, [updateObject]);
+  }, [updateObject, updateEffectZone, objects, effectZones]);
 
-  // Función para manejar la selección de objetos
-  const handleObjectSelect = useCallback((id: string) => {
-    selectObject(id);
-  }, [selectObject]);
+  // Función para manejar la selección de entidades
+  const handleEntitySelect = useCallback((id: string) => {
+    selectEntity(id);
+  }, [selectEntity]);
 
   // Función para manejar clic en el espacio vacío
   const handleBackgroundClick = useCallback((event: any) => {
     // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
     if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry.type === 'PlaneGeometry') {
-      selectObject(null);
+      selectEntity(null);
     }
-  }, [selectObject]);
+  }, [selectEntity]);
 
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
@@ -230,8 +262,24 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [orbitControlsRef]);
 
-  // Log para verificar que está leyendo el estado correctamente
-  console.log('🎵 SceneContent - Objetos en el mundo:', objects);
+  // Efecto para controlar OrbitControls basado en el estado de edición de zona de efectos
+  React.useEffect(() => {
+    if (orbitControlsRef.current) {
+      if (isEditingEffectZone) {
+        orbitControlsRef.current.enabled = false;
+        console.log('🎛️ Editor de zona de efectos activo - OrbitControls deshabilitados');
+      } else {
+        orbitControlsRef.current.enabled = true;
+        console.log('🎛️ Editor de zona de efectos inactivo - OrbitControls habilitados');
+      }
+    }
+  }, [isEditingEffectZone, orbitControlsRef]);
+
+  // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
+  useEffect(() => {
+    console.log('🎵 SceneContent - Objetos en el mundo:', objects.length);
+    console.log('🎛️ SceneContent - Zonas de efectos:', effectZones.length);
+  }, [objects.length, effectZones.length]);
 
   return (
     <>
@@ -247,37 +295,57 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
       {/* Renderizado de objetos del mundo */}
       {objects.map((obj) => {
-        console.log(`🎯 Renderizando objeto: ${obj.type} en posición [${obj.position.join(', ')}]`);
-        
-        const objectRef = objectRefs.get(obj.id);
+        const objectRef = entityRefs.get(obj.id);
         if (!objectRef) return null;
         
         return (
           <SoundObjectContainer 
             key={obj.id} 
             object={obj} 
-            onSelect={handleObjectSelect}
+            onSelect={handleEntitySelect}
             ref={objectRef}
           />
         );
       })}
 
-            {/* TransformControls para el objeto seleccionado */}
-      {selectedObjectId && (() => {
-        const selectedObject = objects.find(obj => obj.id === selectedObjectId);
-        if (!selectedObject) return null;
+      {/* Renderizado de zonas de efectos */}
+      {effectZones.map((zone) => {
+        const zoneRef = entityRefs.get(zone.id);
+        if (!zoneRef) return null;
+        
+        return (
+          <EffectZone
+            key={zone.id}
+            zone={zone}
+            onSelect={handleEntitySelect}
+            ref={zoneRef}
+          />
+        );
+      })}
+
+      {/* TransformControls para la entidad seleccionada */}
+      {selectedEntityId && (() => {
+        const selectedEntity = objects.find(obj => obj.id === selectedEntityId) || 
+                              effectZones.find(zone => zone.id === selectedEntityId);
+        
+        if (!selectedEntity) return null;
+        
+        // Verificar si la zona está bloqueada
+        const isLocked = 'isLocked' in selectedEntity && selectedEntity.isLocked;
         
         return (
           <TransformControls
-            key={`${selectedObjectId}-${transformMode}`}
-            object={objectRefs.get(selectedObjectId)?.current || undefined}
+            key={`${selectedEntityId}-${transformMode}`}
+            object={entityRefs.get(selectedEntityId)?.current || undefined}
             mode={transformMode}
-            position={selectedObject.position}
-            rotation={selectedObject.rotation}
-            scale={selectedObject.scale}
+            // No aplicar la rotación del objeto al gizmo para que se mantenga alineado con la vista
+            position={selectedEntity.position}
+            rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
+            scale={selectedEntity.scale}
+            enabled={!isLocked} // Deshabilitar si está bloqueada
             onObjectChange={(e: any) => {
               if (e?.target?.object) {
-                handleTransformChange(selectedObjectId, e.target.object);
+                handleTransformChange(selectedEntityId, e.target.object);
               }
             }}
             onMouseDown={handleTransformStart}
@@ -287,8 +355,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         );
       })()}
 
-      {/* Mensaje cuando no hay objetos */}
-      {objects.length === 0 && (
+      {/* Mensaje cuando no hay entidades */}
+      {objects.length === 0 && effectZones.length === 0 && (
         <group position={[0, 2, 0]}>
           <mesh>
             <boxGeometry args={[0.1, 0.1, 0.1]} />

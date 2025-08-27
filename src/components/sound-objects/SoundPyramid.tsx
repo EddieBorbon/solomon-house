@@ -17,7 +17,7 @@ interface SoundPyramidProps {
 
 export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, duration }, ref) => {
-    const { selectObject, toggleObjectAudio } = useWorldStore();
+    const { selectEntity, toggleObjectAudio } = useWorldStore();
     const meshRef = useRef<THREE.Mesh>(null);
     const wireframeRef = useRef<THREE.Mesh>(null);
     const timeRef = useRef(0);
@@ -108,7 +108,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
     // Manejador para la selección (solo selección, no audio)
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
     };
 
     return (

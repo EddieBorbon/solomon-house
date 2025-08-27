@@ -20,7 +20,7 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const groupRef = useRef<THREE.Group>(null);
     const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
     const energyRef = useRef(0); // Para la animación de clic
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Obtener la polifonía del objeto (número de dodecaedros)
     const polyphony = audioParams?.polyphony || 4;
@@ -33,7 +33,7 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     // Función para manejar clic y disparar nota
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de clic

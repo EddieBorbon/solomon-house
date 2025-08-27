@@ -33,7 +33,7 @@ export const ObjectCreator = () => {
 
 // Ejemplo 2: Componente que muestra la lista de objetos
 export const ObjectList = () => {
-  const { objects, selectObject, removeObject } = useWorldStore();
+  const { objects, selectEntity, removeObject } = useWorldStore();
 
   return (
     <div className="p-4">
@@ -45,7 +45,7 @@ export const ObjectList = () => {
             className={`p-3 border rounded cursor-pointer ${
               obj.isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
             }`}
-            onClick={() => selectObject(obj.id)}
+            onClick={() => selectEntity(obj.id)}
           >
             <div className="flex justify-between items-center">
               <div>
@@ -81,9 +81,9 @@ export const ObjectList = () => {
 
 // Ejemplo 3: Componente que muestra información del objeto seleccionado
 export const SelectedObjectInfo = () => {
-  const { objects, selectedObjectId, updateObject } = useWorldStore();
+  const { objects, selectedEntityId, updateObject } = useWorldStore();
   
-  const selectedObject = objects.find(obj => obj.id === selectedObjectId);
+  const selectedObject = objects.find(obj => obj.id === selectedEntityId);
 
   if (!selectedObject) {
     return (

@@ -35,7 +35,8 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   const materialRef = useRef<MeshStandardMaterial>(null);
   const energyRef = useRef(0); // Para la animación de clic
   const { 
-    selectObject, 
+    triggerObjectNote, 
+    selectEntity, 
     triggerObjectAttackRelease, 
     startObjectGate, 
     stopObjectGate 
@@ -44,7 +45,7 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   // Manejador para clic corto (trigger)
   const handleClick = (event: any) => {
     event.stopPropagation();
-    selectObject(id);
+    selectEntity(id);
     triggerObjectAttackRelease(id);
     
     // Activar la animación de clic

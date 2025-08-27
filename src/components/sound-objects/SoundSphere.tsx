@@ -21,7 +21,8 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
     const { 
-      selectObject, 
+      triggerObjectNote, 
+      selectEntity, 
       triggerObjectAttackRelease, 
       startObjectGate, 
       stopObjectGate 
@@ -35,7 +36,7 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     // Manejador para clic corto (trigger)
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectAttackRelease(id);
       
       // Activar la animación de clic

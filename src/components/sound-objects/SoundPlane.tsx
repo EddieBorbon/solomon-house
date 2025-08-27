@@ -18,7 +18,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
   ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
-    const { selectObject, triggerObjectPercussion } = useWorldStore();
+    const { selectEntity, triggerObjectPercussion } = useWorldStore();
     
     // Estado para la animación de ondulación
     const [isAnimating, setIsAnimating] = useState(false);
@@ -30,7 +30,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
     // Función para manejar el clic
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectPercussion(id);
       
       // Activar animación de ondulación

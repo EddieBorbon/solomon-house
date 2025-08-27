@@ -7,6 +7,7 @@ import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { WorldInfo } from '../components/ui/WorldInfo';
 import { AudioInitializer } from '../components/ui/AudioInitializer';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
+import { SpatializationDebug } from '../components/ui/SpatializationDebug';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 export default function Home() {
@@ -29,6 +30,9 @@ export default function Home() {
       
       {/* Inicializador de Audio */}
       <AudioInitializer />
+      
+      {/* Debug de Espacialización */}
+      <SpatializationDebug />
       
       {/* Escena 3D */}
       <Suspense 

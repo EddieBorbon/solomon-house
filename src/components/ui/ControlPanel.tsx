@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function ControlPanel() {
-  const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(true);
-  const [isControlsExpanded, setIsControlsExpanded] = useState(true);
-  const { addObject } = useWorldStore();
+  const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
+  const [isControlsExpanded, setIsControlsExpanded] = useState(false);
+  const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
+  const { addObject, addEffectZone } = useWorldStore();
 
   const handleAddCube = () => {
     const x = (Math.random() - 0.5) * 10;
@@ -67,6 +68,12 @@ export function ControlPanel() {
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
     addObject('spiral', [x, 0.5, z]);
+  };
+
+  const handleAddPhaserZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('phaser', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
   };
 
   return (
@@ -131,12 +138,22 @@ export function ControlPanel() {
                 <p>• <strong>Botón de audio:</strong> Activa/desactiva el sonido permanente</p>
               </div>
             </div>
+
+            {/* Información sobre zonas de efectos */}
+            <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg">
+              <h4 className="text-sm font-semibold text-purple-300 mb-2">🎛️ Zonas de Efectos</h4>
+              <div className="space-y-1 text-xs text-purple-200">
+                <p>• <strong>Zonas Phaser:</strong> Aplican efectos de modulación</p>
+                <p>• <strong>Detección automática:</strong> Los objetos dentro de la zona se procesan</p>
+                <p>• <strong>Bloqueo:</strong> Usa el candado para proteger zonas de cambios</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* Sección de Añadir Objeto */}
-      <div>
+      <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             ➕ Añadir objeto
@@ -160,6 +177,11 @@ export function ControlPanel() {
         
         {isAddMenuExpanded && (
           <div className="space-y-3">
+            {/* Separador para objetos sonoros */}
+            <div className="text-center">
+              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">🎵 Objetos Sonoros</span>
+            </div>
+
             <button
               onClick={handleAddCube}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
@@ -238,6 +260,42 @@ export function ControlPanel() {
             >
               <span>🌀</span>
               <span>Espiral de Samples</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Sección de Zonas de Efectos */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            🎛️ Zonas de Efectos
+          </h3>
+          <button
+            onClick={() => setIsEffectsExpanded(!isEffectsExpanded)}
+            className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+            title={isEffectsExpanded ? "Ocultar menú" : "Mostrar menú"}
+          >
+            {isEffectsExpanded ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
+        </div>
+        
+        {isEffectsExpanded && (
+          <div className="space-y-3">
+            <button
+              onClick={handleAddPhaserZone}
+              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de Phaser (sphere)</span>
             </button>
           </div>
         )}

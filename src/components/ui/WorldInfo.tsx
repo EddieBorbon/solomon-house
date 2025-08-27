@@ -5,7 +5,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 
 export function WorldInfo() {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { objects, selectedObjectId } = useWorldStore();
+  const { objects, selectedEntityId } = useWorldStore();
 
   // Contar objetos por tipo
   const objectCounts = objects.reduce((acc, obj) => {
@@ -15,8 +15,8 @@ export function WorldInfo() {
 
   // Calcular estadísticas
   const totalObjects = objects.length;
-  const hasSelection = selectedObjectId !== null;
-  const selectedObject = objects.find(obj => obj.id === selectedObjectId);
+  const hasSelection = selectedEntityId !== null;
+  const selectedObject = objects.find(obj => obj.id === selectedEntityId);
 
   return (
     <div className="fixed bottom-4 left-4 z-50">

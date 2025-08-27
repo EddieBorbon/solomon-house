@@ -2,6 +2,7 @@
 
 import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundIcosahedronProps {
@@ -15,7 +16,7 @@ interface SoundIcosahedronProps {
 
 export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
   ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
-    const { selectObject, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);
@@ -30,7 +31,7 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
     // Animación de vibración cuando se toca
     const handleClick = (event: any) => {
       event.stopPropagation();
-      selectObject(id);
+      selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de vibración

@@ -28,7 +28,7 @@ interface BaseSoundObjectProps {
 // Hook personalizado para interacción universal
 export const useUniversalInteraction = (id: string) => {
   const { 
-    selectObject, 
+    selectEntity, 
     triggerObjectAttackRelease, 
     startObjectGate, 
     stopObjectGate 
@@ -37,7 +37,7 @@ export const useUniversalInteraction = (id: string) => {
   // Manejador para clic corto (trigger)
   const handleClick = (event: any) => {
     event.stopPropagation();
-    selectObject(id);
+    selectEntity(id);
     triggerObjectAttackRelease(id);
   };
 

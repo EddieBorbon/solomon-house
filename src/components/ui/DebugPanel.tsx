@@ -3,7 +3,7 @@
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function DebugPanel() {
-  const { objects, selectedObjectId, addObject, selectObject, clearAllObjects } = useWorldStore();
+  const { objects, selectedEntityId, addObject, selectEntity, clearAllObjects } = useWorldStore();
 
   const handleAddTestObjects = () => {
     // Añadir algunos objetos de prueba
@@ -34,7 +34,7 @@ export function DebugPanel() {
           <div className="flex justify-between mb-2">
             <span>ID seleccionado:</span>
             <span className="font-mono text-xs break-all">
-              {selectedObjectId || 'null'}
+              {selectedEntityId || 'null'}
             </span>
           </div>
           
@@ -81,7 +81,7 @@ export function DebugPanel() {
                     ? 'bg-yellow-600 text-black' 
                     : 'bg-gray-700 hover:bg-gray-600'
                 }`}
-                onClick={() => selectObject(obj.id)}
+                onClick={() => selectEntity(obj.id)}
               >
                 <div className="flex justify-between items-center">
                   <span>{index + 1}. {obj.type}</span>

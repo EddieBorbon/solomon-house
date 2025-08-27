@@ -3,10 +3,10 @@
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function TransformToolbar() {
-  const { selectedObjectId, transformMode, setTransformMode } = useWorldStore();
+  const { selectedEntityId, transformMode, setTransformMode } = useWorldStore();
 
   // Solo mostrar si hay un objeto seleccionado
-  if (!selectedObjectId) {
+  if (!selectedEntityId) {
     return null;
   }
 
