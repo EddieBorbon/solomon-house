@@ -2,7 +2,15 @@ import { useEffect } from 'react';
 import { useWorldStore } from '../state/useWorldStore';
 
 export function useKeyboardShortcuts() {
-  const { setTransformMode, selectObject } = useWorldStore();
+  const { 
+    setTransformMode, 
+    selectEntity, 
+    removeObject, 
+    removeEffectZone, 
+    selectedEntityId,
+    objects,
+    effectZones 
+  } = useWorldStore();
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -26,7 +34,29 @@ export function useKeyboardShortcuts() {
           break;
         case 'escape':
           event.preventDefault();
-          selectObject(null);
+          // ESC: Salir del modo edición - deseleccionar entidad y resetear modo
+          selectEntity(null);
+          setTransformMode('translate');
+          break;
+        case 'delete':
+        case 'backspace':
+          event.preventDefault();
+          // DEL/BACKSPACE: Eliminar la entidad seleccionada
+          if (selectedEntityId) {
+            // Buscar si es un objeto sonoro
+            const soundObject = objects.find(obj => obj.id === selectedEntityId);
+            if (soundObject) {
+              removeObject(selectedEntityId);
+              console.log(`🗑️ Objeto sonoro eliminado: ${selectedEntityId}`);
+            } else {
+              // Buscar si es una zona de efecto
+              const effectZone = effectZones.find(zone => zone.id === selectedEntityId);
+              if (effectZone) {
+                removeEffectZone(selectedEntityId);
+                console.log(`🗑️ Zona de efecto eliminada: ${selectedEntityId}`);
+              }
+            }
+          }
           break;
         // Controles de cámara WASD
         case 'w':
@@ -48,5 +78,5 @@ export function useKeyboardShortcuts() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setTransformMode, selectObject]);
+  }, [setTransformMode, selectEntity, removeObject, removeEffectZone, selectedEntityId, objects, effectZones]);
 }

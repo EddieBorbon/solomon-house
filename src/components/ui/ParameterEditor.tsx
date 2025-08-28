@@ -34,19 +34,20 @@ export function ParameterEditor() {
   }, [objects, effectZones, selectedEntityId]);
 
   // Efecto para activar/desactivar el estado de edición de zona de efectos
+  // NOTA: Este estado ya no bloquea OrbitControls, solo se usa para UI
   React.useEffect(() => {
     if (selectedEntity?.type === 'effectZone') {
       setEditingEffectZone(true);
-      console.log('🎛️ Editor de zona de efectos abierto - OrbitControls deshabilitados');
+      console.log('🎛️ Editor de zona de efectos abierto');
     } else {
       setEditingEffectZone(false);
-      console.log('🎛️ Editor de zona de efectos cerrado - OrbitControls habilitados');
+      console.log('🎛️ Editor de zona de efectos cerrado');
     }
 
     // Cleanup: desactivar el estado cuando se desmonte el componente
     return () => {
       setEditingEffectZone(false);
-      console.log('🎛️ Editor de zona de efectos desmontado - OrbitControls habilitados');
+      console.log('🎛️ Editor de zona de efectos desmontado');
     };
   }, [selectedEntity?.type, setEditingEffectZone]);
 
@@ -89,6 +90,53 @@ export function ParameterEditor() {
     });
 
     console.log(`🎛️ Parámetro de efecto ${param} actualizado a:`, value);
+  };
+
+  // Función para actualizar transformación de la entidad
+  const handleTransformChange = (
+    property: 'position' | 'rotation' | 'scale',
+    axis: 0 | 1 | 2,
+    value: number
+  ) => {
+    if (!selectedEntity) return;
+
+    const newValues = [
+      ...selectedEntity.data[property]
+    ] as [number, number, number];
+    
+    newValues[axis] = value;
+
+    if (selectedEntity.type === 'soundObject') {
+      updateObject(selectedEntity.data.id, {
+        [property]: newValues
+      });
+    } else if (selectedEntity.type === 'effectZone') {
+      updateEffectZone(selectedEntity.data.id, {
+        [property]: newValues
+      });
+    }
+  };
+
+  // Función para resetear transformación
+  const resetTransform = () => {
+    if (!selectedEntity) return;
+
+    const resetValues = {
+      position: [0, 0, 0] as [number, number, number],
+      rotation: [0, 0, 0] as [number, number, number],
+      scale: [1, 1, 1] as [number, number, number]
+    };
+
+    if (selectedEntity.type === 'soundObject') {
+      updateObject(selectedEntity.data.id, resetValues);
+    } else if (selectedEntity.type === 'effectZone') {
+      updateEffectZone(selectedEntity.data.id, resetValues);
+    }
+  };
+
+  // Función para redondear decimales
+  const roundToDecimals = (value: number, decimals: number = 2) => {
+    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
   // Si no hay entidad seleccionada, mostrar mensaje
@@ -289,6 +337,140 @@ export function ParameterEditor() {
                   <span className="ml-1 capitalize">{shape}</span>
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Sección de Posición y Tamaño para Zonas de Efectos */}
+          <div className="mt-6 pt-4 border-t border-gray-700">
+            <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+              📍 Posición y Tamaño
+            </h4>
+            
+            {/* Position */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Position</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: zone.position[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone.position[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone.position[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = parseFloat(e.target.value) || 0;
+                        const newPosition = [...zone.position] as [number, number, number];
+                        newPosition[index] = newValue;
+                        updateEffectZone(zone.id, { position: newPosition });
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      disabled={zone.isLocked}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Rotation */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Rotation</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: zone.rotation[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone.rotation[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone.rotation[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = parseFloat(e.target.value) || 0;
+                        const newRotation = [...zone.rotation] as [number, number, number];
+                        newRotation[index] = newValue;
+                        updateEffectZone(zone.id, { rotation: newRotation });
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      disabled={zone.isLocked}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scale */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Scale</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: zone.scale[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone.scale[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone.scale[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+                        const newScale = [...zone.scale] as [number, number, number];
+                        newScale[index] = newValue;
+                        updateEffectZone(zone.id, { scale: newScale });
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      disabled={zone.isLocked}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Controles de transformación */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  // Resetear a valores por defecto
+                  updateEffectZone(zone.id, { 
+                    position: [0, 0, 0], 
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1] 
+                  });
+                }}
+                className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Resetear posición y tamaño a valores por defecto"
+                disabled={zone.isLocked}
+              >
+                🔄 Reset
+              </button>
+              <button
+                onClick={() => {
+                  // Copiar valores al portapapeles
+                  const transformText = `Position: [${zone.position.join(', ')}]\nRotation: [${zone.rotation.join(', ')}]\nScale: [${zone.scale.join(', ')}]`;
+                  navigator.clipboard.writeText(transformText);
+                }}
+                className="px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
+                title="Copiar valores al portapapeles"
+              >
+                📋
+              </button>
             </div>
           </div>
 
@@ -577,6 +759,8 @@ export function ParameterEditor() {
                                                           </p>
                                                         </div>
                                                       )}
+
+
 
           {/* Controles específicos para MembraneSynth (cono) */}
           {selectedObject.type === 'cone' && (
@@ -1809,6 +1993,123 @@ export function ParameterEditor() {
                <span>100%</span>
              </div>
            </div>
+
+          {/* Sección de Posición y Tamaño - Movida al final */}
+          <div className="pt-6 border-t border-gray-700">
+            <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+              📍 Posición y Tamaño
+            </h4>
+            
+            {/* Position */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Position</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: selectedObject.position[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: selectedObject.position[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: selectedObject.position[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = parseFloat(e.target.value) || 0;
+                        handleTransformChange('position', index as 0 | 1 | 2, newValue);
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Rotation */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Rotation</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: selectedObject.rotation[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: selectedObject.rotation[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: selectedObject.rotation[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = parseFloat(e.target.value) || 0;
+                        handleTransformChange('rotation', index as 0 | 1 | 2, newValue);
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scale */}
+            <div className="space-y-2 mb-4">
+              <label className="text-xs font-medium text-gray-300">Scale</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { axis: 'X', color: 'bg-red-500', value: selectedObject.scale[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: selectedObject.scale[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: selectedObject.scale[2] }
+                ].map(({ axis, color, value }, index) => (
+                  <div key={axis} className="flex flex-col">
+                    <div className="flex items-center gap-1 mb-1">
+                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                      <span className="text-xs text-gray-400">{axis}</span>
+                    </div>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={roundToDecimals(value)}
+                      onChange={(e) => {
+                        const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+                        handleTransformChange('scale', index as 0 | 1 | 2, newValue);
+                      }}
+                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Controles de transformación */}
+            <div className="flex gap-2">
+              <button
+                onClick={resetTransform}
+                className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
+                title="Resetear transformación a valores por defecto"
+              >
+                🔄 Reset
+              </button>
+              <button
+                onClick={() => {
+                  // Copiar valores al portapapeles
+                  const transformText = `Position: [${selectedObject.position.join(', ')}]\nRotation: [${selectedObject.rotation.join(', ')}]\nScale: [${selectedObject.scale.join(', ')}]`;
+                  navigator.clipboard.writeText(transformText);
+                }}
+                className="px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
+                title="Copiar valores al portapapeles"
+              >
+                📋
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Información adicional */}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function WorldInfo() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { objects, selectedEntityId } = useWorldStore();
 
   // Contar objetos por tipo
@@ -102,9 +102,38 @@ export function WorldInfo() {
 
             {/* Información adicional */}
             <div className="mt-4 pt-3 border-t border-gray-700">
-              <p className="text-xs text-gray-400 text-center">
+              <p className="text-xs text-gray-400 text-center mb-3">
                 Mundo sonoro interactivo
               </p>
+              
+              {/* Atajos de teclado */}
+              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-600/50">
+                <h4 className="text-xs font-medium text-gray-300 mb-2 flex items-center gap-1">
+                  ⌨️ Atajos de Teclado
+                </h4>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">G:</span>
+                    <span className="text-white">Mover</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">R:</span>
+                    <span className="text-white">Rotar</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">S:</span>
+                    <span className="text-white">Escalar</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">ESC:</span>
+                    <span className="text-white">Salir edición</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">DEL:</span>
+                    <span className="text-white">Eliminar</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

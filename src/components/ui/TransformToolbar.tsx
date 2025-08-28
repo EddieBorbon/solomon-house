@@ -40,6 +40,23 @@ export function TransformToolbar() {
               <span className="text-xs opacity-70">({mode.shortcut})</span>
             </button>
           ))}
+          
+          {/* Botón para salir del modo edición */}
+          <button
+            onClick={() => {
+              // Simular la acción de ESC
+              const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+              window.dispatchEvent(escapeEvent);
+            }}
+            className="px-4 py-2 rounded-md font-medium text-sm transition-all duration-200
+              bg-red-100 text-red-700 hover:bg-red-200 hover:scale-102
+              flex items-center gap-2 min-w-[80px] justify-center"
+            title="Salir del modo edición (ESC)"
+          >
+            <span className="text-lg">❌</span>
+            <span className="hidden sm:inline">Salir</span>
+            <span className="text-xs opacity-70">(ESC)</span>
+          </button>
         </div>
       </div>
     </div>

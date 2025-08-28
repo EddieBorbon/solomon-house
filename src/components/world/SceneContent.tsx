@@ -263,17 +263,16 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   }, [orbitControlsRef]);
 
   // Efecto para controlar OrbitControls basado en el estado de edición de zona de efectos
+  // Solo deshabilitar OrbitControls cuando se estén usando TransformControls, no solo por editar
   React.useEffect(() => {
     if (orbitControlsRef.current) {
-      if (isEditingEffectZone) {
-        orbitControlsRef.current.enabled = false;
-        console.log('🎛️ Editor de zona de efectos activo - OrbitControls deshabilitados');
-      } else {
-        orbitControlsRef.current.enabled = true;
-        console.log('🎛️ Editor de zona de efectos inactivo - OrbitControls habilitados');
-      }
+      // Solo deshabilitar OrbitControls cuando se estén usando TransformControls
+      // El estado isEditingEffectZone no debería bloquear la cámara
+      // Mantener OrbitControls habilitado para permitir movimiento de cámara
+      orbitControlsRef.current.enabled = true;
+      console.log('🎛️ OrbitControls siempre habilitados para permitir movimiento de cámara');
     }
-  }, [isEditingEffectZone, orbitControlsRef]);
+  }, [orbitControlsRef]);
 
   // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {
