@@ -65,7 +65,7 @@ interface SoundSource {
 export class AudioManager {
   private static instance: AudioManager;
   private soundSources: Map<string, SoundSource> = new Map();
-  private globalEffects: Map<string, { effectNode: Tone.Phaser | any, panner: Tone.Panner3D }> = new Map(); // Efectos globales con panners independientes
+  private globalEffects: Map<string, { effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | any, panner: Tone.Panner3D }> = new Map(); // Efectos globales con panners independientes
   private isContextStarted: boolean = false;
   private playingSounds: Set<string> = new Set(); // Rastrear qué sonidos están activos
   private lastListenerPosition: string = ''; // Para reducir logs del listener
@@ -86,11 +86,11 @@ export class AudioManager {
   /**
    * Crea un efecto global con espacialización independiente
    */
-  public createGlobalEffect(effectId: string, type: 'phaser', position: [number, number, number]): void {
+  public createGlobalEffect(effectId: string, type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher', position: [number, number, number]): void {
     try {
       console.log(`🎛️ AudioManager: Creando efecto global ${type} con ID ${effectId} en posición [${position.join(', ')}]`);
       
-      let effectNode: Tone.Phaser | any;
+      let effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | any;
       
       if (type === 'phaser') {
         effectNode = new Tone.Phaser({
@@ -102,6 +102,45 @@ export class AudioManager {
           frequency: effectNode.frequency.value,
           octaves: effectNode.octaves,
           baseFrequency: effectNode.baseFrequency
+        });
+      } else if (type === 'autoFilter') {
+        effectNode = new Tone.AutoFilter({
+          frequency: 0.5,
+          baseFrequency: 200,
+          octaves: 2.6,
+          depth: 0.5,
+          filter: {
+            type: 'lowpass',
+            rolloff: -12,
+            Q: 1,
+          },
+          type: 'sine',
+        });
+        console.log(`🎛️ AudioManager: AutoFilter creado con parámetros iniciales:`, {
+          frequency: effectNode.frequency.value,
+          baseFrequency: effectNode.baseFrequency,
+          octaves: effectNode.octaves,
+          depth: effectNode.depth.value,
+          filterType: effectNode.filter.type,
+          filterQ: effectNode.filter.Q.value
+        });
+      } else if (type === 'autoWah') {
+        effectNode = new Tone.AutoWah({
+          baseFrequency: 200,
+          octaves: 2.6,
+          sensitivity: 0.5,
+        });
+        console.log(`🎛️ AudioManager: AutoWah creado con parámetros iniciales:`, {
+          baseFrequency: effectNode.baseFrequency,
+          octaves: effectNode.octaves,
+          sensitivity: effectNode.sensitivity.value
+        });
+      } else if (type === 'bitCrusher') {
+        effectNode = new Tone.BitCrusher(4); // bits parameter
+        effectNode.normFreq = 0.5; // Set normFreq after creation
+        console.log(`🎛️ AudioManager: BitCrusher creado con parámetros iniciales:`, {
+          bits: effectNode.bits,
+          normFreq: effectNode.normFreq
         });
       }
       
@@ -245,8 +284,84 @@ export class AudioManager {
           octaves: effectNode.octaves,
           baseFrequency: effectNode.baseFrequency
         });
+      } else if (effectNode instanceof Tone.AutoFilter) {
+        if (params.frequency !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando frequency ${params.frequency} al autoFilter`);
+          effectNode.frequency.rampTo(params.frequency, 0.1);
+        }
+        if (params.baseFrequency !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando baseFrequency ${params.baseFrequency} al autoFilter`);
+          effectNode.baseFrequency = params.baseFrequency;
+        }
+        if (params.octaves !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando octaves ${params.octaves} al autoFilter`);
+          effectNode.octaves = params.octaves;
+        }
+        if (params.depth !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando depth ${params.depth} al autoFilter`);
+          effectNode.depth.rampTo(params.depth, 0.1);
+        }
+        if (params.filterType !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando filterType ${params.filterType} al autoFilter`);
+          effectNode.filter.type = params.filterType;
+        }
+        if (params.filterQ !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando filterQ ${params.filterQ} al autoFilter`);
+          effectNode.filter.Q.rampTo(params.filterQ, 0.1);
+        }
+        if (params.lfoType !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando lfoType ${params.lfoType} al autoFilter`);
+          effectNode.type = params.lfoType;
+        }
+        
+        // Verificar que los parámetros se aplicaron correctamente
+        console.log(`🎛️ AudioManager: Parámetros actuales del autoFilter:`, {
+          frequency: effectNode.frequency.value,
+          baseFrequency: effectNode.baseFrequency,
+          octaves: effectNode.octaves,
+          depth: effectNode.depth.value,
+          filterType: effectNode.filter.type,
+          filterQ: effectNode.filter.Q.value,
+          lfoType: effectNode.type
+        });
+      } else if (effectNode instanceof Tone.AutoWah) {
+        if (params.baseFrequency !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando baseFrequency ${params.baseFrequency} al autoWah`);
+          effectNode.baseFrequency = params.baseFrequency;
+        }
+        if (params.octaves !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando octaves ${params.octaves} al autoWah`);
+          effectNode.octaves = params.octaves;
+        }
+        if (params.sensitivity !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando sensitivity ${params.sensitivity} al autoWah`);
+          effectNode.sensitivity = params.sensitivity;
+        }
+        
+        // Verificar que los parámetros se aplicaron correctamente
+        console.log(`🎛️ AudioManager: Parámetros actuales del autoWah:`, {
+          baseFrequency: effectNode.baseFrequency,
+          octaves: effectNode.octaves,
+          sensitivity: effectNode.sensitivity
+        });
+      } else if (effectNode instanceof Tone.BitCrusher) {
+        if (params.bits !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando bits ${params.bits} al bitCrusher`);
+          // Los bits se configuran en el constructor, no se pueden cambiar después
+          console.log(`ℹ️ AudioManager: Los bits del BitCrusher no se pueden cambiar después de la creación`);
+        }
+        if (params.normFreq !== undefined) {
+          console.log(`🎛️ AudioManager: Aplicando normFreq ${params.normFreq} al bitCrusher`);
+          // normFreq no es una propiedad directa, usar el método correcto si existe
+          console.log(`ℹ️ AudioManager: normFreq no es configurable en tiempo real para BitCrusher`);
+        }
+        
+        // Verificar que los parámetros se aplicaron correctamente
+        console.log(`🎛️ AudioManager: Parámetros actuales del bitCrusher:`, {
+          bits: effectNode.bits
+        });
       } else {
-        console.warn(`⚠️ AudioManager: El nodo del efecto no es un Tone.Phaser:`, effectNode);
+        console.warn(`⚠️ AudioManager: El nodo del efecto no es un Tone.Phaser, Tone.AutoFilter, Tone.AutoWah ni Tone.BitCrusher:`, effectNode);
       }
     } catch (error) {
       console.error(`❌ AudioManager: Error al actualizar parámetros del efecto:`, error);

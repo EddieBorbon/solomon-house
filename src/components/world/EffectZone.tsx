@@ -22,8 +22,23 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
       onSelect(zone.id);
     };
 
-    // Color base para el Phaser (morado)
-    const baseColor = '#8b5cf6';
+    // Colores según el tipo de efecto
+    const getBaseColor = () => {
+      switch (zone.type) {
+        case 'phaser':
+          return '#8b5cf6'; // Morado para Phaser
+        case 'autoFilter':
+          return '#10b981'; // Verde para AutoFilter
+              case 'autoWah':
+        return '#f59e0b'; // Naranja para AutoWah
+      case 'bitCrusher':
+        return '#ef4444'; // Rojo para BitCrusher
+      default:
+        return '#8b5cf6'; // Morado por defecto
+      }
+    };
+    
+    const baseColor = getBaseColor();
     const lockedColor = '#ef4444'; // Rojo para zonas bloqueadas
 
     // Función para renderizar la geometría según la forma

@@ -20,7 +20,7 @@ export interface SoundObject {
 // Interfaz para una zona de efecto
 export interface EffectZone {
   id: string;
-  type: 'phaser';
+  type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher';
   shape: 'sphere' | 'cube';
   position: [number, number, number];
   rotation: [number, number, number];
@@ -29,9 +29,24 @@ export interface EffectZone {
   isLocked: boolean;
   // Parámetros específicos del efecto
   effectParams: {
-    frequency: number;
-    octaves: number;
-    baseFrequency: number;
+    // Parámetros del Phaser
+    frequency?: number;
+    octaves?: number;
+    stages?: number;
+    Q?: number;
+    // Parámetros del AutoFilter
+    depth?: number;
+    filterType?: 'lowpass' | 'highpass' | 'bandpass' | 'notch';
+    filterQ?: number;
+    lfoType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    // Parámetros adicionales para AutoWah
+    sensitivity?: number;
+    rolloff?: number;
+    attack?: number;
+    release?: number;
+    // Parámetros del BitCrusher
+    bits?: number;
+    normFreq?: number;
   };
 }
 
@@ -60,7 +75,7 @@ export interface WorldActions {
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
   removeEffectZone: (id: string) => void;
   toggleLockEffectZone: (id: string) => void;
@@ -461,7 +476,47 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+    // Configurar parámetros por defecto según el tipo de efecto
+    let defaultParams: any = {};
+    
+    if (type === 'phaser') {
+      defaultParams = {
+        frequency: 1000,
+        octaves: 2,
+        stages: 2,
+        Q: 10,
+      };
+    } else if (type === 'autoFilter') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        depth: 0.5,
+        filterType: 'lowpass',
+        filterQ: 1,
+        lfoType: 'sine',
+      };
+    } else if (type === 'autoWah') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        sensitivity: 0.5,
+        rolloff: -12,
+        attack: 0.1,
+        release: 0.1,
+      };
+    } else if (type === 'bitCrusher') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        bits: 4,
+        normFreq: 0.5,
+      };
+    }
+
     const newEffectZone: EffectZone = {
       id: uuidv4(),
       type,
@@ -471,11 +526,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       scale: [1, 1, 1],
       isSelected: false,
       isLocked: false,
-      effectParams: {
-        frequency: 1000, // Valor por defecto
-        octaves: 2,
-        baseFrequency: 1000,
-      },
+      effectParams: defaultParams,
     };
 
     console.log(`➕ Creando zona de efecto ${type} en posición:`, newEffectZone.position);

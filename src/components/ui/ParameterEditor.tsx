@@ -74,7 +74,7 @@ export function ParameterEditor() {
   };
 
   // Función para actualizar parámetros de zona de efecto
-  const handleEffectParamChange = (param: string, value: number) => {
+  const handleEffectParamChange = (param: string, value: number | string) => {
     if (!selectedEntity || selectedEntity.type !== 'effectZone') return;
 
     const effectZone = selectedEntity.data as any; // Type assertion para zona de efecto
@@ -164,6 +164,11 @@ export function ParameterEditor() {
   if (selectedEntity.type === 'effectZone') {
     const zone = selectedEntity.data as any; // Type assertion para zona de efecto
     
+    // Asegurar que effectParams existe
+    if (!zone.effectParams) {
+      zone.effectParams = {};
+    }
+    
     return (
       <div className="fixed top-4 right-4 z-50">
         <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
@@ -230,11 +235,15 @@ export function ParameterEditor() {
             </div>
           </div>
 
-          {/* Controles de parámetros del Phaser */}
+          {/* Controles de parámetros del efecto */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
-              🎛️ Parámetros del Phaser
-            </h4>
+                              <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
+                    zone.type === 'phaser' ? 'text-purple-400' : 
+                    zone.type === 'autoFilter' ? 'text-green-400' : 
+                    zone.type === 'autoWah' ? 'text-orange-400' : 'text-red-400'
+                  }`}>
+                    🎛️ Parámetros del {zone.type === 'phaser' ? 'Phaser' : zone.type === 'autoFilter' ? 'AutoFilter' : zone.type === 'autoWah' ? 'AutoWah' : 'BitCrusher'}
+                  </h4>
             
             {/* Frecuencia de modulación */}
             <div>
@@ -247,13 +256,13 @@ export function ParameterEditor() {
                   min="0.1"
                   max="10"
                   step="0.1"
-                  value={zone.effectParams.frequency}
+                  value={zone.effectParams.frequency ?? 1}
                   onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   disabled={zone.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.frequency}
+                  {zone.effectParams.frequency ?? 1}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -273,13 +282,13 @@ export function ParameterEditor() {
                   min="0.1"
                   max="8"
                   step="0.1"
-                  value={zone.effectParams.octaves}
+                  value={zone.effectParams.octaves ?? 2}
                   onChange={(e) => handleEffectParamChange('octaves', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   disabled={zone.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.octaves}
+                  {zone.effectParams.octaves ?? 2}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -299,13 +308,13 @@ export function ParameterEditor() {
                   min="20"
                   max="20000"
                   step="10"
-                  value={zone.effectParams.baseFrequency}
+                  value={zone.effectParams.baseFrequency ?? 200}
                   onChange={(e) => handleEffectParamChange('baseFrequency', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   disabled={zone.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.baseFrequency}
+                  {zone.effectParams.baseFrequency ?? 200}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -313,7 +322,198 @@ export function ParameterEditor() {
                 <span>20 kHz</span>
               </div>
             </div>
-          </div>
+
+            {/* Parámetros específicos del AutoFilter */}
+            {zone.type === 'autoFilter' && (
+              <>
+                {/* Depth */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Profundidad de Modulación
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      value={zone.effectParams.depth ?? 0.5}
+                      onChange={(e) => handleEffectParamChange('depth', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      disabled={zone.isLocked}
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {zone.effectParams.depth ?? 0.5}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0</span>
+                    <span>1</span>
+                  </div>
+                </div>
+
+                {/* Filter Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Tipo de Filtro
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['lowpass', 'highpass', 'bandpass', 'notch'] as const).map((filterType) => (
+                      <button
+                        key={filterType}
+                        onClick={() => handleEffectParamChange('filterType', filterType)}
+                        disabled={zone.isLocked}
+                        className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                          (zone.effectParams.filterType ?? 'lowpass') === filterType
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
+                      >
+                        <span className="capitalize">{filterType}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Filter Q */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Resonancia (Q)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      value={zone.effectParams.filterQ ?? 1}
+                      onChange={(e) => handleEffectParamChange('filterQ', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      disabled={zone.isLocked}
+                    />
+                    <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {zone.effectParams.filterQ ?? 1}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0.1</span>
+                    <span>10</span>
+                  </div>
+                </div>
+
+                {/* LFO Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Tipo de LFO
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((lfoType) => (
+                      <button
+                        key={lfoType}
+                        onClick={() => handleEffectParamChange('lfoType', lfoType)}
+                        disabled={zone.isLocked}
+                        className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                          (zone.effectParams.lfoType ?? 'sine') === lfoType
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
+                      >
+                        <span className="capitalize">{lfoType}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+                            {/* Parámetros específicos del AutoWah */}
+                {zone.type === 'autoWah' && (
+                  <>
+                    {/* Sensitivity */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Sensibilidad
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                                                value={zone.effectParams.sensitivity ?? 0.5}
+                      onChange={(e) => handleEffectParamChange('sensitivity', Number(e.target.value))}
+                      className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      disabled={zone.isLocked}
+                    />
+                                         <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                      {zone.effectParams.sensitivity ?? 0.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del BitCrusher */}
+                {zone.type === 'bitCrusher' && (
+                  <>
+                    {/* Bits */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Bits
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="1"
+                          max="16"
+                          step="1"
+                          value={zone.effectParams.bits ?? 4}
+                          onChange={(e) => handleEffectParamChange('bits', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                                                     {zone.effectParams.bits ?? 4}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>1</span>
+                        <span>16</span>
+                      </div>
+                    </div>
+
+                    {/* NormFreq */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Frecuencia Normalizada
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.normFreq ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('normFreq', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                                                     {zone.effectParams.normFreq ?? 0.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
 
           {/* Selector de forma */}
           <div className="mt-6 space-y-4">
@@ -489,6 +689,11 @@ export function ParameterEditor() {
 
   // Renderizar controles para objeto sonoro (código existente)
   const selectedObject = selectedEntity.data as any; // Type assertion para objeto sonoro
+  
+  // Asegurar que audioParams existe
+  if (!selectedObject.audioParams) {
+    selectedObject.audioParams = {};
+  }
   
   return (
     <div className="fixed top-4 right-4 z-50">

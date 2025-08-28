@@ -76,6 +76,24 @@ export function ControlPanel() {
     addEffectZone('phaser', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
   };
 
+  const handleAddAutoFilterZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('autoFilter', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
+  };
+
+  const handleAddAutoWahZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('autoWah', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
+  };
+
+  const handleAddBitCrusherZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('bitCrusher', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
+  };
+
   return (
     <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
       
@@ -143,9 +161,12 @@ export function ControlPanel() {
             <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg">
               <h4 className="text-sm font-semibold text-purple-300 mb-2">🎛️ Zonas de Efectos</h4>
               <div className="space-y-1 text-xs text-purple-200">
-                <p>• <strong>Zonas Phaser:</strong> Aplican efectos de modulación</p>
-                <p>• <strong>Detección automática:</strong> Los objetos dentro de la zona se procesan</p>
-                <p>• <strong>Bloqueo:</strong> Usa el candado para proteger zonas de cambios</p>
+                                    <p>• <strong>Zonas Phaser:</strong> Aplican efectos de modulación de fase</p>
+                    <p>• <strong>Zonas AutoFilter:</strong> Aplican filtros automáticos con LFO</p>
+                    <p>• <strong>Zonas AutoWah:</strong> Aplican filtros automáticos con seguimiento de amplitud</p>
+                    <p>• <strong>Zonas BitCrusher:</strong> Aplican efectos de reducción de bits y frecuencia</p>
+                    <p>• <strong>Detección automática:</strong> Los objetos dentro de la zona se procesan</p>
+                    <p>• <strong>Bloqueo:</strong> Usa el candado para proteger zonas de cambios</p>
               </div>
             </div>
           </div>
@@ -296,6 +317,30 @@ export function ControlPanel() {
             >
               <span>🎛️</span>
               <span>Zona de Phaser (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddAutoFilterZone}
+              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de AutoFilter (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddAutoWahZone}
+              className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de AutoWah (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddBitCrusherZone}
+              className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de BitCrusher (sphere)</span>
             </button>
           </div>
         )}
