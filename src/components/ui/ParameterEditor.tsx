@@ -15,8 +15,14 @@ export function ParameterEditor() {
     removeObject, 
     removeEffectZone, 
     toggleLockEffectZone,
-    setEditingEffectZone 
+    setEditingEffectZone,
+    refreshAllEffects
   } = useWorldStore();
+
+  // Estado para mostrar cuando se están actualizando los parámetros
+  const [isUpdatingParams, setIsUpdatingParams] = React.useState(false);
+  const [isRefreshingEffects, setIsRefreshingEffects] = React.useState(false);
+  const [lastUpdatedParam, setLastUpdatedParam] = React.useState<string | null>(null);
 
   // Encontrar la entidad seleccionada (objeto sonoro o zona de efecto)
   const selectedEntity = useMemo(() => {
@@ -80,6 +86,10 @@ export function ParameterEditor() {
     const effectZone = selectedEntity.data as any; // Type assertion para zona de efecto
     console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
 
+    // Mostrar estado de actualización
+    setIsUpdatingParams(true);
+    setLastUpdatedParam(param);
+
     const newEffectParams = {
       ...effectZone.effectParams,
       [param]: value,
@@ -90,6 +100,12 @@ export function ParameterEditor() {
     });
 
     console.log(`🎛️ Parámetro de efecto ${param} actualizado a:`, value);
+
+    // Ocultar estado de actualización después de un breve delay
+    setTimeout(() => {
+      setIsUpdatingParams(false);
+      setLastUpdatedParam(null);
+    }, 1000);
   };
 
   // Función para actualizar transformación de la entidad
@@ -235,15 +251,69 @@ export function ParameterEditor() {
             </div>
           </div>
 
+          {/* Botón de refrescar efectos */}
+          <div className="mb-6 p-4 bg-blue-900/20 border border-blue-600/50 rounded-lg">
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  // Forzar la actualización de todos los efectos
+                  console.log('🔄 Forzando actualización de todos los efectos...');
+                  setIsRefreshingEffects(true);
+                  refreshAllEffects();
+                  
+                  // Ocultar estado después de un delay
+                  setTimeout(() => {
+                    setIsRefreshingEffects(false);
+                  }, 1000);
+                }}
+                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Refrescar todos los efectos para asegurar que los cambios se apliquen"
+                disabled={isRefreshingEffects}
+              >
+                {isRefreshingEffects ? '🔄 Refrescando...' : '🔄 Refrescar Efectos'}
+              </button>
+              <p className="text-xs text-blue-400 mt-1 text-center">
+                Fuerza la actualización de todos los efectos para asegurar que los cambios se apliquen en tiempo real
+              </p>
+            </div>
+          </div>
+
           {/* Controles de parámetros del efecto */}
           <div className="space-y-4">
                               <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
                     zone.type === 'phaser' ? 'text-purple-400' : 
                     zone.type === 'autoFilter' ? 'text-green-400' : 
-                    zone.type === 'autoWah' ? 'text-orange-400' : 'text-red-400'
+                    zone.type === 'autoWah' ? 'text-orange-400' : 
+                    zone.type === 'bitCrusher' ? 'text-red-400' : 
+                    zone.type === 'chebyshev' ? 'text-indigo-400' : 'text-teal-400'
                   }`}>
-                    🎛️ Parámetros del {zone.type === 'phaser' ? 'Phaser' : zone.type === 'autoFilter' ? 'AutoFilter' : zone.type === 'autoWah' ? 'AutoWah' : 'BitCrusher'}
+                    🎛️ Parámetros del {zone.type === 'phaser' ? 'Phaser' : zone.type === 'autoFilter' ? 'AutoFilter' : zone.type === 'autoWah' ? 'AutoWah' : zone.type === 'bitCrusher' ? 'BitCrusher' : zone.type === 'chebyshev' ? 'Chebyshev' : 'Chorus'}
+                    {isUpdatingParams && (
+                      <span className="text-yellow-400 animate-pulse">🔄</span>
+                    )}
                   </h4>
+                  
+                  {/* Indicador de parámetro actualizado */}
+                  {lastUpdatedParam && (
+                    <div className="mb-3 p-2 bg-green-900/20 border border-green-600/50 rounded-lg">
+                      <p className="text-xs text-green-400 text-center">
+                        ✅ Parámetro <strong>{lastUpdatedParam}</strong> actualizado en tiempo real
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Indicador de estado del efecto */}
+                  <div className="mb-3 p-2 bg-blue-900/20 border border-blue-600/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-blue-400">
+                        🎵 Efecto <strong>{zone.type}</strong> activo
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-green-400">En tiempo real</span>
+                      </div>
+                    </div>
+                  </div>
             
             {/* Frecuencia de modulación */}
             <div>
@@ -510,6 +580,242 @@ export function ParameterEditor() {
                         <span>0</span>
                         <span>1</span>
                       </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Chebyshev */}
+                {zone.type === 'chebyshev' && (
+                  <>
+                    {/* Order */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Orden del Polinomio
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="1"
+                          max="100"
+                          step="1"
+                          value={zone.effectParams.order ?? 50}
+                          onChange={(e) => handleEffectParamChange('order', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.order ?? 50}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>1</span>
+                        <span>100</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Orden impar = distorsión armónica, Orden par = distorsión suave
+                      </p>
+                    </div>
+
+                    {/* Oversample */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Oversampling
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['none', '2x', '4x'] as const).map((oversampleType) => (
+                          <button
+                            key={oversampleType}
+                            onClick={() => handleEffectParamChange('oversample', oversampleType)}
+                            disabled={zone.isLocked}
+                            className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                              (zone.effectParams.oversample ?? 'none') === oversampleType
+                                ? 'bg-indigo-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            <span className="capitalize">{oversampleType}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Mayor oversampling = mejor calidad, más CPU
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Chorus */}
+                {zone.type === 'chorus' && (
+                  <>
+                    {/* Frecuencia del LFO */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Frecuencia del LFO (Hz)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="10"
+                          step="0.1"
+                          value={zone.effectParams.chorusFrequency ?? 1.5}
+                          onChange={(e) => handleEffectParamChange('chorusFrequency', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.chorusFrequency ?? 1.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.1 Hz</span>
+                        <span>10 Hz</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Velocidad de modulación del efecto
+                      </p>
+                    </div>
+
+                    {/* Tiempo de Delay */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Tiempo de Delay (ms)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="2"
+                          max="20"
+                          step="0.1"
+                          value={zone.effectParams.delayTime ?? 3.5}
+                          onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.delayTime ?? 3.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>2 ms</span>
+                        <span>20 ms</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Tiempo base del delay del chorus
+                      </p>
+                    </div>
+
+                    {/* Profundidad */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Profundidad
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.chorusDepth ?? 0.7}
+                          onChange={(e) => handleEffectParamChange('chorusDepth', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.chorusDepth ?? 0.7}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Intensidad de la modulación del delay
+                      </p>
+                    </div>
+
+                    {/* Feedback */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Feedback
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="0.9"
+                          step="0.01"
+                          value={zone.effectParams.feedback ?? 0}
+                          onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.feedback ?? 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>0.9</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Cantidad de retroalimentación (0 = chorus, mayor a 0 = flanger)
+                      </p>
+                    </div>
+
+                    {/* Spread */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Spread Estéreo (grados)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="180"
+                          step="1"
+                          value={zone.effectParams.spread ?? 180}
+                          onChange={(e) => handleEffectParamChange('spread', Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                          {zone.effectParams.spread ?? 180}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0°</span>
+                        <span>180°</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        0° = central, 180° = estéreo completo
+                      </p>
+                    </div>
+
+                    {/* Tipo de LFO */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Tipo de LFO
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((lfoType) => (
+                          <button
+                            key={lfoType}
+                            onClick={() => handleEffectParamChange('chorusType', lfoType)}
+                            disabled={zone.isLocked}
+                            className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                              (zone.effectParams.chorusType ?? 'sine') === lfoType
+                                ? 'bg-teal-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            <span className="capitalize">{lfoType}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Forma de onda del LFO para la modulación
+                      </p>
                     </div>
                   </>
                 )}

@@ -94,6 +94,18 @@ export function ControlPanel() {
     addEffectZone('bitCrusher', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
   };
 
+  const handleAddChebyshevZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('chebyshev', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
+  };
+
+  const handleAddChorusZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('chorus', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
+  };
+
   return (
     <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
       
@@ -165,6 +177,8 @@ export function ControlPanel() {
                     <p>• <strong>Zonas AutoFilter:</strong> Aplican filtros automáticos con LFO</p>
                     <p>• <strong>Zonas AutoWah:</strong> Aplican filtros automáticos con seguimiento de amplitud</p>
                     <p>• <strong>Zonas BitCrusher:</strong> Aplican efectos de reducción de bits y frecuencia</p>
+                    <p>• <strong>Zonas Chebyshev:</strong> Aplican efectos de distorsión polinomial</p>
+                    <p>• <strong>Zonas Chorus:</strong> Aplican efectos de coro estéreo con LFO</p>
                     <p>• <strong>Detección automática:</strong> Los objetos dentro de la zona se procesan</p>
                     <p>• <strong>Bloqueo:</strong> Usa el candado para proteger zonas de cambios</p>
               </div>
@@ -341,6 +355,22 @@ export function ControlPanel() {
             >
               <span>🎛️</span>
               <span>Zona de BitCrusher (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddChebyshevZone}
+              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de Chebyshev (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddChorusZone}
+              className="w-full px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>🎛️</span>
+              <span>Zona de Chorus (sphere)</span>
             </button>
           </div>
         )}

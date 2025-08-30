@@ -20,7 +20,7 @@ export interface SoundObject {
 // Interfaz para una zona de efecto
 export interface EffectZone {
   id: string;
-  type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher';
+  type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus';
   shape: 'sphere' | 'cube';
   position: [number, number, number];
   rotation: [number, number, number];
@@ -47,6 +47,16 @@ export interface EffectZone {
     // Parámetros del BitCrusher
     bits?: number;
     normFreq?: number;
+    // Parámetros del Chebyshev
+    order?: number;
+    oversample?: 'none' | '2x' | '4x';
+    // Parámetros del Chorus
+    chorusFrequency?: number;
+    delayTime?: number;
+    chorusDepth?: number;
+    feedback?: number;
+    spread?: number;
+    chorusType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
   };
 }
 
@@ -81,6 +91,7 @@ export interface WorldActions {
   toggleLockEffectZone: (id: string) => void;
   // Nuevas acciones para controlar la edición de zonas de efectos
   setEditingEffectZone: (isEditing: boolean) => void;
+  refreshAllEffects: () => void;
 }
 
 // Parámetros por defecto para cada tipo de objeto
@@ -476,7 +487,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     // Configurar parámetros por defecto según el tipo de efecto
     let defaultParams: any = {};
     
@@ -514,6 +525,26 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         baseFrequency: 200,
         bits: 4,
         normFreq: 0.5,
+      };
+    } else if (type === 'chebyshev') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        order: 50,
+        oversample: 'none',
+      };
+    } else if (type === 'chorus') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        chorusFrequency: 1.5,
+        delayTime: 3.5,
+        chorusDepth: 0.7,
+        feedback: 0,
+        spread: 180,
+        chorusType: 'sine',
       };
     }
 
@@ -601,4 +632,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   setEditingEffectZone: (isEditing: boolean) => {
     set({ isEditingEffectZone: isEditing });
   },
+
+  refreshAllEffects: () => {
+    console.log(`🔄 Store: Refrescando todos los efectos...`);
+    try {
+      audioManager.refreshAllGlobalEffects();
+      console.log(`✅ Todos los efectos han sido refrescados`);
+    } catch (error) {
+      console.error(`❌ Error al refrescar efectos:`, error);
+    }
+  },
+
 }));
