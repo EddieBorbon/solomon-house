@@ -16,7 +16,8 @@ export function ParameterEditor() {
     removeEffectZone, 
     toggleLockEffectZone,
     setEditingEffectZone,
-    refreshAllEffects
+    refreshAllEffects,
+    debugAudioChain
   } = useWorldStore();
 
   // Estado para mostrar cuando se están actualizando los parámetros
@@ -278,6 +279,24 @@ export function ParameterEditor() {
             </div>
           </div>
 
+          {/* Botón de debug de cadena de audio */}
+          {selectedEntity && (selectedEntity as any).type === 'soundObject' && (
+            <div className="mb-6 p-4 bg-purple-900/20 border border-purple-600/50 rounded-lg">
+              <div className="text-center">
+                <button
+                  onClick={() => debugAudioChain(selectedEntity.data.id)}
+                  className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-200"
+                  title="Debug de la cadena de audio para este objeto sonoro"
+                >
+                  🔍 Debug Cadena de Audio
+                </button>
+                <p className="text-xs text-purple-400 mt-1 text-center">
+                  Verifica el estado completo de la cadena de audio en la consola
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Controles de parámetros del efecto */}
           <div className="space-y-4">
                               <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
@@ -292,6 +311,35 @@ export function ParameterEditor() {
                       <span className="text-yellow-400 animate-pulse">🔄</span>
                     )}
                   </h4>
+
+                  {/* Control de Radio de la Zona de Efectos */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Radio de la Zona
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min="0.5"
+                        max="10"
+                        step="0.1"
+                        value={zone.effectParams.radius ?? 2.0}
+                        onChange={(e) => handleEffectParamChange('radius', Number(e.target.value))}
+                        className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                        disabled={zone.isLocked}
+                      />
+                      <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        {zone.effectParams.radius ?? 2.0}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>0.5</span>
+                      <span>10</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Tamaño de la zona donde se aplica el efecto
+                    </p>
+                  </div>
                   
                   {/* Indicador de parámetro actualizado */}
                   {lastUpdatedParam && (

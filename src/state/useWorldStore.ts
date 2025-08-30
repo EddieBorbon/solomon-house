@@ -57,6 +57,8 @@ export interface EffectZone {
     feedback?: number;
     spread?: number;
     chorusType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    // Parámetros generales de zona de efectos
+    radius?: number;
   };
 }
 
@@ -85,13 +87,14 @@ export interface WorldActions {
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
   removeEffectZone: (id: string) => void;
   toggleLockEffectZone: (id: string) => void;
   // Nuevas acciones para controlar la edición de zonas de efectos
   setEditingEffectZone: (isEditing: boolean) => void;
   refreshAllEffects: () => void;
+  debugAudioChain: (soundId: string) => void;
 }
 
 // Parámetros por defecto para cada tipo de objeto
@@ -547,6 +550,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         chorusType: 'sine',
       };
     }
+    
+    // Agregar radio por defecto para todas las zonas de efectos
+    defaultParams.radius = 2.0;
 
     const newEffectZone: EffectZone = {
       id: uuidv4(),
@@ -591,6 +597,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     // Si se actualizan los parámetros del efecto, actualizar también en el AudioManager
     if (updates.effectParams) {
       try {
+        // Si se cambió el radio, actualizarlo en el AudioManager
+        if (updates.effectParams.radius !== undefined) {
+          audioManager.setEffectZoneRadius(id, updates.effectParams.radius);
+          console.log(`✅ Radio de zona de efecto ${id} actualizado a ${updates.effectParams.radius}`);
+        }
+        
+        // Actualizar otros parámetros del efecto
         audioManager.updateGlobalEffect(id, updates.effectParams);
         console.log(`✅ Parámetros del efecto global actualizados para zona ${id}`);
       } catch (error) {
@@ -640,6 +653,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       console.log(`✅ Todos los efectos han sido refrescados`);
     } catch (error) {
       console.error(`❌ Error al refrescar efectos:`, error);
+    }
+  },
+
+  debugAudioChain: (soundId: string) => {
+    console.log(`🔍 Store: Debug de cadena de audio para sonido ${soundId}`);
+    try {
+      audioManager.debugAudioChain(soundId);
+    } catch (error) {
+      console.error(`❌ Error al hacer debug de cadena de audio:`, error);
     }
   },
 
