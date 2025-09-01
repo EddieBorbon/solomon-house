@@ -103,7 +103,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'cube':
       return {
         frequency: 220,
-        volume: 0.1, // Volumen estándar (se mostrará como 10%)
+        volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'sine', // Forma de onda de la portadora
         harmonicity: 1.5,
         modulationWaveform: 'square', // Forma de onda de la moduladora
@@ -112,7 +112,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'sphere':
       return {
         frequency: 300,
-        volume: 0.1, // Volumen estándar (se mostrará como 10%)
+        volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'sine',
         modulationWaveform: 'sine',
         harmonicity: 2, // Ratio de octava
@@ -122,7 +122,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'cylinder':
       return {
         frequency: 220,
-        volume: 0.1, // Volumen estándar (se mostrará como 10%)
+        volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'triangle',
         waveform2: 'sine', // La segunda voz puede ser diferente
         harmonicity: 1.5,
@@ -133,7 +133,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
     case 'cone':
       return {
         frequency: 50, // Frecuencia baja para un bombo
-        volume: 0.1,   // Volumen estándar (se mostrará como 10%)
+        volume: 0.6,   // Volumen aumentado para mejor audibilidad
         waveform: 'sine',
         pitchDecay: 0.05,
         octaves: 10,
@@ -227,7 +227,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
       return {
         frequency: 330,
         waveform: 'sine',
-        volume: 0.1, // Volumen estándar (se mostrará como 10%)
+        volume: 0.6, // Volumen aumentado para mejor audibilidad
       };
   }
 };
