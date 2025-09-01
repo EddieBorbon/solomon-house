@@ -1,81 +1,28 @@
 import * as Tone from 'tone';
 import * as THREE from 'three';
+import { SoundSourceFactory, AudioParams, SoundObjectType, SoundSource } from './factories/SoundSourceFactory';
+import { EffectManager, EffectType, GlobalEffect } from './managers/EffectManager';
+import { SpatialAudioManager, SpatialAudioConfig, ListenerState } from './managers/SpatialAudioManager';
 
-// Tipos para los parámetros de audio
-export interface AudioParams {
-  frequency: number;
-  waveform: OscillatorType;
-  volume: number;
-  harmonicity?: number;
-  modulationWaveform?: OscillatorType;
-  modulationIndex?: number; // Nuevo parámetro para FMSynth
-  // Nuevos parámetros para DuoSynth
-  waveform2?: OscillatorType;
-  vibratoAmount?: number;
-  vibratoRate?: number;
-  // Nuevos parámetros para MembraneSynth
-  pitchDecay?: number;
-  octaves?: number;
-  // Nuevos parámetros para MonoSynth (pyramid)
-  ampAttack?: number;
-  ampDecay?: number;
-  ampSustain?: number;
-  ampRelease?: number;
-  filterAttack?: number;
-  filterDecay?: number;
-  filterSustain?: number;
-  filterRelease?: number;
-  filterBaseFreq?: number;
-  filterOctaves?: number;
-  filterQ?: number;
-  // Nuevos parámetros para MetalSynth (icosahedron)
-  resonance?: number;
-  // Nuevos parámetros para NoiseSynth (plane)
-  noiseType?: 'white' | 'pink' | 'brown';
-  attack?: number;
-  decay?: number;
-  sustain?: number;
-  // Nuevos parámetros para PluckSynth (torus)
-  attackNoise?: number;
-  dampening?: number;
-  // Campo de duración para todos los objetos (Infinity para duración infinita)
-  duration?: number;
-  // Nuevos parámetros para PolySynth (dodecahedronRing)
-  polyphony?: number;
-  chord?: string[];
-  release?: number;
-  // Nuevos parámetros para Sampler (spiral)
-  urls?: Record<string, string>;
-  baseUrl?: string;
-  curve?: 'linear' | 'exponential';
-  notes?: string | string[];
-}
-
-// Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
-
-// Estructura de una fuente de sonido (REFACTORIZADA para Sistema Send/Return Profesional)
-interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
-  panner: Tone.Panner3D; // Panner 3D para la señal seca (posición del objeto sonoro)
-  dryGain: Tone.Gain; // Control de volumen para la señal seca (crossfade)
-  effectSends: Map<string, Tone.Gain>; // Map de envíos a efectos específicos
-}
+// Re-exportar tipos para mantener compatibilidad
+export type { AudioParams, SoundObjectType, SoundSource, EffectType, GlobalEffect, SpatialAudioConfig, ListenerState };
 
 export class AudioManager {
   private static instance: AudioManager;
   private soundSources: Map<string, SoundSource> = new Map();
-  private globalEffects: Map<string, { effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | any, panner: Tone.Panner3D, position: [number, number, number] }> = new Map(); // Efectos globales con panners independientes y posición real
   private isContextStarted: boolean = false;
   private playingSounds: Set<string> = new Set(); // Rastrear qué sonidos están activos
   private lastListenerPosition: string = ''; // Para reducir logs del listener
   private lastSendAmounts: Map<string, number> = new Map(); // Para reducir logs de send amounts
-  private testOscillators: Map<string, Tone.Oscillator> = new Map(); // Osciladores de prueba para efectos
-  private lastEffectIntensities: Map<string, number> = new Map(); // Para reducir logs de intensidades de efectos
-  private effectZoneRadii: Map<string, number> = new Map(); // Para almacenar radios personalizados de zonas de efectos
+  private soundSourceFactory: SoundSourceFactory;
+  private effectManager: EffectManager;
+  private spatialAudioManager: SpatialAudioManager;
 
   private constructor() {
     // Constructor privado para Singleton
+    this.soundSourceFactory = new SoundSourceFactory();
+    this.effectManager = new EffectManager();
+    this.spatialAudioManager = new SpatialAudioManager();
   }
 
   public static getInstance(): AudioManager {
@@ -88,129 +35,16 @@ export class AudioManager {
   /**
    * Crea un efecto global con espacialización independiente
    */
-  public createGlobalEffect(effectId: string, type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus', position: [number, number, number]): void {
-    try {
-      console.log(`🎛️ AudioManager: Creando efecto global ${type} con ID ${effectId} en posición [${position.join(', ')}]`);
-      
-      let effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | any;
-      
-      if (type === 'phaser') {
-        effectNode = new Tone.Phaser({
-          frequency: 0.5,
-          octaves: 2.2,
-          baseFrequency: 1000,
-        });
-        console.log(`🎛️ AudioManager: Phaser creado con parámetros iniciales:`, {
-          frequency: effectNode.frequency.value,
-          octaves: effectNode.octaves,
-          baseFrequency: effectNode.baseFrequency
-        });
-      } else if (type === 'autoFilter') {
-        effectNode = new Tone.AutoFilter({
-          frequency: 0.5,
-          baseFrequency: 200,
-          octaves: 2.6,
-          depth: 0.5,
-          filter: {
-            type: 'lowpass',
-            rolloff: -12,
-            Q: 1,
-          },
-          type: 'sine',
-        });
-        console.log(`🎛️ AudioManager: AutoFilter creado con parámetros iniciales:`, {
-          frequency: effectNode.frequency.value,
-          baseFrequency: effectNode.baseFrequency,
-          octaves: effectNode.octaves,
-          depth: effectNode.depth.value,
-          filterType: effectNode.filter.type,
-          filterQ: effectNode.filter.Q.value
-        });
-      } else if (type === 'autoWah') {
-        effectNode = new Tone.AutoWah({
-          baseFrequency: 200,
-          octaves: 2.6,
-          sensitivity: 0.5,
-        });
-        console.log(`🎛️ AudioManager: AutoWah creado con parámetros iniciales:`, {
-          baseFrequency: effectNode.baseFrequency,
-          octaves: effectNode.octaves,
-          sensitivity: effectNode.sensitivity.value
-        });
-      } else if (type === 'bitCrusher') {
-        effectNode = new Tone.BitCrusher(4); // bits parameter
-        effectNode.normFreq = 0.5; // Set normFreq after creation
-        console.log(`🎛️ AudioManager: BitCrusher creado con parámetros iniciales:`, {
-          bits: effectNode.bits,
-          normFreq: effectNode.normFreq
-        });
-      } else if (type === 'chebyshev') {
-        effectNode = new Tone.Chebyshev(50); // order parameter
-        effectNode.oversample = 'none'; // Set oversample after creation
-        console.log(`🎛️ AudioManager: Chebyshev creado con parámetros iniciales:`, {
-          order: effectNode.order,
-          oversample: effectNode.oversample
-        });
-      } else if (type === 'chorus') {
-        effectNode = new Tone.Chorus(1.5, 3.5, 0.7); // frequency, delayTime, depth
-        // Configurar parámetros usando los métodos de Tone.js
-        try {
-          effectNode.feedback.setValueAtTime(0, effectNode.context.currentTime);
-          effectNode.spread = 180;
-          effectNode.type = 'sine';
-        } catch (error) {
-          console.log(`ℹ️ AudioManager: Algunos parámetros del Chorus no se pudieron configurar inicialmente:`, error);
-        }
-        effectNode.start(); // Start the LFOs
-        console.log(`🎛️ AudioManager: Chorus creado con parámetros iniciales:`, {
-          frequency: effectNode.frequency.value,
-          delayTime: effectNode.delayTime,
-          depth: effectNode.depth,
-          feedback: effectNode.feedback.value,
-          spread: effectNode.spread,
-          type: effectNode.type
-        });
-      }
-      
-      if (effectNode) {
-        // Crear panner 3D independiente para el efecto
-        const effectPanner = new Tone.Panner3D({
-          positionX: position[0],
-          positionY: position[1],
-          positionZ: position[2],
-          panningModel: 'HRTF',
-          distanceModel: 'inverse',
-          refDistance: 1,
-          maxDistance: 100,
-          rolloffFactor: 2,
-          coneInnerAngle: 360,
-          coneOuterAngle: 360,
-          coneOuterGain: 0,
-        });
-        
-        // Conectar efecto -> panner -> destination
-        effectNode.chain(effectPanner, Tone.Destination);
-        console.log(`🎛️ AudioManager: Efecto conectado a la cadena de audio`);
-        
-        // Almacenar tanto el nodo del efecto como su panner y posición
-        this.globalEffects.set(effectId, { effectNode, panner: effectPanner, position: position });
-        console.log(`🎛️ AudioManager: Efecto almacenado en globalEffects. Total de efectos: ${this.globalEffects.size}`);
-        
-        // Configurar radio inicial para la zona de efectos
-        this.setEffectZoneRadius(effectId, 2.0);
-        console.log(`🎛️ AudioManager: Radio inicial configurado para zona de efecto ${effectId}: 2.0 unidades`);
-        
-        // Crear sends para todas las fuentes de sonido existentes
-        this.soundSources.forEach((source, sourceId) => {
-          this.addEffectSendToSource(sourceId, effectId, effectNode);
-        });
-        console.log(`🎛️ AudioManager: Sends creados para ${this.soundSources.size} fuentes de sonido`);
-        
-        // Crear un oscilador de prueba para escuchar los efectos del phaser
-        this.createTestOscillatorForEffect(effectId, effectNode);
-      }
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al crear efecto global:`, error);
+  public createGlobalEffect(effectId: string, type: EffectType, position: [number, number, number]): void {
+    this.effectManager.createGlobalEffect(effectId, type, position);
+    
+    // Crear sends para todas las fuentes de sonido existentes
+    const effectData = this.effectManager.getGlobalEffect(effectId);
+    if (effectData) {
+      this.soundSources.forEach((source, sourceId) => {
+        this.addEffectSendToSource(sourceId, effectId, effectData.effectNode);
+      });
+      console.log(`🎛️ AudioManager: Sends creados para ${this.soundSources.size} fuentes de sonido`);
     }
   }
 
@@ -235,425 +69,68 @@ export class AudioManager {
       
       console.log(`🎛️ AudioManager: Send de efecto ${effectId} creado para fuente ${sourceId} con gain inicial: ${send.gain.value}`);
       
-              // Verificar que el send se creó correctamente
-        console.log(`🔍 AudioManager: Verificando send - ID: ${effectId}, Gain: ${send.gain.value}`);
-        
-        // Verificar las conexiones del send
-        console.log(`🔍 AudioManager: Conexiones del send ${effectId}:`, {
-          input: send.numberOfInputs,
-          output: send.numberOfOutputs,
-          gainValue: send.gain.value
-        });
+      // Verificar que el send se creó correctamente
+      console.log(`🔍 AudioManager: Verificando send - ID: ${effectId}, Gain: ${send.gain.value}`);
+      
+      // Verificar las conexiones del send
+      console.log(`🔍 AudioManager: Conexiones del send ${effectId}:`, {
+        input: send.numberOfInputs,
+        output: send.numberOfOutputs,
+        gainValue: send.gain.value
+      });
     } catch (error) {
       console.error(`❌ AudioManager: Error al crear send de efecto:`, error);
     }
   }
 
-  /**
-   * Crea un oscilador de prueba para escuchar los efectos del phaser
-   */
-  private createTestOscillatorForEffect(effectId: string, effectNode: any): void {
-    try {
-      // Configurar el oscilador según el tipo de efecto para mejor audibilidad
-      let frequency = 440; // Nota A4 por defecto
-      let volume = -30; // Volumen bajo por defecto
-      let type: OscillatorType = 'sine';
-      
-      if (effectNode instanceof Tone.Phaser) {
-        frequency = 440; // A4 - buena para efectos de modulación de fase
-        volume = -25; // Un poco más alto para phaser
-      } else if (effectNode instanceof Tone.AutoFilter) {
-        frequency = 440; // A4 - buena para filtros automáticos
-        volume = -25; // Un poco más alto para autoFilter
-      } else if (effectNode instanceof Tone.AutoWah) {
-        frequency = 220; // A3 - frecuencia más baja para activar mejor el wah
-        volume = -25; // Un poco más alto para autoWah
-      } else if (effectNode instanceof Tone.BitCrusher) {
-        frequency = 880; // A5 - frecuencia más alta para hacer la distorsión más audible
-        volume = -20; // Más alto para bitCrusher
-        type = 'square'; // Forma de onda cuadrada para mejor distorsión
-      } else if (effectNode instanceof Tone.Chebyshev) {
-        frequency = 660; // E5 - frecuencia media para distorsión polinomial
-        volume = -20; // Más alto para chebyshev
-        type = 'sawtooth'; // Forma de onda de sierra para mejor distorsión
-      } else if (effectNode instanceof Tone.Chorus) {
-        frequency = 440; // A4 - buena para efectos de chorus
-        volume = -25; // Un poco más alto para chorus
-        type = 'sine'; // Forma de onda sinusoidal para mejor chorus
-      }
-      
-      // Crear un oscilador de prueba optimizado para el tipo de efecto
-      const testOsc = new Tone.Oscillator({
-        frequency,
-        type,
-        volume,
-      });
-      
-      // Conectar el oscilador directamente al efecto
-      testOsc.connect(effectNode);
-      
-      // Iniciar el oscilador
-      testOsc.start();
-      
-      console.log(`🎛️ AudioManager: Oscilador de prueba optimizado creado para ${effectNode.constructor.name} (${effectId}) - Frecuencia: ${frequency}Hz, Tipo: ${type}, Volumen: ${volume}dB`);
-      
-      // Almacenar el oscilador para poder limpiarlo después
-      if (!this.testOscillators) {
-        this.testOscillators = new Map();
-      }
-      this.testOscillators.set(effectId, testOsc);
-      
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al crear oscilador de prueba:`, error);
-    }
-  }
+
 
   /**
    * Obtiene un efecto global por ID
    */
-  public getGlobalEffect(effectId: string): { effectNode: Tone.Phaser | any, panner: Tone.Panner3D } | undefined {
-    return this.globalEffects.get(effectId);
+  public getGlobalEffect(effectId: string): GlobalEffect | undefined {
+    return this.effectManager.getGlobalEffect(effectId);
   }
 
   /**
    * Actualiza los parámetros de un efecto global
    */
   public updateGlobalEffect(effectId: string, params: any): void {
-    const effectData = this.globalEffects.get(effectId);
-    if (!effectData) {
-      console.warn(`⚠️ AudioManager: No se encontró efecto global con ID ${effectId}`);
-      return;
-    }
-
-    try {
-      const { effectNode } = effectData;
-      console.log(`🎛️ AudioManager: Actualizando parámetros del efecto ${effectId}:`, params);
-      
-      if (effectNode instanceof Tone.Phaser) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al phaser`);
-            this.safeUpdateParam(effectNode, paramName, params[paramName]);
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del phaser:`, {
-          frequency: effectNode.frequency?.value || 'N/A',
-          octaves: effectNode.octaves || 'N/A',
-          baseFrequency: effectNode.baseFrequency || 'N/A'
-        });
-      } else if (effectNode instanceof Tone.AutoFilter) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al autoFilter`);
-            // Manejar casos especiales para AutoFilter
-            if (paramName === 'filterType' && effectNode.filter) {
-              this.safeUpdateParam(effectNode, 'filter.type', params[paramName]);
-            } else if (paramName === 'filterQ' && effectNode.filter) {
-              this.safeUpdateParam(effectNode, 'filter.Q', params[paramName]);
-            } else {
-              this.safeUpdateParam(effectNode, paramName, params[paramName]);
-            }
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del autoFilter:`, {
-          frequency: effectNode.frequency?.value || 'N/A',
-          baseFrequency: effectNode.baseFrequency || 'N/A',
-          octaves: effectNode.octaves || 'N/A',
-          depth: effectNode.depth?.value || 'N/A',
-          filterType: effectNode.filter?.type || 'N/A',
-          filterQ: effectNode.filter?.Q?.value || 'N/A',
-          lfoType: effectNode.type || 'N/A'
-        });
-      } else if (effectNode instanceof Tone.AutoWah) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al autoWah`);
-            this.safeUpdateParam(effectNode, paramName, params[paramName]);
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del autoWah:`, {
-          baseFrequency: effectNode.baseFrequency || 'N/A',
-          octaves: effectNode.octaves || 'N/A',
-          sensitivity: effectNode.sensitivity || 'N/A'
-        });
-      } else if (effectNode instanceof Tone.BitCrusher) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al bitCrusher`);
-            if (paramName === 'bits') {
-              console.log(`ℹ️ AudioManager: Los bits del BitCrusher no se pueden cambiar después de la creación`);
-            } else {
-              this.safeUpdateParam(effectNode, paramName, params[paramName]);
-            }
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del bitCrusher:`, {
-          bits: effectNode.bits || 'N/A'
-        });
-      } else if (effectNode instanceof Tone.Chebyshev) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al chebyshev`);
-            this.safeUpdateParam(effectNode, paramName, params[paramName]);
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del chebyshev:`, {
-          order: effectNode.order || 'N/A',
-          oversample: effectNode.oversample || 'N/A'
-        });
-      } else if (effectNode instanceof Tone.Chorus) {
-        // Usar la función de utilidad para actualizar parámetros de manera segura
-        Object.keys(params).forEach(paramName => {
-          if (params[paramName] !== undefined) {
-            console.log(`🎛️ AudioManager: Aplicando ${paramName} ${params[paramName]} al chorus`);
-            // Manejar casos especiales para Chorus
-            if (paramName === 'chorusFrequency') {
-              this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
-            } else if (paramName === 'chorusDepth') {
-              this.safeUpdateParam(effectNode, 'depth', params[paramName]);
-            } else if (paramName === 'chorusType') {
-              this.safeUpdateParam(effectNode, 'type', params[paramName]);
-            } else {
-              this.safeUpdateParam(effectNode, paramName, params[paramName]);
-            }
-          }
-        });
-        
-        // Verificar que los parámetros se aplicaron correctamente
-        console.log(`🎛️ AudioManager: Parámetros actuales del chorus:`, {
-          frequency: effectNode.frequency?.value || 'N/A',
-          delayTime: effectNode.delayTime || 'N/A',
-          depth: effectNode.depth || 'N/A',
-          feedback: effectNode.feedback?.value || 'N/A',
-          spread: effectNode.spread || 'N/A',
-          type: effectNode.type || 'N/A'
-        });
-      } else {
-        console.warn(`⚠️ AudioManager: El nodo del efecto no es un Tone.Phaser, Tone.AutoFilter, Tone.AutoWah, Tone.BitCrusher, Tone.Chebyshev ni Tone.Chorus:`, effectNode);
-      }
-      
-      // Refrescar el efecto para asegurar que los cambios se apliquen en tiempo real
-      this.refreshGlobalEffect(effectId);
-      
-      // Log adicional para confirmar que los parámetros se aplicaron
-      console.log(`✅ AudioManager: Parámetros del efecto ${effectId} actualizados y refrescados`);
-      
-      // Forzar actualización adicional para parámetros críticos
-      Object.keys(params).forEach(paramName => {
-        if (params[paramName] !== undefined) {
-          this.forceEffectUpdate(effectId, paramName, params[paramName]);
-        }
-      });
-      
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al actualizar parámetros del efecto:`, error);
-    }
+    this.effectManager.updateGlobalEffect(effectId, params);
   }
 
   /**
    * Fuerza la actualización de un efecto global reiniciando su oscilador de prueba
    */
   public refreshGlobalEffect(effectId: string): void {
-    const effectData = this.globalEffects.get(effectId);
-    if (!effectData) {
-      console.warn(`⚠️ AudioManager: No se encontró efecto global con ID ${effectId} para refrescar`);
-      return;
-    }
-
-    try {
-      const { effectNode } = effectData;
-      const testOsc = this.testOscillators.get(effectId);
-      
-      if (testOsc) {
-        console.log(`🔄 AudioManager: Refrescando efecto ${effectId} (${effectNode.constructor.name})`);
-        
-        // Estrategias de refresco específicas según el tipo de efecto
-        if (effectNode instanceof Tone.Phaser) {
-          // Para Phaser: cambiar frecuencia y reiniciar
-          testOsc.frequency.rampTo(880, 0.1); // A5
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 150); // Volver a A4
-        } else if (effectNode instanceof Tone.AutoFilter) {
-          // Para AutoFilter: modulación de frecuencia
-          testOsc.frequency.rampTo(660, 0.1); // E5
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 150); // Volver a A4
-        } else if (effectNode instanceof Tone.AutoWah) {
-          // Para AutoWah: cambio de frecuencia para activar el wah
-          testOsc.frequency.rampTo(110, 0.1); // A2 (frecuencia baja)
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 200); // Volver a A4
-        } else if (effectNode instanceof Tone.BitCrusher) {
-          // Para BitCrusher: cambio de frecuencia para hacer la distorsión más audible
-          testOsc.frequency.rampTo(880, 0.1); // A5
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 100); // Volver a A4
-        } else if (effectNode instanceof Tone.Chebyshev) {
-          // Para Chebyshev: cambio de frecuencia para hacer la distorsión más audible
-          testOsc.frequency.rampTo(660, 0.1); // E5
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 150); // Volver a A4
-        } else if (effectNode instanceof Tone.Chorus) {
-          // Para Chorus: cambio de frecuencia para hacer el efecto más audible
-          testOsc.frequency.rampTo(880, 0.1); // A5
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 100); // Volver a A4
-        } else {
-          // Estrategia genérica para otros efectos
-          const currentFreq = testOsc.frequency.value;
-          const newFreq = currentFreq === 440 ? 880 : 440;
-          testOsc.frequency.rampTo(newFreq, 0.1);
-          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 200);
-        }
-      }
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al refrescar efecto global:`, error);
-    }
+    this.effectManager.refreshGlobalEffect(effectId);
   }
 
   /**
    * Elimina un efecto global
    */
   public removeGlobalEffect(effectId: string): void {
-    const effectData = this.globalEffects.get(effectId);
-    if (effectData) {
-      try {
-        const { effectNode, panner } = effectData;
-        
-        // Limpiar todas las conexiones a fuentes de sonido antes de eliminar
-        this.cleanupEffectSourceConnections(effectId);
-        
-        // Limpiar el oscilador de prueba si existe
-        const testOsc = this.testOscillators.get(effectId);
-        if (testOsc) {
-          try {
-            testOsc.stop();
-            testOsc.dispose();
-            this.testOscillators.delete(effectId);
-            console.log(`🎛️ AudioManager: Oscilador de prueba eliminado para efecto ${effectId}`);
-          } catch (oscError) {
-            console.error(`❌ AudioManager: Error al limpiar oscilador de prueba:`, oscError);
-          }
-        }
-        
-        // Desconectar todas las conexiones antes de disponer
-        try {
-          effectNode.disconnect();
-          panner.disconnect();
-        } catch (disconnectError) {
-          // Manejo silencioso de errores
-        }
-        
-        effectNode.dispose();
-        panner.dispose();
-        this.globalEffects.delete(effectId);
-      } catch (error) {
-        // Manejo silencioso de errores
-      }
-    }
+    // Limpiar todas las conexiones a fuentes de sonido antes de eliminar
+    this.cleanupEffectSourceConnections(effectId);
+    
+    // Eliminar el efecto usando el EffectManager
+    this.effectManager.removeGlobalEffect(effectId);
   }
 
   /**
    * Fuerza la actualización de todos los efectos globales activos
    */
   public refreshAllGlobalEffects(): void {
-    console.log(`🔄 AudioManager: Refrescando todos los efectos globales activos`);
-    
-    this.globalEffects.forEach((effectData, effectId) => {
-      try {
-        this.refreshGlobalEffect(effectId);
-      } catch (error) {
-        console.error(`❌ AudioManager: Error al refrescar efecto ${effectId}:`, error);
-      }
-    });
+    this.effectManager.refreshAllGlobalEffects();
   }
 
-  /**
-   * Función de utilidad para actualizar parámetros de manera segura
-   */
-  private safeUpdateParam(effectNode: any, paramPath: string, newValue: any, fallbackValue?: any): boolean {
-    try {
-      const pathParts = paramPath.split('.');
-      let current = effectNode;
-      
-      // Navegar hasta el penúltimo elemento del path
-      for (let i = 0; i < pathParts.length - 1; i++) {
-        if (current && current[pathParts[i]]) {
-          current = current[pathParts[i]];
-        } else {
-          console.log(`ℹ️ AudioManager: Path ${paramPath} no válido en ${effectNode.constructor.name}`);
-          return false;
-        }
-      }
-      
-      const lastPart = pathParts[pathParts.length - 1];
-      const target = current[lastPart];
-      
-      if (target !== undefined) {
-        if (typeof target.rampTo === 'function') {
-          target.rampTo(newValue, 0.1);
-          return true;
-        } else if (typeof target.setValueAtTime === 'function') {
-          target.setValueAtTime(newValue, effectNode.context.currentTime);
-          return true;
-        } else if (typeof target === 'number' || typeof target === 'string') {
-          current[lastPart] = newValue;
-          return true;
-        } else {
-          console.log(`ℹ️ AudioManager: Parámetro ${paramPath} no es configurable en tiempo real`);
-          return false;
-        }
-      } else {
-        console.log(`ℹ️ AudioManager: Parámetro ${paramPath} no encontrado`);
-        return false;
-      }
-    } catch (error) {
-      console.log(`ℹ️ AudioManager: Error al actualizar ${paramPath}:`, error);
-      return false;
-    }
-  }
+
 
   /**
    * Fuerza la actualización de un efecto específico con estrategias optimizadas
    */
   public forceEffectUpdate(effectId: string, paramName: string, newValue: any): void {
-    const effectData = this.globalEffects.get(effectId);
-    if (!effectData) {
-      console.warn(`⚠️ AudioManager: No se encontró efecto global con ID ${effectId} para forzar actualización`);
-      return;
-    }
-
-    try {
-      const { effectNode } = effectData;
-      console.log(`🔄 AudioManager: Forzando actualización del parámetro ${paramName} = ${newValue} en ${effectNode.constructor.name}`);
-      
-      // Estrategias específicas para parámetros críticos
-      if (effectNode instanceof Tone.BitCrusher && paramName === 'bits') {
-        // Para BitCrusher, los bits no son configurables en tiempo real
-        // Podríamos recrear el efecto si es necesario
-        console.log(`ℹ️ AudioManager: Los bits del BitCrusher requieren recreación del efecto`);
-        this.refreshGlobalEffect(effectId);
-      } else if (effectNode instanceof Tone.Chebyshev && paramName === 'order') {
-        // Para Chebyshev, el orden se puede cambiar en tiempo real
-        console.log(`✅ AudioManager: Orden de Chebyshev actualizado en tiempo real`);
-        this.refreshGlobalEffect(effectId);
-      } else {
-        // Para otros parámetros, usar el refresco estándar
-        this.refreshGlobalEffect(effectId);
-      }
-      
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al forzar actualización del efecto:`, error);
-    }
+    this.effectManager.forceEffectUpdate(effectId, paramName, newValue);
   }
 
   /**
@@ -708,7 +185,7 @@ export class AudioManager {
         return;
       }
 
-      const effectData = this.globalEffects.get(effectId);
+      const effectData = this.effectManager.getGlobalEffect(effectId);
       if (!effectData) {
         return;
       }
@@ -776,20 +253,11 @@ export class AudioManager {
       this.playingSounds.clear();
       this.lastSendAmounts.clear();
       
-      // Limpiar osciladores de prueba
-      this.testOscillators.forEach((testOsc) => {
-        try {
-          testOsc.stop();
-          testOsc.dispose();
-        } catch (error) {
-          // Manejo silencioso de errores
-        }
-      });
-      this.testOscillators.clear();
+      // Limpiar efectos usando el EffectManager
+      this.effectManager.cleanup();
       
       // Forzar limpieza de conexiones
       this.soundSources.clear();
-      this.globalEffects.clear();
     } catch (error) {
       // Manejo silencioso de errores
     }
@@ -822,25 +290,8 @@ export class AudioManager {
         }
       });
       
-      // Limpiar todas las conexiones de efectos globales
-      this.globalEffects.forEach((effectData, effectId) => {
-        try {
-          this.cleanupEffectSourceConnections(effectId);
-        } catch (error) {
-          // Manejo silencioso de errores
-        }
-      });
-      
-      // Limpiar todos los osciladores de prueba
-      this.testOscillators.forEach((testOsc, effectId) => {
-        try {
-          testOsc.stop();
-          testOsc.dispose();
-        } catch (error) {
-          // Manejo silencioso de errores
-        }
-      });
-      this.testOscillators.clear();
+      // Limpiar todos los efectos usando el EffectManager
+      this.effectManager.cleanup();
       
       // Limpiar el Map de send amounts
       this.lastSendAmounts.clear();
@@ -886,7 +337,7 @@ export class AudioManager {
   }
 
   /**
-   * Crea una nueva fuente de sonido (REFACTORIZADA COMPLETAMENTE)
+   * Crea una nueva fuente de sonido usando la factory
    */
   public createSoundSource(
     id: string, 
@@ -900,272 +351,23 @@ export class AudioManager {
     }
 
     try {
-      // Crear el sintetizador apropiado según el tipo
-      let synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
-      
-      if (type === 'cube') {
-        synth = new Tone.AMSynth({
-          harmonicity: params.harmonicity || 1.5,
-          oscillator: {
-            type: params.waveform,
-          },
-          modulation: {
-            type: params.modulationWaveform || 'square',
-          },
-          envelope: {
-            attack: 0.1,
-            decay: 0.2,
-            sustain: 0.8,
-            release: 0.5, // Release más largo para un fade-out suave
-          },
-        });
-        
-        // Configurar la amplitud inicial de la portadora para síntesis AM
-        (synth as Tone.AMSynth).oscillator.volume.setValueAtTime(Tone.gainToDb(params.volume || 0.05), Tone.now());
-      } else if (type === 'sphere') {
-        // sphere - FMSynth con configuración completa
-        synth = new Tone.FMSynth({
-          harmonicity: params.harmonicity || 2,
-          modulationIndex: params.modulationIndex || 10,
-          oscillator: {
-            type: params.waveform,
-          },
-          modulation: {
-            type: params.modulationWaveform || 'sine',
-          },
-          envelope: {
-            attack: 0.01,
-            decay: 0.1,
-            sustain: 0.5,
-            release: 1.0,
-          },
-        });
-      } else if (type === 'cylinder') {
-        // cylinder - DuoSynth
-        synth = new Tone.DuoSynth({
-          harmonicity: params.harmonicity || 1.5,
-          vibratoAmount: params.vibratoAmount || 0.2,
-          vibratoRate: params.vibratoRate || 5,
-          voice0: { 
-            oscillator: { type: params.waveform || 'triangle' } 
-          },
-          voice1: { 
-            oscillator: { type: params.waveform2 || 'sine' } 
-          },
-        });
-      } else if (type === 'cone') {
-        // cone - MembraneSynth para sonidos percusivos
-        synth = new Tone.MembraneSynth({
-          pitchDecay: params.pitchDecay || 0.05,
-          octaves: params.octaves || 10,
-          oscillator: { 
-            type: params.waveform || 'sine' 
-          },
-          envelope: { 
-            attack: 0.001, 
-            decay: 0.2, 
-            sustain: 0.01, 
-            release: 0.3 
-          },
-        });
-      } else if (type === 'pyramid') {
-        // pyramid - MonoSynth para sonidos de bajo clásicos
-        synth = new Tone.MonoSynth({
-          oscillator: { 
-            type: params.waveform || 'sawtooth' 
-          },
-          envelope: { 
-            attack: params.ampAttack || 0.01, 
-            decay: params.ampDecay || 0.2, 
-            sustain: params.ampSustain || 0.1, 
-            release: params.ampRelease || 0.5 
-          },
-          filterEnvelope: { 
-            attack: params.filterAttack || 0.005, 
-            decay: params.filterDecay || 0.1, 
-            sustain: params.filterSustain || 0.05, 
-            release: params.filterRelease || 0.2, 
-            baseFrequency: params.filterBaseFreq || 200, 
-            octaves: params.filterOctaves || 4 
-          },
-          filter: { 
-            Q: params.filterQ || 2, 
-            type: 'lowpass' 
-          },
-        });
-      } else if (type === 'icosahedron') {
-        // icosahedron - MetalSynth para sonidos metálicos y percusivos
-        synth = new Tone.MetalSynth({
-          envelope: {
-            attack: 0.001,
-            decay: 1.4,
-            release: 0.2,
-          },
-          harmonicity: params.harmonicity || 5.1,
-          modulationIndex: params.modulationIndex || 32,
-          resonance: params.resonance || 4000,
-          octaves: params.octaves || 1.5,
-        });
-      } else if (type === 'plane') {
-        // plane - NoiseSynth para sonidos de ruido percusivos
-        synth = new Tone.NoiseSynth({
-          noise: { 
-            type: params.noiseType || 'white' 
-          },
-          envelope: { 
-            attack: params.attack || 0.001, 
-            decay: params.decay || 0.1, 
-            sustain: params.sustain || 0, 
-            release: 0.1 
-          },
-        });
-      } else if (type === 'torus') {
-        // torus - PluckSynth para sonidos de cuerdas
-        synth = new Tone.PluckSynth({
-          attackNoise: params.attackNoise || 1,
-          dampening: params.dampening || 4000,
-          resonance: params.resonance || 0.9,
-        });
-      } else if (type === 'dodecahedronRing') {
-        // dodecahedronRing - PolySynth para acordes polifónicos
-        synth = new Tone.PolySynth({
-          maxPolyphony: params.polyphony || 4,
-          voice: Tone.FMSynth,
-          options: {
-            harmonicity: params.harmonicity || 1,
-            modulationIndex: params.modulationIndex || 2,
-            oscillator: {
-              type: params.waveform || 'sine',
-            },
-            modulation: {
-              type: params.modulationWaveform || 'triangle',
-            },
-            envelope: {
-              attack: params.attack || 1.5,
-              decay: 0.1,
-              sustain: 1.0,
-              release: params.release || 2.0,
-            },
-          },
-        });
-      } else if (type === 'spiral') {
-        // spiral - Sampler para reproducción de samples de audio
-        try {
-          synth = new Tone.Sampler({
-            urls: params.urls || { C4: 'C4.mp3' },
-            baseUrl: params.baseUrl || '/samples/piano/',
-            release: params.release || 1.0,
-            attack: params.attack || 0.1,
-            onload: () => {
-              // Sample cargado exitosamente
-            },
-            onerror: (error) => {
-              // Usar fallback de sintetizador si el Sampler falla
-            }
-          });
-        } catch (samplerError) {
-          // Fallback a un sintetizador básico si el Sampler falla
-          synth = new Tone.AMSynth({
-            harmonicity: 1.5,
-            oscillator: { type: 'sine' },
-            envelope: {
-              attack: params.attack || 0.1,
-              decay: 0.2,
-              sustain: 0.8,
-              release: params.release || 1.0,
-            }
-          });
-          
-          // Marcar que este objeto usa fallback para futuras referencias
-          (synth as any)._isFallback = true;
-        }
-      } else {
-        // Fallback por defecto
-        synth = new Tone.AMSynth();
-      }
+      // Usar la factory para crear la fuente de sonido
+      const soundSource = this.soundSourceFactory.createSoundSource(
+        id, 
+        type, 
+        params, 
+        position, 
+        this.effectManager.getAllGlobalEffects()
+      );
 
-      // --- ARQUITECTURA REFACTORIZADA: ENRUTAMIENTO "SEND/RETURN" CORRECTO ---
-      
-      // 1. Crear panner 3D para la señal seca (posición del objeto sonoro)
-      const panner = new Tone.Panner3D({
-        positionX: position[0],
-        positionY: position[1],
-        positionZ: position[2],
-        panningModel: 'HRTF', // Usar HRTF para mejor espacialización 3D
-        distanceModel: 'inverse',
-        refDistance: 1,
-        maxDistance: 100,
-        rolloffFactor: 2, // Atenuación más pronunciada con la distancia
-        coneInnerAngle: 360, // Ángulo interno del cono (360 = omnidireccional)
-        coneOuterAngle: 360, // Ángulo externo del cono
-        coneOuterGain: 0, // Ganancia fuera del cono
-      });
-
-      // 2. Crear control de volumen para la señal seca (inicialmente a volumen completo)
-      const dryGain = new Tone.Gain(1);
-
-      // 3. Crear Map de envíos a efectos
-      const effectSends = new Map<string, Tone.Gain>();
-
-      // 4. ENRUTAMIENTO "SEND/RETURN" CORRECTO: Crossfade entre señal seca y efectos
-      // CAMINO SECO: synth -> panner -> dryGain -> Destination
-      synth.connect(panner);
-      panner.connect(dryGain);
-      dryGain.connect(Tone.Destination);
-
-      // CAMINO MOJADO: synth -> effectSend -> globalEffect -> Destination
-      // El synth se conecta DIRECTAMENTE a cada send (sin splitter)
-      this.globalEffects.forEach((effectData, effectId) => {
-        const send = new Tone.Gain(0); // Inicialmente silenciado
-        effectSends.set(effectId, send);
-        
-        // CONEXIÓN CORRECTA: synth -> send -> efecto (camino independiente)
-        synth.connect(send);
-        send.connect(effectData.effectNode);
-      });
-
-      // Almacenar en el Map con la nueva estructura
-      this.soundSources.set(id, {
-        synth,
-        panner,
-        dryGain,
-        effectSends,
-      });
-
-      // Configurar parámetros iniciales - asegurar frecuencia segura
-      const safeFrequency = Math.max(params.frequency, 20);
-      
-      // Configurar frecuencia según el tipo de sintetizador
-      if (type === 'cube' || type === 'sphere') {
-        (synth as Tone.AMSynth | Tone.FMSynth).oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
-      } else if (type === 'cylinder') {
-        // Para DuoSynth, la frecuencia se configura en el sintetizador principal
-        (synth as Tone.DuoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
-      } else if (type === 'cone') {
-        // Para MembraneSynth, la frecuencia se configura en el sintetizador principal
-        (synth as Tone.MembraneSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
-      } else if (type === 'pyramid') {
-        // Para MonoSynth, la frecuencia se configura en el sintetizador principal
-        (synth as Tone.MonoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
-      } else if (type === 'icosahedron') {
-        // Para MetalSynth, la frecuencia se configura en el sintetizador principal
-        (synth as Tone.MetalSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
-      } else if (type === 'plane') {
-        // Para NoiseSynth, no se configura frecuencia ya que genera ruido
-      } else if (type === 'torus') {
-        // Para PluckSynth, la frecuencia se configura en el sintetizador principal
-        (synth as Tone.PluckSynth).toFrequency(safeFrequency);
-      } else if (type === 'dodecahedronRing') {
-        // Para PolySynth, no se configura frecuencia individual ya que usa acordes
-      } else if (type === 'spiral') {
-        // Para Sampler, no se configura frecuencia ya que usa notas musicales
-      }
+      // Almacenar en el Map
+      this.soundSources.set(id, soundSource);
       
       // Configurar la mezcla inicial de efectos basada en la posición
       console.log(`🎵 AudioManager: Configurando mezcla inicial de efectos para sonido ${id}`);
       this.updateSoundEffectMixing(id, position);
     } catch (error) {
-      // Manejo silencioso de errores
+      console.error(`❌ AudioManager: Error al crear fuente de sonido:`, error);
     }
   }
 
@@ -1848,37 +1050,22 @@ export class AudioManager {
    * Actualiza la posición 3D de una zona de efecto
    */
   public updateEffectZonePosition(id: string, position: [number, number, number]): void {
-    const effectData = this.globalEffects.get(id);
-    if (!effectData) {
-      return;
-    }
-
-    try {
-      console.log(`📍 AudioManager: Actualizando posición de zona de efecto ${id} a [${position.join(', ')}]`);
+    this.effectManager.updateEffectZonePosition(id, position);
+    
+    // Actualizar la mezcla de efectos para todos los objetos sonoros
+    console.log(`🔄 AudioManager: Actualizando mezcla para ${this.soundSources.size} objetos sonoros después de mover zona de efecto`);
+    this.soundSources.forEach((source, soundId) => {
+      // Obtener la posición actual del objeto sonoro desde su panner
+      const soundPosition: [number, number, number] = [
+        source.panner.positionX.value,
+        source.panner.positionY.value,
+        source.panner.positionZ.value
+      ];
       
-      // Actualizar la posición del panner del efecto
-      effectData.panner.setPosition(position[0], position[1], position[2]);
-      
-      // Actualizar la posición almacenada en el efecto
-      effectData.position = position;
-      
-      // Actualizar la mezcla de efectos para todos los objetos sonoros
-      console.log(`🔄 AudioManager: Actualizando mezcla para ${this.soundSources.size} objetos sonoros después de mover zona de efecto`);
-      this.soundSources.forEach((source, soundId) => {
-        // Obtener la posición actual del objeto sonoro desde su panner
-        const soundPosition: [number, number, number] = [
-          source.panner.positionX.value,
-          source.panner.positionY.value,
-          source.panner.positionZ.value
-        ];
-        
-        console.log(`🔄 AudioManager: Actualizando mezcla para sonido ${soundId} en posición [${soundPosition.join(', ')}]`);
-        // Actualizar la mezcla para este objeto sonoro
-        this.updateSoundEffectMixing(soundId, soundPosition);
-      });
-    } catch (error) {
-      console.error(`❌ AudioManager: Error al actualizar posición de zona de efecto:`, error);
-    }
+      console.log(`🔄 AudioManager: Actualizando mezcla para sonido ${soundId} en posición [${soundPosition.join(', ')}]`);
+      // Actualizar la mezcla para este objeto sonoro
+      this.updateSoundEffectMixing(soundId, soundPosition);
+    });
   }
 
   /**
@@ -1894,8 +1081,8 @@ export class AudioManager {
     try {
       console.log(`📍 AudioManager: Actualizando posición de sonido ${id} a [${position.join(', ')}]`);
       
-      // Actualizar la posición del panner
-      source.panner.setPosition(position[0], position[1], position[2]);
+      // Actualizar la posición del panner usando el SpatialAudioManager
+      this.spatialAudioManager.updatePannerPosition(source.panner, position);
       
       // Actualizar la mezcla de efectos basada en la nueva posición
       console.log(`🔄 AudioManager: Llamando a updateSoundEffectMixing para sonido ${id}`);
@@ -1909,8 +1096,7 @@ export class AudioManager {
    * Configura el radio de una zona de efectos
    */
   public setEffectZoneRadius(effectId: string, radius: number): void {
-    this.effectZoneRadii.set(effectId, radius);
-    console.log(`🎛️ AudioManager: Radio de zona de efecto ${effectId} configurado a ${radius} unidades`);
+    this.effectManager.setEffectZoneRadius(effectId, radius);
     
     // Actualizar la mezcla de efectos para todos los objetos sonoros
     console.log(`🔄 AudioManager: Actualizando mezcla para ${this.soundSources.size} objetos sonoros después de cambiar radio`);
@@ -1929,9 +1115,7 @@ export class AudioManager {
    * Obtiene el radio de una zona de efectos
    */
   public getEffectZoneRadius(effectId: string): number {
-    const radius = this.effectZoneRadii.get(effectId) || 2.0; // Radio por defecto: 2.0
-    console.log(`📏 AudioManager: Radio para zona de efecto ${effectId}: ${radius} unidades`);
-    return radius;
+    return this.effectManager.getEffectZoneRadius(effectId);
   }
 
   /**
@@ -1946,7 +1130,8 @@ export class AudioManager {
 
     try {
       console.log(`🔍 AudioManager: Actualizando mezcla de efectos para sonido ${soundId} en posición [${soundPosition.join(', ')}]`);
-      console.log(`🔍 AudioManager: Efectos globales disponibles:`, Array.from(this.globalEffects.keys()));
+      const globalEffects = this.effectManager.getAllGlobalEffects();
+      console.log(`🔍 AudioManager: Efectos globales disponibles:`, Array.from(globalEffects.keys()));
       console.log(`🔍 AudioManager: Total de objetos sonoros: ${this.soundSources.size}`);
       
       // Verificar el estado actual de la fuente de sonido
@@ -1957,7 +1142,7 @@ export class AudioManager {
       });
       
       // Calcular la mezcla para cada efecto global
-      this.globalEffects.forEach((effectData, effectId) => {
+      globalEffects.forEach((effectData, effectId) => {
         const send = source.effectSends.get(effectId);
         if (!send) {
           console.log(`⚠️ AudioManager: No se encontró send para efecto ${effectId} en sonido ${soundId}`);
@@ -1972,31 +1157,22 @@ export class AudioManager {
 
         console.log(`🔍 AudioManager: Posición del efecto ${effectId}: [${effectPosition.join(', ')}]`);
 
-        // Calcular distancia entre el sonido y el efecto
-        const distance = Math.sqrt(
-          Math.pow(soundPosition[0] - effectPosition[0], 2) +
-          Math.pow(soundPosition[1] - effectPosition[1], 2) +
-          Math.pow(soundPosition[2] - effectPosition[2], 2)
-        );
-
-        // Radio de la zona de efecto (personalizable por zona)
+        // Calcular intensidad del efecto usando el SpatialAudioManager
         const effectRadius = this.getEffectZoneRadius(effectId);
+        const effectIntensity = this.spatialAudioManager.calculateEffectIntensity(
+          soundPosition, 
+          effectPosition, 
+          effectRadius
+        );
         
-        console.log(`🔍 AudioManager: Distancia: ${distance.toFixed(2)}, Radio: ${effectRadius}, Sonido ${soundId} -> Efecto ${effectId}`);
+        console.log(`🔍 AudioManager: Distancia: ${this.spatialAudioManager.calculateDistance(soundPosition, effectPosition).toFixed(2)}, Radio: ${effectRadius}, Sonido ${soundId} -> Efecto ${effectId}`);
         
-        // Calcular intensidad del efecto (0 = fuera, 1 = dentro)
-        let effectIntensity = 0;
-        if (distance <= effectRadius) {
-          // Dentro de la zona: intensidad completa
-          effectIntensity = 1.0;
+        // Log del estado basado en la intensidad calculada
+        if (effectIntensity === 1.0) {
           console.log(`✅ AudioManager: Sonido ${soundId} DENTRO de zona de efecto ${effectId}`);
-        } else if (distance <= effectRadius * 2) {
-          // Zona de transición: intensidad gradual
-          effectIntensity = 1.0 - ((distance - effectRadius) / effectRadius);
+        } else if (effectIntensity > 0) {
           console.log(`🔄 AudioManager: Sonido ${soundId} en TRANSICIÓN de zona de efecto ${effectId}`);
         } else {
-          // Fuera de la zona: sin efecto
-          effectIntensity = 0.0;
           console.log(`❌ AudioManager: Sonido ${soundId} FUERA de zona de efecto ${effectId}`);
         }
 
@@ -2013,8 +1189,9 @@ export class AudioManager {
         console.log(`🔍 AudioManager: Verificación - Send gain: ${send.gain.value}, Dry gain: ${source.dryGain.gain.value}`);
 
         // Log para debug (solo cuando hay cambios significativos)
-        const lastIntensity = this.lastEffectIntensities.get(`${soundId}-${effectId}`) || 0;
+        const lastIntensity = this.lastSendAmounts.get(`${soundId}-${effectId}`) || 0;
         if (Math.abs(effectIntensity - lastIntensity) > 0.1) {
+          const distance = this.spatialAudioManager.calculateDistance(soundPosition, effectPosition);
           console.log(`🎛️ AudioManager: Sonido ${soundId} en efecto ${effectId}:`, {
             distance: distance.toFixed(2),
             effectIntensity: effectIntensity.toFixed(2),
@@ -2022,19 +1199,20 @@ export class AudioManager {
             position: soundPosition,
             effectPosition: effectPosition,
             effectRadius: effectRadius,
-            isInside: distance <= effectRadius,
-            isInTransition: distance > effectRadius && distance <= effectRadius * 2
+            isInside: effectIntensity === 1.0,
+            isInTransition: effectIntensity > 0 && effectIntensity < 1.0
           });
           
           // Actualizar el registro de intensidades
-          this.lastEffectIntensities.set(`${soundId}-${effectId}`, effectIntensity);
+          this.lastSendAmounts.set(`${soundId}-${effectId}`, effectIntensity);
         }
         
         // Log resumen del estado actual
+        const distance = this.spatialAudioManager.calculateDistance(soundPosition, effectPosition);
         console.log(`📊 AudioManager: RESUMEN - Sonido ${soundId}:`, {
           distancia: `${distance.toFixed(2)} unidades`,
           radio: `${effectRadius} unidades`,
-          estado: distance <= effectRadius ? 'DENTRO' : distance <= effectRadius * 2 ? 'TRANSICIÓN' : 'FUERA',
+          estado: effectIntensity === 1.0 ? 'DENTRO' : effectIntensity > 0 ? 'TRANSICIÓN' : 'FUERA',
           mezcla: `Wet: ${effectIntensity.toFixed(2)}, Dry: ${dryIntensity.toFixed(2)}`
         });
       });
@@ -2047,30 +1225,7 @@ export class AudioManager {
    * Actualiza la posición y orientación del oyente global de Tone.js
    */
   public updateListener(position: THREE.Vector3, forward: THREE.Vector3): void {
-    try {
-      // Actualizar la posición del oyente
-      Tone.Listener.positionX.value = position.x;
-      Tone.Listener.positionY.value = position.y;
-      Tone.Listener.positionZ.value = position.z;
-      
-      // Actualizar la orientación del oyente (hacia dónde mira)
-      Tone.Listener.forwardX.value = forward.x;
-      Tone.Listener.forwardY.value = forward.y;
-      Tone.Listener.forwardZ.value = forward.z;
-      
-      // Configurar el vector "arriba" del oyente (normalmente Y positivo)
-      Tone.Listener.upX.value = 0;
-      Tone.Listener.upY.value = 1;
-      Tone.Listener.upZ.value = 0;
-      
-      // Solo loggear cambios significativos en la posición (cada 0.5 unidades)
-      const currentPos = `${Math.round(position.x * 2) / 2},${Math.round(position.y * 2) / 2},${Math.round(position.z * 2) / 2}`;
-      if (this.lastListenerPosition !== currentPos) {
-        this.lastListenerPosition = currentPos;
-      }
-    } catch (error) {
-      // Manejo silencioso de errores
-    }
+    this.spatialAudioManager.updateListener(position, forward);
   }
 
   /**
@@ -2126,7 +1281,8 @@ export class AudioManager {
     });
 
     // Verificar efectos globales
-    this.globalEffects.forEach((effectData, effectId) => {
+    const globalEffects = this.effectManager.getAllGlobalEffects();
+    globalEffects.forEach((effectData, effectId) => {
       console.log(`🎛️ Efecto ${effectId}:`, {
         tipo: effectData.effectNode.constructor.name,
         posicion: effectData.position,
