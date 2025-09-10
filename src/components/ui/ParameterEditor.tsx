@@ -160,15 +160,18 @@ export function ParameterEditor() {
   if (!selectedEntity) {
     return (
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-2xl">🎯</span>
+        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
+          {/* Efecto de brillo interior */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
+          
+          <div className="text-center relative z-10">
+            <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-cyan-500/20 to-black/40 rounded-full flex items-center justify-center border border-cyan-400/30">
+              <span className="text-lg">🎯</span>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">
               No hay entidad seleccionada
             </h3>
-            <p className="text-gray-400 text-sm">
+            <p className="text-cyan-300 text-sm">
               Haz clic en un objeto sonoro o zona de efecto en el mundo 3D para seleccionarlo y editar sus parámetros.
             </p>
           </div>
@@ -188,12 +191,14 @@ export function ParameterEditor() {
     
     return (
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
+        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
+          {/* Efecto de brillo interior */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
           {/* Header con información de la zona de efecto */}
-          <div className="mb-6">
+          <div className="mb-4 relative z-10">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded bg-purple-500" />
+                <div className="w-4 h-4 rounded bg-gradient-to-br from-black to-pink-500 shadow-lg shadow-black/50" />
                 <h3 className="text-lg font-semibold text-white">
                   Editor de Zona de Efecto
                 </h3>
@@ -204,7 +209,7 @@ export function ParameterEditor() {
                     removeEffectZone(zone.id);
                   }
                 }}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors duration-200"
+                className="px-3 py-2 bg-gradient-to-r from-red-600/80 to-red-700/80 hover:from-red-500/90 hover:to-red-600/90 text-white text-sm rounded-xl hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 border border-red-400/30 hover:border-red-300/50"
                 title="Eliminar zona de efecto"
               >
                 🗑️
@@ -313,30 +318,35 @@ export function ParameterEditor() {
                   </h4>
 
                   {/* Control de Radio de la Zona de Efectos */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Radio de la Zona
+                  <div className="glass-container p-4">
+                    <label className="block text-sm font-bold neon-text mb-3">
+                      Radio de la Zona: {zone.effectParams.radius ?? 2.0}
                     </label>
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="10"
-                        step="0.1"
-                        value={zone.effectParams.radius ?? 2.0}
-                        onChange={(e) => handleEffectParamChange('radius', Number(e.target.value))}
-                        className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                        disabled={zone.isLocked}
-                      />
-                      <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 relative">
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="10"
+                          step="0.1"
+                          value={zone.effectParams.radius ?? 2.0}
+                          onChange={(e) => handleEffectParamChange('radius', Number(e.target.value))}
+                          className="w-full h-2 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                          style={{
+                            background: `linear-gradient(to right, #8b5cf6 0%, #06b6d4 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 100%)`
+                          }}
+                        />
+                      </div>
+                      <span className="text-cyan-300 font-mono text-sm min-w-[4rem] text-right bg-black/60 px-2 py-1 rounded-lg border border-cyan-500/30">
                         {zone.effectParams.radius ?? 2.0}
                       </span>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-xs text-purple-300 mt-2">
                       <span>0.5</span>
                       <span>10</span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-cyan-300 mt-2 bg-black/40 px-2 py-1 rounded-lg border border-cyan-500/20">
                       Tamaño de la zona donde se aplica el efecto
                     </p>
                   </div>
@@ -365,7 +375,7 @@ export function ParameterEditor() {
             
             {/* Frecuencia de modulación */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 Frecuencia de Modulación (Hz)
               </label>
               <div className="flex items-center gap-3">
@@ -391,7 +401,7 @@ export function ParameterEditor() {
 
             {/* Octavas */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 Octavas
               </label>
               <div className="flex items-center gap-3">
@@ -417,7 +427,7 @@ export function ParameterEditor() {
 
             {/* Frecuencia base */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 Frecuencia Base (Hz)
               </label>
               <div className="flex items-center gap-3">
@@ -446,7 +456,7 @@ export function ParameterEditor() {
               <>
                 {/* Depth */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Profundidad de Modulación
                   </label>
                   <div className="flex items-center gap-3">
@@ -472,7 +482,7 @@ export function ParameterEditor() {
 
                 {/* Filter Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Tipo de Filtro
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -481,7 +491,7 @@ export function ParameterEditor() {
                         key={filterType}
                         onClick={() => handleEffectParamChange('filterType', filterType)}
                         disabled={zone.isLocked}
-                        className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           (zone.effectParams.filterType ?? 'lowpass') === filterType
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -495,7 +505,7 @@ export function ParameterEditor() {
 
                 {/* Filter Q */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Resonancia (Q)
                   </label>
                   <div className="flex items-center gap-3">
@@ -521,7 +531,7 @@ export function ParameterEditor() {
 
                 {/* LFO Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Tipo de LFO
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -530,7 +540,7 @@ export function ParameterEditor() {
                         key={lfoType}
                         onClick={() => handleEffectParamChange('lfoType', lfoType)}
                         disabled={zone.isLocked}
-                        className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                        className={`px-2 py-1 text-xs rounded-md transition-colors ${
                           (zone.effectParams.lfoType ?? 'sine') === lfoType
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -549,7 +559,7 @@ export function ParameterEditor() {
                   <>
                     {/* Sensitivity */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Sensibilidad
                       </label>
                       <div className="flex items-center gap-3">
@@ -563,7 +573,7 @@ export function ParameterEditor() {
                       className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                       disabled={zone.isLocked}
                     />
-                                         <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                       {zone.effectParams.sensitivity ?? 0.5}
                         </span>
                       </div>
@@ -580,7 +590,7 @@ export function ParameterEditor() {
                   <>
                     {/* Bits */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Bits
                       </label>
                       <div className="flex items-center gap-3">
@@ -591,10 +601,10 @@ export function ParameterEditor() {
                           step="1"
                           value={zone.effectParams.bits ?? 4}
                           onChange={(e) => handleEffectParamChange('bits', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                                                      {zone.effectParams.bits ?? 4}
                         </span>
                       </div>
@@ -606,7 +616,7 @@ export function ParameterEditor() {
 
                     {/* NormFreq */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Frecuencia Normalizada
                       </label>
                       <div className="flex items-center gap-3">
@@ -617,10 +627,10 @@ export function ParameterEditor() {
                           step="0.01"
                           value={zone.effectParams.normFreq ?? 0.5}
                           onChange={(e) => handleEffectParamChange('normFreq', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                                                      {zone.effectParams.normFreq ?? 0.5}
                         </span>
                       </div>
@@ -637,7 +647,7 @@ export function ParameterEditor() {
                   <>
                     {/* Order */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Orden del Polinomio
                       </label>
                       <div className="flex items-center gap-3">
@@ -648,10 +658,10 @@ export function ParameterEditor() {
                           step="1"
                           value={zone.effectParams.order ?? 50}
                           onChange={(e) => handleEffectParamChange('order', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.order ?? 50}
                         </span>
                       </div>
@@ -659,14 +669,14 @@ export function ParameterEditor() {
                         <span>1</span>
                         <span>100</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Orden impar = distorsión armónica, Orden par = distorsión suave
                       </p>
                     </div>
 
                     {/* Oversample */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Oversampling
                       </label>
                       <div className="grid grid-cols-3 gap-2">
@@ -675,7 +685,7 @@ export function ParameterEditor() {
                             key={oversampleType}
                             onClick={() => handleEffectParamChange('oversample', oversampleType)}
                             disabled={zone.isLocked}
-                            className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                            className={`px-2 py-1 text-xs rounded-md transition-colors ${
                               (zone.effectParams.oversample ?? 'none') === oversampleType
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -685,7 +695,7 @@ export function ParameterEditor() {
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Mayor oversampling = mejor calidad, más CPU
                       </p>
                     </div>
@@ -697,7 +707,7 @@ export function ParameterEditor() {
                   <>
                     {/* Frecuencia del LFO */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Frecuencia del LFO (Hz)
                       </label>
                       <div className="flex items-center gap-3">
@@ -708,10 +718,10 @@ export function ParameterEditor() {
                           step="0.1"
                           value={zone.effectParams.chorusFrequency ?? 1.5}
                           onChange={(e) => handleEffectParamChange('chorusFrequency', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.chorusFrequency ?? 1.5}
                         </span>
                       </div>
@@ -719,14 +729,14 @@ export function ParameterEditor() {
                         <span>0.1 Hz</span>
                         <span>10 Hz</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Velocidad de modulación del efecto
                       </p>
                     </div>
 
                     {/* Tiempo de Delay */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Tiempo de Delay (ms)
                       </label>
                       <div className="flex items-center gap-3">
@@ -737,10 +747,10 @@ export function ParameterEditor() {
                           step="0.1"
                           value={zone.effectParams.delayTime ?? 3.5}
                           onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.delayTime ?? 3.5}
                         </span>
                       </div>
@@ -748,14 +758,14 @@ export function ParameterEditor() {
                         <span>2 ms</span>
                         <span>20 ms</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Tiempo base del delay del chorus
                       </p>
                     </div>
 
                     {/* Profundidad */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Profundidad
                       </label>
                       <div className="flex items-center gap-3">
@@ -766,10 +776,10 @@ export function ParameterEditor() {
                           step="0.01"
                           value={zone.effectParams.chorusDepth ?? 0.7}
                           onChange={(e) => handleEffectParamChange('chorusDepth', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.chorusDepth ?? 0.7}
                         </span>
                       </div>
@@ -777,14 +787,14 @@ export function ParameterEditor() {
                         <span>0</span>
                         <span>1</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Intensidad de la modulación del delay
                       </p>
                     </div>
 
                     {/* Feedback */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Feedback
                       </label>
                       <div className="flex items-center gap-3">
@@ -795,10 +805,10 @@ export function ParameterEditor() {
                           step="0.01"
                           value={zone.effectParams.feedback ?? 0}
                           onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.feedback ?? 0}
                         </span>
                       </div>
@@ -806,14 +816,14 @@ export function ParameterEditor() {
                         <span>0</span>
                         <span>0.9</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Cantidad de retroalimentación (0 = chorus, mayor a 0 = flanger)
                       </p>
                     </div>
 
                     {/* Spread */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Spread Estéreo (grados)
                       </label>
                       <div className="flex items-center gap-3">
@@ -824,10 +834,10 @@ export function ParameterEditor() {
                           step="1"
                           value={zone.effectParams.spread ?? 180}
                           onChange={(e) => handleEffectParamChange('spread', Number(e.target.value))}
-                          className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
                           disabled={zone.isLocked}
                         />
-                        <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                           {zone.effectParams.spread ?? 180}
                         </span>
                       </div>
@@ -835,14 +845,14 @@ export function ParameterEditor() {
                         <span>0°</span>
                         <span>180°</span>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         0° = central, 180° = estéreo completo
                       </p>
                     </div>
 
                     {/* Tipo de LFO */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Tipo de LFO
                       </label>
                       <div className="grid grid-cols-2 gap-2">
@@ -851,7 +861,7 @@ export function ParameterEditor() {
                             key={lfoType}
                             onClick={() => handleEffectParamChange('chorusType', lfoType)}
                             disabled={zone.isLocked}
-                            className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                            className={`px-2 py-1 text-xs rounded-md transition-colors ${
                               (zone.effectParams.chorusType ?? 'sine') === lfoType
                                 ? 'bg-teal-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -861,8 +871,949 @@ export function ParameterEditor() {
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 mt-0.5">
                         Forma de onda del LFO para la modulación
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Distortion */}
+                {zone.type === 'distortion' && (
+                  <>
+                    {/* Distortion amount */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Cantidad de distorsión
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.distortion ?? 0.4}
+                          onChange={(e) => handleEffectParamChange('distortion', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.distortion ?? 0.4}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Nivel de distorsión (0 a 1)
+                      </p>
+                    </div>
+
+                    {/* Oversample */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Oversampling
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['none', '2x', '4x'] as const).map((oversampleType) => (
+                          <button
+                            key={oversampleType}
+                            onClick={() => handleEffectParamChange('oversample', oversampleType)}
+                            disabled={zone.isLocked}
+                            className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                              (zone.effectParams.oversample ?? 'none') === oversampleType
+                                ? 'bg-pink-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            <span className="capitalize">{oversampleType}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mayor oversampling = mejor calidad, más CPU
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del FeedbackDelay */}
+                {zone.type === 'feedbackDelay' && (
+                  <>
+                    {/* Delay Time */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Tiempo de Delay
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={typeof zone.effectParams.delayTime === 'number' ? zone.effectParams.delayTime : 0.25}
+                          onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {typeof zone.effectParams.delayTime === 'number' ? zone.effectParams.delayTime : '8n'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0 s</span>
+                        <span>1 s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Retraso en segundos (puedes usar también valores musicales como '8n')
+                      </p>
+                    </div>
+
+                    {/* Feedback */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Feedback
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="0.95"
+                          step="0.01"
+                          value={zone.effectParams.feedback ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.feedback ?? 0.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>0.95</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Proporción de señal realimentada
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Freeverb */}
+                {zone.type === 'freeverb' && (
+                  <>
+                    {/* Room Size */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Room Size
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.roomSize ?? 0.7}
+                          onChange={(e) => handleEffectParamChange('roomSize', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.roomSize ?? 0.7}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        0 = sala pequeña, 1 = sala grande (más decay)
+                      </p>
+                    </div>
+
+                    {/* Dampening */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Dampening (Hz)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="500"
+                          max="8000"
+                          step="10"
+                          value={zone.effectParams.dampening ?? 3000}
+                          onChange={(e) => handleEffectParamChange('dampening', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.dampening ?? 3000}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>500 Hz</span>
+                        <span>8 kHz</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Filtro lowpass interno del reverb
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del FrequencyShifter */}
+                {zone.type === 'frequencyShifter' && (
+                  <>
+                    {/* Frequency Shift */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Frecuencia de Shift (Hz)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="-2000"
+                          max="2000"
+                          step="1"
+                          value={zone.effectParams.frequency ?? 0}
+                          onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.frequency ?? 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>-2000 Hz</span>
+                        <span>2000 Hz</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Desplaza todas las frecuencias por un valor fijo
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del JCReverb */}
+                {zone.type === 'jcReverb' && (
+                  <>
+                    {/* Room Size */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Room Size
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.roomSize ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('roomSize', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.roomSize ?? 0.5}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0</span>
+                        <span>1</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        0 = sala pequeña, 1 = sala grande (schroeder)
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del PingPongDelay */}
+                {zone.type === 'pingPongDelay' && (
+                  <>
+                    {/* Delay Time */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Tiempo de Delay
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <select
+                          value={zone.effectParams.pingPongDelayTime ?? '4n'}
+                          onChange={(e) => handleEffectParamChange('pingPongDelayTime', e.target.value)}
+                          className="flex-1 px-3 py-2 bg-gray-700 text-white rounded-md border border-gray-600 focus:border-violet-500 focus:outline-none"
+                          disabled={zone.isLocked}
+                        >
+                          <option value="1n">Nota completa (1n)</option>
+                          <option value="2n">Media nota (2n)</option>
+                          <option value="4n">Cuarto de nota (4n)</option>
+                          <option value="8n">Octavo de nota (8n)</option>
+                          <option value="16n">Dieciseisavo de nota (16n)</option>
+                          <option value="32n">Treinta y dosavo de nota (32n)</option>
+                        </select>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tiempo entre ecos consecutivos
+                      </p>
+                    </div>
+
+                    {/* Feedback */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Feedback ({(zone.effectParams.pingPongFeedback ?? 0.2) * 100}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="0.9"
+                          step="0.05"
+                          value={zone.effectParams.pingPongFeedback ?? 0.2}
+                          onChange={(e) => handleEffectParamChange('pingPongFeedback', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.pingPongFeedback ?? 0.2) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>90%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Cantidad de señal que se retroalimenta
+                      </p>
+                    </div>
+
+                    {/* Max Delay */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Max Delay ({zone.effectParams.maxDelay ?? 1.0}s)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="2"
+                          step="0.1"
+                          value={zone.effectParams.maxDelay ?? 1.0}
+                          onChange={(e) => handleEffectParamChange('maxDelay', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.maxDelay ?? 1.0}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.1s</span>
+                        <span>2.0s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tiempo máximo de delay en segundos
+                      </p>
+                    </div>
+
+                    {/* Wet */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.wet ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mezcla entre señal seca y procesada
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del PitchShift */}
+                {zone.type === 'pitchShift' && (
+                  <>
+                    {/* Pitch */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Pitch (Semi-tonos): {zone.effectParams.pitchShift ?? 0}
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="-24"
+                          max="24"
+                          step="1"
+                          value={zone.effectParams.pitchShift ?? 0}
+                          onChange={(e) => handleEffectParamChange('pitchShift', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.pitchShift ?? 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>-24 (2 octavas abajo)</span>
+                        <span>+24 (2 octavas arriba)</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Intervalo de transposición en semi-tonos
+                      </p>
+                    </div>
+
+                    {/* Window Size */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Window Size ({zone.effectParams.windowSize ?? 0.1}s)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.03"
+                          max="0.1"
+                          step="0.01"
+                          value={zone.effectParams.windowSize ?? 0.1}
+                          onChange={(e) => handleEffectParamChange('windowSize', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.windowSize ?? 0.1}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.03s</span>
+                        <span>0.1s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tamaño de ventana para el pitch shifting (menor = menos delay, mayor = más suave)
+                      </p>
+                    </div>
+
+                    {/* Delay Time */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Delay Time ({zone.effectParams.delayTime ?? 0}s)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.delayTime ?? 0}
+                          onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.delayTime ?? 0}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0s</span>
+                        <span>1s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tiempo de delay en la señal de entrada
+                      </p>
+                    </div>
+
+                    {/* Feedback */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Feedback ({(zone.effectParams.feedback ?? 0) * 100}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="0.9"
+                          step="0.05"
+                          value={zone.effectParams.feedback ?? 0}
+                          onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.feedback ?? 0) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>90%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Cantidad de señal que se retroalimenta
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Reverb */}
+                {zone.type === 'reverb' && (
+                  <>
+                    {/* Decay */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Decay ({zone.effectParams.decay ?? 1.5}s)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="10"
+                          step="0.1"
+                          value={zone.effectParams.decay ?? 1.5}
+                          onChange={(e) => handleEffectParamChange('decay', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.decay ?? 1.5}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.1s</span>
+                        <span>10s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Duración de la reverberación
+                      </p>
+                    </div>
+
+                    {/* PreDelay */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        PreDelay ({zone.effectParams.preDelay ?? 0.01}s)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="0.1"
+                          step="0.001"
+                          value={zone.effectParams.preDelay ?? 0.01}
+                          onChange={(e) => handleEffectParamChange('preDelay', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.preDelay ?? 0.01}s
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0s</span>
+                        <span>0.1s</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tiempo antes de que la reverberación se active completamente
+                      </p>
+                    </div>
+
+                    {/* Wet */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.wet ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mezcla entre señal seca y procesada
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del StereoWidener */}
+                {zone.type === 'stereoWidener' && (
+                  <>
+                    {/* Width */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Width (Ancho Estéreo): {Math.round((zone.effectParams.width ?? 0.5) * 100)}%
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.width ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('width', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.width ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0% (Mono)</span>
+                        <span>100% (Estéreo)</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Ancho del campo estéreo (0 = mono, 0.5 = sin cambio, 1 = estéreo máximo)
+                      </p>
+                    </div>
+
+                    {/* Wet */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.wet ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mezcla entre señal seca y procesada
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Tremolo */}
+                {zone.type === 'tremolo' && (
+                  <>
+                    {/* Frequency */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Frecuencia: {zone.effectParams.tremoloFrequency ?? 10} Hz
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="20"
+                          step="0.1"
+                          value={zone.effectParams.tremoloFrequency ?? 10}
+                          onChange={(e) => handleEffectParamChange('tremoloFrequency', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.tremoloFrequency ?? 10} Hz
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.1 Hz</span>
+                        <span>20 Hz</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Velocidad de modulación del tremolo
+                      </p>
+                    </div>
+
+                    {/* Depth */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Profundidad: {Math.round((zone.effectParams.tremoloDepth ?? 0.5) * 100)}%
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.tremoloDepth ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('tremoloDepth', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.tremoloDepth ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Intensidad de la modulación de amplitud
+                      </p>
+                    </div>
+
+                    {/* Spread */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Spread: {zone.effectParams.tremoloSpread ?? 180}°
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="180"
+                          step="1"
+                          value={zone.effectParams.tremoloSpread ?? 180}
+                          onChange={(e) => handleEffectParamChange('tremoloSpread', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.tremoloSpread ?? 180}°
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0°</span>
+                        <span>180°</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Separación estéreo entre canales LFO
+                      </p>
+                    </div>
+
+                    {/* Type */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Tipo de Onda
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((waveType) => (
+                          <button
+                            key={waveType}
+                            onClick={() => handleEffectParamChange('tremoloType', waveType)}
+                            disabled={zone.isLocked}
+                            className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                              zone.effectParams.tremoloType === waveType
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            {waveType}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Forma de onda del LFO
+                      </p>
+                    </div>
+
+                    {/* Wet */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.wet ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mezcla entre señal seca y procesada
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Parámetros específicos del Vibrato */}
+                {zone.type === 'vibrato' && (
+                  <>
+                    {/* Frequency */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Frecuencia: {zone.effectParams.vibratoFrequency ?? 5} Hz
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.1"
+                          max="20"
+                          step="0.1"
+                          value={zone.effectParams.vibratoFrequency ?? 5}
+                          onChange={(e) => handleEffectParamChange('vibratoFrequency', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {zone.effectParams.vibratoFrequency ?? 5} Hz
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0.1 Hz</span>
+                        <span>20 Hz</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Velocidad de modulación del vibrato
+                      </p>
+                    </div>
+
+                    {/* Depth */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Profundidad: {Math.round((zone.effectParams.vibratoDepth ?? 0.1) * 100)}%
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          value={zone.effectParams.vibratoDepth ?? 0.1}
+                          onChange={(e) => handleEffectParamChange('vibratoDepth', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.vibratoDepth ?? 0.1) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Intensidad de la modulación de pitch
+                      </p>
+                    </div>
+
+                    {/* Type */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Tipo de Onda
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((waveType) => (
+                          <button
+                            key={waveType}
+                            onClick={() => handleEffectParamChange('vibratoType', waveType)}
+                            disabled={zone.isLocked}
+                            className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                              zone.effectParams.vibratoType === waveType
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                            }`}
+                          >
+                            {waveType}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Forma de onda del LFO
+                      </p>
+                    </div>
+
+                    {/* Max Delay */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Max Delay: {(zone.effectParams.vibratoMaxDelay ?? 0.005) * 1000} ms
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0.001"
+                          max="0.02"
+                          step="0.001"
+                          value={zone.effectParams.vibratoMaxDelay ?? 0.005}
+                          onChange={(e) => handleEffectParamChange('vibratoMaxDelay', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.vibratoMaxDelay ?? 0.005) * 1000)} ms
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>1 ms</span>
+                        <span>20 ms</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Tiempo máximo de delay para el vibrato
+                      </p>
+                    </div>
+
+                    {/* Wet */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                      </label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={zone.effectParams.wet ?? 0.5}
+                          onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
+                          className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+                          disabled={zone.isLocked}
+                        />
+                        <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>0%</span>
+                        <span>100%</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Mezcla entre señal seca y procesada
                       </p>
                     </div>
                   </>
@@ -870,8 +1821,8 @@ export function ParameterEditor() {
               </div>
 
           {/* Selector de forma */}
-          <div className="mt-6 space-y-4">
-            <h4 className="text-sm font-semibold text-purple-400 mb-3 flex items-center gap-2">
+          <div className="mt-4 space-y-3">
+            <h4 className="text-xs font-semibold text-purple-400 mb-2 flex items-center gap-2">
               🔷 Cambiar Forma
             </h4>
             <div className="grid grid-cols-2 gap-2">
@@ -880,7 +1831,7 @@ export function ParameterEditor() {
                   key={shape}
                   onClick={() => updateEffectZone(zone.id, { shape })}
                   disabled={zone.isLocked}
-                  className={`px-3 py-2 text-xs rounded-md transition-colors ${
+                  className={`px-2 py-1 text-xs rounded-md transition-colors ${
                     zone.shape === shape
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
@@ -1229,7 +2180,7 @@ export function ParameterEditor() {
           {/* Frecuencia - Para todos los objetos excepto spiral */}
           {selectedObject.type !== 'spiral' && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
               </label>
               <div className="flex items-center gap-3">
@@ -1261,7 +2212,7 @@ export function ParameterEditor() {
           {/* Forma de Onda (Portadora) - Para todos los objetos excepto spiral */}
           {selectedObject.type !== 'spiral' && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-gray-300 mb-1">
                 Forma de Onda
               </label>
               <select
@@ -1280,7 +2231,7 @@ export function ParameterEditor() {
                                                       {/* Duración - Para todos los objetos excepto spiral */}
                                                       {selectedObject.type !== 'spiral' && (
                                                         <div>
-                                                          <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                          <label className="block text-xs font-medium text-gray-300 mb-1">
                                                             Duración (segundos)
                                                           </label>
                                                           <div className="flex items-center gap-3">
@@ -1302,7 +2253,7 @@ export function ParameterEditor() {
                                                               className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
                                                             />
 
-                                                            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+                                                            <span className="text-white font-mono text-xs min-w-[3rem] text-right">
                                                               {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
                                                             </span>
                                                           </div>
@@ -1310,7 +2261,7 @@ export function ParameterEditor() {
                                                             <span>0.1s</span>
                                                             <span>60s</span>
                                                           </div>
-                                                          <p className="text-xs text-gray-400 mt-1">
+                                                          <p className="text-xs text-gray-400 mt-0.5">
                                                             {selectedObject.audioParams.duration === Infinity 
                                                               ? 'Sonido continuo - usa el botón "Activar Sonido Continuo" para controlar'
                                                               : 'Sonido con duración finita - se detiene automáticamente'
@@ -1326,7 +2277,7 @@ export function ParameterEditor() {
             <>
               {/* Pitch Decay */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Pitch Decay (Caída de Tono)
                 </label>
                 <div className="flex items-center gap-3">
@@ -1351,7 +2302,7 @@ export function ParameterEditor() {
 
               {/* Octaves */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Octaves (Impacto)
                 </label>
                 <div className="flex items-center gap-3">
@@ -1381,7 +2332,7 @@ export function ParameterEditor() {
             <>
               {/* Harmonicity */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Harmonicity
                 </label>
                 <div className="flex items-center gap-3">
@@ -1406,7 +2357,7 @@ export function ParameterEditor() {
 
               {/* Forma de Onda (Moduladora) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Forma de Onda (Moduladora)
                 </label>
                 <select
@@ -1428,7 +2379,7 @@ export function ParameterEditor() {
             <>
               {/* Harmonicity */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Harmonicity
                 </label>
                 <div className="flex items-center gap-3">
@@ -1453,7 +2404,7 @@ export function ParameterEditor() {
 
               {/* Modulation Index (Timbre) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Modulation Index (Timbre)
                 </label>
                 <div className="flex items-center gap-3">
@@ -1478,7 +2429,7 @@ export function ParameterEditor() {
 
               {/* Forma de Onda (Moduladora) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Forma de Onda (Moduladora)
                 </label>
                 <select
@@ -1500,7 +2451,7 @@ export function ParameterEditor() {
             <>
               {/* Harmonicity (Desafinación) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Harmonicity (Desafinación)
                 </label>
                 <div className="flex items-center gap-3">
@@ -1525,7 +2476,7 @@ export function ParameterEditor() {
 
               {/* Velocidad de Vibrato */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Velocidad de Vibrato
                 </label>
                 <div className="flex items-center gap-3">
@@ -1550,7 +2501,7 @@ export function ParameterEditor() {
 
               {/* Cantidad de Vibrato */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Cantidad de Vibrato
                 </label>
                 <div className="flex items-center gap-3">
@@ -1575,7 +2526,7 @@ export function ParameterEditor() {
 
               {/* Forma de Onda (Voz 1) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Forma de Onda (Voz 1)
                 </label>
                 <select
@@ -1592,7 +2543,7 @@ export function ParameterEditor() {
 
               {/* Forma de Onda (Voz 2) */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs font-medium text-gray-300 mb-1">
                   Forma de Onda (Voz 2)
                 </label>
                 <select
@@ -1620,7 +2571,7 @@ export function ParameterEditor() {
                 
                 {/* Amp Attack */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Attack (Ataque)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1645,7 +2596,7 @@ export function ParameterEditor() {
 
                 {/* Amp Decay */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Decay (Caída)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1670,7 +2621,7 @@ export function ParameterEditor() {
 
                 {/* Amp Sustain */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Sustain (Sostenido)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1695,7 +2646,7 @@ export function ParameterEditor() {
 
                 {/* Amp Release */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Release (Liberación)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1727,7 +2678,7 @@ export function ParameterEditor() {
                 
                 {/* Filter Attack */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Filter Attack
                   </label>
                   <div className="flex items-center gap-3">
@@ -1752,7 +2703,7 @@ export function ParameterEditor() {
 
                 {/* Filter Decay */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Filter Decay
                   </label>
                   <div className="flex items-center gap-3">
@@ -1777,7 +2728,7 @@ export function ParameterEditor() {
 
                 {/* Filter Sustain */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Filter Sustain
                   </label>
                   <div className="flex items-center gap-3">
@@ -1802,7 +2753,7 @@ export function ParameterEditor() {
 
                 {/* Filter Release */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Filter Release
                   </label>
                   <div className="flex items-center gap-3">
@@ -1827,7 +2778,7 @@ export function ParameterEditor() {
 
                 {/* Filter Base Frequency */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Frec. Base del Filtro
                   </label>
                   <div className="flex items-center gap-3">
@@ -1852,7 +2803,7 @@ export function ParameterEditor() {
 
                 {/* Filter Octaves */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Octavas del Filtro
                   </label>
                   <div className="flex items-center gap-3">
@@ -1877,7 +2828,7 @@ export function ParameterEditor() {
 
                 {/* Filter Q (Resonancia) */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Resonancia (Q)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1914,7 +2865,7 @@ export function ParameterEditor() {
                 
                 {/* Harmonicity */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Harmonicity
                   </label>
                   <div className="flex items-center gap-3">
@@ -1939,7 +2890,7 @@ export function ParameterEditor() {
 
                 {/* Modulation Index */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Modulation Index
                   </label>
                   <div className="flex items-center gap-3">
@@ -1964,7 +2915,7 @@ export function ParameterEditor() {
 
                 {/* Resonance */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Resonance (Frec. Filtro)
                   </label>
                   <div className="flex items-center gap-3">
@@ -1989,7 +2940,7 @@ export function ParameterEditor() {
 
                 {/* Octaves */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Octaves (Barrido de Filtro)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2026,7 +2977,7 @@ export function ParameterEditor() {
                 
                 {/* Tipo de Ruido */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Tipo de Ruido
                   </label>
                   <select
@@ -2042,7 +2993,7 @@ export function ParameterEditor() {
 
                 {/* Duración del Golpe */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Duración del Golpe (segundos)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2067,7 +3018,7 @@ export function ParameterEditor() {
 
                 {/* Attack */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Attack (Ataque)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2092,7 +3043,7 @@ export function ParameterEditor() {
 
                 {/* Decay */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Decay (Caída)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2117,7 +3068,7 @@ export function ParameterEditor() {
 
                 {/* Sustain */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Sustain (Sostenido)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2154,7 +3105,7 @@ export function ParameterEditor() {
                 
                 {/* Attack Noise */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Attack Noise (Ruido de Ataque)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2179,7 +3130,7 @@ export function ParameterEditor() {
 
                 {/* Dampening */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Dampening (Amortiguación)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2204,7 +3155,7 @@ export function ParameterEditor() {
 
                 {/* Resonance */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Resonance (Sustain)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2241,7 +3192,7 @@ export function ParameterEditor() {
                 
                 {/* Polifonía */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Polifonía (Número de Voces)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2266,7 +3217,7 @@ export function ParameterEditor() {
 
                 {/* Tipo de Acorde */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Tipo de Acorde
                   </label>
                   <select
@@ -2298,7 +3249,7 @@ export function ParameterEditor() {
 
                 {/* Attack */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Attack (Ataque)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2323,7 +3274,7 @@ export function ParameterEditor() {
 
                 {/* Release */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Release (Liberación)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2348,7 +3299,7 @@ export function ParameterEditor() {
 
                 {/* Harmonicity */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Harmonicity (Armonicidad)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2373,7 +3324,7 @@ export function ParameterEditor() {
 
                 {/* Modulation Index */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Modulation Index (Índice de Modulación)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2410,7 +3361,7 @@ export function ParameterEditor() {
                 
                 {/* Attack */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Attack (Ataque)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2435,7 +3386,7 @@ export function ParameterEditor() {
 
                 {/* Release */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Release (Liberación)
                   </label>
                   <div className="flex items-center gap-3">
@@ -2460,7 +3411,7 @@ export function ParameterEditor() {
 
                 {/* Curva de Envolvente */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Curva de Envolvente
                   </label>
                   <select
@@ -2475,7 +3426,7 @@ export function ParameterEditor() {
 
                 {/* Set de Samples */}
                 <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-xs font-medium text-gray-300 mb-1">
                     Set de Samples
                   </label>
                   <select

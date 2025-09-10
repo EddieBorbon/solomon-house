@@ -1,11 +1,11 @@
 import * as Tone from 'tone';
 
 // Tipos para efectos
-export type EffectType = 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus';
+export type EffectType = 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato';
 
 // Estructura de un efecto global
 export interface GlobalEffect {
-  effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | any;
+  effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | Tone.Distortion | Tone.FeedbackDelay | Tone.Freeverb | Tone.FrequencyShifter | Tone.JCReverb | Tone.PingPongDelay | Tone.PitchShift | Tone.Reverb | Tone.StereoWidener | Tone.Tremolo | Tone.Vibrato | any;
   panner: Tone.Panner3D;
   position: [number, number, number];
 }
@@ -78,6 +78,28 @@ export class EffectManager {
         return this.createChebyshev();
       case 'chorus':
         return this.createChorus();
+      case 'distortion':
+        return this.createDistortion();
+      case 'feedbackDelay':
+        return this.createFeedbackDelay();
+      case 'freeverb':
+        return this.createFreeverb();
+      case 'frequencyShifter':
+        return this.createFrequencyShifter();
+      case 'jcReverb':
+        return this.createJCReverb();
+      case 'pingPongDelay':
+        return this.createPingPongDelay();
+      case 'pitchShift':
+        return this.createPitchShift();
+      case 'reverb':
+        return this.createReverb();
+      case 'stereoWidener':
+        return this.createStereoWidener();
+      case 'tremolo':
+        return this.createTremolo();
+      case 'vibrato':
+        return this.createVibrato();
       default:
         throw new Error(`Tipo de efecto no soportado: ${type}`);
     }
@@ -130,17 +152,15 @@ export class EffectManager {
     console.log(`🎛️ EffectManager: AutoWah creado con parámetros iniciales:`, {
       baseFrequency: effectNode.baseFrequency,
       octaves: effectNode.octaves,
-      sensitivity: effectNode.sensitivity.value
+      sensitivity: effectNode.sensitivity
     });
     return effectNode;
   }
 
   private createBitCrusher(): Tone.BitCrusher {
     const effectNode = new Tone.BitCrusher(4);
-    effectNode.normFreq = 0.5;
     console.log(`🎛️ EffectManager: BitCrusher creado con parámetros iniciales:`, {
-      bits: effectNode.bits,
-      normFreq: effectNode.normFreq
+      bits: effectNode.bits
     });
     return effectNode;
   }
@@ -176,6 +196,140 @@ export class EffectManager {
     return effectNode;
   }
 
+  private createDistortion(): Tone.Distortion {
+    const effectNode = new Tone.Distortion(0.4);
+    try {
+      effectNode.oversample = 'none';
+    } catch (error) {
+      // Ignorar
+    }
+    console.log(`🎛️ EffectManager: Distortion creado con parámetros iniciales:`, {
+      distortion: effectNode.distortion,
+      oversample: effectNode.oversample
+    });
+    return effectNode;
+  }
+
+  private createFeedbackDelay(): Tone.FeedbackDelay {
+    const effectNode = new Tone.FeedbackDelay('8n', 0.5);
+    console.log(`🎛️ EffectManager: FeedbackDelay creado con parámetros iniciales:`, {
+      delayTime: effectNode.delayTime,
+      feedback: effectNode.feedback
+    });
+    return effectNode;
+  }
+
+  private createFreeverb(): Tone.Freeverb {
+    const effectNode = new Tone.Freeverb({ roomSize: 0.7, dampening: 3000 });
+    console.log(`🎛️ EffectManager: Freeverb creado con parámetros iniciales:`, {
+      roomSize: effectNode.roomSize,
+      dampening: effectNode.dampening
+    });
+    return effectNode;
+  }
+
+  private createFrequencyShifter(): Tone.FrequencyShifter {
+    const effectNode = new Tone.FrequencyShifter(0);
+    console.log(`🎛️ EffectManager: FrequencyShifter creado con parámetros iniciales:`, {
+      frequency: effectNode.frequency
+    });
+    return effectNode;
+  }
+
+  private createJCReverb(): Tone.JCReverb {
+    const effectNode = new Tone.JCReverb({ roomSize: 0.5 });
+    console.log(`🎛️ EffectManager: JCReverb creado con parámetros iniciales:`, {
+      roomSize: effectNode.roomSize
+    });
+    return effectNode;
+  }
+
+  private createPingPongDelay(): Tone.PingPongDelay {
+    const effectNode = new Tone.PingPongDelay({
+      delayTime: '4n',
+      feedback: 0.2,
+      maxDelay: 1
+    });
+    console.log(`🎛️ EffectManager: PingPongDelay creado con parámetros iniciales:`, {
+      delayTime: effectNode.delayTime.value,
+      feedback: effectNode.feedback.value,
+      maxDelay: effectNode.maxDelay
+    });
+    return effectNode;
+  }
+
+  private createPitchShift(): Tone.PitchShift {
+    const effectNode = new Tone.PitchShift({
+      pitch: 0,
+      windowSize: 0.1,
+      delayTime: 0,
+      feedback: 0
+    });
+    console.log(`🎛️ EffectManager: PitchShift creado con parámetros iniciales:`, {
+      pitch: effectNode.pitch,
+      windowSize: effectNode.windowSize,
+      delayTime: effectNode.delayTime.value,
+      feedback: effectNode.feedback.value
+    });
+    return effectNode;
+  }
+
+  private createReverb(): Tone.Reverb {
+    const effectNode = new Tone.Reverb({
+      decay: 1.5,
+      preDelay: 0.01
+    });
+    console.log(`🎛️ EffectManager: Reverb creado con parámetros iniciales:`, {
+      decay: effectNode.decay,
+      preDelay: effectNode.preDelay,
+      wet: effectNode.wet.value
+    });
+    return effectNode;
+  }
+
+  private createStereoWidener(): Tone.StereoWidener {
+    const effectNode = new Tone.StereoWidener({
+      width: 0.5
+    });
+    console.log(`🎛️ EffectManager: StereoWidener creado con parámetros iniciales:`, {
+      width: effectNode.width.value,
+      wet: effectNode.wet.value
+    });
+    return effectNode;
+  }
+
+  private createTremolo(): Tone.Tremolo {
+    const effectNode = new Tone.Tremolo({
+      frequency: 10,
+      depth: 0.5,
+      type: 'sine',
+      spread: 180
+    });
+    console.log(`🎛️ EffectManager: Tremolo creado con parámetros iniciales:`, {
+      frequency: effectNode.frequency.value,
+      depth: effectNode.depth.value,
+      type: effectNode.type,
+      spread: effectNode.spread
+    });
+    return effectNode;
+  }
+
+  private createVibrato(): Tone.Vibrato {
+    const effectNode = new Tone.Vibrato({
+      frequency: 5,
+      depth: 0.1,
+      type: 'sine',
+      maxDelay: 0.005
+    });
+    console.log(`🎛️ EffectManager: Vibrato creado con parámetros iniciales:`, {
+      frequency: effectNode.frequency.value,
+      depth: effectNode.depth.value,
+      type: effectNode.type,
+      maxDelay: 0.005
+    });
+    return effectNode;
+  }
+
   /**
    * Crea un oscilador de prueba para escuchar los efectos
    */
@@ -206,6 +360,50 @@ export class EffectManager {
       } else if (effectNode instanceof Tone.Chorus) {
         frequency = 440;
         volume = -25;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.Distortion) {
+        frequency = 440;
+        volume = -20;
+        type = 'sawtooth';
+      } else if (effectNode instanceof Tone.FeedbackDelay) {
+        frequency = 220;
+        volume = -24;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.Freeverb) {
+        frequency = 440;
+        volume = -28;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.FrequencyShifter) {
+        frequency = 330;
+        volume = -24;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.JCReverb) {
+        frequency = 520;
+        volume = -28;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.PingPongDelay) {
+        frequency = 220;
+        volume = -24;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.PitchShift) {
+        frequency = 440;
+        volume = -22;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.Reverb) {
+        frequency = 330;
+        volume = -20;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.StereoWidener) {
+        frequency = 550;
+        volume = -18;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.Tremolo) {
+        frequency = 440;
+        volume = -20;
+        type = 'sine';
+      } else if (effectNode instanceof Tone.Vibrato) {
+        frequency = 440;
+        volume = -20;
         type = 'sine';
       }
       
@@ -265,6 +463,28 @@ export class EffectManager {
         this.updateChebyshevParams(effectNode, params);
       } else if (effectNode instanceof Tone.Chorus) {
         this.updateChorusParams(effectNode, params);
+      } else if (effectNode instanceof Tone.Distortion) {
+        this.updateDistortionParams(effectNode, params);
+      } else if (effectNode instanceof Tone.FeedbackDelay) {
+        this.updateFeedbackDelayParams(effectNode, params);
+      } else if (effectNode instanceof Tone.Freeverb) {
+        this.updateFreeverbParams(effectNode, params);
+      } else if (effectNode instanceof Tone.FrequencyShifter) {
+        this.updateFrequencyShifterParams(effectNode, params);
+      } else if (effectNode instanceof Tone.JCReverb) {
+        this.updateJCReverbParams(effectNode, params);
+      } else if (effectNode instanceof Tone.PingPongDelay) {
+        this.updatePingPongDelayParams(effectNode, params);
+      } else if (effectNode instanceof Tone.PitchShift) {
+        this.updatePitchShiftParams(effectNode, params);
+      } else if (effectNode instanceof Tone.Reverb) {
+        this.updateReverbParams(effectNode, params);
+      } else if (effectNode instanceof Tone.StereoWidener) {
+        this.updateStereoWidenerParams(effectNode, params);
+      } else if (effectNode instanceof Tone.Tremolo) {
+        this.updateTremoloParams(effectNode, params);
+      } else if (effectNode instanceof Tone.Vibrato) {
+        this.updateVibratoParams(effectNode, params);
       } else {
         console.warn(`⚠️ EffectManager: El nodo del efecto no es un tipo reconocido:`, effectNode);
       }
@@ -399,6 +619,257 @@ export class EffectManager {
     });
   }
 
+  private updateDistortionParams(effectNode: Tone.Distortion, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al distortion`);
+        if (paramName === 'distortion') {
+          this.safeUpdateParam(effectNode, 'distortion', params[paramName]);
+        } else if (paramName === 'oversample') {
+          this.safeUpdateParam(effectNode, 'oversample', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del distortion:`, {
+      distortion: effectNode.distortion,
+      oversample: effectNode.oversample
+    });
+  }
+
+  private updateFreeverbParams(effectNode: Tone.Freeverb, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a freeverb`);
+        if (paramName === 'roomSize') {
+          this.safeUpdateParam(effectNode, 'roomSize', params[paramName]);
+        } else if (paramName === 'dampening') {
+          this.safeUpdateParam(effectNode, 'dampening', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del freeverb:`, {
+      roomSize: effectNode.roomSize,
+      dampening: effectNode.dampening
+    });
+  }
+
+  private updateFrequencyShifterParams(effectNode: Tone.FrequencyShifter, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a frequencyShifter`);
+        if (paramName === 'frequencyShift' || paramName === 'frequency') {
+          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del frequencyShifter:`, {
+      frequency: effectNode.frequency
+    });
+  }
+
+  private updateJCReverbParams(effectNode: Tone.JCReverb, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a jcReverb`);
+        if (paramName === 'roomSize') {
+          this.safeUpdateParam(effectNode, 'roomSize', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del jcReverb:`, {
+      roomSize: effectNode.roomSize
+    });
+  }
+
+  private updatePingPongDelayParams(effectNode: Tone.PingPongDelay, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pingPongDelay`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'pingPongDelayTime' || paramName === 'delayTime') {
+          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
+        } else if (paramName === 'pingPongFeedback' || paramName === 'feedback') {
+          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
+        } else if (paramName === 'maxDelay') {
+          this.safeUpdateParam(effectNode, 'maxDelay', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del pingPongDelay:`, {
+      delayTime: effectNode.delayTime?.value || 'N/A',
+      feedback: effectNode.feedback?.value || 'N/A',
+      maxDelay: effectNode.maxDelay || 'N/A',
+      wet: effectNode.wet?.value || 'N/A'
+    });
+  }
+
+  private updatePitchShiftParams(effectNode: Tone.PitchShift, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pitchShift`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'pitchShift' || paramName === 'pitch') {
+          this.safeUpdateParam(effectNode, 'pitch', params[paramName]);
+        } else if (paramName === 'windowSize') {
+          this.safeUpdateParam(effectNode, 'windowSize', params[paramName]);
+        } else if (paramName === 'delayTime') {
+          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
+        } else if (paramName === 'feedback') {
+          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del pitchShift:`, {
+      pitch: effectNode.pitch || 'N/A',
+      windowSize: effectNode.windowSize || 'N/A',
+      delayTime: effectNode.delayTime?.value || 'N/A',
+      feedback: effectNode.feedback?.value || 'N/A',
+      wet: effectNode.wet?.value || 'N/A'
+    });
+  }
+
+  private updateReverbParams(effectNode: Tone.Reverb, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a reverb`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'decay') {
+          this.safeUpdateParam(effectNode, 'decay', params[paramName]);
+        } else if (paramName === 'preDelay') {
+          this.safeUpdateParam(effectNode, 'preDelay', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del reverb:`, {
+      decay: effectNode.decay || 'N/A',
+      preDelay: effectNode.preDelay || 'N/A',
+      wet: effectNode.wet?.value || 'N/A'
+    });
+  }
+
+  private updateStereoWidenerParams(effectNode: Tone.StereoWidener, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a stereoWidener`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'width') {
+          this.safeUpdateParam(effectNode, 'width', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del stereoWidener:`, {
+      width: effectNode.width?.value || 'N/A',
+      wet: effectNode.wet?.value || 'N/A'
+    });
+  }
+
+  private updateTremoloParams(effectNode: Tone.Tremolo, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a tremolo`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'tremoloFrequency') {
+          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
+        } else if (paramName === 'tremoloDepth') {
+          this.safeUpdateParam(effectNode, 'depth', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else if (paramName === 'tremoloSpread') {
+          effectNode.spread = params[paramName];
+        } else if (paramName === 'tremoloType') {
+          effectNode.type = params[paramName];
+        } else {
+          console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Tremolo`);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del tremolo:`, {
+      frequency: effectNode.frequency?.value || 'N/A',
+      depth: effectNode.depth?.value || 'N/A',
+      wet: effectNode.wet?.value || 'N/A',
+      spread: effectNode.spread || 'N/A',
+      type: effectNode.type || 'N/A'
+    });
+  }
+
+  private updateVibratoParams(effectNode: Tone.Vibrato, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a vibrato`);
+        
+        // Mapear parámetros del store a parámetros del efecto
+        if (paramName === 'vibratoFrequency') {
+          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
+        } else if (paramName === 'vibratoDepth') {
+          this.safeUpdateParam(effectNode, 'depth', params[paramName]);
+        } else if (paramName === 'wet') {
+          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
+        } else if (paramName === 'vibratoType') {
+          effectNode.type = params[paramName];
+        } else if (paramName === 'vibratoMaxDelay') {
+          // maxDelay no es un parámetro que se pueda cambiar en tiempo real
+          console.log(`ℹ️ EffectManager: maxDelay no se puede cambiar en tiempo real para Vibrato`);
+        } else {
+          console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Vibrato`);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del vibrato:`, {
+      frequency: effectNode.frequency?.value || 'N/A',
+      depth: effectNode.depth?.value || 'N/A',
+      wet: effectNode.wet?.value || 'N/A',
+      type: effectNode.type || 'N/A'
+    });
+  }
+
+  private updateFeedbackDelayParams(effectNode: Tone.FeedbackDelay, params: any): void {
+    Object.keys(params).forEach(paramName => {
+      if (params[paramName] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a feedbackDelay`);
+        if (paramName === 'feedback') {
+          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
+        } else if (paramName === 'delayTime') {
+          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
+        } else {
+          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        }
+      }
+    });
+    console.log(`🎛️ EffectManager: Parámetros actuales del feedbackDelay:`, {
+      delayTime: effectNode.delayTime,
+      feedback: effectNode.feedback
+    });
+  }
+
   /**
    * Fuerza la actualización de un efecto global reiniciando su oscilador de prueba
    */
@@ -435,6 +906,39 @@ export class EffectManager {
         } else if (effectNode instanceof Tone.Chorus) {
           testOsc.frequency.rampTo(880, 0.1);
           setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 100);
+        } else if (effectNode instanceof Tone.FeedbackDelay) {
+          testOsc.frequency.rampTo(330, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.Freeverb) {
+          testOsc.frequency.rampTo(550, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.Distortion) {
+          testOsc.frequency.rampTo(880, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.FrequencyShifter) {
+          testOsc.frequency.rampTo(330, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.JCReverb) {
+          testOsc.frequency.rampTo(520, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.PingPongDelay) {
+          testOsc.frequency.rampTo(330, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.PitchShift) {
+          testOsc.frequency.rampTo(880, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.05), 120);
+        } else if (effectNode instanceof Tone.Reverb) {
+          testOsc.frequency.rampTo(660, 0.1);
+          setTimeout(() => testOsc.frequency.rampTo(330, 0.1), 200);
+        } else if (effectNode instanceof Tone.StereoWidener) {
+          testOsc.frequency.rampTo(1100, 0.05);
+          setTimeout(() => testOsc.frequency.rampTo(550, 0.05), 100);
+        } else if (effectNode instanceof Tone.Tremolo) {
+          testOsc.frequency.rampTo(880, 0.1);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 200);
+        } else if (effectNode instanceof Tone.Vibrato) {
+          testOsc.frequency.rampTo(880, 0.1);
+          setTimeout(() => testOsc.frequency.rampTo(440, 0.1), 200);
         } else {
           const currentFreq = testOsc.frequency.value;
           const newFreq = currentFreq === 440 ? 880 : 440;

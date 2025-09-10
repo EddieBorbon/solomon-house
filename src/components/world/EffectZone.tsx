@@ -33,6 +33,32 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
         return '#f59e0b'; // Naranja para AutoWah
       case 'bitCrusher':
         return '#ef4444'; // Rojo para BitCrusher
+      case 'chebyshev':
+        return '#6366f1'; // Índigo para Chebyshev
+      case 'chorus':
+        return '#14b8a6'; // Teal para Chorus
+      case 'distortion':
+        return '#ec4899'; // Rosa para Distortion
+      case 'feedbackDelay':
+        return '#f59e0b'; // Ámbar para FeedbackDelay
+      case 'freeverb':
+        return '#0ea5e9'; // Azul cielo para Freeverb
+      case 'frequencyShifter':
+        return '#65a30d'; // Verde lima para FrequencyShifter
+      case 'jcReverb':
+        return '#1e3a8a'; // Azul marino para JCReverb
+      case 'pingPongDelay':
+        return '#7c3aed'; // Violeta para PingPongDelay
+      case 'pitchShift':
+        return '#10b981'; // Verde esmeralda para PitchShift
+      case 'reverb':
+        return '#f59e0b'; // Ámbar para Reverb
+      case 'stereoWidener':
+        return '#06b6d4'; // Cian para StereoWidener
+      case 'tremolo':
+        return '#ef4444'; // Rojo para Tremolo
+      case 'vibrato':
+        return '#f97316'; // Naranja para Vibrato
       default:
         return '#8b5cf6'; // Morado por defecto
       }

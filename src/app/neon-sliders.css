@@ -1,0 +1,176 @@
+/* Estilos para sliders neon y glass */
+.slider-thumb-neon {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider-thumb-neon::-webkit-slider-track {
+  background: linear-gradient(to right, #1f2937 0%, #1f2937 100%);
+  height: 8px;
+  border-radius: 4px;
+  border: 1px solid #374151;
+}
+
+.slider-thumb-neon::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.slider-thumb-neon::-webkit-slider-thumb:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.slider-thumb-neon::-moz-range-track {
+  background: linear-gradient(to right, #1f2937 0%, #1f2937 100%);
+  height: 8px;
+  border-radius: 4px;
+  border: 1px solid #374151;
+}
+
+.slider-thumb-neon::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.slider-thumb-neon::-moz-range-thumb:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Estilos para contenedores glass */
+.glass-container {
+  background: rgba(15, 15, 15, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-container:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para botones neon */
+.neon-button {
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  font-weight: 500;
+}
+
+.neon-button:hover {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Estilos para texto neon */
+.neon-text {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para scrollbar personalizada */
+.scrollbar-neon::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-neon::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.scrollbar-neon::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #06b6d4, #ec4899);
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+}
+
+.scrollbar-neon::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0891b2, #f472b6);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+}
+
+/* Animaciones de pulso para elementos activos */
+.pulse-neon {
+  animation: pulseNeon 2s infinite;
+}
+
+@keyframes pulseNeon {
+  0%, 100% {
+    box-shadow: 
+      0 0 5px rgba(6, 182, 212, 0.5),
+      0 0 10px rgba(236, 72, 153, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 10px rgba(6, 182, 212, 0.8),
+      0 0 20px rgba(236, 72, 153, 0.5),
+      0 0 30px rgba(6, 182, 212, 0.3);
+  }
+}
+
+/* Estilos para inputs de texto */
+.neon-input {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.neon-input:focus {
+  outline: none;
+  border-color: rgba(0, 0, 0, 0.6);
+  box-shadow: 
+    0 0 10px rgba(0, 0, 0, 0.3),
+    inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.neon-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}

@@ -20,7 +20,7 @@ export interface SoundObject {
 // Interfaz para una zona de efecto
 export interface EffectZone {
   id: string;
-  type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus';
+  type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato';
   shape: 'sphere' | 'cube';
   position: [number, number, number];
   rotation: [number, number, number];
@@ -50,6 +50,9 @@ export interface EffectZone {
     // Parámetros del Chebyshev
     order?: number;
     oversample?: 'none' | '2x' | '4x';
+    // Parámetros del Distortion
+    distortion?: number;
+    distortionOversample?: 'none' | '2x' | '4x';
     // Parámetros del Chorus
     chorusFrequency?: number;
     delayTime?: number;
@@ -57,6 +60,32 @@ export interface EffectZone {
     feedback?: number;
     spread?: number;
     chorusType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    // Parámetros del FeedbackDelay
+    delayTime?: number | string;
+    feedback?: number;
+    // Parámetros del PingPongDelay
+    pingPongDelayTime?: number | string;
+    pingPongFeedback?: number;
+    maxDelay?: number;
+    wet?: number;
+    // Parámetros del PitchShift
+    pitchShift?: number;
+    windowSize?: number;
+    // Parámetros del Reverb
+    decay?: number;
+    preDelay?: number;
+    // Parámetros del StereoWidener
+    width?: number;
+    // Parámetros del Tremolo
+    tremoloFrequency?: number;
+    tremoloDepth?: number;
+    tremoloSpread?: number;
+    tremoloType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    // Parámetros del Vibrato
+    vibratoFrequency?: number;
+    vibratoDepth?: number;
+    vibratoType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
+    vibratoMaxDelay?: number;
     // Parámetros generales de zona de efectos
     radius?: number;
   };
@@ -87,7 +116,7 @@ export interface WorldActions {
   clearAllObjects: () => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
   removeEffectZone: (id: string) => void;
   toggleLockEffectZone: (id: string) => void;
@@ -490,7 +519,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     // Configurar parámetros por defecto según el tipo de efecto
     let defaultParams: any = {};
     
@@ -548,6 +577,73 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         feedback: 0,
         spread: 180,
         chorusType: 'sine',
+      };
+    } else if (type === 'distortion') {
+      defaultParams = {
+        frequency: 1,
+        octaves: 2,
+        baseFrequency: 200,
+        distortion: 0.4,
+        oversample: 'none',
+      };
+    } else if (type === 'feedbackDelay') {
+      defaultParams = {
+        delayTime: '8n',
+        feedback: 0.5,
+      };
+    } else if (type === 'freeverb') {
+      defaultParams = {
+        roomSize: 0.7,
+        dampening: 3000,
+      };
+    } else if (type === 'frequencyShifter') {
+      defaultParams = {
+        frequency: 0,
+      };
+    } else if (type === 'jcReverb') {
+      defaultParams = {
+        roomSize: 0.5,
+      };
+    } else if (type === 'pingPongDelay') {
+      defaultParams = {
+        pingPongDelayTime: '4n',
+        pingPongFeedback: 0.2,
+        maxDelay: 1.0,
+        wet: 0.5,
+      };
+    } else if (type === 'pitchShift') {
+      defaultParams = {
+        pitchShift: 0,
+        windowSize: 0.1,
+        delayTime: 0,
+        feedback: 0,
+      };
+    } else if (type === 'reverb') {
+      defaultParams = {
+        decay: 1.5,
+        preDelay: 0.01,
+        wet: 0.5,
+      };
+    } else if (type === 'stereoWidener') {
+      defaultParams = {
+        width: 0.5,
+        wet: 0.5,
+      };
+    } else if (type === 'tremolo') {
+      defaultParams = {
+        tremoloFrequency: 10,
+        tremoloDepth: 0.5,
+        wet: 0.5,
+        tremoloSpread: 180,
+        tremoloType: 'sine',
+      };
+    } else if (type === 'vibrato') {
+      defaultParams = {
+        vibratoFrequency: 5,
+        vibratoDepth: 0.1,
+        wet: 0.5,
+        vibratoType: 'sine',
+        vibratoMaxDelay: 0.005,
       };
     }
     

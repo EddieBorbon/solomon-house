@@ -5,3 +5,8 @@ export { ParameterEditor } from './ParameterEditor';
 export { WorldInfo } from './WorldInfo';
 export { FPSDisplay } from './FPSDisplay';
 export { TransformToolbar } from './TransformToolbar';
+export { default as ProjectCard } from './ProjectCard';
+export { default as Dashboard } from './Dashboard';
+export { default as BentoGrid } from './BentoGrid';
+export { default as AudioEffectCard } from './AudioEffectCard';
+export { default as AudioEffectsDashboard } from './AudioEffectsDashboard';

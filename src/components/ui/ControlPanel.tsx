@@ -106,18 +106,87 @@ export function ControlPanel() {
     addEffectZone('chorus', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
   };
 
+  const handleAddDistortionZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('distortion', [x, 1, z], 'sphere');
+  };
+
+  const handleAddFeedbackDelayZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('feedbackDelay', [x, 1, z], 'sphere');
+  };
+
+  const handleAddFreeverbZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('freeverb', [x, 1, z], 'sphere');
+  };
+
+  const handleAddFrequencyShifterZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('frequencyShifter', [x, 1, z], 'sphere');
+  };
+
+  const handleAddJCReverbZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('jcReverb', [x, 1, z], 'sphere');
+  };
+
+  const handleAddPingPongDelayZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('pingPongDelay', [x, 1, z], 'sphere');
+  };
+
+  const handleAddPitchShiftZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('pitchShift', [x, 1, z], 'sphere');
+  };
+
+  const handleAddReverbZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('reverb', [x, 1, z], 'sphere');
+  };
+
+  const handleAddStereoWidenerZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('stereoWidener', [x, 1, z], 'sphere');
+  };
+
+  const handleAddTremoloZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('tremolo', [x, 1, z], 'sphere');
+  };
+
+  const handleAddVibratoZone = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addEffectZone('vibrato', [x, 1, z], 'sphere');
+  };
+
   return (
-    <div className="fixed top-4 left-4 bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 z-50 min-w-[280px]">
+      <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 z-50 min-w-[280px] max-w-[320px] max-h-[70vh] overflow-hidden">
+      {/* Efecto de brillo interior */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
       
       {/* Sección de Controles */}
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            💡 Controles
+            <span className="text-xl">💡</span>
+            Controles
           </h3>
           <button
             onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+            className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-cyan-500/20"
             title={isControlsExpanded ? "Ocultar controles" : "Mostrar controles"}
           >
             {isControlsExpanded ? (
@@ -189,13 +258,14 @@ export function ControlPanel() {
 
       {/* Sección de Añadir Objeto */}
       <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            ➕ Añadir objeto
+            <span className="text-xl">➕</span>
+            Añadir objeto
           </h3>
           <button
             onClick={() => setIsAddMenuExpanded(!isAddMenuExpanded)}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-purple-500/20"
             title={isAddMenuExpanded ? "Ocultar menú" : "Mostrar menú"}
           >
             {isAddMenuExpanded ? (
@@ -302,13 +372,14 @@ export function ControlPanel() {
 
       {/* Sección de Zonas de Efectos */}
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            🎛️ Zonas de Efectos
+            <span className="text-xl">🎛️</span>
+            Zonas de Efectos
           </h3>
           <button
             onClick={() => setIsEffectsExpanded(!isEffectsExpanded)}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+            className="text-pink-400 hover:text-pink-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-pink-500/20"
             title={isEffectsExpanded ? "Ocultar menú" : "Mostrar menú"}
           >
             {isEffectsExpanded ? (
@@ -324,53 +395,150 @@ export function ControlPanel() {
         </div>
         
         {isEffectsExpanded && (
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-transparent">
+            {/* Slider de navegación */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm text-cyan-300 mb-2">
+                <span>Efectos Disponibles</span>
+                <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll ↓</span>
+              </div>
+              <div className="w-full h-1 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full"></div>
+            </div>
+
             <button
               onClick={handleAddPhaserZone}
-              className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de Phaser (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Phaser (sphere)</span>
             </button>
             
             <button
               onClick={handleAddAutoFilterZone}
-              className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de AutoFilter (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de AutoFilter (sphere)</span>
             </button>
             
             <button
               onClick={handleAddAutoWahZone}
-              className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de AutoWah (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de AutoWah (sphere)</span>
             </button>
             
             <button
               onClick={handleAddBitCrusherZone}
-              className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de BitCrusher (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de BitCrusher (sphere)</span>
             </button>
             
             <button
               onClick={handleAddChebyshevZone}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de Chebyshev (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Chebyshev (sphere)</span>
             </button>
             
             <button
               onClick={handleAddChorusZone}
-              className="w-full px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
             >
-              <span>🎛️</span>
-              <span>Zona de Chorus (sphere)</span>
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Chorus (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddDistortionZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Distortion (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddFeedbackDelayZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de FeedbackDelay (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddFreeverbZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Freeverb (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddFrequencyShifterZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de FrequencyShifter (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddJCReverbZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de JCReverb (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddPingPongDelayZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de PingPongDelay (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddPitchShiftZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de PitchShift (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddReverbZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Reverb (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddStereoWidenerZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de StereoWidener (sphere)</span>
+            </button>
+
+            <button
+              onClick={handleAddTremoloZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Tremolo (sphere)</span>
+            </button>
+            
+            <button
+              onClick={handleAddVibratoZone}
+              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            >
+              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
+              <span className="font-medium text-sm">Zona de Vibrato (sphere)</span>
             </button>
           </div>
         )}

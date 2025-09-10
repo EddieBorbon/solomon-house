@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./tailwind.css";
+import "./neon-sliders.css";
+import "./glassmorphism.css";
 import { StoreProvider } from "../components/StoreProvider";
 
 const geistSans = Geist({
