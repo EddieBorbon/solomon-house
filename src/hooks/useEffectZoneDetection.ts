@@ -4,24 +4,28 @@ import { audioManager } from '../lib/AudioManager';
 import * as THREE from 'three';
 
 export function useEffectZoneDetection() {
-  const { objects, effectZones } = useWorldStore();
+  const { grids } = useWorldStore();
   let lastDebugTime = 0;
+  
+  // Obtener todos los objetos de todas las cuadrículas
+  const allObjects = Array.from(grids.values()).flatMap(grid => grid.objects);
+  const allEffectZones = Array.from(grids.values()).flatMap(grid => grid.effectZones);
 
   useFrame(() => {
     // Solo procesar si hay zonas de efectos
-    if (effectZones.length === 0) return;
+    if (allEffectZones.length === 0) return;
 
     // Solo debuggear cada 2 segundos para no saturar la consola
     const now = Date.now();
     const shouldDebug = now - lastDebugTime > 2000;
 
     // Iterar sobre cada objeto sonoro
-    objects.forEach((soundObject) => {
+    allObjects.forEach((soundObject) => {
       // Rastrear si el objeto está dentro de alguna zona
       let isInsideAnyZone = false;
       
       // Iterar sobre cada zona de efecto
-      effectZones.forEach((effectZone) => {
+      allEffectZones.forEach((effectZone) => {
         // DETECCIÓN DE COLISIÓN MEJORADA CON BOX3
         let isInside = false;
         let effectAmount = 0.0;
@@ -94,8 +98,8 @@ export function useEffectZoneDetection() {
       });
 
       // IMPORTANTE: Si el objeto no está dentro de ninguna zona, asegurar que todos los efectos estén desconectados
-      if (!isInsideAnyZone && effectZones.length > 0) {
-        effectZones.forEach((effectZone) => {
+      if (!isInsideAnyZone && allEffectZones.length > 0) {
+        allEffectZones.forEach((effectZone) => {
           audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
         });
         

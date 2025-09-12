@@ -7,171 +7,93 @@ export function ControlPanel() {
   const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
-  const { addObject, addEffectZone, addMobileObject } = useWorldStore();
+  const [isMobileObjectExpanded, setIsMobileObjectExpanded] = useState(false);
+  const { addObject, addEffectZone, addMobileObject, activeGridId, grids } = useWorldStore();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const effectsScrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Obtener información de la cuadrícula activa
+  const activeGrid = activeGridId ? grids.get(activeGridId) : null;
 
-  const handleAddCube = () => {
+  // Función helper para crear objetos en la cuadrícula activa
+  const createObjectInActiveGrid = (type: string) => {
+    if (!activeGrid) {
+      console.warn('No hay cuadrícula activa para crear objetos');
+      return;
+    }
+    
+    // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addObject('cube', [x, 0.5, z]);
+    addObject(type as any, [x, 0.5, z]);
+    console.log(`🎯 Creando ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 0.5, z]);
   };
 
-  const handleAddSphere = () => {
+  // Función helper para crear zonas de efecto en la cuadrícula activa
+  const createEffectZoneInActiveGrid = (type: string) => {
+    if (!activeGrid) {
+      console.warn('No hay cuadrícula activa para crear zonas de efecto');
+      return;
+    }
+    
+    // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addObject('sphere', [x, 0.5, z]);
+    addEffectZone(type as any, [x, 1, z], 'sphere');
+    console.log(`🎯 Creando zona de efecto ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 1, z]);
   };
 
-  const handleAddCylinder = () => {
+  // Función helper para crear objetos móviles en la cuadrícula activa
+  const createMobileObjectInActiveGrid = () => {
+    console.log(`🚀 createMobileObjectInActiveGrid llamado - Cuadrícula activa: ${activeGridId}`);
+    console.log(`🚀 activeGrid:`, activeGrid);
+    
+    if (!activeGrid) {
+      console.warn('No hay cuadrícula activa para crear objetos móviles');
+      return;
+    }
+    
+    // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addObject('cylinder', [x, 0.5, z]);
+    const finalPosition: [number, number, number] = [x, 0.5, z];
+    
+    console.log(`🚀 Posición de la cuadrícula:`, activeGrid.position);
+    console.log(`🚀 Posición relativa del objeto móvil:`, finalPosition);
+    
+    addMobileObject(finalPosition);
+    console.log(`🎯 Creando objeto móvil en cuadrícula activa ${activeGridId} en posición relativa:`, finalPosition);
   };
 
-  const handleAddCone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('cone', [x, 0.5, z]);
-  };
+  const handleAddCube = () => createObjectInActiveGrid('cube');
+  const handleAddSphere = () => createObjectInActiveGrid('sphere');
 
-  const handleAddPyramid = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('pyramid', [x, 0.5, z]);
-  };
+  const handleAddCylinder = () => createObjectInActiveGrid('cylinder');
+  const handleAddCone = () => createObjectInActiveGrid('cone');
+  const handleAddPyramid = () => createObjectInActiveGrid('pyramid');
+  const handleAddIcosahedron = () => createObjectInActiveGrid('icosahedron');
+  const handleAddPlane = () => createObjectInActiveGrid('plane');
+  const handleAddTorus = () => createObjectInActiveGrid('torus');
+  const handleAddDodecahedronRing = () => createObjectInActiveGrid('dodecahedronRing');
+  const handleAddSpiral = () => createObjectInActiveGrid('spiral');
 
-  const handleAddIcosahedron = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('icosahedron', [x, 0.5, z]);
-  };
-
-  const handleAddPlane = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('plane', [x, 0.5, z]);
-  };
-
-  const handleAddTorus = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('torus', [x, 0.5, z]);
-  };
-
-  const handleAddDodecahedronRing = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('dodecahedronRing', [x, 0.5, z]);
-  };
-
-  const handleAddSpiral = () => {
-    // Añadir espiral de samples en posición aleatoria
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addObject('spiral', [x, 0.5, z]);
-  };
-
-  const handleAddPhaserZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('phaser', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddAutoFilterZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('autoFilter', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddAutoWahZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('autoWah', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddBitCrusherZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('bitCrusher', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddChebyshevZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('chebyshev', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddChorusZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('chorus', [x, 1, z], 'sphere'); // Usar 'sphere' como forma por defecto
-  };
-
-  const handleAddDistortionZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('distortion', [x, 1, z], 'sphere');
-  };
-
-  const handleAddFeedbackDelayZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('feedbackDelay', [x, 1, z], 'sphere');
-  };
-
-  const handleAddFreeverbZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('freeverb', [x, 1, z], 'sphere');
-  };
-
-  const handleAddFrequencyShifterZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('frequencyShifter', [x, 1, z], 'sphere');
-  };
-
-  const handleAddJCReverbZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('jcReverb', [x, 1, z], 'sphere');
-  };
-
-  const handleAddPingPongDelayZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('pingPongDelay', [x, 1, z], 'sphere');
-  };
-
-  const handleAddPitchShiftZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('pitchShift', [x, 1, z], 'sphere');
-  };
-
-  const handleAddReverbZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('reverb', [x, 1, z], 'sphere');
-  };
-
-  const handleAddStereoWidenerZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('stereoWidener', [x, 1, z], 'sphere');
-  };
-
-  const handleAddTremoloZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('tremolo', [x, 1, z], 'sphere');
-  };
-
-  const handleAddVibratoZone = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addEffectZone('vibrato', [x, 1, z], 'sphere');
-  };
+  const handleAddPhaserZone = () => createEffectZoneInActiveGrid('phaser');
+  const handleAddAutoFilterZone = () => createEffectZoneInActiveGrid('autoFilter');
+  const handleAddAutoWahZone = () => createEffectZoneInActiveGrid('autoWah');
+  const handleAddBitCrusherZone = () => createEffectZoneInActiveGrid('bitCrusher');
+  const handleAddChebyshevZone = () => createEffectZoneInActiveGrid('chebyshev');
+  const handleAddChorusZone = () => createEffectZoneInActiveGrid('chorus');
+  const handleAddDistortionZone = () => createEffectZoneInActiveGrid('distortion');
+  const handleAddFeedbackDelayZone = () => createEffectZoneInActiveGrid('feedbackDelay');
+  const handleAddFreeverbZone = () => createEffectZoneInActiveGrid('freeverb');
+  const handleAddFrequencyShifterZone = () => createEffectZoneInActiveGrid('frequencyShifter');
+  const handleAddJCReverbZone = () => createEffectZoneInActiveGrid('jcReverb');
+  const handleAddPingPongDelayZone = () => createEffectZoneInActiveGrid('pingPongDelay');
+  const handleAddPitchShiftZone = () => createEffectZoneInActiveGrid('pitchShift');
+  const handleAddReverbZone = () => createEffectZoneInActiveGrid('reverb');
+  const handleAddStereoWidenerZone = () => createEffectZoneInActiveGrid('stereoWidener');
+  const handleAddTremoloZone = () => createEffectZoneInActiveGrid('tremolo');
+  const handleAddVibratoZone = () => createEffectZoneInActiveGrid('vibrato');
 
   // Funciones para controlar el scroll horizontal
   const scrollLeft = () => {
@@ -186,16 +108,39 @@ export function ControlPanel() {
     }
   };
 
-  const handleAddMobileObject = () => {
-    const x = (Math.random() - 0.5) * 10;
-    const z = (Math.random() - 0.5) * 10;
-    addMobileObject([x, 0.5, z]);
+  // Funciones de scroll para zonas de efectos
+  const scrollEffectsLeft = () => {
+    if (effectsScrollContainerRef.current) {
+      effectsScrollContainerRef.current.scrollBy({ left: -150, behavior: 'smooth' });
+    }
   };
+
+  const scrollEffectsRight = () => {
+    if (effectsScrollContainerRef.current) {
+      effectsScrollContainerRef.current.scrollBy({ left: 150, behavior: 'smooth' });
+    }
+  };
+
+  const handleAddMobileObject = () => createMobileObjectInActiveGrid();
+
 
   return (
       <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 z-50 min-w-[280px] max-w-[320px] max-h-[70vh] overflow-hidden">
       {/* Efecto de brillo interior */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
+      
+      {/* Indicador de Cuadrícula Activa */}
+      {activeGrid && (
+        <div className="mb-4 p-3 bg-cyan-900/20 border border-cyan-700/50 rounded-lg">
+          <div className="text-sm text-cyan-300 mb-1">Cuadrícula Activa</div>
+          <div className="text-white font-medium">
+            Coordenadas: ({activeGrid.coordinates[0]}, {activeGrid.coordinates[1]}, {activeGrid.coordinates[2]})
+          </div>
+          <div className="text-xs text-cyan-200">
+            {activeGrid.objects.length} objetos, {activeGrid.mobileObjects.length} móviles, {activeGrid.effectZones.length} zonas
+          </div>
+        </div>
+      )}
       
       {/* Sección de Controles */}
       <div className="mb-4">
@@ -222,7 +167,7 @@ export function ControlPanel() {
         </div>
         
         {isControlsExpanded && (
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent">
             {/* Controles de cámara */}
             <div className="p-3 bg-gray-800/50 border border-gray-600/50 rounded-lg">
               <h4 className="text-sm font-semibold text-gray-300 mb-2">📷 Cámara</h4>
@@ -448,151 +393,177 @@ export function ControlPanel() {
         </div>
         
         {isEffectsExpanded && (
-          <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/50 scrollbar-track-transparent">
-            {/* Slider de navegación */}
+          <div className="space-y-3">
+            {/* Slider de navegación para zonas de efectos */}
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm text-cyan-300 mb-2">
                 <span>Efectos Disponibles</span>
-                <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll ↓</span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={scrollEffectsLeft}
+                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
+                    title="Scroll izquierda"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll</span>
+                  <button
+                    onClick={scrollEffectsRight}
+                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
+                    title="Scroll derecha"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div className="w-full h-1 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full"></div>
             </div>
 
-            <button
-              onClick={handleAddPhaserZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
+            {/* Contenedor con scroll horizontal para las zonas de efectos */}
+            <div 
+              ref={effectsScrollContainerRef}
+              className="flex space-x-3 overflow-x-auto scrollbar-thin scroll-smooth scroll-fade pb-2"
             >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Phaser (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddAutoFilterZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de AutoFilter (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddAutoWahZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de AutoWah (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddBitCrusherZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de BitCrusher (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddChebyshevZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Chebyshev (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddChorusZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Chorus (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddPhaserZone}
+                className="flex-shrink-0 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Phaser</span>
+              </button>
+              
+              <button
+                onClick={handleAddAutoFilterZone}
+                className="flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>AutoFilter</span>
+              </button>
+              
+              <button
+                onClick={handleAddAutoWahZone}
+                className="flex-shrink-0 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>AutoWah</span>
+              </button>
+              
+              <button
+                onClick={handleAddBitCrusherZone}
+                className="flex-shrink-0 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>BitCrusher</span>
+              </button>
+              
+              <button
+                onClick={handleAddChebyshevZone}
+                className="flex-shrink-0 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Chebyshev</span>
+              </button>
+              
+              <button
+                onClick={handleAddChorusZone}
+                className="flex-shrink-0 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Chorus</span>
+              </button>
 
-            <button
-              onClick={handleAddDistortionZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Distortion (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddDistortionZone}
+                className="flex-shrink-0 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Distortion</span>
+              </button>
 
-            <button
-              onClick={handleAddFeedbackDelayZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de FeedbackDelay (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddFeedbackDelayZone}
+                className="flex-shrink-0 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>FeedbackDelay</span>
+              </button>
 
-            <button
-              onClick={handleAddFreeverbZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Freeverb (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddFreeverbZone}
+                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Freeverb</span>
+              </button>
 
-            <button
-              onClick={handleAddFrequencyShifterZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de FrequencyShifter (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddFrequencyShifterZone}
+                className="flex-shrink-0 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>FrequencyShifter</span>
+              </button>
 
-            <button
-              onClick={handleAddJCReverbZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de JCReverb (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddJCReverbZone}
+                className="flex-shrink-0 px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>JCReverb</span>
+              </button>
 
-            <button
-              onClick={handleAddPingPongDelayZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de PingPongDelay (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddPingPongDelayZone}
+                className="flex-shrink-0 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>PingPongDelay</span>
+              </button>
 
-            <button
-              onClick={handleAddPitchShiftZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de PitchShift (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddPitchShiftZone}
+                className="flex-shrink-0 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>PitchShift</span>
+              </button>
 
-            <button
-              onClick={handleAddReverbZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Reverb (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddReverbZone}
+                className="flex-shrink-0 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Reverb</span>
+              </button>
 
-            <button
-              onClick={handleAddStereoWidenerZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de StereoWidener (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddStereoWidenerZone}
+                className="flex-shrink-0 px-4 py-2 bg-lime-500 text-white rounded-lg hover:bg-lime-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>StereoWidener</span>
+              </button>
 
-            <button
-              onClick={handleAddTremoloZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Tremolo (sphere)</span>
-            </button>
-            
-            <button
-              onClick={handleAddVibratoZone}
-              className="w-full px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center space-x-2 group"
-            >
-              <span className="text-lg group-hover:scale-105 transition-transform duration-200">🎛️</span>
-              <span className="font-medium text-sm">Zona de Vibrato (sphere)</span>
-            </button>
+              <button
+                onClick={handleAddTremoloZone}
+                className="flex-shrink-0 px-4 py-2 bg-fuchsia-500 text-white rounded-lg hover:bg-fuchsia-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Tremolo</span>
+              </button>
+              
+              <button
+                onClick={handleAddVibratoZone}
+                className="flex-shrink-0 px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🎛️</span>
+                <span>Vibrato</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -604,19 +575,34 @@ export function ControlPanel() {
             <span className="text-xl">🚀</span>
             Objeto Móvil
           </h3>
+          <button
+            onClick={() => setIsMobileObjectExpanded(!isMobileObjectExpanded)}
+            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-purple-500/20"
+            title={isMobileObjectExpanded ? "Ocultar menú" : "Mostrar menú"}
+          >
+            {isMobileObjectExpanded ? (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
         </div>
         
-        <div className="space-y-3">
-          <button
-            onClick={handleAddMobileObject}
-            className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-3 group shadow-lg hover:shadow-purple-500/25"
-          >
-            <span className="text-2xl group-hover:scale-110 transition-transform duration-200">🚀</span>
-            <span className="font-medium text-lg">Añadir Objeto Móvil</span>
-          </button>
-          
-
-        </div>
+        {isMobileObjectExpanded && (
+          <div className="space-y-3">
+            <button
+              onClick={handleAddMobileObject}
+              className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-3 group shadow-lg hover:shadow-purple-500/25"
+            >
+              <span className="text-2xl group-hover:scale-110 transition-transform duration-200">🚀</span>
+              <span className="font-medium text-lg">Añadir Objeto Móvil</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

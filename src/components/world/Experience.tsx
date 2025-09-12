@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
 import { Suspense } from 'react';
 import { useCameraControls } from '../../hooks/useCameraControls';
+import { CameraController } from './CameraController';
 import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
@@ -13,8 +14,9 @@ import { audioManager } from '../../lib/AudioManager';
 type EnvironmentPreset = 'forest' | 'sunset' | 'dawn' | 'night' | 'warehouse' | 'apartment' | 'studio' | 'city' | 'park' | 'lobby';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
-function CameraController({ orbitControlsRef }: { orbitControlsRef: React.RefObject<any> }) {
-  const { updateCameraPosition } = useCameraControls(null, orbitControlsRef.current);
+function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<any> }) {
+  const { camera } = useThree();
+  const { updateCameraPosition } = useCameraControls(camera, orbitControlsRef.current);
   
   // Inicializar la espacialización de audio
   useAudioListener();
@@ -48,6 +50,8 @@ function CameraController({ orbitControlsRef }: { orbitControlsRef: React.RefObj
 export function Experience() {
   const orbitControlsRef = useRef<any>(null);
   const [environmentPreset] = useState<EnvironmentPreset>('forest');
+  
+  console.log('🎬 Experience component rendering...');
 
   return (
     <div className="w-full h-screen">
@@ -82,7 +86,7 @@ export function Experience() {
         }}
       >
         {/* Controlador de cámara WASD */}
-        <CameraController orbitControlsRef={orbitControlsRef} />
+        <CameraControllerInternal orbitControlsRef={orbitControlsRef} />
         
         {/* Controles de cámara */}
         <OrbitControls 
@@ -90,8 +94,8 @@ export function Experience() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          maxDistance={50}
-          minDistance={1}
+          maxDistance={500}
+          minDistance={0.5}
           dampingFactor={0.05}
           enableDamping={true}
         />
@@ -132,11 +136,10 @@ export function Experience() {
           color="#ffffff" 
         />
 
-        {/* Grid helper para referencia visual */}
-        <gridHelper args={[20, 20, '#888888', '#cccccc']} />
+        {/* Grid helper eliminado - las cuadrículas personalizadas ya proporcionan la referencia visual */}
 
-        {/* Entorno */}
-        <Environment preset={environmentPreset} />
+        {/* Entorno - temporalmente deshabilitado para evitar errores de shader */}
+        {/* <Environment preset={environmentPreset} /> */}
 
         {/* Contenido de la escena */}
         <SceneContent orbitControlsRef={orbitControlsRef} />

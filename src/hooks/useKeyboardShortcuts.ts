@@ -58,7 +58,7 @@ export function useKeyboardShortcuts() {
             }
           }
           break;
-        // Controles de cámara WASD
+        // Controles de cámara WASD - no interceptar, dejar que se manejen en useCameraControls
         case 'w':
         case 'a':
         case 's':
@@ -67,8 +67,7 @@ export function useKeyboardShortcuts() {
         case 'e':
         case 'shift':
         case ' ':
-          event.preventDefault();
-          // Los controles de cámara se manejan en el componente Experience
+          // No hacer preventDefault para permitir que useCameraControls los maneje
           break;
       }
     };

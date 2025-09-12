@@ -4,10 +4,10 @@ import { Suspense } from 'react';
 import { Experience } from '../components/world/Experience';
 import { ControlPanel } from '../components/ui/ControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
-import { WorldInfo } from '../components/ui/WorldInfo';
 import { AudioInitializer } from '../components/ui/AudioInitializer';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { SpatializationDebug } from '../components/ui/SpatializationDebug';
+import { GridCreator } from '../components/ui/GridCreator';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 export default function Home() {
@@ -23,7 +23,6 @@ export default function Home() {
       <ParameterEditor />
       
       {/* Información del mundo */}
-      <WorldInfo />
       
       {/* Panel de control */}
       <ControlPanel />
@@ -33,6 +32,10 @@ export default function Home() {
       
       {/* Debug de Espacialización */}
       <SpatializationDebug />
+      
+      {/* Creador de Cuadrículas */}
+      <GridCreator />
+      
       
       {/* Escena 3D */}
       <Suspense fallback={

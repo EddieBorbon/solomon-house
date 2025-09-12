@@ -8,9 +8,7 @@ import { MobileObjectEditor } from './MobileObjectEditor';
 
 export function ParameterEditor() {
   const { 
-    objects, 
-    mobileObjects,
-    effectZones, 
+    grids,
     selectedEntityId, 
     updateObject, 
     updateMobileObject,
@@ -31,22 +29,47 @@ export function ParameterEditor() {
 
   // Encontrar la entidad seleccionada (objeto sonoro o zona de efecto)
   const selectedEntity = useMemo(() => {
-    if (!selectedEntityId) return null;
+    console.log(`🔍 ParameterEditor - Buscando entidad con ID: ${selectedEntityId}`);
+    console.log(`🔍 ParameterEditor - Cuadrículas disponibles:`, Array.from(grids.keys()));
     
-    // Buscar en objetos sonoros
-    const soundObject = objects.find(obj => obj.id === selectedEntityId);
-    if (soundObject) return { type: 'soundObject', data: soundObject };
+    if (!selectedEntityId) {
+      console.log(`🔍 ParameterEditor - No hay entidad seleccionada`);
+      return null;
+    }
     
-    // Buscar en objetos móviles
-    const mobileObject = mobileObjects.find(obj => obj.id === selectedEntityId);
-    if (mobileObject) return { type: 'mobileObject', data: mobileObject };
+    // Buscar en todas las cuadrículas
+    for (const grid of grids.values()) {
+      console.log(`🔍 ParameterEditor - Buscando en cuadrícula ${grid.id}:`, {
+        objects: grid.objects.length,
+        mobileObjects: grid.mobileObjects.length,
+        effectZones: grid.effectZones.length
+      });
+      
+      // Buscar en objetos sonoros
+      const soundObject = grid.objects.find(obj => obj.id === selectedEntityId);
+      if (soundObject) {
+        console.log(`✅ ParameterEditor - Objeto sonoro encontrado:`, soundObject);
+        return { type: 'soundObject', data: soundObject };
+      }
+      
+      // Buscar en objetos móviles
+      const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
+      if (mobileObject) {
+        console.log(`✅ ParameterEditor - Objeto móvil encontrado:`, mobileObject);
+        return { type: 'mobileObject', data: mobileObject };
+      }
+      
+      // Buscar en zonas de efectos
+      const effectZone = grid.effectZones.find(zone => zone.id === selectedEntityId);
+      if (effectZone) {
+        console.log(`✅ ParameterEditor - Zona de efecto encontrada:`, effectZone);
+        return { type: 'effectZone', data: effectZone };
+      }
+    }
     
-    // Buscar en zonas de efectos
-    const effectZone = effectZones.find(zone => zone.id === selectedEntityId);
-    if (effectZone) return { type: 'effectZone', data: effectZone };
-    
+    console.log(`❌ ParameterEditor - Entidad ${selectedEntityId} no encontrada en ninguna cuadrícula`);
     return null;
-  }, [objects, mobileObjects, effectZones, selectedEntityId]);
+  }, [grids, selectedEntityId]);
 
   // Efecto para activar/desactivar el estado de edición de zona de efectos
   // NOTA: Este estado ya no bloquea OrbitControls, solo se usa para UI
