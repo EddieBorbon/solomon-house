@@ -198,14 +198,21 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     
     gridsArray.forEach((grid, index) => {
       console.log(`🔍 Cuadrícula ${index} (${grid.id}):`, {
-        objects: grid.objects.length,
-        mobileObjects: grid.mobileObjects.length,
-        effectZones: grid.effectZones.length
+        objects: grid.objects?.length || 0,
+        mobileObjects: grid.mobileObjects?.length || 0,
+        effectZones: grid.effectZones?.length || 0
       });
       
-      objects.push(...grid.objects);
-      mobileObjects.push(...grid.mobileObjects);
-      effectZones.push(...grid.effectZones);
+      // Verificar que los arrays existan antes de hacer push
+      if (Array.isArray(grid.objects)) {
+        objects.push(...grid.objects.filter(obj => obj && obj.id));
+      }
+      if (Array.isArray(grid.mobileObjects)) {
+        mobileObjects.push(...grid.mobileObjects.filter(obj => obj && obj.id));
+      }
+      if (Array.isArray(grid.effectZones)) {
+        effectZones.push(...grid.effectZones.filter(zone => zone && zone.id));
+      }
     });
     
     console.log(`🔍 SceneContent useMemo - Total recopilado:`, {
@@ -346,16 +353,19 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       </mesh>
 
       {/* Renderizado de cuadrículas con sus objetos */}
-      {Array.from(grids.values()).map((grid) => (
-        <group key={grid.id} position={grid.position}>
+      {Array.from(grids.values()).map((grid) => {
+        if (!grid || !grid.id) return null;
+        return (
+          <group key={grid.id} position={grid.position}>
           {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {grid.objects.map((obj) => {
+          {Array.isArray(grid.objects) && grid.objects.map((obj) => {
+            if (!obj || !obj.id) return null;
             const objectRef = entityRefs.get(obj.id);
             if (!objectRef) return null;
             
             return (
               <SoundObjectContainer 
-                key={obj.id} 
+                key={`sound-${obj.id}`} 
                 object={obj} 
                 onSelect={handleEntitySelect}
                 ref={objectRef}
@@ -364,13 +374,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de objetos móviles de esta cuadrícula */}
-          {grid.mobileObjects.map((mobileObj) => {
+          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj) => {
+            if (!mobileObj || !mobileObj.id) return null;
             const objectRef = entityRefs.get(mobileObj.id);
             if (!objectRef) return null;
             
             return (
               <MobileObject
-                key={mobileObj.id}
+                key={`mobile-${mobileObj.id}`}
                 id={mobileObj.id}
                 position={[0, 0, 0]} // Posición relativa a la cuadrícula
                 rotation={mobileObj.rotation}
@@ -388,21 +399,23 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de zonas de efectos de esta cuadrícula */}
-          {grid.effectZones.map((zone) => {
+          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone) => {
+            if (!zone || !zone.id) return null;
             const zoneRef = entityRefs.get(zone.id);
             if (!zoneRef) return null;
             
             return (
               <EffectZone
-                key={zone.id}
+                key={`effect-${zone.id}`}
                 zone={zone}
                 onSelect={handleEntitySelect}
                 ref={zoneRef}
               />
             );
           })}
-        </group>
-      ))}
+          </group>
+        );
+      })}
 
       {/* TransformControls para la entidad seleccionada */}
       {selectedEntityId && (() => {

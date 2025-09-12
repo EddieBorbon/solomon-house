@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
+import { PersistencePanel } from './PersistencePanel';
 
 export function ControlPanel() {
   const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
@@ -129,18 +130,6 @@ export function ControlPanel() {
       {/* Efecto de brillo interior */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
       
-      {/* Indicador de Cuadrícula Activa */}
-      {activeGrid && (
-        <div className="mb-4 p-3 bg-cyan-900/20 border border-cyan-700/50 rounded-lg">
-          <div className="text-sm text-cyan-300 mb-1">Cuadrícula Activa</div>
-          <div className="text-white font-medium">
-            Coordenadas: ({activeGrid.coordinates[0]}, {activeGrid.coordinates[1]}, {activeGrid.coordinates[2]})
-          </div>
-          <div className="text-xs text-cyan-200">
-            {activeGrid.objects.length} objetos, {activeGrid.mobileObjects.length} móviles, {activeGrid.effectZones.length} zonas
-          </div>
-        </div>
-      )}
       
       {/* Sección de Controles */}
       <div className="mb-4">
@@ -567,6 +556,9 @@ export function ControlPanel() {
           </div>
         )}
       </div>
+
+      {/* Panel de Persistencia */}
+      <PersistencePanel />
 
       {/* Sección de Objeto Móvil */}
       <div className="mt-4">

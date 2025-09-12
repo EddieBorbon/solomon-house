@@ -32,15 +32,6 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       scale={grid.scale}
       onClick={handleClick}
     >
-      {/* Cuadrícula principal - más visible */}
-      <mesh position={[0, 0, 0]}>
-        <planeGeometry args={[grid.gridSize, grid.gridSize]} />
-        <meshBasicMaterial
-          color={grid.isSelected ? '#00ff88' : '#606060'}
-          transparent
-          opacity={grid.isSelected ? 0.4 : 0.2}
-        />
-      </mesh>
       
       {/* Cuadrícula con líneas usando Grid de drei - más visible */}
       <Grid
@@ -58,16 +49,6 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
         infiniteGrid={false}
       />
       
-      {/* Borde de la cuadrícula para mayor visibilidad - simplificado */}
-      <mesh position={[0, 0.01, 0]}>
-        <planeGeometry args={[grid.gridSize, grid.gridSize]} />
-        <meshBasicMaterial
-          color={grid.isSelected ? '#00ff88' : '#999999'}
-          transparent
-          opacity={grid.isSelected ? 0.1 : 0.05}
-          side={2} // DoubleSide
-        />
-      </mesh>
       
       {/* Esferas en las esquinas - simplificadas */}
       {[
