@@ -144,6 +144,9 @@ export interface WorldState {
   gridSize: number; // Tamaño de cada cuadrícula
   renderDistance: number; // Distancia de renderizado (cuántas cuadrículas cargar)
   
+  // Proyecto actual para sincronización
+  currentProjectId: string | null;
+  
   // Estado de objetos (de la cuadrícula actual)
   objects: SoundObject[];
   mobileObjects: MobileObject[]; // Array para objetos móviles
@@ -165,6 +168,9 @@ export interface WorldActions {
   // Acciones para manipulación de cuadrículas
   createGrid: (position: [number, number, number], size?: number) => void;
   selectGrid: (gridId: string | null) => void;
+  
+  // Acciones para proyecto actual
+  setCurrentProjectId: (projectId: string | null) => void;
   setActiveGrid: (gridId: string | null) => void;
   updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => void;
   deleteGrid: (gridId: string) => void;
@@ -360,6 +366,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   ]),
   currentGridCoordinates: [0, 0, 0],
   activeGridId: '0,0,0', // Cuadrícula principal por defecto
+  currentProjectId: null, // No hay proyecto cargado inicialmente
   gridSize: 20,
   renderDistance: 2, // Cargar 2 cuadrículas en cada dirección
   objects: [],
@@ -1440,6 +1447,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       state.updateGrid(gridId, { position });
       console.log(`🚀 Moviendo cuadrícula ${gridId} a posición ${position}`);
     }
+  },
+
+  // Acción para establecer el proyecto actual
+  setCurrentProjectId: (projectId: string | null) => {
+    set({ currentProjectId: projectId });
+    console.log(`📡 Proyecto actual establecido: ${projectId || 'ninguno'}`);
   },
 
   rotateGrid: (gridId: string, rotation: [number, number, number]) => {

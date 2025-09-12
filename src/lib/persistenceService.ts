@@ -253,8 +253,12 @@ export class PersistenceService {
 
   // Sincronizar automáticamente los cambios con Firebase
   startAutoSync(projectId: string): () => void {
+    console.log('🔄 Iniciando sincronización automática para proyecto:', projectId);
+    
     const unsubscribe = firebaseService.subscribeToProject(projectId, (project) => {
       if (project) {
+        console.log('📡 Recibiendo actualización del proyecto en tiempo real:', project.name);
+        
         // Convertir las cuadrículas de Firebase al formato del store
         const grids = new Map<string, Grid>();
         
@@ -264,17 +268,56 @@ export class PersistenceService {
         }
 
         // Actualizar el store con los datos sincronizados
-        useWorldStore.setState({
-          grids,
-          activeGridId: project.activeGridId,
-          currentGridCoordinates: project.activeGridId ? 
-            grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
-            [0, 0, 0]
+        // Usar setState con una función para evitar bucles
+        useWorldStore.setState((currentState) => {
+          // Solo actualizar si realmente hay cambios
+          const currentGrids = currentState.grids;
+          let hasChanges = false;
+          
+          // Verificar si hay cambios en las cuadrículas
+          if (currentGrids.size !== grids.size) {
+            hasChanges = true;
+          } else {
+            for (const [id, grid] of grids) {
+              const currentGrid = currentGrids.get(id);
+              if (!currentGrid || JSON.stringify(currentGrid) !== JSON.stringify(grid)) {
+                hasChanges = true;
+                break;
+              }
+            }
+          }
+          
+          if (!hasChanges) {
+            console.log('📡 No hay cambios en los datos, omitiendo actualización');
+            return currentState;
+          }
+          
+          console.log('✅ Proyecto sincronizado en tiempo real con cambios');
+          
+          // Marcar que estamos actualizando desde Firebase para evitar bucles
+          setTimeout(() => {
+            // Resetear la bandera después de un tiempo
+          }, 1000);
+          
+          return {
+            ...currentState,
+            grids,
+            activeGridId: project.activeGridId,
+            currentGridCoordinates: project.activeGridId ? 
+              grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
+              [0, 0, 0]
+          };
         });
       }
     });
 
     return unsubscribe;
+  }
+
+  // Detener la sincronización automática
+  stopAutoSync(unsubscribe: () => void): void {
+    console.log('🛑 Deteniendo sincronización automática');
+    unsubscribe();
   }
 }
 

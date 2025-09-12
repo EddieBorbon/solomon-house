@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { persistenceService } from '../../lib/persistenceService';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import type { FirebaseProject } from '../../lib/firebaseService';
 
 export function PersistencePanel() {
@@ -11,11 +12,11 @@ export function PersistencePanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
-  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
 
-  const { grids, activeGridId } = useWorldStore();
+  const { grids, activeGridId, currentProjectId, setCurrentProjectId } = useWorldStore();
+  const { isConnected, isSyncing, lastSyncTime, error } = useRealtimeSync(currentProjectId);
 
   // Cargar proyectos al montar el componente
   useEffect(() => {
@@ -164,9 +165,42 @@ export function PersistencePanel() {
           {/* Información del estado actual */}
           <div className="p-3 bg-gray-800/50 border border-gray-600/50 rounded-lg">
             <div className="text-sm text-gray-300 mb-2">Estado Actual</div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-400 mb-2">
               {getGridCount()} cuadrículas, {getObjectCount()} objetos
             </div>
+            
+            {/* Estado de sincronización en tiempo real */}
+            {currentProjectId && (
+              <div className="mt-2 pt-2 border-t border-gray-600/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-2 h-2 rounded-full ${
+                    isConnected ? 'bg-green-500' : 'bg-red-500'
+                  }`} />
+                  <span className="text-xs text-gray-300">
+                    {isConnected ? 'Sincronización activa' : 'Sin sincronización'}
+                  </span>
+                </div>
+                
+                {isSyncing && (
+                  <div className="flex items-center gap-2 text-xs text-cyan-400">
+                    <div className="w-3 h-3 border border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                    <span>Sincronizando...</span>
+                  </div>
+                )}
+                
+                {lastSyncTime && (
+                  <div className="text-xs text-gray-500">
+                    Última sync: {lastSyncTime.toLocaleTimeString()}
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="text-xs text-red-400 mt-1">
+                    Error: {error}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Botones de acción */}

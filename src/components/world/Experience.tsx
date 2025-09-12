@@ -10,6 +10,8 @@ import { CameraController } from './CameraController';
 import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
+import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
+import { useWorldStore } from '../../state/useWorldStore';
 
 type EnvironmentPreset = 'forest' | 'sunset' | 'dawn' | 'night' | 'warehouse' | 'apartment' | 'studio' | 'city' | 'park' | 'lobby';
 
@@ -50,11 +52,15 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 export function Experience() {
   const orbitControlsRef = useRef<any>(null);
   const [environmentPreset] = useState<EnvironmentPreset>('forest');
+  const { currentProjectId } = useWorldStore();
   
   console.log('🎬 Experience component rendering...');
 
   return (
     <div className="w-full h-screen">
+      {/* Estado de sincronización en tiempo real */}
+      <RealtimeSyncStatus projectId={currentProjectId} />
+      
       <Canvas
         camera={{
           position: [5, 5, 5],
