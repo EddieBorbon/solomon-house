@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 
 export function ControlPanel() {
   const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
-  const { addObject, addEffectZone } = useWorldStore();
+  const { addObject, addEffectZone, addMobileObject } = useWorldStore();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleAddCube = () => {
     const x = (Math.random() - 0.5) * 10;
@@ -172,6 +173,25 @@ export function ControlPanel() {
     addEffectZone('vibrato', [x, 1, z], 'sphere');
   };
 
+  // Funciones para controlar el scroll horizontal
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -150, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 150, behavior: 'smooth' });
+    }
+  };
+
+  const handleAddMobileObject = () => {
+    const x = (Math.random() - 0.5) * 10;
+    const z = (Math.random() - 0.5) * 10;
+    addMobileObject([x, 0.5, z]);
+  };
+
   return (
       <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 z-50 min-w-[280px] max-w-[320px] max-h-[70vh] overflow-hidden">
       {/* Efecto de brillo interior */}
@@ -261,7 +281,7 @@ export function ControlPanel() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <span className="text-xl">➕</span>
-            Añadir objeto
+            Objetos Sonoros
           </h3>
           <button
             onClick={() => setIsAddMenuExpanded(!isAddMenuExpanded)}
@@ -282,90 +302,123 @@ export function ControlPanel() {
         
         {isAddMenuExpanded && (
           <div className="space-y-3">
-            {/* Separador para objetos sonoros */}
-            <div className="text-center">
-              <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">🎵 Objetos Sonoros</span>
+
+
+            {/* Slider de navegación para objetos sonoros */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-sm text-cyan-300 mb-2">
+                <span>Objetos Disponibles</span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={scrollLeft}
+                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
+                    title="Scroll izquierda"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll</span>
+                  <button
+                    onClick={scrollRight}
+                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
+                    title="Scroll derecha"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="w-full h-1 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full"></div>
             </div>
 
-            <button
-              onClick={handleAddCube}
-              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2"
+            {/* Contenedor con scroll horizontal para los objetos */}
+            <div 
+              ref={scrollContainerRef}
+              className="flex space-x-3 overflow-x-auto scrollbar-thin scroll-smooth scroll-fade pb-2"
             >
-              <span>⬜</span>
-              <span>Cubo</span>
-            </button>
-            
-            <button
-              onClick={handleAddSphere}
-              className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔵</span>
-              <span>Esfera</span>
-            </button>
-            
-            <button
-              onClick={handleAddCylinder}
-              className="w-full px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔶</span>
-              <span>Cilindro</span>
-            </button>
-            
-            <button
-              onClick={handleAddCone}
-              className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🥁</span>
-              <span>Cono</span>
-            </button>
-            
-            <button
-              onClick={handleAddPyramid}
-              className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔺</span>
-              <span>Pirámide</span>
-            </button>
-            
-            <button
-              onClick={handleAddIcosahedron}
-              className="w-full px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔶</span>
-              <span>Icosaedro</span>
-            </button>
-            
-            <button
-              onClick={handleAddPlane}
-              className="w-full px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🟦</span>
-              <span>Plano</span>
-            </button>
-            
-            <button
-              onClick={handleAddTorus}
-              className="w-full px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔄</span>
-              <span>Toroide</span>
-            </button>
+              <button
+                onClick={handleAddCube}
+                className="flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>⬜</span>
+                <span>Cubo</span>
+              </button>
+              
+              <button
+                onClick={handleAddSphere}
+                className="flex-shrink-0 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔵</span>
+                <span>Esfera</span>
+              </button>
+              
+              <button
+                onClick={handleAddCylinder}
+                className="flex-shrink-0 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔶</span>
+                <span>Cilindro</span>
+              </button>
+              
+              <button
+                onClick={handleAddCone}
+                className="flex-shrink-0 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🥁</span>
+                <span>Cono</span>
+              </button>
+              
+              <button
+                onClick={handleAddPyramid}
+                className="flex-shrink-0 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔺</span>
+                <span>Pirámide</span>
+              </button>
+              
+              <button
+                onClick={handleAddIcosahedron}
+                className="flex-shrink-0 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔶</span>
+                <span>Icosaedro</span>
+              </button>
+              
+              <button
+                onClick={handleAddPlane}
+                className="flex-shrink-0 px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🟦</span>
+                <span>Plano</span>
+              </button>
+              
+              <button
+                onClick={handleAddTorus}
+                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔄</span>
+                <span>Toroide</span>
+              </button>
 
-            <button
-              onClick={handleAddDodecahedronRing}
-              className="w-full px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🔷</span>
-              <span>Anillo de Dodecaedros</span>
-            </button>
+              <button
+                onClick={handleAddDodecahedronRing}
+                className="flex-shrink-0 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🔷</span>
+                <span>Anillo de Dodecaedros</span>
+              </button>
 
-            <button
-              onClick={handleAddSpiral}
-              className="w-full px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2"
-            >
-              <span>🌀</span>
-              <span>Espiral de Samples</span>
-            </button>
+              <button
+                onClick={handleAddSpiral}
+                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
+              >
+                <span>🌀</span>
+                <span>Espiral de Samples</span>
+              </button>
+
+            </div>
           </div>
         )}
       </div>
@@ -542,6 +595,28 @@ export function ControlPanel() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Sección de Objeto Móvil */}
+      <div className="mt-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            <span className="text-xl">🚀</span>
+            Objeto Móvil
+          </h3>
+        </div>
+        
+        <div className="space-y-3">
+          <button
+            onClick={handleAddMobileObject}
+            className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-3 group shadow-lg hover:shadow-purple-500/25"
+          >
+            <span className="text-2xl group-hover:scale-110 transition-transform duration-200">🚀</span>
+            <span className="font-medium text-lg">Añadir Objeto Móvil</span>
+          </button>
+          
+
+        </div>
       </div>
     </div>
   );

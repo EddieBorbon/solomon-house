@@ -5,6 +5,22 @@ import { audioManager, type AudioParams } from '../lib/AudioManager';
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
+// Interfaz para un mundo/cuadrícula
+export interface World {
+  id: string;
+  name: string;
+  position: [number, number, number];
+  objects: SoundObject[];
+  mobileObjects: MobileObject[];
+  effectZones: EffectZone[];
+  isActive: boolean;
+  gridSize: number;
+  gridColor: string;
+}
+
+// Tipos de movimiento para objetos móviles
+export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
+
 // Interfaz para un objeto de sonido
 export interface SoundObject {
   id: string;
@@ -15,6 +31,31 @@ export interface SoundObject {
   audioParams: AudioParams;
   isSelected: boolean;
   audioEnabled: boolean;
+}
+
+// Interfaz para un objeto móvil
+export interface MobileObject {
+  id: string;
+  type: 'mobile';
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  isSelected: boolean;
+  mobileParams: {
+    movementType: MovementType;
+    radius: number;
+    speed: number;
+    proximityThreshold: number;
+    isActive: boolean;
+    centerPosition: [number, number, number];
+    direction: [number, number, number];
+    axis: [number, number, number];
+    amplitude: number;
+    frequency: number;
+    randomSeed: number;
+    showRadiusIndicator: boolean;
+    showProximityIndicator: boolean;
+  };
 }
 
 // Interfaz para una zona de efecto
@@ -94,6 +135,7 @@ export interface EffectZone {
 // Estado del mundo 3D
 export interface WorldState {
   objects: SoundObject[];
+  mobileObjects: MobileObject[]; // Array para objetos móviles
   effectZones: EffectZone[]; // Nuevo array para zonas de efectos
   selectedEntityId: string | null; // Renombrado de selectedObjectId para ser más genérico
   transformMode: 'translate' | 'rotate' | 'scale';
@@ -124,6 +166,12 @@ export interface WorldActions {
   setEditingEffectZone: (isEditing: boolean) => void;
   refreshAllEffects: () => void;
   debugAudioChain: (soundId: string) => void;
+  
+  // Acciones para objetos móviles
+  addMobileObject: (position: [number, number, number]) => void;
+  updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => void;
+  removeMobileObject: (id: string) => void;
+  updateMobileObjectPosition: (id: string, position: [number, number, number]) => void;
 }
 
 // Parámetros por defecto para cada tipo de objeto
@@ -265,6 +313,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
 export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Estado inicial
   objects: [],
+  mobileObjects: [],
   effectZones: [],
   selectedEntityId: null,
   transformMode: 'translate',
@@ -759,6 +808,64 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     } catch (error) {
       console.error(`❌ Error al hacer debug de cadena de audio:`, error);
     }
+  },
+
+  // Acciones para objetos móviles
+  addMobileObject: (position: [number, number, number]) => {
+    const newMobileObject: MobileObject = {
+      id: uuidv4(),
+      type: 'mobile',
+      position,
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1],
+      isSelected: false,
+      mobileParams: {
+        movementType: 'circular',
+        radius: 2,
+        speed: 1,
+        proximityThreshold: 1.5,
+        isActive: true,
+        centerPosition: position,
+        direction: [1, 0, 0],
+        axis: [0, 1, 0],
+        amplitude: 0.5,
+        frequency: 1,
+        randomSeed: Math.random() * 1000,
+        showRadiusIndicator: true,
+        showProximityIndicator: true,
+      },
+    };
+
+    console.log(`➕ Creando objeto móvil en posición:`, newMobileObject.position);
+
+    set((state) => ({
+      mobileObjects: [...state.mobileObjects, newMobileObject],
+    }));
+  },
+
+  updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
+    console.log(`🔄 Store: Actualizando objeto móvil ${id} con:`, updates);
+    
+    set((state) => ({
+      mobileObjects: state.mobileObjects.map((obj) =>
+        obj.id === id ? { ...obj, ...updates } : obj
+      ),
+    }));
+  },
+
+  removeMobileObject: (id: string) => {
+    set((state) => ({
+      mobileObjects: state.mobileObjects.filter((obj) => obj.id !== id),
+      selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
+    }));
+  },
+
+  updateMobileObjectPosition: (id: string, position: [number, number, number]) => {
+    set((state) => ({
+      mobileObjects: state.mobileObjects.map((obj) =>
+        obj.id === id ? { ...obj, position } : obj
+      ),
+    }));
   },
 
 }));

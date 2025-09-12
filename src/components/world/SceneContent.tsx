@@ -14,6 +14,7 @@ import { SoundPlane } from '../sound-objects/SoundPlane';
 import { SoundTorus } from '../sound-objects/SoundTorus';
 import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
 import { SoundSpiral } from '../sound-objects/SoundSpiral';
+import { MobileObject } from '../sound-objects/MobileObject';
 import { EffectZone } from './EffectZone';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
@@ -171,10 +172,12 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const { 
     objects, 
+    mobileObjects,
     effectZones, 
     selectedEntityId, 
     transformMode, 
     updateObject, 
+    updateMobileObject,
     updateEffectZone, 
     selectEntity, 
     isEditingEffectZone,
@@ -194,13 +197,18 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       refs.set(obj.id, React.createRef<Group | null>());
     });
     
+    // Refs para objetos móviles
+    mobileObjects.forEach(obj => {
+      refs.set(obj.id, React.createRef<Group | null>());
+    });
+    
     // Refs para zonas de efectos
     effectZones.forEach(zone => {
       refs.set(zone.id, React.createRef<Group | null>());
     });
     
     return refs;
-  }, [objects, effectZones]);
+  }, [objects, mobileObjects, effectZones]);
 
   // Función para manejar cambios en las transformaciones
   const handleTransformChange = useCallback((entityId: string, newTransform: any) => {
@@ -220,18 +228,21 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
       
       if (Object.keys(updates).length > 0) {
-        // Determinar si es un objeto sonoro o una zona de efecto
+        // Determinar si es un objeto sonoro, móvil o una zona de efecto
         const isSoundObject = objects.some(obj => obj.id === entityId);
+        const isMobileObject = mobileObjects.some(obj => obj.id === entityId);
         const isEffectZone = effectZones.some(zone => zone.id === entityId);
         
         if (isSoundObject) {
           updateObject(entityId, updates);
+        } else if (isMobileObject) {
+          updateMobileObject(entityId, updates);
         } else if (isEffectZone) {
           updateEffectZone(entityId, updates);
         }
       }
     }
-  }, [updateObject, updateEffectZone, objects, effectZones]);
+  }, [updateObject, updateMobileObject, updateEffectZone, objects, mobileObjects, effectZones]);
 
   // Función para manejar la selección de entidades
   const handleEntitySelect = useCallback((id: string) => {
@@ -277,8 +288,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {
     console.log('🎵 SceneContent - Objetos en el mundo:', objects.length);
+    console.log('🚀 SceneContent - Objetos móviles:', mobileObjects.length);
     console.log('🎛️ SceneContent - Zonas de efectos:', effectZones.length);
-  }, [objects.length, effectZones.length]);
+  }, [objects.length, mobileObjects.length, effectZones.length]);
 
   return (
     <>
@@ -307,6 +319,27 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         );
       })}
 
+      {/* Renderizado de objetos móviles */}
+      {mobileObjects.map((mobileObj) => {
+        const objectRef = entityRefs.get(mobileObj.id);
+        if (!objectRef) return null;
+        
+        return (
+          <MobileObject
+            key={mobileObj.id}
+            id={mobileObj.id}
+            position={mobileObj.position}
+            rotation={mobileObj.rotation}
+            scale={mobileObj.scale}
+            isSelected={mobileObj.isSelected}
+            mobileParams={mobileObj.mobileParams}
+            onUpdatePosition={(id, position) => updateMobileObject(id, { position })}
+            onSelect={handleEntitySelect}
+            ref={objectRef}
+          />
+        );
+      })}
+
       {/* Renderizado de zonas de efectos */}
       {effectZones.map((zone) => {
         const zoneRef = entityRefs.get(zone.id);
@@ -325,6 +358,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       {/* TransformControls para la entidad seleccionada */}
       {selectedEntityId && (() => {
         const selectedEntity = objects.find(obj => obj.id === selectedEntityId) || 
+                              mobileObjects.find(obj => obj.id === selectedEntityId) ||
                               effectZones.find(zone => zone.id === selectedEntityId);
         
         if (!selectedEntity) return null;
@@ -355,7 +389,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       })()}
 
       {/* Mensaje cuando no hay entidades */}
-      {objects.length === 0 && effectZones.length === 0 && (
+      {objects.length === 0 && mobileObjects.length === 0 && effectZones.length === 0 && (
         <group position={[0, 2, 0]}>
           <mesh>
             <boxGeometry args={[0.1, 0.1, 0.1]} />
