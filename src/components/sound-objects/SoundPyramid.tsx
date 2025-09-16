@@ -53,7 +53,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
     });
 
          // Manejador para cuando se presiona el clic
-     const handlePointerDown = (event: any) => {
+     const handlePointerDown = (event: React.PointerEvent) => {
        event.stopPropagation();
        
        if (isGateMode) {
@@ -74,7 +74,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
      };
 
          // Manejador para cuando se suelta el clic
-     const handlePointerUp = (event: any) => {
+     const handlePointerUp = (event: React.PointerEvent) => {
        event.stopPropagation();
        
        if (isGateMode) {
@@ -90,7 +90,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
      };
 
          // Manejador para cuando el cursor sale del objeto
-     const handlePointerLeave = (event: any) => {
+     const handlePointerLeave = (event: React.PointerEvent) => {
        event.stopPropagation();
        
        if (isGateMode) {
@@ -106,7 +106,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
      };
 
     // Manejador para la selección (solo selección, no audio)
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
     };

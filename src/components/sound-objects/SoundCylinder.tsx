@@ -1,9 +1,8 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo, useEffect } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundCylinderProps {
@@ -33,12 +32,9 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
     const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Crear geometría de cilindro con más detalle
-    const cylinderGeometry = useMemo(() => {
-      return new THREE.CylinderGeometry(0.5, 0.5, 1.5, 32);
-    }, []);
 
     // Función para manejar clic y disparar nota
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);

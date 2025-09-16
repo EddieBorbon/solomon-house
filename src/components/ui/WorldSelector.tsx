@@ -9,8 +9,7 @@ export function WorldSelector() {
     currentWorldId, 
     switchWorld, 
     createWorld, 
-    deleteWorld, 
-    updateWorld 
+    deleteWorld
   } = useWorldStore();
   
   const [isExpanded, setIsExpanded] = useState(false);

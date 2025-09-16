@@ -11,11 +11,16 @@ interface SoundPlaneProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
-  audioParams: any;
+  audioParams: {
+    frequency?: number;
+    volume?: number;
+    waveform?: OscillatorType;
+    duration?: number;
+  };
 }
 
 export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
     const { selectEntity, triggerObjectPercussion } = useWorldStore();
@@ -28,7 +33,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
 
     // Función para manejar el clic
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectPercussion(id);
@@ -51,7 +56,6 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
         for (let i = 0; i < count; i++) {
           const x = vertices.getX(i);
           const y = vertices.getY(i);
-          const z = vertices.getZ(i);
           
           // Efecto de ondulación que decae con el tiempo
           const wave = Math.sin(x * 10 + time * 20) * Math.sin(y * 10 + time * 15) * 0.1;
@@ -71,8 +75,6 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
           setIsAnimating(false);
           // Restaurar posición original
           for (let i = 0; i < count; i++) {
-            const x = vertices.getX(i);
-            const y = vertices.getY(i);
             vertices.setZ(i, 0);
           }
           vertices.needsUpdate = true;

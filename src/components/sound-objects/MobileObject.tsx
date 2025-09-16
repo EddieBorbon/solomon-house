@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useEffect, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, Line, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -96,7 +96,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
   // Función para calcular la nueva posición según el tipo de movimiento
   const calculateNewPosition = (time: number): [number, number, number] => {
-    const { movementType, radius, speed, direction, axis, amplitude, frequency, randomSeed } = mobileParams;
+    const { movementType, radius, speed, direction, amplitude, frequency, randomSeed } = mobileParams;
     
     // El objeto se mueve desde el origen (0,0,0) del grupo
     const origin = [0, 0, 0] as [number, number, number];

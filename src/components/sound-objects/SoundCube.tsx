@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useEffect } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -35,7 +35,6 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   const materialRef = useRef<MeshStandardMaterial>(null);
   const energyRef = useRef(0); // Para la animación de clic
   const { 
-    triggerObjectNote, 
     selectEntity, 
     triggerObjectAttackRelease, 
     startObjectGate, 
@@ -43,7 +42,7 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   } = useWorldStore();
 
   // Manejador para clic corto (trigger)
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     selectEntity(id);
     triggerObjectAttackRelease(id);
@@ -53,7 +52,7 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   };
 
   // Manejador para clic sostenido (gate)
-  const handlePointerDown = (event: any) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     event.stopPropagation();
     startObjectGate(id);
     
@@ -62,13 +61,13 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   };
 
   // Manejador para liberar clic sostenido
-  const handlePointerUp = (event: any) => {
+  const handlePointerUp = (event: React.PointerEvent) => {
     event.stopPropagation();
     stopObjectGate(id);
   };
 
   // Manejador para cuando el puntero sale del objeto
-  const handlePointerLeave = (event: any) => {
+  const handlePointerLeave = (event: React.PointerEvent) => {
     event.stopPropagation();
     stopObjectGate(id);
   };

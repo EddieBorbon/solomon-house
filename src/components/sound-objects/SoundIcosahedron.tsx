@@ -11,11 +11,16 @@ interface SoundIcosahedronProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
-  audioParams: any;
+  audioParams: {
+    frequency?: number;
+    volume?: number;
+    waveform?: OscillatorType;
+    duration?: number;
+  };
 }
 
 export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Referencias para la animación
@@ -29,7 +34,7 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
     const selectionScale = isSelected ? 1.2 : 1.0;
 
     // Animación de vibración cuando se toca
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
@@ -40,7 +45,7 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
     };
 
     // Animación en cada frame
-    useFrame((state, delta) => {
+    useFrame((state) => {
       if (meshRef.current && animationRef.current.energy > 0) {
         // Decaer la energía de la vibración
         animationRef.current.energy *= 0.95;
@@ -69,10 +74,10 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
           ref={meshRef}
           scale={[scale[0] * selectionScale, scale[1] * selectionScale, scale[2] * selectionScale]}
           onClick={handleClick}
-          onPointerOver={(e) => {
+          onPointerOver={() => {
             document.body.style.cursor = 'pointer';
           }}
-          onPointerOut={(e) => {
+          onPointerOut={() => {
             document.body.style.cursor = 'default';
           }}
         >

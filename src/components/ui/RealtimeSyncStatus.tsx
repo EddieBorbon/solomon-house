@@ -91,7 +91,7 @@ export function RealtimeSyncStatus({ projectId }: RealtimeSyncStatusProps) {
       {isConnected && (
         <div className="mt-2 pt-2 border-t border-white/10">
           <div className="text-xs text-gray-400">
-            💡 Usa el botón "Sync" para sincronizar cambios manualmente
+            💡 Usa el botón &quot;Sync&quot; para sincronizar cambios manualmente
           </div>
         </div>
       )}

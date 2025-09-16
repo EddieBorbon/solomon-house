@@ -11,11 +11,16 @@ interface SoundTorusProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
-  audioParams: any;
+  audioParams: {
+    frequency?: number;
+    volume?: number;
+    waveform?: OscillatorType;
+    duration?: number;
+  };
 }
 
 export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Referencias para la animación
@@ -35,7 +40,7 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
     }, [isSelected]);
 
     // Función para manejar el clic
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);

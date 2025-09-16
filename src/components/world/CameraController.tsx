@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
 export function CameraController() {
   const { camera } = useThree();
-  const { currentGridCoordinates, gridSize, moveToGrid } = useWorldStore();
+  const { currentGridCoordinates, gridSize } = useWorldStore();
   const targetPosition = useRef(new THREE.Vector3());
   const isMoving = useRef(false);
   const moveSpeed = useRef(0.05);

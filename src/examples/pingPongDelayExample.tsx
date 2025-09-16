@@ -95,7 +95,7 @@ export const PingPongDelayExample = () => {
         </h2>
         <p className="text-blue-700">
           El PingPongDelay es un efecto de delay estéreo donde el eco se escucha primero en un canal 
-          y luego en el canal opuesto, creando un efecto de "ping-pong" entre los altavoces izquierdo y derecho.
+          y luego en el canal opuesto, creando un efecto de &quot;ping-pong&quot; entre los altavoces izquierdo y derecho.
         </p>
       </div>
 

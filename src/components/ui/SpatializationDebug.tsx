@@ -1,12 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useWorldStore } from '../../state/useWorldStore';
 import { audioManager } from '../../lib/AudioManager';
 
 export function SpatializationDebug() {
   const [isVisible, setIsVisible] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<any>({});
+  const [debugInfo, setDebugInfo] = useState<{
+    contextState?: string;
+    soundSourcesCount?: number;
+    soundSourceIds?: string[];
+    listenerInfo?: { hasListener: boolean };
+  }>({});
 
   useEffect(() => {
     if (!isVisible) return;

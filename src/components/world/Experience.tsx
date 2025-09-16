@@ -2,11 +2,9 @@
 
 import React, { useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
-import { Suspense } from 'react';
 import { useCameraControls } from '../../hooks/useCameraControls';
-import { CameraController } from './CameraController';
 import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
@@ -16,7 +14,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 type EnvironmentPreset = 'forest' | 'sunset' | 'dawn' | 'night' | 'warehouse' | 'apartment' | 'studio' | 'city' | 'park' | 'lobby';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
-function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<any> }) {
+function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<unknown> }) {
   const { camera } = useThree();
   const { updateCameraPosition } = useCameraControls(camera, orbitControlsRef.current);
   
@@ -50,8 +48,7 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 }
 
 export function Experience() {
-  const orbitControlsRef = useRef<any>(null);
-  const [environmentPreset] = useState<EnvironmentPreset>('forest');
+  const orbitControlsRef = useRef<unknown>(null);
   const { currentProjectId } = useWorldStore();
   
   console.log('🎬 Experience component rendering...');

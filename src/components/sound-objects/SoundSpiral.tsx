@@ -2,7 +2,6 @@
 
 import React, { forwardRef, useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Box } from '@react-three/drei';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import * as THREE from 'three';
@@ -17,7 +16,7 @@ interface SoundSpiralProps {
 }
 
 export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioParams }) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     const groupRef = useRef<THREE.Group>(null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +47,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
     }, [sampleCount]);
 
     // Manejar clic en el objeto
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
@@ -117,12 +116,12 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
           const boxScale = getBoxScale(index);
           
           return (
-            <Box
+            <mesh
               key={index}
               position={pos}
-              args={[boxScale, boxScale, boxScale]}
-              scale={[1, 1, 1]}
+              scale={[boxScale, boxScale, boxScale]}
             >
+              <boxGeometry args={[1, 1, 1]} />
               <meshStandardMaterial
                 color={color}
                 emissive={isPulsing ? color.clone().multiplyScalar(0.3) : new THREE.Color(0, 0, 0)}
@@ -131,7 +130,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
                 transparent
                 opacity={isPulsing ? 0.9 : 0.8}
               />
-            </Box>
+            </mesh>
           );
         })}
 

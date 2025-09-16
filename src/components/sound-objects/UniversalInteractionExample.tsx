@@ -22,7 +22,12 @@ interface BaseSoundObjectProps {
   scale?: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: any; // AudioParams específico del tipo
+  audioParams: {
+    frequency?: number;
+    volume?: number;
+    waveform?: OscillatorType;
+    duration?: number;
+  };
 }
 
 // Hook personalizado para interacción universal
@@ -35,26 +40,26 @@ export const useUniversalInteraction = (id: string) => {
   } = useWorldStore();
 
   // Manejador para clic corto (trigger)
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     selectEntity(id);
     triggerObjectAttackRelease(id);
   };
 
   // Manejador para clic sostenido (gate)
-  const handlePointerDown = (event: any) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     event.stopPropagation();
     startObjectGate(id);
   };
 
   // Manejador para liberar clic sostenido
-  const handlePointerUp = (event: any) => {
+  const handlePointerUp = (event: React.PointerEvent) => {
     event.stopPropagation();
     stopObjectGate(id);
   };
 
   // Manejador para cuando el puntero sale del objeto
-  const handlePointerLeave = (event: any) => {
+  const handlePointerLeave = (event: React.PointerEvent) => {
     event.stopPropagation();
     stopObjectGate(id);
   };
@@ -69,9 +74,14 @@ export const useUniversalInteraction = (id: string) => {
 
 // Hook personalizado para animación reactiva
 export const useReactiveAnimation = (
-  meshRef: React.RefObject<any>,
-  materialRef: React.RefObject<any>,
-  audioParams: any,
+  meshRef: React.RefObject<THREE.Mesh>,
+  materialRef: React.RefObject<THREE.MeshStandardMaterial>,
+  audioParams: {
+    frequency?: number;
+    volume?: number;
+    waveform?: OscillatorType;
+    duration?: number;
+  },
   audioEnabled: boolean
 ) => {
   const energyRef = useRef(0);
@@ -146,7 +156,7 @@ export const useReactiveAnimation = (
 };
 
 // Ejemplo de implementación para un nuevo tipo de objeto
-export const ExampleSoundObject = forwardRef<any, BaseSoundObjectProps>(({
+export const ExampleSoundObject = forwardRef<THREE.Group, BaseSoundObjectProps>(({
   id,
   position,
   rotation = [0, 0, 0],
@@ -155,8 +165,8 @@ export const ExampleSoundObject = forwardRef<any, BaseSoundObjectProps>(({
   audioEnabled,
   audioParams,
 }, ref) => {
-  const meshRef = useRef<any>(null);
-  const materialRef = useRef<any>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   
   // Usar el hook de interacción universal
   const interactionHandlers = useUniversalInteraction(id);
@@ -170,12 +180,12 @@ export const ExampleSoundObject = forwardRef<any, BaseSoundObjectProps>(({
   );
 
   // Combinar manejadores para activar animación
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent) => {
     interactionHandlers.handleClick(event);
     triggerAnimation();
   };
 
-  const handlePointerDown = (event: any) => {
+  const handlePointerDown = (event: React.PointerEvent) => {
     interactionHandlers.handlePointerDown(event);
     triggerAnimation();
   };

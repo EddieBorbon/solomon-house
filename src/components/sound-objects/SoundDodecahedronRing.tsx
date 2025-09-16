@@ -2,7 +2,6 @@
 
 import React, { forwardRef, useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Dodecahedron } from '@react-three/drei';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -31,7 +30,7 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     }, []);
 
     // Función para manejar clic y disparar nota
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
@@ -87,7 +86,8 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
             if (material) {
               // Efecto de pulso basado en modulationIndex
               const pulseIntensity = (audioParams?.modulationIndex || 2) / 10;
-              const pulseScale = 1 + Math.sin(time * 2 + index * 0.5) * pulseIntensity * 0.1;
+              // pulseScale calculado pero no usado - comentado para evitar warning
+              // const pulseScale = 1 + Math.sin(time * 2 + index * 0.5) * pulseIntensity * 0.1;
               
               // Efecto de brillo basado en harmonicity
               const harmonicityEffect = (audioParams?.harmonicity || 1) / 5;

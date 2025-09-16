@@ -2,7 +2,6 @@
 
 import React, { forwardRef, useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -21,7 +20,6 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
     const { 
-      triggerObjectNote, 
       selectEntity, 
       triggerObjectAttackRelease, 
       startObjectGate, 
@@ -34,7 +32,7 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     }, []);
 
     // Manejador para clic corto (trigger)
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectAttackRelease(id);
@@ -44,7 +42,7 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     };
 
     // Manejador para clic sostenido (gate)
-    const handlePointerDown = (event: any) => {
+    const handlePointerDown = (event: React.PointerEvent) => {
       event.stopPropagation();
       startObjectGate(id);
       
@@ -53,13 +51,13 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     };
 
     // Manejador para liberar clic sostenido
-    const handlePointerUp = (event: any) => {
+    const handlePointerUp = (event: React.PointerEvent) => {
       event.stopPropagation();
       stopObjectGate(id);
     };
 
     // Manejador para cuando el puntero sale del objeto
-    const handlePointerLeave = (event: any) => {
+    const handlePointerLeave = (event: React.PointerEvent) => {
       event.stopPropagation();
       stopObjectGate(id);
     };
@@ -149,24 +147,26 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
 
         {/* Indicador de selección sin wireframe */}
         {isSelected && (
-          <Sphere args={[0.75, 16, 16]}>
+          <mesh>
+            <sphereGeometry args={[0.75, 16, 16]} />
             <meshBasicMaterial
               color="#fbbf24"
               transparent
               opacity={0.3}
             />
-          </Sphere>
+          </mesh>
         )}
 
         {/* Indicador de audio activo sin wireframe */}
         {audioEnabled && (
-          <Sphere args={[0.8, 8, 8]}>
+          <mesh>
+            <sphereGeometry args={[0.8, 8, 8]} />
             <meshBasicMaterial
               color="#10b981"
               transparent
               opacity={0.4}
             />
-          </Sphere>
+          </mesh>
         )}
       </group>
     );

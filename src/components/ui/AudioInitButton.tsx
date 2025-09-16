@@ -62,7 +62,7 @@ export function AudioInitButton() {
 
       {!isAudioContextStarted && !isInitializing && (
         <p className="text-xs text-yellow-400">
-          ⚠️ Haz clic en "Iniciar Audio" para activar la funcionalidad de sonido.
+          ⚠️ Haz clic en &quot;Iniciar Audio&quot; para activar la funcionalidad de sonido.
         </p>
       )}
     </div>

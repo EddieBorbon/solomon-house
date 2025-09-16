@@ -1,7 +1,6 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import * as THREE from 'three';
@@ -13,11 +12,10 @@ interface EffectZoneProps {
 
 export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
   ({ zone, onSelect }, ref) => {
-    const { updateEffectZone } = useWorldStore();
 
     // Eliminamos la rotación automática para que el gizmo no se gire
 
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       onSelect(zone.id);
     };

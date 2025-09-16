@@ -23,7 +23,7 @@ interface SoundConeProps {
 }
 
 export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
-  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo
@@ -68,7 +68,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     });
 
     // Función para manejar el clic y disparar la nota percusiva
-    const handleClick = (event: any) => {
+    const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
