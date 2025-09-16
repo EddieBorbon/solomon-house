@@ -6,7 +6,12 @@ import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
 interface ManipulatableGridProps {
-  grid: any;
+  grid: {
+    id: string;
+    coordinates: [number, number, number];
+    position: [number, number, number];
+    [key: string]: unknown;
+  };
   onSelect: (gridId: string) => void;
 }
 
@@ -15,7 +20,7 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onSelect(grid.id);
     selectGrid(grid.id);

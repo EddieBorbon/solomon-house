@@ -18,12 +18,12 @@ export function useRealtimeSync(projectId: string | null) {
   });
 
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const { grids, activeGridId } = useWorldStore();
+  const { } = useWorldStore();
   const lastSyncRef = useRef<number>(0);
   const isUpdatingFromFirebaseRef = useRef<boolean>(false);
 
   // Iniciar sincronización automática
-  const startSync = () => {
+  const startSync = useCallback(() => {
     if (!projectId) return;
 
     try {
@@ -48,7 +48,7 @@ export function useRealtimeSync(projectId: string | null) {
         error: error instanceof Error ? error.message : 'Error desconocido'
       }));
     }
-  };
+  }, [projectId]);
 
   // Detener sincronización automática
   const stopSync = () => {
@@ -108,7 +108,7 @@ export function useRealtimeSync(projectId: string | null) {
     return () => {
       stopSync();
     };
-  }, [projectId]);
+  }, [projectId, startSync]);
 
   // Efecto para sincronizar cambios locales automáticamente
   // TEMPORALMENTE DESHABILITADO para evitar bucles infinitos

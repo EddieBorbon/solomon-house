@@ -29,7 +29,7 @@ export function MobileObjectEditor({ mobileObject }: MobileObjectEditorProps) {
   const { updateMobileObject } = useWorldStore();
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleParamChange = (param: string, value: any) => {
+  const handleParamChange = (param: string, value: string | number | boolean) => {
     updateMobileObject(mobileObject.id, {
       mobileParams: {
         ...mobileObject.mobileParams,
@@ -38,7 +38,7 @@ export function MobileObjectEditor({ mobileObject }: MobileObjectEditorProps) {
     });
   };
 
-  const handleNestedParamChange = (param: string, value: any) => {
+  const handleNestedParamChange = (param: string, value: [number, number, number]) => {
     updateMobileObject(mobileObject.id, {
       mobileParams: {
         ...mobileObject.mobileParams,

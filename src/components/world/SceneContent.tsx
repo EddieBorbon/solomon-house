@@ -3,7 +3,7 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone } from '../../state/useWorldStore';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
@@ -21,12 +21,22 @@ import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
 interface SceneContentProps {
-  orbitControlsRef: React.RefObject<any>;
+  orbitControlsRef: React.RefObject<unknown>;
 }
 
 // Componente contenedor para cada objeto de sonido
 interface SoundObjectContainerProps {
-  object: any;
+  object: {
+    id: string;
+    type: string;
+    position: [number, number, number];
+    rotation: [number, number, number];
+    scale: [number, number, number];
+    isSelected: boolean;
+    audioEnabled: boolean;
+    audioParams: Record<string, unknown>;
+    [key: string]: unknown;
+  };
   onSelect: (id: string) => void;
 }
 
@@ -34,7 +44,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
     const { triggerObjectNote, toggleObjectAudio } = useWorldStore();
     
-    const handleClick = useCallback((event: any) => {
+    const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       onSelect(object.id);
       
@@ -179,17 +189,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     updateObject, 
     updateMobileObject,
     updateEffectZone, 
-    selectEntity, 
-    isEditingEffectZone,
-    setTransformMode,
-    setEditingEffectZone
+    selectEntity
   } = useWorldStore();
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
-    const objects: any[] = [];
-    const mobileObjects: any[] = [];
-    const effectZones: any[] = [];
+    const objects: SoundObject[] = [];
+    const mobileObjects: MobileObjectType[] = [];
+    const effectZones: EffectZone[] = [];
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());
@@ -250,9 +257,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   }, [allObjects]);
 
   // Función para manejar cambios en las transformaciones
-  const handleTransformChange = useCallback((entityId: string, newTransform: any) => {
+  const handleTransformChange = useCallback((entityId: string, newTransform: { position?: { x: number, y: number, z: number }, rotation?: { x: number, y: number, z: number }, scale?: { x: number, y: number, z: number } }) => {
     if (newTransform) {
-      const updates: any = {};
+      const updates: Record<string, unknown> = {};
       
       if (newTransform.position) {
         updates.position = [newTransform.position.x, newTransform.position.y, newTransform.position.z];
@@ -291,7 +298,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   }, [selectEntity]);
 
   // Función para manejar clic en el espacio vacío
-  const handleBackgroundClick = useCallback((event: any) => {
+  const handleBackgroundClick = useCallback((event: React.MouseEvent) => {
     // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
     if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry.type === 'PlaneGeometry') {
       selectEntity(null);
@@ -438,7 +445,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
             scale={selectedEntity.scale}
             enabled={!isLocked} // Deshabilitar si está bloqueada
-            onObjectChange={(e: any) => {
+            onObjectChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               if (e?.target?.object) {
                 handleTransformChange(selectedEntityId, e.target.object);
               }

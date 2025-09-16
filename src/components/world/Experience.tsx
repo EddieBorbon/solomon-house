@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { SceneContent } from './SceneContent';
@@ -11,7 +11,6 @@ import { audioManager } from '../../lib/AudioManager';
 import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
 import { useWorldStore } from '../../state/useWorldStore';
 
-type EnvironmentPreset = 'forest' | 'sunset' | 'dawn' | 'night' | 'warehouse' | 'apartment' | 'studio' | 'city' | 'park' | 'lobby';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<unknown> }) {

@@ -1,4 +1,5 @@
 import * as Tone from 'tone';
+import { type EffectNode } from '../managers/EffectManager';
 
 // Tipos para los parámetros de audio
 export interface AudioParams {
@@ -61,7 +62,7 @@ export class SoundSourceFactory {
     type: SoundObjectType, 
     params: AudioParams, 
     position: [number, number, number],
-    globalEffects: Map<string, { effectNode: any, panner: Tone.Panner3D, position: [number, number, number] }>
+    globalEffects: Map<string, { effectNode: EffectNode, panner: Tone.Panner3D, position: [number, number, number] }>
   ): SoundSource {
     // Verificar si ya existe una fuente con este ID
     if (id) {
@@ -93,7 +94,7 @@ export class SoundSourceFactory {
   /**
    * Crea el sintetizador apropiado según el tipo
    */
-  private createSynthesizer(type: SoundObjectType, params: AudioParams): any {
+  private createSynthesizer(type: SoundObjectType, params: AudioParams): Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth {
     switch (type) {
       case 'cube':
         return this.createAMSynth(params);
@@ -124,9 +125,9 @@ export class SoundSourceFactory {
    * Crea la cadena de audio con arquitectura Send/Return
    */
   private createAudioChain(
-    synth: any, 
+    synth: Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth, 
     position: [number, number, number],
-    globalEffects: Map<string, { effectNode: any, panner: Tone.Panner3D, position: [number, number, number] }>
+    globalEffects: Map<string, { effectNode: EffectNode, panner: Tone.Panner3D, position: [number, number, number] }>
   ): { panner: Tone.Panner3D, dryGain: Tone.Gain, effectSends: Map<string, Tone.Gain> } {
     // 1. Crear panner 3D para la señal seca
     const panner = new Tone.Panner3D({
@@ -171,7 +172,7 @@ export class SoundSourceFactory {
   /**
    * Configura los parámetros iniciales del sintetizador
    */
-  private configureInitialParameters(synth: any, type: SoundObjectType, params: AudioParams): void {
+  private configureInitialParameters(synth: Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth, type: SoundObjectType, params: AudioParams): void {
     // Configurar frecuencia según el tipo de sintetizador
     const safeFrequency = Math.max(params.frequency, 20);
     
@@ -372,7 +373,7 @@ export class SoundSourceFactory {
       });
       
       // Marcar que este objeto usa fallback para futuras referencias
-      (fallbackSynth as any)._isFallback = true;
+      (fallbackSynth as SynthesizerType & { _isFallback?: boolean })._isFallback = true;
       return fallbackSynth;
     }
   }

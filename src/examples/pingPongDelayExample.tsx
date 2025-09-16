@@ -66,7 +66,7 @@ export const PingPongDelayExample = () => {
   };
 
   // Actualizar parámetros del PingPongDelay
-  const updateEffectParam = (paramName: string, value: any) => {
+  const updateEffectParam = (paramName: string, value: string | number) => {
     const newParams = { ...effectParams, [paramName]: value };
     setEffectParams(newParams);
     

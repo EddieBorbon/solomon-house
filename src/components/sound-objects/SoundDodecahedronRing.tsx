@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo } from 'react';
+import React, { forwardRef, useRef, useMemo, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -30,14 +30,14 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     }, []);
 
     // Función para manejar clic y disparar nota
-    const handleClick = (event: React.MouseEvent) => {
+    const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de clic
       energyRef.current = 1;
-    };
+    }, [id, selectEntity, triggerObjectNote]);
 
     // Animación del clic y efectos de audio
     useFrame((state, delta) => {
@@ -82,10 +82,10 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
           groupRef.current.rotation.y = time * 0.3;
           
           // Efectos individuales en cada dodecaedro
-          materialRefs.current.forEach((material, index) => {
+          materialRefs.current.forEach((material) => {
             if (material) {
               // Efecto de pulso basado en modulationIndex
-              const pulseIntensity = (audioParams?.modulationIndex || 2) / 10;
+              // const pulseIntensity = (audioParams?.modulationIndex || 2) / 10;
               // pulseScale calculado pero no usado - comentado para evitar warning
               // const pulseScale = 1 + Math.sin(time * 2 + index * 0.5) * pulseIntensity * 0.1;
               

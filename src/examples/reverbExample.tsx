@@ -65,7 +65,7 @@ export const ReverbExample = () => {
   };
 
   // Actualizar parámetros del Reverb
-  const updateEffectParam = (paramName: string, value: any) => {
+  const updateEffectParam = (paramName: string, value: string | number) => {
     const newParams = { ...effectParams, [paramName]: value };
     setEffectParams(newParams);
     

@@ -64,7 +64,7 @@ export const StereoWidenerExample = () => {
   };
 
   // Actualizar parámetros del StereoWidener
-  const updateEffectParam = (paramName: string, value: any) => {
+  const updateEffectParam = (paramName: string, value: string | number) => {
     const newParams = { ...effectParams, [paramName]: value };
     setEffectParams(newParams);
     

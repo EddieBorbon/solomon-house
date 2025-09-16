@@ -11,7 +11,7 @@ interface CameraControls {
   fast: boolean;
 }
 
-export function useCameraControls(camera: THREE.Camera | null, orbitControls: any) {
+export function useCameraControls(_camera: THREE.Camera | null, _orbitControls: unknown) {
   const controls = useRef<CameraControls>({
     forward: false,
     backward: false,
@@ -93,7 +93,7 @@ export function useCameraControls(camera: THREE.Camera | null, orbitControls: an
   }, []);
 
   // Función para actualizar la posición de la cámara
-  const updateCameraPosition = (camera: THREE.Camera, orbitControls: any) => {
+  const updateCameraPosition = (camera: THREE.Camera, orbitControls: unknown) => {
     if (!camera || !orbitControls) return;
     
     // Debug: verificar si hay controles activos

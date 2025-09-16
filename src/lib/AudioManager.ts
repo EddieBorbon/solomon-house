@@ -6,6 +6,10 @@ import { SpatialAudioManager, SpatialAudioConfig, ListenerState } from './manage
 import { AudioContextManager, AudioContextState, AudioContextConfig } from './managers/AudioContextManager';
 import { SoundPlaybackManager, PlaybackState, PlaybackConfig } from './managers/SoundPlaybackManager';
 import { ParameterManager, ParameterUpdateResult, ParameterConfig } from './managers/ParameterManager';
+import { type EffectZone } from '../state/useWorldStore';
+
+// Type for effect parameters
+export type EffectParams = EffectZone['effectParams'];
 
 // Re-exportar tipos para mantener compatibilidad
 export type { AudioParams, SoundObjectType, SoundSource, EffectType, GlobalEffect, SpatialAudioConfig, ListenerState, AudioContextState, AudioContextConfig, PlaybackState, PlaybackConfig, ParameterUpdateResult, ParameterConfig };
@@ -62,7 +66,7 @@ export class AudioManager {
     /**
    * Añade un send de efecto a una fuente de sonido existente
    */
-  private addEffectSendToSource(sourceId: string, effectId: string, effectNode: any): void {
+  private addEffectSendToSource(sourceId: string, effectId: string, effectNode: AudioNode): void {
     try {
       const source = this.soundSources.get(sourceId);
       if (!source) {
@@ -79,7 +83,7 @@ export class AudioManager {
       send.connect(effectNode);
       
       console.log(`🎛️ AudioManager: Send de efecto ${effectId} creado para fuente ${sourceId}`);
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al crear send de efecto:`, error);
     }
   }
@@ -96,7 +100,7 @@ export class AudioManager {
   /**
    * Actualiza los parámetros de un efecto global
    */
-  public updateGlobalEffect(effectId: string, params: any): void {
+  public updateGlobalEffect(effectId: string, params: EffectParams): void {
     this.effectManager.updateGlobalEffect(effectId, params);
   }
 
@@ -130,7 +134,7 @@ export class AudioManager {
   /**
    * Fuerza la actualización de un efecto específico con estrategias optimizadas
    */
-  public forceEffectUpdate(effectId: string, paramName: string, newValue: any): void {
+  public forceEffectUpdate(effectId: string, paramName: string, newValue: number | string): void {
     this.effectManager.forceEffectUpdate(effectId, paramName, newValue);
   }
 
@@ -144,7 +148,7 @@ export class AudioManager {
     source.effectSends.forEach((send) => {
       try {
         send.disconnect();
-      } catch (error) {
+      } catch (_error) {
         // Manejo silencioso de errores
       }
     });
@@ -160,7 +164,7 @@ export class AudioManager {
         if (effectSend) {
           effectSend.disconnect();
         }
-      } catch (error) {
+      } catch (_error) {
         // Manejo silencioso de errores
       }
     });
@@ -169,7 +173,7 @@ export class AudioManager {
   /**
    * Valida que el contexto de audio esté en estado válido
    */
-  private isAudioContextValid(effectSend: any, dryGain: any): boolean {
+  private isAudioContextValid(effectSend: Tone.GainNode, dryGain: Tone.GainNode): boolean {
     return effectSend.context && dryGain.context &&
            effectSend.context.state === 'running' && dryGain.context.state === 'running' &&
            !effectSend.disposed && !dryGain.disposed;
@@ -201,7 +205,7 @@ export class AudioManager {
       if (this.lastSendAmounts.get(key) !== currentSendAmount) {
         this.lastSendAmounts.set(key, currentSendAmount);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al establecer send amount:`, error);
     }
   }
@@ -215,7 +219,7 @@ export class AudioManager {
       this.lastSendAmounts.clear();
       this.effectManager.cleanup();
       this.soundSources.clear();
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error en emergency cleanup:`, error);
     }
   }
@@ -240,7 +244,7 @@ export class AudioManager {
       
       // Limpiar el Map de send amounts
       this.lastSendAmounts.clear();
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error en cleanup:`, error);
     }
   }
@@ -274,7 +278,7 @@ export class AudioManager {
 
       this.soundSources.set(id, soundSource);
       this.updateSoundEffectMixing(id, position);
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al crear fuente de sonido:`, error);
     }
   }
@@ -307,7 +311,7 @@ export class AudioManager {
       source.effectSends.forEach((send) => {
         try {
           send.dispose();
-        } catch (error) {
+        } catch (_error) {
           // Manejo silencioso de errores
         }
       });
@@ -315,7 +319,7 @@ export class AudioManager {
       // Eliminar del Map y limpiar el estado
       this.soundSources.delete(id);
       this.soundPlaybackManager.removePlaybackState(id);
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al eliminar fuente de sonido:`, error);
     }
   }
@@ -476,7 +480,7 @@ export class AudioManager {
       
       // Actualizar la mezcla de efectos basada en la nueva posición
       this.updateSoundEffectMixing(id, position);
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al actualizar posición de sonido:`, error);
     }
   }
@@ -532,7 +536,7 @@ export class AudioManager {
           this.lastSendAmounts.set(`${soundId}-${effectId}`, effectIntensity);
         }
       });
-    } catch (error) {
+    } catch (_error) {
       console.error(`❌ AudioManager: Error al actualizar mezcla de efectos:`, error);
     }
   }
@@ -569,9 +573,9 @@ export class AudioManager {
     contextState: string;
     soundSourcesCount: number;
     soundSourceIds: string[];
-    contextDebugInfo: any;
-    playbackDebugInfo: any;
-    parameterDebugInfo: any;
+    contextDebugInfo: object;
+    playbackDebugInfo: object;
+    parameterDebugInfo: object;
   } {
     return {
       contextState: Tone.context.state,

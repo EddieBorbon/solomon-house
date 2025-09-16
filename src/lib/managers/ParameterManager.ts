@@ -1,6 +1,9 @@
 import * as Tone from 'tone';
 import { AudioParams, SoundSource } from '../factories/SoundSourceFactory';
 
+// Union type for all possible synthesizer types
+type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth;
+
 // Tipos para gestión de parámetros
 export interface ParameterUpdateResult {
   success: boolean;
@@ -155,7 +158,7 @@ export class ParameterManager {
       // Actualizar parámetros de las voces FMSynth
       if (params.harmonicity !== undefined || params.modulationIndex !== undefined || 
           params.attack !== undefined || params.release !== undefined) {
-        const voiceOptions: any = {};
+        const voiceOptions: Record<string, unknown> = {};
         
         if (params.harmonicity !== undefined) {
           voiceOptions.harmonicity = params.harmonicity;
@@ -185,7 +188,7 @@ export class ParameterManager {
    * Actualiza la frecuencia de un sintetizador
    */
   private updateFrequency(
-    synth: any, 
+    synth: SynthesizerType, 
     frequency: number, 
     result: ParameterUpdateResult
   ): void {
@@ -245,7 +248,7 @@ export class ParameterManager {
    * Actualiza el tipo de onda de un sintetizador
    */
   private updateWaveform(
-    synth: any, 
+    synth: SynthesizerType, 
     waveform: string, 
     result: ParameterUpdateResult
   ): void {
@@ -269,7 +272,7 @@ export class ParameterManager {
    * Actualiza la harmonicity de un sintetizador
    */
   private updateHarmonicity(
-    synth: any, 
+    synth: SynthesizerType, 
     harmonicity: number, 
     result: ParameterUpdateResult
   ): void {
@@ -290,7 +293,7 @@ export class ParameterManager {
    * Actualiza el modulationIndex de un sintetizador
    */
   private updateModulationIndex(
-    synth: any, 
+    synth: SynthesizerType, 
     modulationIndex: number, 
     result: ParameterUpdateResult
   ): void {
@@ -311,7 +314,7 @@ export class ParameterManager {
    * Actualiza la forma de onda de modulación
    */
   private updateModulationWaveform(
-    synth: any, 
+    synth: SynthesizerType, 
     modulationWaveform: string, 
     result: ParameterUpdateResult
   ): void {
@@ -327,7 +330,7 @@ export class ParameterManager {
    * Actualiza parámetros específicos del DuoSynth
    */
   private updateDuoSynthParams(
-    synth: any, 
+    synth: SynthesizerType, 
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -364,7 +367,7 @@ export class ParameterManager {
    * Actualiza parámetros específicos del MembraneSynth
    */
   private updateMembraneSynthParams(
-    synth: any, 
+    synth: SynthesizerType, 
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -389,7 +392,7 @@ export class ParameterManager {
    * Actualiza parámetros específicos del MonoSynth
    */
   private updateMonoSynthParams(
-    synth: any, 
+    synth: SynthesizerType, 
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -452,7 +455,7 @@ export class ParameterManager {
    * Actualiza parámetros específicos del MetalSynth
    */
   private updateMetalSynthParams(
-    synth: any, 
+    synth: SynthesizerType, 
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -518,7 +521,7 @@ export class ParameterManager {
       // Actualizar attack
       if (params.attack !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as any).envelope.attack = params.attack;
+          (synth as SynthesizerType & { envelope: { attack: number } }).envelope.attack = params.attack;
           result.updatedParams.push('attack');
         }
       }
@@ -526,7 +529,7 @@ export class ParameterManager {
       // Actualizar release
       if (params.release !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as any).envelope.release = params.release;
+          (synth as SynthesizerType & { envelope: { release: number } }).envelope.release = params.release;
           result.updatedParams.push('release');
         }
       }
@@ -534,7 +537,7 @@ export class ParameterManager {
       // Actualizar curve
       if (params.curve !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as any).envelope.curve = params.curve;
+          (synth as SynthesizerType & { envelope: { curve: string } }).envelope.curve = params.curve;
           result.updatedParams.push('curve');
         }
       }
@@ -547,7 +550,7 @@ export class ParameterManager {
    * Actualiza el volumen de un sintetizador
    */
   private updateVolume(
-    synth: any, 
+    synth: SynthesizerType, 
     volume: number, 
     result: ParameterUpdateResult
   ): void {

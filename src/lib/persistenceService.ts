@@ -1,5 +1,5 @@
 import { firebaseService, type FirebaseProject, type FirebaseGrid } from './firebaseService';
-import { useWorldStore, type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
 
 // Convertir Grid del store a FirebaseGrid
 export function gridToFirebase(grid: Grid): Omit<FirebaseGrid, 'createdAt' | 'updatedAt'> {
@@ -16,7 +16,7 @@ export function gridToFirebase(grid: Grid): Omit<FirebaseGrid, 'createdAt' | 'up
 // Convertir FirebaseGrid a Grid del store
 export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
   // Asegurar que los objetos tengan todos los campos requeridos
-  const normalizedObjects = (firebaseGrid.objects || []).map((obj: any) => ({
+  const normalizedObjects = (firebaseGrid.objects || []).map((obj: SoundObject) => ({
     id: obj.id || `obj-${Math.random().toString(36).substr(2, 9)}`,
     type: obj.type || 'cube',
     position: obj.position || [0, 0, 0],
@@ -27,7 +27,7 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
     audioEnabled: obj.audioEnabled || false,
   }));
 
-  const normalizedMobileObjects = (firebaseGrid.mobileObjects || []).map((obj: any) => ({
+  const normalizedMobileObjects = (firebaseGrid.mobileObjects || []).map((obj: MobileObject) => ({
     id: obj.id || `mobile-${Math.random().toString(36).substr(2, 9)}`,
     type: obj.type || 'mobile',
     position: obj.position || [0, 0, 0],
@@ -43,7 +43,7 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
     }
   }));
 
-  const normalizedEffectZones = (firebaseGrid.effectZones || []).map((zone: any) => ({
+  const normalizedEffectZones = (firebaseGrid.effectZones || []).map((zone: EffectZone) => ({
     id: zone.id || `zone-${Math.random().toString(36).substr(2, 9)}`,
     type: zone.type || 'phaser',
     position: zone.position || [0, 0, 0],

@@ -790,7 +790,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Nuevas acciones para zonas de efectos
   addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     // Configurar parámetros por defecto según el tipo de efecto
-    let defaultParams: any = {};
+    let defaultParams: Record<string, unknown> = {};
     
     if (type === 'phaser') {
       defaultParams = {

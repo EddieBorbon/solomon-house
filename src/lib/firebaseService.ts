@@ -1,7 +1,6 @@
 import { 
   collection, 
   doc, 
-  setDoc, 
   getDoc, 
   getDocs, 
   addDoc, 
@@ -13,15 +12,16 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
 
 // Tipos de datos para Firebase
 export interface FirebaseGrid {
   id: string;
   coordinates: [number, number, number];
   position: [number, number, number];
-  objects: any[];
-  mobileObjects: any[];
-  effectZones: any[];
+  objects: SoundObject[];
+  mobileObjects: MobileObject[];
+  effectZones: EffectZone[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

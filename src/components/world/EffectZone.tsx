@@ -1,7 +1,6 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { useWorldStore } from '../../state/useWorldStore';
 import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import * as THREE from 'three';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useWorldStore } from '../../state/useWorldStore';
+import { useWorldStore, type EffectZone, type SoundObject } from '../../state/useWorldStore';
 import { useMemo } from 'react';
 import { type AudioParams } from '../../lib/AudioManager';
 import React from 'react';
@@ -11,7 +11,6 @@ export function ParameterEditor() {
     grids,
     selectedEntityId, 
     updateObject, 
-    updateMobileObject,
     updateEffectZone, 
     removeObject, 
     removeMobileObject,
@@ -93,7 +92,7 @@ export function ParameterEditor() {
   const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
     if (!selectedEntity || selectedEntity.type !== 'soundObject') return;
 
-    const soundObject = selectedEntity.data as any; // Type assertion para objeto sonoro
+    const soundObject = selectedEntity.data as { audioParams: AudioParams; [key: string]: unknown };
     console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
     console.log(`🎛️ UI: Objeto seleccionado:`, soundObject);
 
@@ -115,7 +114,7 @@ export function ParameterEditor() {
   const handleEffectParamChange = (param: string, value: number | string) => {
     if (!selectedEntity || selectedEntity.type !== 'effectZone') return;
 
-    const effectZone = selectedEntity.data as any; // Type assertion para zona de efecto
+    const effectZone = selectedEntity.data as { effectParams: Record<string, unknown>; [key: string]: unknown };
     console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
 
     // Mostrar estado de actualización
@@ -213,7 +212,7 @@ export function ParameterEditor() {
 
   // Renderizar controles según el tipo de entidad seleccionada
   if (selectedEntity.type === 'mobileObject') {
-    const mobileObject = selectedEntity.data as any;
+    const mobileObject = selectedEntity.data as { mobileParams: Record<string, unknown>; [key: string]: unknown };
     
     return (
       <div className="fixed top-4 right-4 z-50">
@@ -253,7 +252,7 @@ export function ParameterEditor() {
   }
   
   if (selectedEntity.type === 'effectZone') {
-    const zone = selectedEntity.data as any; // Type assertion para zona de efecto
+    const zone = selectedEntity.data as EffectZone; // Type assertion para zona de efecto
     
     // Asegurar que effectParams existe
     if (!zone.effectParams) {
@@ -356,7 +355,7 @@ export function ParameterEditor() {
           </div>
 
           {/* Botón de debug de cadena de audio */}
-          {selectedEntity && (selectedEntity as any).type === 'soundObject' && (
+          {selectedEntity && selectedEntity.type === 'soundObject' && (
             <div className="mb-6 p-4 bg-purple-900/20 border border-purple-600/50 rounded-lg">
               <div className="text-center">
                 <button
@@ -1037,7 +1036,7 @@ export function ParameterEditor() {
                         <span>1 s</span>
                       </div>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        Retraso en segundos (puedes usar también valores musicales como '8n')
+                        Retraso en segundos (puedes usar también valores musicales como &apos;8n&apos;)
                       </p>
                     </div>
 
@@ -2064,7 +2063,7 @@ export function ParameterEditor() {
   }
 
   // Renderizar controles para objeto sonoro (código existente)
-  const selectedObject = selectedEntity.data as any; // Type assertion para objeto sonoro
+  const selectedObject = selectedEntity.data as SoundObject; // Type assertion para objeto sonoro
   
   // Asegurar que audioParams existe
   if (!selectedObject.audioParams) {

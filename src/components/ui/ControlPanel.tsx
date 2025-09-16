@@ -26,7 +26,7 @@ export function ControlPanel() {
     // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addObject(type as any, [x, 0.5, z]);
+    addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', [x, 0.5, z]);
     console.log(`🎯 Creando ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 0.5, z]);
   };
 
@@ -40,7 +40,7 @@ export function ControlPanel() {
     // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addEffectZone(type as any, [x, 1, z], 'sphere');
+    addEffectZone(type as 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', [x, 1, z], 'sphere');
     console.log(`🎯 Creando zona de efecto ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 1, z]);
   };
 

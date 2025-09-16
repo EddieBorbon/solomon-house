@@ -1,11 +1,18 @@
 import * as Tone from 'tone';
+import { type EffectZone } from '../../state/useWorldStore';
 
 // Tipos para efectos
 export type EffectType = 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato';
 
+// Type for effect parameters
+export type EffectParams = EffectZone['effectParams'];
+
+// Union type for all possible effect nodes
+export type EffectNode = Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | Tone.Distortion | Tone.FeedbackDelay | Tone.Freeverb | Tone.FrequencyShifter | Tone.JCReverb | Tone.PingPongDelay | Tone.PitchShift | Tone.Reverb | Tone.StereoWidener | Tone.Tremolo | Tone.Vibrato;
+
 // Estructura de un efecto global
 export interface GlobalEffect {
-  effectNode: Tone.Phaser | Tone.AutoFilter | Tone.AutoWah | Tone.BitCrusher | Tone.Chebyshev | Tone.Chorus | Tone.Distortion | Tone.FeedbackDelay | Tone.Freeverb | Tone.FrequencyShifter | Tone.JCReverb | Tone.PingPongDelay | Tone.PitchShift | Tone.Reverb | Tone.StereoWidener | Tone.Tremolo | Tone.Vibrato | any;
+  effectNode: EffectNode;
   panner: Tone.Panner3D;
   position: [number, number, number];
 }
@@ -64,7 +71,7 @@ export class EffectManager {
   /**
    * Crea el nodo de efecto según el tipo
    */
-  private createEffectNode(type: EffectType): any {
+  private createEffectNode(type: EffectType): EffectNode {
     switch (type) {
       case 'phaser':
         return this.createPhaser();
@@ -333,7 +340,7 @@ export class EffectManager {
   /**
    * Crea un oscilador de prueba para escuchar los efectos
    */
-  private createTestOscillatorForEffect(effectId: string, effectNode: any): void {
+  private createTestOscillatorForEffect(effectId: string, effectNode: EffectNode): void {
     try {
       // Configurar el oscilador según el tipo de efecto para mejor audibilidad
       let frequency = 440;
@@ -440,7 +447,7 @@ export class EffectManager {
   /**
    * Actualiza los parámetros de un efecto global
    */
-  public updateGlobalEffect(effectId: string, params: any): void {
+  public updateGlobalEffect(effectId: string, params: EffectParams): void {
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
       console.warn(`⚠️ EffectManager: No se encontró efecto global con ID ${effectId}`);
@@ -507,7 +514,7 @@ export class EffectManager {
     }
   }
 
-  private updatePhaserParams(effectNode: Tone.Phaser, params: any): void {
+  private updatePhaserParams(effectNode: Tone.Phaser, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al phaser`);
@@ -522,7 +529,7 @@ export class EffectManager {
     });
   }
 
-  private updateAutoFilterParams(effectNode: Tone.AutoFilter, params: any): void {
+  private updateAutoFilterParams(effectNode: Tone.AutoFilter, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al autoFilter`);
@@ -547,7 +554,7 @@ export class EffectManager {
     });
   }
 
-  private updateAutoWahParams(effectNode: Tone.AutoWah, params: any): void {
+  private updateAutoWahParams(effectNode: Tone.AutoWah, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al autoWah`);
@@ -562,7 +569,7 @@ export class EffectManager {
     });
   }
 
-  private updateBitCrusherParams(effectNode: Tone.BitCrusher, params: any): void {
+  private updateBitCrusherParams(effectNode: Tone.BitCrusher, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al bitCrusher`);
@@ -579,7 +586,7 @@ export class EffectManager {
     });
   }
 
-  private updateChebyshevParams(effectNode: Tone.Chebyshev, params: any): void {
+  private updateChebyshevParams(effectNode: Tone.Chebyshev, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al chebyshev`);
@@ -593,7 +600,7 @@ export class EffectManager {
     });
   }
 
-  private updateChorusParams(effectNode: Tone.Chorus, params: any): void {
+  private updateChorusParams(effectNode: Tone.Chorus, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al chorus`);
@@ -619,7 +626,7 @@ export class EffectManager {
     });
   }
 
-  private updateDistortionParams(effectNode: Tone.Distortion, params: any): void {
+  private updateDistortionParams(effectNode: Tone.Distortion, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al distortion`);
@@ -638,7 +645,7 @@ export class EffectManager {
     });
   }
 
-  private updateFreeverbParams(effectNode: Tone.Freeverb, params: any): void {
+  private updateFreeverbParams(effectNode: Tone.Freeverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a freeverb`);
@@ -657,7 +664,7 @@ export class EffectManager {
     });
   }
 
-  private updateFrequencyShifterParams(effectNode: Tone.FrequencyShifter, params: any): void {
+  private updateFrequencyShifterParams(effectNode: Tone.FrequencyShifter, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a frequencyShifter`);
@@ -673,7 +680,7 @@ export class EffectManager {
     });
   }
 
-  private updateJCReverbParams(effectNode: Tone.JCReverb, params: any): void {
+  private updateJCReverbParams(effectNode: Tone.JCReverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a jcReverb`);
@@ -689,7 +696,7 @@ export class EffectManager {
     });
   }
 
-  private updatePingPongDelayParams(effectNode: Tone.PingPongDelay, params: any): void {
+  private updatePingPongDelayParams(effectNode: Tone.PingPongDelay, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pingPongDelay`);
@@ -716,7 +723,7 @@ export class EffectManager {
     });
   }
 
-  private updatePitchShiftParams(effectNode: Tone.PitchShift, params: any): void {
+  private updatePitchShiftParams(effectNode: Tone.PitchShift, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pitchShift`);
@@ -746,7 +753,7 @@ export class EffectManager {
     });
   }
 
-  private updateReverbParams(effectNode: Tone.Reverb, params: any): void {
+  private updateReverbParams(effectNode: Tone.Reverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a reverb`);
@@ -770,7 +777,7 @@ export class EffectManager {
     });
   }
 
-  private updateStereoWidenerParams(effectNode: Tone.StereoWidener, params: any): void {
+  private updateStereoWidenerParams(effectNode: Tone.StereoWidener, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a stereoWidener`);
@@ -791,7 +798,7 @@ export class EffectManager {
     });
   }
 
-  private updateTremoloParams(effectNode: Tone.Tremolo, params: any): void {
+  private updateTremoloParams(effectNode: Tone.Tremolo, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a tremolo`);
@@ -821,7 +828,7 @@ export class EffectManager {
     });
   }
 
-  private updateVibratoParams(effectNode: Tone.Vibrato, params: any): void {
+  private updateVibratoParams(effectNode: Tone.Vibrato, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a vibrato`);
@@ -851,7 +858,7 @@ export class EffectManager {
     });
   }
 
-  private updateFeedbackDelayParams(effectNode: Tone.FeedbackDelay, params: any): void {
+  private updateFeedbackDelayParams(effectNode: Tone.FeedbackDelay, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
         console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a feedbackDelay`);
@@ -1012,7 +1019,7 @@ export class EffectManager {
   /**
    * Fuerza la actualización de un efecto específico con estrategias optimizadas
    */
-  public forceEffectUpdate(effectId: string, paramName: string, newValue: any): void {
+  public forceEffectUpdate(effectId: string, paramName: string, newValue: number | string): void {
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
       console.warn(`⚠️ EffectManager: No se encontró efecto global con ID ${effectId} para forzar actualización`);
@@ -1042,7 +1049,7 @@ export class EffectManager {
   /**
    * Función de utilidad para actualizar parámetros de manera segura
    */
-  private safeUpdateParam(effectNode: any, paramPath: string, newValue: any, fallbackValue?: any): boolean {
+  private safeUpdateParam(effectNode: EffectNode, paramPath: string, newValue: number | string, fallbackValue?: number | string): boolean {
     try {
       const pathParts = paramPath.split('.');
       let current = effectNode;
