@@ -10,6 +10,10 @@ interface ManipulatableGridProps {
     id: string;
     coordinates: [number, number, number];
     position: [number, number, number];
+    rotation?: [number, number, number] | THREE.Euler;
+    scale?: [number, number, number] | number;
+    gridSize: number;
+    isSelected?: boolean;
     [key: string]: unknown;
   };
   onSelect: (gridId: string) => void;
@@ -34,8 +38,8 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
     <group 
       ref={groupRef}
       position={grid.position}
-      rotation={grid.rotation}
-      scale={grid.scale}
+      rotation={grid.rotation || [0, 0, 0]}
+      scale={grid.scale || [1, 1, 1]}
     >
       {/* Plano invisible más grande para facilitar la selección */}
       <mesh 

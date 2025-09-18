@@ -4,6 +4,9 @@ import { useAudioContext } from '../../hooks/useAudioContext';
 import { useObjectAudio } from '../../hooks/useObjectAudio';
 import { useState } from 'react';
 
+// Definir el tipo personalizado de OscillatorType
+type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
+
 export function AudioTestPanel() {
   const { isAudioContextStarted, startAudioContext } = useAudioContext();
   const [testParams, setTestParams] = useState({

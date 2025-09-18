@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 interface CameraControls {
   forward: boolean;
@@ -11,7 +12,7 @@ interface CameraControls {
   fast: boolean;
 }
 
-export function useCameraControls(_camera: THREE.Camera | null, _orbitControls: unknown) {
+export function useCameraControls() {
   const controls = useRef<CameraControls>({
     forward: false,
     backward: false,
@@ -93,7 +94,7 @@ export function useCameraControls(_camera: THREE.Camera | null, _orbitControls: 
   }, []);
 
   // Función para actualizar la posición de la cámara
-  const updateCameraPosition = (camera: THREE.Camera, orbitControls: unknown) => {
+  const updateCameraPosition = (camera: THREE.Camera, orbitControls: OrbitControlsImpl | null) => {
     if (!camera || !orbitControls) return;
     
     // Debug: verificar si hay controles activos

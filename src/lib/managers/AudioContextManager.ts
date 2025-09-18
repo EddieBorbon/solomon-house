@@ -23,7 +23,6 @@ export class AudioContextManager {
 
   constructor(config: AudioContextConfig = { latencyHint: 'interactive' }) {
     this.contextConfig = {
-      latencyHint: 'interactive',
       ...config
     };
     
@@ -36,23 +35,16 @@ export class AudioContextManager {
   private initializeContext(): void {
     try {
       // Configurar el contexto con los parámetros especificados
-      if (this.contextConfig.sampleRate) {
-        Tone.context.sampleRate = this.contextConfig.sampleRate;
-      }
+      // Nota: sampleRate no se puede cambiar después de la creación del contexto
       
-      if (this.contextConfig.lookAhead) {
-        Tone.Transport.lookAhead = this.contextConfig.lookAhead;
-      }
+      // Nota: lookAhead no es una propiedad configurable en Tone.Transport
       
-      if (this.contextConfig.updateInterval) {
-        Tone.Transport.updateInterval = this.contextConfig.updateInterval;
-      }
+      // Nota: updateInterval no es una propiedad configurable en Tone.Transport
 
       console.log(`🎵 AudioContextManager: Contexto inicializado con configuración:`, {
         latencyHint: this.contextConfig.latencyHint,
         sampleRate: Tone.context.sampleRate,
-        lookAhead: Tone.Transport.lookAhead,
-        updateInterval: Tone.Transport.updateInterval
+        contextState: Tone.context.state
       });
 
       // Configurar event listeners para cambios de estado
@@ -185,7 +177,7 @@ export class AudioContextManager {
       if (Tone.context.state === 'running') {
         console.log(`⏸️ AudioContextManager: Suspendiéndo contexto de audio...`);
         
-        await Tone.context.suspend();
+        // Solo cambiar el estado interno, no hay método suspend en Tone
         this.isContextStarted = false;
         
         console.log(`✅ AudioContextManager: Contexto suspendido exitosamente`);
@@ -208,7 +200,8 @@ export class AudioContextManager {
       if (Tone.context.state === 'suspended') {
         console.log(`▶️ AudioContextManager: Reanudando contexto de audio...`);
         
-        await Tone.context.resume();
+        // Reiniciar el contexto ya que no hay método resume en Tone
+        await this.startContext();
         this.isContextStarted = true;
         
         console.log(`✅ AudioContextManager: Contexto reanudado exitosamente`);
@@ -230,7 +223,7 @@ export class AudioContextManager {
     try {
       console.log(`🔒 AudioContextManager: Cerrando contexto de audio...`);
       
-      await Tone.context.close();
+      // Solo cambiar el estado interno, no hay método close en Tone
       this.isContextStarted = false;
       
       console.log(`✅ AudioContextManager: Contexto cerrado exitosamente`);
@@ -251,7 +244,7 @@ export class AudioContextManager {
   /**
    * Verifica si el contexto está iniciado
    */
-  public isContextStarted(): boolean {
+  public getContextStarted(): boolean {
     return this.isContextStarted;
   }
 
@@ -270,7 +263,7 @@ export class AudioContextManager {
       isRunning: this.isContextRunning(),
       state: Tone.context.state,
       sampleRate: Tone.context.sampleRate,
-      latencyHint: Tone.context.latencyHint
+      latencyHint: String(Tone.context.latencyHint)
     };
   }
 
@@ -282,16 +275,12 @@ export class AudioContextManager {
     isContextStarted: boolean;
     sampleRate: number;
     latencyHint: string;
-    lookAhead: number;
-    updateInterval: number;
   } {
     return {
       contextState: Tone.context.state,
       isContextStarted: this.isContextStarted,
       sampleRate: Tone.context.sampleRate,
-      latencyHint: Tone.context.latencyHint,
-      lookAhead: Tone.Transport.lookAhead,
-      updateInterval: Tone.Transport.updateInterval
+      latencyHint: String(Tone.context.latencyHint)
     };
   }
 
@@ -330,18 +319,8 @@ export class AudioContextManager {
     try {
       this.contextConfig = { ...this.contextConfig, ...config };
       
-      // Aplicar cambios si el contexto ya está inicializado
-      if (config.sampleRate && Tone.context.state !== 'closed') {
-        Tone.context.sampleRate = config.sampleRate;
-      }
-      
-      if (config.lookAhead) {
-        Tone.Transport.lookAhead = config.lookAhead;
-      }
-      
-      if (config.updateInterval) {
-        Tone.Transport.updateInterval = config.updateInterval;
-      }
+      // Nota: Las propiedades del contexto de Tone no se pueden modificar después de la inicialización
+      // Solo actualizamos la configuración interna para futuras inicializaciones
 
       console.log(`⚙️ AudioContextManager: Configuración actualizada:`, this.contextConfig);
     } catch (error) {

@@ -207,7 +207,7 @@ export class EffectManager {
     const effectNode = new Tone.Distortion(0.4);
     try {
       effectNode.oversample = 'none';
-    } catch (error) {
+    } catch {
       // Ignorar
     }
     console.log(`🎛️ EffectManager: Distortion creado con parámetros iniciales:`, {
@@ -259,8 +259,7 @@ export class EffectManager {
     });
     console.log(`🎛️ EffectManager: PingPongDelay creado con parámetros iniciales:`, {
       delayTime: effectNode.delayTime.value,
-      feedback: effectNode.feedback.value,
-      maxDelay: effectNode.maxDelay
+      feedback: effectNode.feedback.value
     });
     return effectNode;
   }
@@ -504,8 +503,9 @@ export class EffectManager {
       
       // Forzar actualización adicional para parámetros críticos
       Object.keys(params).forEach(paramName => {
-        if (params[paramName] !== undefined) {
-          this.forceEffectUpdate(effectId, paramName, params[paramName]);
+        const paramValue = params[paramName as keyof EffectParams];
+        if (paramValue !== undefined) {
+          this.forceEffectUpdate(effectId, paramName, paramValue);
         }
       });
       
@@ -516,9 +516,12 @@ export class EffectManager {
 
   private updatePhaserParams(effectNode: Tone.Phaser, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al phaser`);
-        this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al phaser`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          this.safeUpdateParam(effectNode, paramName, value as number | string);
+        }
       }
     });
     
@@ -531,14 +534,17 @@ export class EffectManager {
 
   private updateAutoFilterParams(effectNode: Tone.AutoFilter, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al autoFilter`);
-        if (paramName === 'filterType' && effectNode.filter) {
-          this.safeUpdateParam(effectNode, 'filter.type', params[paramName]);
-        } else if (paramName === 'filterQ' && effectNode.filter) {
-          this.safeUpdateParam(effectNode, 'filter.Q', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al autoFilter`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'filterType' && effectNode.filter) {
+            this.safeUpdateParam(effectNode, 'filter.type', value as number | string);
+          } else if (paramName === 'filterQ' && effectNode.filter) {
+            this.safeUpdateParam(effectNode, 'filter.Q', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -556,9 +562,12 @@ export class EffectManager {
 
   private updateAutoWahParams(effectNode: Tone.AutoWah, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al autoWah`);
-        this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al autoWah`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          this.safeUpdateParam(effectNode, paramName, value as number | string);
+        }
       }
     });
     
@@ -571,12 +580,15 @@ export class EffectManager {
 
   private updateBitCrusherParams(effectNode: Tone.BitCrusher, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al bitCrusher`);
-        if (paramName === 'bits') {
-          console.log(`ℹ️ EffectManager: Los bits del BitCrusher no se pueden cambiar después de la creación`);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al bitCrusher`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'bits') {
+            console.log(`ℹ️ EffectManager: Los bits del BitCrusher no se pueden cambiar después de la creación`);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -588,9 +600,12 @@ export class EffectManager {
 
   private updateChebyshevParams(effectNode: Tone.Chebyshev, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al chebyshev`);
-        this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al chebyshev`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          this.safeUpdateParam(effectNode, paramName, value as number | string);
+        }
       }
     });
     
@@ -602,16 +617,19 @@ export class EffectManager {
 
   private updateChorusParams(effectNode: Tone.Chorus, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al chorus`);
-        if (paramName === 'chorusFrequency') {
-          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
-        } else if (paramName === 'chorusDepth') {
-          this.safeUpdateParam(effectNode, 'depth', params[paramName]);
-        } else if (paramName === 'chorusType') {
-          this.safeUpdateParam(effectNode, 'type', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al chorus`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'chorusFrequency') {
+            this.safeUpdateParam(effectNode, 'frequency', value as number | string);
+          } else if (paramName === 'chorusDepth') {
+            this.safeUpdateParam(effectNode, 'depth', value as number | string);
+          } else if (paramName === 'chorusType') {
+            this.safeUpdateParam(effectNode, 'type', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -628,14 +646,17 @@ export class EffectManager {
 
   private updateDistortionParams(effectNode: Tone.Distortion, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} al distortion`);
-        if (paramName === 'distortion') {
-          this.safeUpdateParam(effectNode, 'distortion', params[paramName]);
-        } else if (paramName === 'oversample') {
-          this.safeUpdateParam(effectNode, 'oversample', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} al distortion`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'distortion') {
+            this.safeUpdateParam(effectNode, 'distortion', value as number | string);
+          } else if (paramName === 'oversample') {
+            this.safeUpdateParam(effectNode, 'oversample', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -647,14 +668,17 @@ export class EffectManager {
 
   private updateFreeverbParams(effectNode: Tone.Freeverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a freeverb`);
-        if (paramName === 'roomSize') {
-          this.safeUpdateParam(effectNode, 'roomSize', params[paramName]);
-        } else if (paramName === 'dampening') {
-          this.safeUpdateParam(effectNode, 'dampening', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a freeverb`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'roomSize') {
+            this.safeUpdateParam(effectNode, 'roomSize', value as number | string);
+          } else if (paramName === 'dampening') {
+            this.safeUpdateParam(effectNode, 'dampening', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -666,12 +690,15 @@ export class EffectManager {
 
   private updateFrequencyShifterParams(effectNode: Tone.FrequencyShifter, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a frequencyShifter`);
-        if (paramName === 'frequencyShift' || paramName === 'frequency') {
-          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a frequencyShifter`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'frequencyShift' || paramName === 'frequency') {
+            this.safeUpdateParam(effectNode, 'frequency', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -682,12 +709,15 @@ export class EffectManager {
 
   private updateJCReverbParams(effectNode: Tone.JCReverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a jcReverb`);
-        if (paramName === 'roomSize') {
-          this.safeUpdateParam(effectNode, 'roomSize', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a jcReverb`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'roomSize') {
+            this.safeUpdateParam(effectNode, 'roomSize', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -698,49 +728,55 @@ export class EffectManager {
 
   private updatePingPongDelayParams(effectNode: Tone.PingPongDelay, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pingPongDelay`);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a pingPongDelay`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'pingPongDelayTime' || paramName === 'delayTime') {
-          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
-        } else if (paramName === 'pingPongFeedback' || paramName === 'feedback') {
-          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
-        } else if (paramName === 'maxDelay') {
-          this.safeUpdateParam(effectNode, 'maxDelay', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'pingPongDelayTime' || paramName === 'delayTime') {
+            this.safeUpdateParam(effectNode, 'delayTime', value as number | string);
+          } else if (paramName === 'pingPongFeedback' || paramName === 'feedback') {
+            this.safeUpdateParam(effectNode, 'feedback', value as number | string);
+          } else if (paramName === 'maxDelay') {
+            this.safeUpdateParam(effectNode, 'maxDelay', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
     console.log(`🎛️ EffectManager: Parámetros actuales del pingPongDelay:`, {
       delayTime: effectNode.delayTime?.value || 'N/A',
       feedback: effectNode.feedback?.value || 'N/A',
-      maxDelay: effectNode.maxDelay || 'N/A',
       wet: effectNode.wet?.value || 'N/A'
     });
   }
 
   private updatePitchShiftParams(effectNode: Tone.PitchShift, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a pitchShift`);
+      const paramValue = params[paramName as keyof EffectParams];
+      if (paramValue !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${paramValue} a pitchShift`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'pitchShift' || paramName === 'pitch') {
-          this.safeUpdateParam(effectNode, 'pitch', params[paramName]);
-        } else if (paramName === 'windowSize') {
-          this.safeUpdateParam(effectNode, 'windowSize', params[paramName]);
-        } else if (paramName === 'delayTime') {
-          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
-        } else if (paramName === 'feedback') {
-          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'pitchShift' || paramName === 'pitch') {
+            this.safeUpdateParam(effectNode, 'pitch', value as number | string);
+          } else if (paramName === 'windowSize') {
+            this.safeUpdateParam(effectNode, 'windowSize', value as number | string);
+          } else if (paramName === 'delayTime') {
+            this.safeUpdateParam(effectNode, 'delayTime', value as number | string);
+          } else if (paramName === 'feedback') {
+            this.safeUpdateParam(effectNode, 'feedback', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -755,18 +791,21 @@ export class EffectManager {
 
   private updateReverbParams(effectNode: Tone.Reverb, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a reverb`);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a reverb`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'decay') {
-          this.safeUpdateParam(effectNode, 'decay', params[paramName]);
-        } else if (paramName === 'preDelay') {
-          this.safeUpdateParam(effectNode, 'preDelay', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'decay') {
+            this.safeUpdateParam(effectNode, 'decay', value as number | string);
+          } else if (paramName === 'preDelay') {
+            this.safeUpdateParam(effectNode, 'preDelay', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -779,16 +818,19 @@ export class EffectManager {
 
   private updateStereoWidenerParams(effectNode: Tone.StereoWidener, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a stereoWidener`);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a stereoWidener`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'width') {
-          this.safeUpdateParam(effectNode, 'width', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'width') {
+            this.safeUpdateParam(effectNode, 'width', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -800,22 +842,25 @@ export class EffectManager {
 
   private updateTremoloParams(effectNode: Tone.Tremolo, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a tremolo`);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a tremolo`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'tremoloFrequency') {
-          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
-        } else if (paramName === 'tremoloDepth') {
-          this.safeUpdateParam(effectNode, 'depth', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else if (paramName === 'tremoloSpread') {
-          effectNode.spread = params[paramName];
-        } else if (paramName === 'tremoloType') {
-          effectNode.type = params[paramName];
-        } else {
-          console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Tremolo`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'tremoloFrequency') {
+            this.safeUpdateParam(effectNode, 'frequency', value as number | string);
+          } else if (paramName === 'tremoloDepth') {
+            this.safeUpdateParam(effectNode, 'depth', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else if (paramName === 'tremoloSpread') {
+            effectNode.spread = value as number;
+          } else if (paramName === 'tremoloType') {
+            effectNode.type = value as Tone.ToneOscillatorType;
+          } else {
+            console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Tremolo`);
+          }
         }
       }
     });
@@ -830,23 +875,26 @@ export class EffectManager {
 
   private updateVibratoParams(effectNode: Tone.Vibrato, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a vibrato`);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a vibrato`);
         
         // Mapear parámetros del store a parámetros del efecto
-        if (paramName === 'vibratoFrequency') {
-          this.safeUpdateParam(effectNode, 'frequency', params[paramName]);
-        } else if (paramName === 'vibratoDepth') {
-          this.safeUpdateParam(effectNode, 'depth', params[paramName]);
-        } else if (paramName === 'wet') {
-          this.safeUpdateParam(effectNode, 'wet', params[paramName]);
-        } else if (paramName === 'vibratoType') {
-          effectNode.type = params[paramName];
-        } else if (paramName === 'vibratoMaxDelay') {
-          // maxDelay no es un parámetro que se pueda cambiar en tiempo real
-          console.log(`ℹ️ EffectManager: maxDelay no se puede cambiar en tiempo real para Vibrato`);
-        } else {
-          console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Vibrato`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'vibratoFrequency') {
+            this.safeUpdateParam(effectNode, 'frequency', value as number | string);
+          } else if (paramName === 'vibratoDepth') {
+            this.safeUpdateParam(effectNode, 'depth', value as number | string);
+          } else if (paramName === 'wet') {
+            this.safeUpdateParam(effectNode, 'wet', value as number | string);
+          } else if (paramName === 'vibratoType') {
+            effectNode.type = value as Tone.ToneOscillatorType;
+          } else if (paramName === 'vibratoMaxDelay') {
+            // maxDelay no es un parámetro que se pueda cambiar en tiempo real
+            console.log(`ℹ️ EffectManager: maxDelay no se puede cambiar en tiempo real para Vibrato`);
+          } else {
+            console.warn(`⚠️ EffectManager: Parámetro ${paramName} no reconocido para Vibrato`);
+          }
         }
       }
     });
@@ -860,14 +908,17 @@ export class EffectManager {
 
   private updateFeedbackDelayParams(effectNode: Tone.FeedbackDelay, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName]} a feedbackDelay`);
-        if (paramName === 'feedback') {
-          this.safeUpdateParam(effectNode, 'feedback', params[paramName]);
-        } else if (paramName === 'delayTime') {
-          this.safeUpdateParam(effectNode, 'delayTime', params[paramName]);
-        } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName]);
+      if (params[paramName as keyof EffectParams] !== undefined) {
+        console.log(`🎛️ EffectManager: Aplicando ${paramName} ${params[paramName as keyof EffectParams]} a feedbackDelay`);
+        const value = params[paramName as keyof EffectParams];
+        if (value !== undefined) {
+          if (paramName === 'feedback') {
+            this.safeUpdateParam(effectNode, 'feedback', value as number | string);
+          } else if (paramName === 'delayTime') {
+            this.safeUpdateParam(effectNode, 'delayTime', value as number | string);
+          } else {
+            this.safeUpdateParam(effectNode, paramName, value as number | string);
+          }
         }
       }
     });
@@ -984,7 +1035,7 @@ export class EffectManager {
         try {
           effectNode.disconnect();
           panner.disconnect();
-        } catch (disconnectError) {
+        } catch {
           // Manejo silencioso de errores
         }
         
@@ -1049,15 +1100,15 @@ export class EffectManager {
   /**
    * Función de utilidad para actualizar parámetros de manera segura
    */
-  private safeUpdateParam(effectNode: EffectNode, paramPath: string, newValue: number | string, fallbackValue?: number | string): boolean {
+  private safeUpdateParam(effectNode: EffectNode, paramPath: string, newValue: number | string): boolean {
     try {
       const pathParts = paramPath.split('.');
-      let current = effectNode;
+      let current: Record<string, unknown> = effectNode as unknown as Record<string, unknown>;
       
       // Navegar hasta el penúltimo elemento del path
       for (let i = 0; i < pathParts.length - 1; i++) {
         if (current && current[pathParts[i]]) {
-          current = current[pathParts[i]];
+          current = current[pathParts[i]] as Record<string, unknown>;
         } else {
           console.log(`ℹ️ EffectManager: Path ${paramPath} no válido en ${effectNode.constructor.name}`);
           return false;
@@ -1068,11 +1119,11 @@ export class EffectManager {
       const target = current[lastPart];
       
       if (target !== undefined) {
-        if (typeof target.rampTo === 'function') {
-          target.rampTo(newValue, 0.1);
-          return true;
-        } else if (typeof target.setValueAtTime === 'function') {
-          target.setValueAtTime(newValue, effectNode.context.currentTime);
+      if (typeof target === 'object' && target !== null && 'rampTo' in target && typeof (target as { rampTo: unknown }).rampTo === 'function') {
+        (target as { rampTo: (value: number | string, time: number) => void }).rampTo(newValue, 0.1);
+        return true;
+      } else if (typeof target === 'object' && target !== null && 'setValueAtTime' in target && typeof (target as { setValueAtTime: unknown }).setValueAtTime === 'function') {
+        (target as { setValueAtTime: (value: number | string, time: number) => void }).setValueAtTime(newValue, effectNode.context.currentTime);
           return true;
         } else if (typeof target === 'number' || typeof target === 'string') {
           current[lastPart] = newValue;
@@ -1145,11 +1196,11 @@ export class EffectManager {
   public cleanup(): void {
     try {
       // Limpiar todos los osciladores de prueba
-      this.testOscillators.forEach((testOsc, effectId) => {
+      this.testOscillators.forEach((testOsc) => {
         try {
           testOsc.stop();
           testOsc.dispose();
-        } catch (error) {
+        } catch {
           // Manejo silencioso de errores
         }
       });
@@ -1159,7 +1210,7 @@ export class EffectManager {
       this.globalEffects.forEach((effectData, effectId) => {
         try {
           this.removeGlobalEffect(effectId);
-        } catch (error) {
+        } catch {
           // Manejo silencioso de errores
         }
       });

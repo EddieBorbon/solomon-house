@@ -1,6 +1,8 @@
 import * as Tone from 'tone';
 import { type EffectNode } from '../managers/EffectManager';
 
+type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
+
 // Tipos para los parámetros de audio
 export interface AudioParams {
   frequency: number;
@@ -47,7 +49,7 @@ export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid
 
 // Estructura de una fuente de sonido
 export interface SoundSource {
-  synth: Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
+  synth: Tone.Synth | Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler;
   panner: Tone.Panner3D;
   dryGain: Tone.Gain;
   effectSends: Map<string, Tone.Gain>;
@@ -94,7 +96,7 @@ export class SoundSourceFactory {
   /**
    * Crea el sintetizador apropiado según el tipo
    */
-  private createSynthesizer(type: SoundObjectType, params: AudioParams): Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth {
+  private createSynthesizer(type: SoundObjectType, params: AudioParams): Tone.Synth | Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler {
     switch (type) {
       case 'cube':
         return this.createAMSynth(params);
@@ -125,7 +127,7 @@ export class SoundSourceFactory {
    * Crea la cadena de audio con arquitectura Send/Return
    */
   private createAudioChain(
-    synth: Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth, 
+    synth: Tone.Synth | Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler, 
     position: [number, number, number],
     globalEffects: Map<string, { effectNode: EffectNode, panner: Tone.Panner3D, position: [number, number, number] }>
   ): { panner: Tone.Panner3D, dryGain: Tone.Gain, effectSends: Map<string, Tone.Gain> } {
@@ -172,22 +174,28 @@ export class SoundSourceFactory {
   /**
    * Configura los parámetros iniciales del sintetizador
    */
-  private configureInitialParameters(synth: Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth, type: SoundObjectType, params: AudioParams): void {
+  private configureInitialParameters(synth: Tone.Synth | Tone.AMSynth | Tone.FMSynth | Tone.DuoSynth | Tone.MembraneSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.PolySynth | Tone.Sampler, type: SoundObjectType, params: AudioParams): void {
     // Configurar frecuencia según el tipo de sintetizador
     const safeFrequency = Math.max(params.frequency, 20);
     
     if (type === 'cube' || type === 'sphere') {
-      (synth as Tone.AMSynth | Tone.FMSynth).oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
+      const synthWithOsc = synth as { oscillator: { frequency: { setValueAtTime: (value: number, time: number) => void } } };
+      synthWithOsc.oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'cylinder') {
-      (synth as Tone.DuoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
+      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
+      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'cone') {
-      (synth as Tone.MembraneSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
+      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
+      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'pyramid') {
-      (synth as Tone.MonoSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
+      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
+      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'icosahedron') {
-      (synth as Tone.MetalSynth).frequency.setValueAtTime(safeFrequency, Tone.now());
+      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
+      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'torus') {
-      (synth as Tone.PluckSynth).toFrequency(safeFrequency);
+      const pluckSynth = synth as { toFrequency: (freq: number) => void };
+      pluckSynth.toFrequency(safeFrequency);
     }
     // Para 'plane', 'dodecahedronRing', 'spiral' no se configura frecuencia inicial
   }
@@ -323,26 +331,24 @@ export class SoundSourceFactory {
   }
 
   private createPolySynth(params: AudioParams): Tone.PolySynth {
-    return new Tone.PolySynth({
-      maxPolyphony: params.polyphony || 4,
-      voice: Tone.FMSynth,
-      options: {
-        harmonicity: params.harmonicity || 1,
-        modulationIndex: params.modulationIndex || 2,
-        oscillator: {
-          type: params.waveform || 'sine',
-        },
-        modulation: {
-          type: params.modulationWaveform || 'triangle',
-        },
-        envelope: {
-          attack: params.attack || 1.5,
-          decay: 0.1,
-          sustain: 1.0,
-          release: params.release || 2.0,
-        },
+    const polySynth = new Tone.PolySynth(Tone.FMSynth, {
+      harmonicity: params.harmonicity || 1,
+      modulationIndex: params.modulationIndex || 2,
+      oscillator: {
+        type: params.waveform || 'sine',
+      },
+      modulation: {
+        type: params.modulationWaveform || 'triangle',
+      },
+      envelope: {
+        attack: params.attack || 1.5,
+        decay: 0.1,
+        sustain: 1.0,
+        release: params.release || 2.0,
       },
     });
+    polySynth.maxPolyphony = params.polyphony || 4;
+    return polySynth;
   }
 
   private createSampler(params: AudioParams): Tone.Sampler {
@@ -355,11 +361,11 @@ export class SoundSourceFactory {
         onload: () => {
           // Sample cargado exitosamente
         },
-        onerror: (error) => {
+        onerror: () => {
           // Usar fallback de sintetizador si el Sampler falla
         }
       });
-    } catch (samplerError) {
+    } catch {
       // Fallback a un sintetizador básico si el Sampler falla
       const fallbackSynth = new Tone.AMSynth({
         harmonicity: 1.5,
@@ -373,8 +379,8 @@ export class SoundSourceFactory {
       });
       
       // Marcar que este objeto usa fallback para futuras referencias
-      (fallbackSynth as SynthesizerType & { _isFallback?: boolean })._isFallback = true;
-      return fallbackSynth;
+      (fallbackSynth as { _isFallback?: boolean })._isFallback = true;
+      return fallbackSynth as unknown as Tone.Sampler;
     }
   }
 }

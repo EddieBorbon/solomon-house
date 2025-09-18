@@ -72,7 +72,7 @@ export class SoundPlaybackManager {
         (source.synth as SynthesizerType).triggerAttack(params.frequency, this.getUniqueStartTime());
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
-      } catch (error) {
+      } catch {
         // Fallback: intentar con triggerAttackRelease si está disponible
         if ('triggerAttackRelease' in source.synth) {
           try {
@@ -80,12 +80,12 @@ export class SoundPlaybackManager {
             (source.synth as SynthesizerType).triggerAttackRelease(params.frequency, fallbackDuration, this.getUniqueStartTime());
             this.playingSounds.add(soundId);
             this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: fallbackDuration, params });
-          } catch (fallbackError) {
+          } catch {
             // Manejo silencioso de errores
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Manejo silencioso de errores
     }
   }
@@ -131,7 +131,7 @@ export class SoundPlaybackManager {
         (source.synth as SynthesizerType).triggerAttack(params.frequency, Tone.now());
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
-      } catch (error) {
+      } catch {
         // Fallback: intentar con triggerAttackRelease si está disponible
         if ('triggerAttackRelease' in source.synth) {
           try {
@@ -139,12 +139,12 @@ export class SoundPlaybackManager {
             (source.synth as SynthesizerType).triggerAttackRelease(params.frequency, fallbackDuration, Tone.now());
             this.playingSounds.add(soundId);
             this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: fallbackDuration, params });
-          } catch (fallbackError) {
+          } catch {
             // Manejo silencioso de errores
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Manejo silencioso de errores
     }
   }
@@ -173,7 +173,7 @@ export class SoundPlaybackManager {
       
       this.playingSounds.delete(soundId);
       this.removePlaybackState(soundId);
-    } catch (error) {
+    } catch {
       // Aún así, marcar como no sonando
       this.playingSounds.delete(soundId);
       this.removePlaybackState(soundId);
@@ -205,18 +205,18 @@ export class SoundPlaybackManager {
           source.synth.triggerAttackRelease(notes, duration, Tone.now());
           this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
           return;
-        } catch (samplerError) {
+        } catch {
           // Si el Sampler falla, usar el fallback como un sintetizador normal
           const duration = params.duration || this.config.defaultDuration;
           const frequency = this.getNoteFrequency(params.notes?.[0] || "C4");
-          (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
+          (source.synth as unknown as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
           this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
           return;
         }
       }
       
       // Para sintetizadores de fallback (cuando el Sampler no pudo cargar)
-      if ((source.synth as SynthesizerType)._isFallback) {
+      if ((source.synth as { _isFallback?: boolean })._isFallback) {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || this.config.defaultDuration;
         
@@ -227,7 +227,7 @@ export class SoundPlaybackManager {
           setTimeout(() => {
             try {
               (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
-            } catch (error) {
+            } catch {
               // Manejo silencioso de errores
             }
           }, delay * 1000);
@@ -260,7 +260,7 @@ export class SoundPlaybackManager {
         try {
           (source.synth as SynthesizerType).triggerAttack(params.frequency, Tone.now());
           this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
-        } catch (fallbackError) {
+        } catch {
           // Último recurso: intentar con triggerAttack en el sintetizador principal
           if (typeof (source.synth as SynthesizerType).triggerAttack === 'function') {
             (source.synth as SynthesizerType).triggerAttack(params.frequency, Tone.now());
@@ -268,7 +268,7 @@ export class SoundPlaybackManager {
           }
         }
       }
-    } catch (error) {
+    } catch {
       // Manejo silencioso de errores
     }
   }
@@ -317,7 +317,7 @@ export class SoundPlaybackManager {
       }
       
       // Para sintetizadores de fallback
-      if ((source.synth as SynthesizerType)._isFallback) {
+      if ((source.synth as { _isFallback?: boolean })._isFallback) {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || '8n';
         
@@ -327,7 +327,7 @@ export class SoundPlaybackManager {
           setTimeout(() => {
             try {
               (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
-            } catch (error) {
+            } catch {
               // Manejo silencioso de errores
             }
           }, delay * 1000);
@@ -352,13 +352,13 @@ export class SoundPlaybackManager {
         setTimeout(() => {
           try {
             (source.synth as SynthesizerType).triggerRelease(Tone.now());
-          } catch (error) {
+          } catch {
             // Manejo silencioso de errores
           }
         }, duration * 1000);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
       }
-    } catch (error) {
+    } catch {
       // Manejo silencioso de errores
     }
   }
@@ -386,7 +386,7 @@ export class SoundPlaybackManager {
         source.synth.triggerAttackRelease(duration, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
       }
-    } catch (error) {
+    } catch {
       // Manejo silencioso de errores
     }
   }
@@ -422,7 +422,7 @@ export class SoundPlaybackManager {
         if (source) {
           this.stopSound(soundId, source);
         }
-      } catch (error) {
+      } catch {
         // Manejo silencioso de errores
       }
     });
@@ -502,7 +502,7 @@ export class SoundPlaybackManager {
     
     // Convertir notación musical a segundos
     const tempo = Tone.Transport.bpm.value;
-    const timeSignature = Tone.Transport.timeSignature;
+    // const timeSignature = Tone.Transport.timeSignature; // Not used currently
     
     // Simplificar: asumir 4/4 y convertir notación básica
     const noteValues: { [key: string]: number } = {

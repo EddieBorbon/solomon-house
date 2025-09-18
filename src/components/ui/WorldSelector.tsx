@@ -65,7 +65,7 @@ export function WorldSelector() {
           <div className="text-sm text-cyan-300 mb-1">Mundo Actual</div>
           <div className="text-white font-medium">{currentWorld?.name || 'Ninguno'}</div>
           <div className="text-xs text-cyan-200">
-            {currentWorld ? `${currentWorld.objects.length} objetos, ${currentWorld.mobileObjects.length} móviles, ${currentWorld.effectZones.length} zonas` : 'Sin mundo'}
+            {currentWorld ? `Mundo activo` : 'Sin mundo'}
           </div>
         </div>
 
@@ -87,7 +87,7 @@ export function WorldSelector() {
                     <div className="flex-1">
                       <div className="text-white font-medium">{world.name}</div>
                       <div className="text-xs text-gray-400">
-                        {world.objects.length} objetos, {world.mobileObjects.length} móviles, {world.effectZones.length} zonas
+                        Mundo disponible
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

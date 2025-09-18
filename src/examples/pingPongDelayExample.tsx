@@ -44,6 +44,7 @@ export const PingPongDelayExample = () => {
       {
         frequency: 440,
         volume: 0.3,
+        waveform: 'sine',
         attack: 0.1,
         decay: 0.2,
         sustain: 0.5,
@@ -56,6 +57,7 @@ export const PingPongDelayExample = () => {
     audioManager.startContinuousSound(soundId, {
       frequency: 440,
       volume: 0.3,
+      waveform: 'sine',
       attack: 0.1,
       decay: 0.2,
       sustain: 0.5,

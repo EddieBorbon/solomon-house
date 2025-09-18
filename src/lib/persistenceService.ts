@@ -1,5 +1,5 @@
 import { firebaseService, type FirebaseProject, type FirebaseGrid } from './firebaseService';
-import { type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { useWorldStore, type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
 
 // Convertir Grid del store a FirebaseGrid
 export function gridToFirebase(grid: Grid): Omit<FirebaseGrid, 'createdAt' | 'updatedAt'> {
@@ -35,15 +35,16 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
     scale: obj.scale || [1, 1, 1],
     isSelected: obj.isSelected || false,
     mobileParams: {
-      movementType: obj.mobileParams?.movementType || 'linear',
+      ...obj.mobileParams,
       radius: obj.mobileParams?.radius || 5,
       speed: obj.mobileParams?.speed || 1,
       centerPosition: obj.mobileParams?.centerPosition || [0, 0, 0],
-      ...obj.mobileParams
+      movementType: obj.mobileParams?.movementType || 'linear'
     }
   }));
 
   const normalizedEffectZones = (firebaseGrid.effectZones || []).map((zone: EffectZone) => ({
+    ...zone,
     id: zone.id || `zone-${Math.random().toString(36).substr(2, 9)}`,
     type: zone.type || 'phaser',
     position: zone.position || [0, 0, 0],
@@ -51,8 +52,7 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
     scale: zone.scale || [1, 1, 1],
     isSelected: zone.isSelected || false,
     isLocked: zone.isLocked || false,
-    effectParams: zone.effectParams || {},
-    ...zone
+    effectParams: zone.effectParams || {}
   }));
 
   return {
@@ -90,7 +90,7 @@ export class PersistenceService {
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
       
-      for (const [_, grid] of state.grids) {
+      for (const [, grid] of state.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
 
@@ -98,7 +98,11 @@ export class PersistenceService {
       const projectData: Omit<FirebaseProject, 'id' | 'createdAt' | 'updatedAt'> = {
         name: projectName,
         description: description || '',
-        grids: firebaseGrids,
+        grids: firebaseGrids.map(grid => ({
+          ...grid,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        })),
         activeGridId: state.activeGridId
       };
 
@@ -219,7 +223,7 @@ export class PersistenceService {
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
       
-      for (const [_, grid] of state.grids) {
+      for (const [, grid] of state.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
 

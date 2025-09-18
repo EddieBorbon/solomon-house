@@ -2,11 +2,17 @@
 
 import React, { forwardRef, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, Group, MeshStandardMaterial, Color, Vector3, Line, BufferGeometry, LineBasicMaterial } from 'three';
+import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 // Tipos de movimiento disponibles
 export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
+
+// Interface para refs de líneas en React Three Fiber
+interface LineRef {
+  geometry?: BufferGeometry;
+}
+
 
 // Interfaz para los parámetros del objeto móvil
 export interface MobileObjectParams {
@@ -21,6 +27,8 @@ export interface MobileObjectParams {
   amplitude: number; // Para movimiento polar
   frequency: number; // Para movimiento polar
   randomSeed: number; // Para movimiento aleatorio
+  showRadiusIndicator?: boolean; // Para mostrar indicador de radio
+  showProximityIndicator?: boolean; // Para mostrar indicador de proximidad
 }
 
 interface MobileObjectProps {
@@ -46,9 +54,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 }, ref) => {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
-  const lineRef = useRef<Line>(null);
-  const connectionLineRef = useRef<Line>(null);
-  const touchLineRef = useRef<Line>(null);
+  const lineRef = useRef<LineRef>(null);
+  const connectionLineRef = useRef<LineRef>(null);
+  const touchLineRef = useRef<LineRef>(null);
   const energyRef = useRef(0);
   const timeRef = useRef(0);
   const [isActivating, setIsActivating] = useState(false);
@@ -201,7 +209,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       const target = new Vector3(...targetPos);
       
       lineGeometry.setFromPoints([currentPos, target]);
-      lineRef.current.geometry = lineGeometry;
+      if (lineRef.current) {
+        lineRef.current.geometry = lineGeometry;
+      }
     }
   };
 
@@ -217,7 +227,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       const target = new Vector3(...targetPos);
       
       touchLineGeometry.setFromPoints([currentPos, target]);
-      touchLineRef.current.geometry = touchLineGeometry;
+      if (touchLineRef.current) {
+        touchLineRef.current.geometry = touchLineGeometry;
+      }
     }
   };
 
@@ -240,7 +252,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         new Vector3(0, 0, 0), // Punto de origen
         new Vector3(...newPosition) // Posición actual del objeto móvil
       ]);
-      connectionLineRef.current.geometry = connectionLineGeometry;
+      if (connectionLineRef.current) {
+        connectionLineRef.current.geometry = connectionLineGeometry;
+      }
     }
     
     // Detectar objetos cercanos
@@ -435,11 +449,13 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
       {/* Línea de activación */}
       {isActivating && activatedObjectId && (
+        // @ts-expect-error - React Three Fiber line ref type compatibility
         <line ref={lineRef} geometry={lineGeometry} material={lineMaterial} />
       )}
 
       {/* Línea de toque - indicador visual cuando toca un objeto sonoro */}
       {touchedObjectId && (
+        // @ts-expect-error - React Three Fiber line ref type compatibility
         <line ref={touchLineRef} geometry={touchLineGeometry} material={touchLineMaterial} />
       )}
 
@@ -456,6 +472,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       )}
 
       {/* Línea que conecta el objeto móvil con el punto de origen */}
+      {/* @ts-expect-error - React Three Fiber line ref type compatibility */}
       <line ref={connectionLineRef} geometry={connectionLineGeometry} material={connectionLineMaterial} />
     </group>
   );

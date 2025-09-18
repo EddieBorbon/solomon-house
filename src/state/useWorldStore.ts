@@ -19,6 +19,7 @@ export interface Grid {
   gridColor: string;
   isLoaded: boolean; // Si la cuadrícula está cargada en memoria
   isSelected: boolean; // Si la cuadrícula está seleccionada
+  [key: string]: unknown; // Firma de índice para acceso dinámico
 }
 
 // Tipos de movimiento para objetos móviles
@@ -56,8 +57,8 @@ export interface MobileObject {
     amplitude: number;
     frequency: number;
     randomSeed: number;
-    showRadiusIndicator: boolean;
-    showProximityIndicator: boolean;
+    showRadiusIndicator?: boolean;
+    showProximityIndicator?: boolean;
   };
 }
 
@@ -99,9 +100,9 @@ export interface EffectZone {
     distortionOversample?: 'none' | '2x' | '4x';
     // Parámetros del Chorus
     chorusFrequency?: number;
-    delayTime?: number;
+    chorusDelayTime?: number;
     chorusDepth?: number;
-    feedback?: number;
+    chorusFeedback?: number;
     spread?: number;
     chorusType?: 'sine' | 'square' | 'triangle' | 'sawtooth';
     // Parámetros del FeedbackDelay
@@ -118,6 +119,8 @@ export interface EffectZone {
     // Parámetros del Reverb
     decay?: number;
     preDelay?: number;
+    roomSize?: number;
+    dampening?: number;
     // Parámetros del StereoWidener
     width?: number;
     // Parámetros del Tremolo
@@ -154,6 +157,10 @@ export interface WorldState {
   selectedEntityId: string | null; // Renombrado de selectedObjectId para ser más genérico
   transformMode: 'translate' | 'rotate' | 'scale';
   isEditingEffectZone: boolean; // Nuevo estado para indicar cuando se está editando una zona de efectos
+  
+  // World management (placeholder implementation)
+  worlds: Array<{ id: string; name: string }>;
+  currentWorldId: string | null;
 }
 
 // Acciones disponibles en el store
@@ -172,6 +179,11 @@ export interface WorldActions {
   // Acciones para proyecto actual
   setCurrentProjectId: (projectId: string | null) => void;
   setActiveGrid: (gridId: string | null) => void;
+  
+  // Acciones para gestión de mundos
+  createWorld: (name: string) => void;
+  deleteWorld: (id: string) => void;
+  switchWorld: (id: string) => void;
   updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => void;
   deleteGrid: (gridId: string) => void;
   resizeGrid: (gridId: string, newSize: number) => void;
@@ -375,6 +387,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   selectedEntityId: null,
   transformMode: 'translate',
   isEditingEffectZone: false,
+  
+  // World management state
+  worlds: [{ id: 'default', name: 'Default World' }],
+  currentWorldId: 'default',
 
   // Acción para añadir un nuevo objeto
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
@@ -510,15 +526,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     // Buscar el objeto en todas las cuadrículas y actualizarlo
     set((state) => {
       const newGrids = new Map(state.grids);
-      let updatedObject: SoundObject | null = null;
-      
       // Buscar el objeto en todas las cuadrículas
       for (const [gridId, grid] of newGrids) {
         const objectIndex = grid.objects.findIndex(obj => obj.id === id);
         if (objectIndex !== -1) {
           const updatedObjects = [...grid.objects];
           updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
-          updatedObject = updatedObjects[objectIndex];
           
           // Actualizar la cuadrícula
           newGrids.set(gridId, {
@@ -788,7 +801,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   // Nuevas acciones para zonas de efectos
-  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
+  addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     // Configurar parámetros por defecto según el tipo de efecto
     let defaultParams: Record<string, unknown> = {};
     
@@ -1298,7 +1311,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     if (!grid) return;
 
     // NO sobrescribir el estado global de objetos - solo cambiar la cuadrícula actual
-    set((state) => ({
+    set(() => ({
       currentGridCoordinates: coordinates,
       selectedEntityId: null, // Deseleccionar al cambiar de cuadrícula
     }));
@@ -1327,7 +1340,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acciones para manipulación de cuadrículas
   createGrid: (position: [number, number, number], size: number = 20) => {
-    const state = get();
+    get(); // Get current state but don't use it
     const gridId = uuidv4();
     
     // Calcular las coordenadas de la cuadrícula basadas en la posición 3D
@@ -1383,13 +1396,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const state = get();
     
     if (gridId && state.grids.has(gridId)) {
-      set((state) => ({
+      set(() => ({
         activeGridId: gridId,
       }));
       
       console.log(`🎯 Cuadrícula activa cambiada a: ${gridId}`);
     } else {
-      set((state) => ({
+      set(() => ({
         activeGridId: null,
       }));
       
@@ -1412,7 +1425,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   },
 
   deleteGrid: (gridId: string) => {
-    const state = get();
+    get(); // Get current state but don't use it
     
     // No permitir eliminar la cuadrícula principal
     if (gridId === '0,0,0') {
@@ -1472,6 +1485,53 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     if (grid) {
       state.updateGrid(gridId, { scale });
       console.log(`📐 Escalando cuadrícula ${gridId} a escala ${scale}`);
+    }
+  },
+
+  // World management functions
+  createWorld: (name: string) => {
+    const state = get();
+    const newWorld = {
+      id: `world_${Date.now()}`,
+      name: name
+    };
+    
+    set({
+      worlds: [...state.worlds, newWorld],
+      currentWorldId: newWorld.id
+    });
+    
+    console.log(`🌍 Mundo creado: ${name} (ID: ${newWorld.id})`);
+  },
+
+  deleteWorld: (id: string) => {
+    const state = get();
+    
+    if (id === 'default') {
+      console.warn('⚠️ No se puede eliminar el mundo por defecto');
+      return;
+    }
+    
+    const updatedWorlds = state.worlds.filter(w => w.id !== id);
+    const newCurrentWorldId = state.currentWorldId === id ? 'default' : state.currentWorldId;
+    
+    set({
+      worlds: updatedWorlds,
+      currentWorldId: newCurrentWorldId
+    });
+    
+    console.log(`🗑️ Mundo eliminado: ${id}`);
+  },
+
+  switchWorld: (id: string) => {
+    const state = get();
+    const world = state.worlds.find(w => w.id === id);
+    
+    if (world) {
+      set({ currentWorldId: id });
+      console.log(`🔄 Cambiando a mundo: ${world.name} (ID: ${id})`);
+    } else {
+      console.warn(`⚠️ Mundo no encontrado: ${id}`);
     }
   },
 

@@ -56,6 +56,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
         for (let i = 0; i < count; i++) {
           const x = vertices.getX(i);
           const y = vertices.getY(i);
+          const z = vertices.getZ(i);
           
           // Efecto de ondulación que decae con el tiempo
           const wave = Math.sin(x * 10 + time * 20) * Math.sin(y * 10 + time * 15) * 0.1;

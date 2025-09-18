@@ -2,7 +2,101 @@ import * as Tone from 'tone';
 import { AudioParams, SoundSource } from '../factories/SoundSourceFactory';
 
 // Union type for all possible synthesizer types
-type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth;
+type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.MembraneSynth | Tone.PolySynth | Tone.Sampler;
+
+// Type definitions for synthesizer properties
+interface SynthesizerWithOscillator {
+  oscillator: {
+    type: string;
+  };
+}
+
+interface SynthesizerWithVoice0 {
+  voice0: {
+    oscillator: {
+      type: string;
+    };
+  };
+}
+
+interface SynthesizerWithHarmonicity {
+  harmonicity: {
+    rampTo: (value: number, time: number) => void;
+  } | number;
+}
+
+interface SynthesizerWithModulationIndex {
+  modulationIndex: {
+    rampTo: (value: number, time: number) => void;
+  } | number;
+}
+
+interface SynthesizerWithModulation {
+  modulation: {
+    type: string;
+  };
+}
+
+interface SynthesizerWithVoice1 {
+  voice1: {
+    oscillator: {
+      type: string;
+    };
+  };
+}
+
+interface SynthesizerWithEnvelope {
+  envelope: {
+    attack: number;
+    decay: number;
+    sustain: number;
+    release: number;
+    curve?: string;
+  };
+}
+
+interface SynthesizerWithFilterEnvelope {
+  filterEnvelope: {
+    attack: number;
+    decay: number;
+    sustain: number;
+    release: number;
+    baseFrequency: number;
+    octaves: number;
+  };
+}
+
+interface SynthesizerWithFilter {
+  filter: {
+    Q: {
+      value: number;
+    };
+  };
+}
+
+interface SynthesizerWithVibratoAmount {
+  vibratoAmount: {
+    rampTo: (value: number, time: number) => void;
+  };
+}
+
+interface SynthesizerWithVibratoRate {
+  vibratoRate: {
+    rampTo: (value: number, time: number) => void;
+  };
+}
+
+interface SynthesizerWithPitchDecay {
+  pitchDecay: number;
+}
+
+interface SynthesizerWithOctaves {
+  octaves: number;
+}
+
+interface SynthesizerWithResonance {
+  resonance: number;
+}
 
 // Tipos para gestión de parámetros
 export interface ParameterUpdateResult {
@@ -168,12 +262,12 @@ export class ParameterManager {
         }
         if (params.attack !== undefined || params.release !== undefined) {
           voiceOptions.envelope = {};
-          if (params.attack !== undefined) {
-            voiceOptions.envelope.attack = params.attack;
-          }
-          if (params.release !== undefined) {
-            voiceOptions.envelope.release = params.release;
-          }
+        if (params.attack !== undefined) {
+          (voiceOptions.envelope as { attack: number }).attack = params.attack;
+        }
+        if (params.release !== undefined) {
+          (voiceOptions.envelope as { release: number }).release = params.release;
+        }
         }
         
         synth.set(voiceOptions);
@@ -256,11 +350,11 @@ export class ParameterManager {
       // Manejar según el tipo de sintetizador
       if ('oscillator' in synth) {
         // AMSynth, FMSynth, MembraneSynth o MonoSynth
-        synth.oscillator.type = waveform;
+        (synth as SynthesizerWithOscillator).oscillator.type = waveform;
         result.updatedParams.push('waveform');
       } else if ('voice0' in synth) {
         // DuoSynth
-        synth.voice0.oscillator.type = waveform;
+        (synth as SynthesizerWithVoice0).voice0.oscillator.type = waveform;
         result.updatedParams.push('waveform');
       }
     } catch (error) {
@@ -277,13 +371,15 @@ export class ParameterManager {
     result: ParameterUpdateResult
   ): void {
     try {
-      const harmonicityParam = synth.harmonicity;
+      if ('harmonicity' in synth) {
+        const harmonicityParam = (synth as SynthesizerWithHarmonicity).harmonicity;
       if (typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
         harmonicityParam.rampTo(harmonicity, this.config.rampTime);
       } else {
-        synth.harmonicity = harmonicity;
+          (synth as SynthesizerWithHarmonicity).harmonicity = harmonicity;
+        }
+        result.updatedParams.push('harmonicity');
       }
-      result.updatedParams.push('harmonicity');
     } catch (error) {
       result.errors.push(`Harmonicity update: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -298,13 +394,15 @@ export class ParameterManager {
     result: ParameterUpdateResult
   ): void {
     try {
-      const modulationIndexParam = synth.modulationIndex;
+      if ('modulationIndex' in synth) {
+        const modulationIndexParam = (synth as SynthesizerWithModulationIndex).modulationIndex;
       if (typeof modulationIndexParam === 'object' && 'rampTo' in modulationIndexParam) {
         modulationIndexParam.rampTo(modulationIndex, this.config.rampTime);
       } else {
-        synth.modulationIndex = modulationIndex;
+          (synth as SynthesizerWithModulationIndex).modulationIndex = modulationIndex;
+        }
+        result.updatedParams.push('modulationIndex');
       }
-      result.updatedParams.push('modulationIndex');
     } catch (error) {
       result.errors.push(`ModulationIndex update: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -319,8 +417,10 @@ export class ParameterManager {
     result: ParameterUpdateResult
   ): void {
     try {
-      synth.modulation.type = modulationWaveform;
+      if ('modulation' in synth) {
+        (synth as SynthesizerWithModulation).modulation.type = modulationWaveform;
       result.updatedParams.push('modulationWaveform');
+      }
     } catch (error) {
       result.errors.push(`ModulationWaveform update: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -336,26 +436,31 @@ export class ParameterManager {
   ): void {
     try {
       // Actualizar harmonicity
-      if (params.harmonicity !== undefined) {
-        synth.harmonicity.rampTo(params.harmonicity, this.config.rampTime);
+      if (params.harmonicity !== undefined && 'harmonicity' in synth) {
+        const harmonicityParam = (synth as SynthesizerWithHarmonicity).harmonicity;
+        if (typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
+          harmonicityParam.rampTo(params.harmonicity, this.config.rampTime);
+        } else {
+          (synth as { harmonicity: number }).harmonicity = params.harmonicity;
+        }
         result.updatedParams.push('harmonicity');
       }
       
       // Actualizar vibratoAmount
-      if (params.vibratoAmount !== undefined) {
-        synth.vibratoAmount.rampTo(params.vibratoAmount, this.config.rampTime);
+      if (params.vibratoAmount !== undefined && 'vibratoAmount' in synth) {
+        (synth as SynthesizerWithVibratoAmount).vibratoAmount.rampTo(params.vibratoAmount, this.config.rampTime);
         result.updatedParams.push('vibratoAmount');
       }
       
       // Actualizar vibratoRate
-      if (params.vibratoRate !== undefined) {
-        synth.vibratoRate.rampTo(params.vibratoRate, this.config.rampTime);
+      if (params.vibratoRate !== undefined && 'vibratoRate' in synth) {
+        (synth as SynthesizerWithVibratoRate).vibratoRate.rampTo(params.vibratoRate, this.config.rampTime);
         result.updatedParams.push('vibratoRate');
       }
       
       // Actualizar waveform2 (segunda voz)
-      if (params.waveform2 !== undefined) {
-        synth.voice1.oscillator.type = params.waveform2;
+      if (params.waveform2 !== undefined && 'voice1' in synth) {
+        (synth as SynthesizerWithVoice1).voice1.oscillator.type = params.waveform2;
         result.updatedParams.push('waveform2');
       }
     } catch (error) {
@@ -373,14 +478,14 @@ export class ParameterManager {
   ): void {
     try {
       // Actualizar pitchDecay
-      if (params.pitchDecay !== undefined) {
-        synth.pitchDecay = params.pitchDecay;
+      if (params.pitchDecay !== undefined && 'pitchDecay' in synth) {
+        (synth as SynthesizerWithPitchDecay).pitchDecay = params.pitchDecay;
         result.updatedParams.push('pitchDecay');
       }
       
       // Actualizar octaves
-      if (params.octaves !== undefined) {
-        synth.octaves = params.octaves;
+      if (params.octaves !== undefined && 'octaves' in synth) {
+        (synth as SynthesizerWithOctaves).octaves = params.octaves;
         result.updatedParams.push('octaves');
       }
     } catch (error) {
@@ -398,52 +503,52 @@ export class ParameterManager {
   ): void {
     try {
       // Actualizar envolvente de amplitud
-      if (params.ampAttack !== undefined) {
-        synth.envelope.attack = params.ampAttack;
+      if (params.ampAttack !== undefined && 'envelope' in synth) {
+        (synth as SynthesizerWithEnvelope).envelope.attack = params.ampAttack;
         result.updatedParams.push('ampAttack');
       }
-      if (params.ampDecay !== undefined) {
-        synth.envelope.decay = params.ampDecay;
+      if (params.ampDecay !== undefined && 'envelope' in synth) {
+        (synth as SynthesizerWithEnvelope).envelope.decay = params.ampDecay;
         result.updatedParams.push('ampDecay');
       }
-      if (params.ampSustain !== undefined) {
-        synth.envelope.sustain = params.ampSustain;
+      if (params.ampSustain !== undefined && 'envelope' in synth) {
+        (synth as SynthesizerWithEnvelope).envelope.sustain = params.ampSustain;
         result.updatedParams.push('ampSustain');
       }
-      if (params.ampRelease !== undefined) {
-        synth.envelope.release = params.ampRelease;
+      if (params.ampRelease !== undefined && 'envelope' in synth) {
+        (synth as SynthesizerWithEnvelope).envelope.release = params.ampRelease;
         result.updatedParams.push('ampRelease');
       }
       
       // Actualizar envolvente de filtro
-      if (params.filterAttack !== undefined) {
-        synth.filterEnvelope.attack = params.filterAttack;
+      if (params.filterAttack !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.attack = params.filterAttack;
         result.updatedParams.push('filterAttack');
       }
-      if (params.filterDecay !== undefined) {
-        synth.filterEnvelope.decay = params.filterDecay;
+      if (params.filterDecay !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.decay = params.filterDecay;
         result.updatedParams.push('filterDecay');
       }
-      if (params.filterSustain !== undefined) {
-        synth.filterEnvelope.sustain = params.filterSustain;
+      if (params.filterSustain !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.sustain = params.filterSustain;
         result.updatedParams.push('filterSustain');
       }
-      if (params.filterRelease !== undefined) {
-        synth.filterEnvelope.release = params.filterRelease;
+      if (params.filterRelease !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.release = params.filterRelease;
         result.updatedParams.push('filterRelease');
       }
-      if (params.filterBaseFreq !== undefined) {
-        synth.filterEnvelope.baseFrequency = params.filterBaseFreq;
+      if (params.filterBaseFreq !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.baseFrequency = params.filterBaseFreq;
         result.updatedParams.push('filterBaseFreq');
       }
-      if (params.filterOctaves !== undefined) {
-        synth.filterEnvelope.octaves = params.filterOctaves;
+      if (params.filterOctaves !== undefined && 'filterEnvelope' in synth) {
+        (synth as SynthesizerWithFilterEnvelope).filterEnvelope.octaves = params.filterOctaves;
         result.updatedParams.push('filterOctaves');
       }
       
       // Actualizar parámetros del filtro
-      if (params.filterQ !== undefined) {
-        synth.filter.Q.value = params.filterQ;
+      if (params.filterQ !== undefined && 'filter' in synth) {
+        (synth as SynthesizerWithFilter).filter.Q.value = params.filterQ;
         result.updatedParams.push('filterQ');
       }
     } catch (error) {
@@ -461,14 +566,14 @@ export class ParameterManager {
   ): void {
     try {
       // Actualizar resonance
-      if (params.resonance !== undefined) {
-        synth.resonance = params.resonance;
+      if (params.resonance !== undefined && 'resonance' in synth) {
+        (synth as SynthesizerWithResonance).resonance = params.resonance;
         result.updatedParams.push('resonance');
       }
       
       // Actualizar octaves
-      if (params.octaves !== undefined) {
-        synth.octaves = params.octaves;
+      if (params.octaves !== undefined && 'octaves' in synth) {
+        (synth as SynthesizerWithOctaves).octaves = params.octaves;
         result.updatedParams.push('octaves');
       }
     } catch (error) {
@@ -521,7 +626,7 @@ export class ParameterManager {
       // Actualizar attack
       if (params.attack !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as SynthesizerType & { envelope: { attack: number } }).envelope.attack = params.attack;
+          (synth as SynthesizerWithEnvelope).envelope.attack = params.attack;
           result.updatedParams.push('attack');
         }
       }
@@ -529,7 +634,7 @@ export class ParameterManager {
       // Actualizar release
       if (params.release !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as SynthesizerType & { envelope: { release: number } }).envelope.release = params.release;
+          (synth as SynthesizerWithEnvelope).envelope.release = params.release;
           result.updatedParams.push('release');
         }
       }
@@ -537,7 +642,7 @@ export class ParameterManager {
       // Actualizar curve
       if (params.curve !== undefined) {
         if ('envelope' in synth && synth.envelope) {
-          (synth as SynthesizerType & { envelope: { curve: string } }).envelope.curve = params.curve;
+          (synth as SynthesizerWithEnvelope).envelope.curve = params.curve;
           result.updatedParams.push('curve');
         }
       }

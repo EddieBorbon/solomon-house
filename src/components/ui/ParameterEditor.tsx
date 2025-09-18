@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { type AudioParams } from '../../lib/AudioManager';
 import React from 'react';
 import { MobileObjectEditor } from './MobileObjectEditor';
+import { type MobileObjectParams } from '../sound-objects/MobileObject';
 
 export function ParameterEditor() {
   const { 
@@ -17,8 +18,7 @@ export function ParameterEditor() {
     removeEffectZone, 
     toggleLockEffectZone,
     setEditingEffectZone,
-    refreshAllEffects,
-    debugAudioChain
+    refreshAllEffects
   } = useWorldStore();
 
   // Estado para mostrar cuando se están actualizando los parámetros
@@ -92,7 +92,7 @@ export function ParameterEditor() {
   const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
     if (!selectedEntity || selectedEntity.type !== 'soundObject') return;
 
-    const soundObject = selectedEntity.data as { audioParams: AudioParams; [key: string]: unknown };
+    const soundObject = selectedEntity.data as unknown as { id: string; audioParams: AudioParams; [key: string]: unknown };
     console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
     console.log(`🎛️ UI: Objeto seleccionado:`, soundObject);
 
@@ -114,7 +114,7 @@ export function ParameterEditor() {
   const handleEffectParamChange = (param: string, value: number | string) => {
     if (!selectedEntity || selectedEntity.type !== 'effectZone') return;
 
-    const effectZone = selectedEntity.data as { effectParams: Record<string, unknown>; [key: string]: unknown };
+    const effectZone = selectedEntity.data as unknown as { id: string; effectParams: Record<string, unknown>; [key: string]: unknown };
     console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
 
     // Mostrar estado de actualización
@@ -212,7 +212,12 @@ export function ParameterEditor() {
 
   // Renderizar controles según el tipo de entidad seleccionada
   if (selectedEntity.type === 'mobileObject') {
-    const mobileObject = selectedEntity.data as { mobileParams: Record<string, unknown>; [key: string]: unknown };
+    const mobileObject = selectedEntity.data as unknown as { 
+      id: string; 
+      position: [number, number, number]; 
+      mobileParams: MobileObjectParams; 
+      [key: string]: unknown 
+    };
     
     return (
       <div className="fixed top-4 right-4 z-50">
@@ -354,23 +359,6 @@ export function ParameterEditor() {
             </div>
           </div>
 
-          {/* Botón de debug de cadena de audio */}
-          {selectedEntity && selectedEntity.type === 'soundObject' && (
-            <div className="mb-6 p-4 bg-purple-900/20 border border-purple-600/50 rounded-lg">
-              <div className="text-center">
-                <button
-                  onClick={() => debugAudioChain(selectedEntity.data.id)}
-                  className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-200"
-                  title="Debug de la cadena de audio para este objeto sonoro"
-                >
-                  🔍 Debug Cadena de Audio
-                </button>
-                <p className="text-xs text-purple-400 mt-1 text-center">
-                  Verifica el estado completo de la cadena de audio en la consola
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* Controles de parámetros del efecto */}
           <div className="space-y-4">
@@ -506,13 +494,13 @@ export function ParameterEditor() {
                   min="20"
                   max="20000"
                   step="10"
-                  value={zone.effectParams.baseFrequency ?? 200}
-                  onChange={(e) => handleEffectParamChange('baseFrequency', Number(e.target.value))}
+                  value={zone.effectParams.frequency ?? 200}
+                  onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                   disabled={zone.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.baseFrequency ?? 200}
+                  {zone.effectParams.frequency ?? 200}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -2067,7 +2055,11 @@ export function ParameterEditor() {
   
   // Asegurar que audioParams existe
   if (!selectedObject.audioParams) {
-    selectedObject.audioParams = {};
+    selectedObject.audioParams = {
+      frequency: 440,
+      waveform: 'sine',
+      volume: 0.5
+    };
   }
   
   return (

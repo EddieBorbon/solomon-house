@@ -12,6 +12,7 @@
 
 import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 // Interfaz base para todos los objetos sonoros
@@ -74,8 +75,8 @@ export const useUniversalInteraction = (id: string) => {
 
 // Hook personalizado para animación reactiva
 export const useReactiveAnimation = (
-  meshRef: React.RefObject<THREE.Mesh>,
-  materialRef: React.RefObject<THREE.MeshStandardMaterial>,
+  meshRef: React.RefObject<THREE.Mesh | null>,
+  materialRef: React.RefObject<THREE.MeshStandardMaterial | null>,
   audioParams: {
     frequency?: number;
     volume?: number;

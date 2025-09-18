@@ -3,25 +3,13 @@
 import React, { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 
+import { type MobileObjectParams } from '../sound-objects/MobileObject';
+
 interface MobileObjectEditorProps {
   mobileObject: {
     id: string;
     position: [number, number, number];
-    mobileParams: {
-      movementType: 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
-      radius: number;
-      speed: number;
-      proximityThreshold: number;
-      isActive: boolean;
-      centerPosition: [number, number, number];
-      direction: [number, number, number];
-      axis: [number, number, number];
-      amplitude: number;
-      frequency: number;
-      randomSeed: number;
-      showRadiusIndicator: boolean;
-      showProximityIndicator: boolean;
-    };
+    mobileParams: MobileObjectParams;
   };
 }
 
@@ -168,14 +156,14 @@ export function MobileObjectEditor({ mobileObject }: MobileObjectEditorProps) {
                 Mostrar Radio de Desplazamiento
               </label>
               <button
-                onClick={() => handleParamChange('showRadiusIndicator', !mobileObject.mobileParams.showRadiusIndicator)}
+                onClick={() => handleParamChange('showRadiusIndicator', !(mobileObject.mobileParams.showRadiusIndicator ?? false))}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  mobileObject.mobileParams.showRadiusIndicator ? 'bg-green-500' : 'bg-gray-600'
+                  (mobileObject.mobileParams.showRadiusIndicator ?? false) ? 'bg-green-500' : 'bg-gray-600'
                 }`}
               >
                 <span
                   className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    mobileObject.mobileParams.showRadiusIndicator ? 'translate-x-5' : 'translate-x-1'
+                    (mobileObject.mobileParams.showRadiusIndicator ?? false) ? 'translate-x-5' : 'translate-x-1'
                   }`}
                 />
               </button>
@@ -187,14 +175,14 @@ export function MobileObjectEditor({ mobileObject }: MobileObjectEditorProps) {
                 Mostrar Umbral de Proximidad
               </label>
               <button
-                onClick={() => handleParamChange('showProximityIndicator', !mobileObject.mobileParams.showProximityIndicator)}
+                onClick={() => handleParamChange('showProximityIndicator', !(mobileObject.mobileParams.showProximityIndicator ?? false))}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                  mobileObject.mobileParams.showProximityIndicator ? 'bg-red-500' : 'bg-gray-600'
+                  (mobileObject.mobileParams.showProximityIndicator ?? false) ? 'bg-red-500' : 'bg-gray-600'
                 }`}
               >
                 <span
                   className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    mobileObject.mobileParams.showProximityIndicator ? 'translate-x-5' : 'translate-x-1'
+                    (mobileObject.mobileParams.showProximityIndicator ?? false) ? 'translate-x-5' : 'translate-x-1'
                   }`}
                 />
               </button>

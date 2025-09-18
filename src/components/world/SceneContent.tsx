@@ -3,7 +3,8 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
-import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone } from '../../state/useWorldStore';
+import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
@@ -21,22 +22,12 @@ import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
 interface SceneContentProps {
-  orbitControlsRef: React.RefObject<unknown>;
+  orbitControlsRef: React.RefObject<{ enabled: boolean } | null>;
 }
 
 // Componente contenedor para cada objeto de sonido
 interface SoundObjectContainerProps {
-  object: {
-    id: string;
-    type: string;
-    position: [number, number, number];
-    rotation: [number, number, number];
-    scale: [number, number, number];
-    isSelected: boolean;
-    audioEnabled: boolean;
-    audioParams: Record<string, unknown>;
-    [key: string]: unknown;
-  };
+  object: SoundObject;
   onSelect: (id: string) => void;
 }
 
@@ -89,7 +80,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'sphere' ? (
           <SoundSphere
@@ -97,7 +88,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             position={[0, 0, 0]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'cylinder' ? (
           <SoundCylinder
@@ -107,7 +98,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'cone' ? (
           <SoundCone
@@ -117,7 +108,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'pyramid' ? (
           <SoundPyramid
@@ -135,7 +126,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'plane' ? (
           <SoundPlane
@@ -144,7 +135,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'torus' ? (
           <SoundTorus
@@ -153,7 +144,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'dodecahedronRing' ? (
           <SoundDodecahedronRing
@@ -161,7 +152,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             position={[0, 0, 0]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'spiral' ? (
           <SoundSpiral
@@ -170,7 +161,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
-            audioParams={object.audioParams}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : null}
       </group>
@@ -196,7 +187,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const allObjects = useMemo(() => {
     const objects: SoundObject[] = [];
     const mobileObjects: MobileObjectType[] = [];
-    const effectZones: EffectZone[] = [];
+    const effectZones: EffectZoneType[] = [];
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());
@@ -298,9 +289,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   }, [selectEntity]);
 
   // Función para manejar clic en el espacio vacío
-  const handleBackgroundClick = useCallback((event: React.MouseEvent) => {
+  const handleBackgroundClick = useCallback((event: { object?: { type?: string; geometry?: { type?: string } } }) => {
     // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
-    if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry.type === 'PlaneGeometry') {
+    if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry?.type === 'PlaneGeometry') {
       selectEntity(null);
     }
   }, [selectEntity]);
@@ -445,9 +436,10 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
             scale={selectedEntity.scale}
             enabled={!isLocked} // Deshabilitar si está bloqueada
-            onObjectChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              if (e?.target?.object) {
-                handleTransformChange(selectedEntityId, e.target.object);
+            onObjectChange={(e) => {
+              const event = e as { target?: { object?: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number }; scale?: { x: number; y: number; z: number } } } };
+              if (event?.target?.object) {
+                handleTransformChange(selectedEntityId, event.target.object);
               }
             }}
             onMouseDown={handleTransformStart}

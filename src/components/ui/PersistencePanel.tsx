@@ -15,7 +15,7 @@ export function PersistencePanel() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
 
-  const { grids, activeGridId, currentProjectId, setCurrentProjectId } = useWorldStore();
+  const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
   const { isConnected, isSyncing, lastSyncTime, error } = useRealtimeSync(currentProjectId);
 
   // Cargar proyectos al montar el componente
@@ -130,7 +130,7 @@ export function PersistencePanel() {
 
   const getObjectCount = () => {
     let totalObjects = 0;
-    for (const [_, grid] of grids) {
+    for (const [, grid] of grids) {
       totalObjects += grid.objects.length + grid.mobileObjects.length + grid.effectZones.length;
     }
     return totalObjects;

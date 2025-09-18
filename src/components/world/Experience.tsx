@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { SceneContent } from './SceneContent';
 import { useCameraControls } from '../../hooks/useCameraControls';
 import * as THREE from 'three';
@@ -11,11 +12,10 @@ import { audioManager } from '../../lib/AudioManager';
 import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
 import { useWorldStore } from '../../state/useWorldStore';
 
-
 // Componente interno para manejar los controles de cámara y audio espacializado
-function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<unknown> }) {
-  const { camera } = useThree();
-  const { updateCameraPosition } = useCameraControls(camera, orbitControlsRef.current);
+function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
+  const { } = useThree();
+  const { updateCameraPosition } = useCameraControls();
   
   // Inicializar la espacialización de audio
   useAudioListener();
@@ -47,7 +47,7 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 }
 
 export function Experience() {
-  const orbitControlsRef = useRef<unknown>(null);
+  const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { currentProjectId } = useWorldStore();
   
   console.log('🎬 Experience component rendering...');
@@ -83,7 +83,7 @@ export function Experience() {
           
           // Guardar referencia a la cámara
           if (orbitControlsRef.current) {
-            orbitControlsRef.current.camera = camera;
+            orbitControlsRef.current.object = camera;
           }
         }}
       >
