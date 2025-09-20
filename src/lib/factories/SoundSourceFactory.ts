@@ -351,7 +351,7 @@ export class SoundSourceFactory {
     return polySynth;
   }
 
-  private createSampler(params: AudioParams): Tone.Sampler {
+  private createSampler(params: AudioParams): Tone.Sampler | Tone.AMSynth {
     try {
       return new Tone.Sampler({
         urls: params.urls || { C4: 'C4.mp3' },
@@ -380,7 +380,7 @@ export class SoundSourceFactory {
       
       // Marcar que este objeto usa fallback para futuras referencias
       (fallbackSynth as { _isFallback?: boolean })._isFallback = true;
-      return fallbackSynth as unknown as Tone.Sampler;
+      return fallbackSynth;
     }
   }
 }

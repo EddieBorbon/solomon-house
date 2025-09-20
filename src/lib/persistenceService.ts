@@ -1,5 +1,6 @@
 import { firebaseService, type FirebaseProject, type FirebaseGrid } from './firebaseService';
 import { useWorldStore, type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { Timestamp } from 'firebase/firestore';
 
 // Convertir Grid del store a FirebaseGrid
 export function gridToFirebase(grid: Grid): Omit<FirebaseGrid, 'createdAt' | 'updatedAt'> {
@@ -100,8 +101,8 @@ export class PersistenceService {
         description: description || '',
         grids: firebaseGrids.map(grid => ({
           ...grid,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
         })),
         activeGridId: state.activeGridId
       };
@@ -228,7 +229,11 @@ export class PersistenceService {
       }
 
       const updateData: Partial<FirebaseProject> = {
-        grids: firebaseGrids,
+        grids: firebaseGrids.map(grid => ({
+          ...grid,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        })),
         activeGridId: state.activeGridId
       };
 

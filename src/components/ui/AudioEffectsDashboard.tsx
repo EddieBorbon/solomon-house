@@ -1,3 +1,5 @@
+'use client';
+
 import AudioEffectCard from './AudioEffectCard';
 
 export default function AudioEffectsDashboard() {
