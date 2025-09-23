@@ -14,6 +14,7 @@ import { RefreshEffectsButton } from './RefreshEffectsButton';
 import { EffectParametersSection } from './EffectParametersSection';
 import { TransformControls } from './TransformControls';
 import { EffectSpecificParameters } from './EffectSpecificParameters';
+import { NoSelectionMessage, MobileObjectEditorWrapper } from './parameter-editor';
 
 export function ParameterEditor() {
   const { 
@@ -131,26 +132,7 @@ export function ParameterEditor() {
 
   // Si no hay entidad seleccionada, mostrar mensaje
   if (!selectedEntity) {
-    return (
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
-          {/* Efecto de brillo interior */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
-          
-          <div className="text-center relative z-10">
-            <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-cyan-500/20 to-black/40 rounded-full flex items-center justify-center border border-cyan-400/30">
-              <span className="text-lg">🎯</span>
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              No hay entidad seleccionada
-            </h3>
-            <p className="text-cyan-300 text-sm">
-              Haz clic en un objeto sonoro o zona de efecto en el mundo 3D para seleccionarlo y editar sus parámetros.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <NoSelectionMessage />;
   }
 
   // Renderizar controles según el tipo de entidad seleccionada
@@ -159,39 +141,10 @@ export function ParameterEditor() {
     if (!mobileObject) return null;
     
     return (
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
-          {/* Header con información del objeto móvil */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded bg-gradient-to-br from-purple-500 to-pink-500" />
-                <h3 className="text-lg font-semibold text-white">
-                  Editor de Objeto Móvil
-                </h3>
-              </div>
-              <button
-                onClick={() => {
-                  if (confirm('¿Estás seguro de que quieres eliminar este objeto móvil?')) {
-                    removeMobileObject(mobileObject.id);
-                  }
-                }}
-                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors duration-200"
-                title="Eliminar objeto móvil"
-              >
-                🗑️
-              </button>
-            </div>
-            <div className="text-sm text-gray-400">
-              <p>Tipo: <span className="text-white">Objeto Móvil</span></p>
-              <p>ID: <span className="text-white font-mono text-xs">{mobileObject.id.slice(0, 8)}...</span></p>
-            </div>
-          </div>
-
-          {/* Contenido del editor de objeto móvil */}
-          <MobileObjectEditor mobileObject={mobileObject} />
-        </div>
-      </div>
+      <MobileObjectEditorWrapper 
+        mobileObject={mobileObject} 
+        onRemove={removeMobileObject} 
+      />
     );
   }
   
