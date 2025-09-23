@@ -15,6 +15,7 @@ import { EffectParametersSection } from './EffectParametersSection';
 import { TransformControls } from './TransformControls';
 import { EffectSpecificParameters } from './EffectSpecificParameters';
 import { NoSelectionMessage, MobileObjectEditorWrapper, EffectZoneHeader } from './parameter-editor';
+import { AudioControlSection } from './AudioControlSection';
 
 export function ParameterEditor() {
   const { 
@@ -59,16 +60,13 @@ export function ParameterEditor() {
   React.useEffect(() => {
     if (selectedEntity?.type === 'effectZone') {
       setEditingEffectZone(true);
-      console.log('🎛️ Editor de zona de efectos abierto');
     } else {
       setEditingEffectZone(false);
-      console.log('🎛️ Editor de zona de efectos cerrado');
     }
 
     // Cleanup: desactivar el estado cuando se desmonte el componente
     return () => {
       setEditingEffectZone(false);
-      console.log('🎛️ Editor de zona de efectos desmontado');
     };
   }, [selectedEntity?.type, setEditingEffectZone]);
 
@@ -79,21 +77,14 @@ export function ParameterEditor() {
     const soundObject = getSoundObject();
     if (!soundObject) return;
 
-    console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
-    console.log(`🎛️ UI: Objeto seleccionado:`, soundObject);
-
     const newAudioParams = {
       ...soundObject.audioParams,
       [param]: value,
     };
 
-    console.log(`🎛️ UI: Nuevos parámetros de audio:`, newAudioParams);
-
     updateObject(soundObject.id, {
       audioParams: newAudioParams,
     });
-
-    console.log(`🎵 Parámetro ${param} actualizado a:`, value);
   };
 
   // Función para actualizar parámetros de zona de efecto
@@ -102,8 +93,6 @@ export function ParameterEditor() {
 
     const effectZone = getEffectZone();
     if (!effectZone) return;
-
-    console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
 
     // Mostrar estado de actualización
     setIsUpdatingParams(true);
@@ -117,8 +106,6 @@ export function ParameterEditor() {
     updateEffectZone(effectZone.id, {
       effectParams: newEffectParams,
     });
-
-    console.log(`🎛️ Parámetro de efecto ${param} actualizado a:`, value);
 
     // Ocultar estado de actualización después de un breve delay
     setTimeout(() => {
@@ -1869,139 +1856,10 @@ export function ParameterEditor() {
         </div>
 
         {/* Control de activación de audio */}
-        <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
-          <div className="text-center">
-            <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-              selectedObject.type === 'cone' ? 'bg-orange-500' :
-              selectedObject.type === 'cube' ? 'bg-blue-500' :
-              selectedObject.type === 'sphere' ? 'bg-purple-500' :
-              selectedObject.type === 'cylinder' ? 'bg-green-500' :
-              selectedObject.type === 'pyramid' ? 'bg-red-500' :
-              selectedObject.type === 'icosahedron' ? 'bg-indigo-500' :
-              selectedObject.type === 'torus' ? 'bg-cyan-500' : 
-              selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' :
-              selectedObject.type === 'spiral' ? 'bg-cyan-500' : 'bg-gray-500'
-            }`}>
-              <span className="text-lg">
-                {selectedObject.type === 'cone' ? '🥁' :
-                 selectedObject.type === 'cube' ? '🔷' :
-                 selectedObject.type === 'sphere' ? '🔮' :
-                 selectedObject.type === 'cylinder' ? '🔶' :
-                 selectedObject.type === 'pyramid' ? '🔺' :
-                 selectedObject.type === 'icosahedron' ? '🔶' :
-                 selectedObject.type === 'torus' ? '🔄' : 
-                 selectedObject.type === 'dodecahedronRing' ? '🔷' :
-                 selectedObject.type === 'spiral' ? '🌀' : '❓'}
-              </span>
-            </div>
-            <span className="text-sm font-medium text-gray-300">
-              {selectedObject.type === 'cone' ? 'MembraneSynth' :
-               selectedObject.type === 'cube' ? 'Síntesis AM' :
-               selectedObject.type === 'sphere' ? 'Síntesis FM' :
-               selectedObject.type === 'cylinder' ? 'DuoSynth' :
-               selectedObject.type === 'pyramid' ? 'MonoSynth' :
-               selectedObject.type === 'icosahedron' ? 'MetalSynth' :
-               selectedObject.type === 'plane' ? 'NoiseSynth' :
-               selectedObject.type === 'torus' ? 'PluckSynth' : 
-               selectedObject.type === 'dodecahedronRing' ? 'PolySynth' :
-               selectedObject.type === 'spiral' ? 'Sampler' : 'Objeto de Sonido'}
-            </span>
-            
-
-            
-                         {/* Texto informativo específico para cada tipo */}
-             {selectedObject.type === 'pyramid' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   {selectedObject.audioParams.duration === Infinity 
-                     ? 'Haz clic para activar/desactivar el sonido continuo'
-                     : 'Mantén presionado el clic sobre el objeto para tocar (gate)'
-                   }
-                 </p>
-               </div>
-             ) : selectedObject.type === 'icosahedron' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   Haz clic en el objeto para tocar
-                 </p>
-                 <p className="text-xs text-gray-400 mt-1">
-                   Sonido percusivo metálico
-                 </p>
-               </div>
-             ) : selectedObject.type === 'plane' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   Haz clic en el objeto para tocar
-                 </p>
-                 <p className="text-xs text-gray-400 mt-1">
-                   Generador de ruido percusivo
-                 </p>
-               </div>
-             ) : selectedObject.type === 'torus' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   Haz clic en el objeto para tocar
-                 </p>
-                 <p className="text-xs text-gray-400 mt-1">
-                   Instrumento de cuerdas percusivo
-                 </p>
-               </div>
-             ) : selectedObject.type === 'dodecahedronRing' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   Haz clic para activar/desactivar el acorde continuo
-                 </p>
-                 <p className="text-xs text-gray-400 mt-1">
-                   Instrumento polifónico para acordes
-                 </p>
-               </div>
-             ) : selectedObject.type === 'spiral' ? (
-               <div className="mt-2">
-                 <p className="text-xs text-gray-400 mt-1">
-                   Haz clic en el objeto para tocar
-                 </p>
-                 <p className="text-xs text-gray-400 mt-1">
-                   Sampler percusivo polifónico
-                 </p>
-               </div>
-             ) : (
-              <div className="mt-2">
-                <p className="text-xs text-gray-400 mt-1">
-                  Control de Sonido Continuo
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Duración: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}s
-                </p>
-              </div>
-            )}
-            
-            {/* Botón de activación/desactivación de audio */}
-            <div className="mt-4">
-                             <button
-                 onClick={() => {
-                   const { toggleObjectAudio } = useWorldStore.getState();
-                   toggleObjectAudio(selectedObject.id);
-                 }}
-                 className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-                   selectedObject.audioEnabled
-                     ? 'bg-red-600 hover:bg-red-700 text-white'
-                     : 'bg-green-600 hover:bg-green-700 text-white'
-                 }`}
-               >
-                 {selectedObject.audioEnabled ? '🔇 Desactivar Sonido Continuo' : '🔊 Activar Sonido Continuo'}
-               </button>
-               <p className="text-xs text-gray-400 mt-1 text-center">
-                 {selectedObject.audioEnabled 
-                   ? 'Sonido continuo activado. Haz clic para desactivar.'
-                   : 'Sonido continuo desactivado. Haz clic para activar.'
-                 }
-               </p>
-              <p className="text-xs text-blue-400 mt-2 text-center">
-                💡 El botón controla el sonido continuo. Para sonidos cortos, haz clic en el objeto 3D.
-              </p>
-            </div>
-          </div>
-        </div>
+        <AudioControlSection 
+          selectedObject={selectedObject} 
+          onRemove={removeObject} 
+        />
 
                 {/* Controles de parámetros */}
         <div className="space-y-4">
