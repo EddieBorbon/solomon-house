@@ -200,7 +200,7 @@ export function ParameterEditor() {
     if (!zone) return null;
     
     // Asegurar que effectParams existe
-    if (!zone.effectParams) {
+    if (!zone?.effectParams) {
       zone.effectParams = {};
     }
     
@@ -216,103 +216,34 @@ export function ParameterEditor() {
           <LockControl zone={zone} onToggleLock={toggleLockEffectZone} />
 
           {/* Botón de refrescar efectos */}
-          <div className="mb-6 p-4 bg-blue-900/20 border border-blue-600/50 rounded-lg">
-            <div className="text-center">
-              <button
-                onClick={() => {
-                  // Forzar la actualización de todos los efectos
-                  console.log('🔄 Forzando actualización de todos los efectos...');
-                  setIsRefreshingEffects(true);
-                  refreshAllEffects();
-                  
-                  // Ocultar estado después de un delay
-                  setTimeout(() => {
-                    setIsRefreshingEffects(false);
-                  }, 1000);
-                }}
-                className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Refrescar todos los efectos para asegurar que los cambios se apliquen"
-                disabled={isRefreshingEffects}
-              >
-                {isRefreshingEffects ? '🔄 Refrescando...' : '🔄 Refrescar Efectos'}
-              </button>
-              <p className="text-xs text-blue-400 mt-1 text-center">
-                Fuerza la actualización de todos los efectos para asegurar que los cambios se apliquen en tiempo real
-              </p>
-            </div>
-          </div>
+          <RefreshEffectsButton 
+            isRefreshing={isRefreshingEffects}
+            onRefresh={() => {
+              setIsRefreshingEffects(true);
+              refreshAllEffects();
+              
+              // Ocultar estado después de un delay
+              setTimeout(() => {
+                setIsRefreshingEffects(false);
+              }, 1000);
+            }}
+          />
 
 
           {/* Controles de parámetros del efecto */}
           <div className="space-y-4">
-                              <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
-                    zone.type === 'phaser' ? 'text-purple-400' : 
-                    zone.type === 'autoFilter' ? 'text-green-400' : 
-                    zone.type === 'autoWah' ? 'text-orange-400' : 
-                    zone.type === 'bitCrusher' ? 'text-red-400' : 
-                    zone.type === 'chebyshev' ? 'text-indigo-400' : 'text-teal-400'
-                  }`}>
-                    🎛️ Parámetros del {zone.type === 'phaser' ? 'Phaser' : zone.type === 'autoFilter' ? 'AutoFilter' : zone.type === 'autoWah' ? 'AutoWah' : zone.type === 'bitCrusher' ? 'BitCrusher' : zone.type === 'chebyshev' ? 'Chebyshev' : 'Chorus'}
-                    {isUpdatingParams && (
-                      <span className="text-yellow-400 animate-pulse">🔄</span>
-                    )}
-                  </h4>
-
-                  {/* Control de Radio de la Zona de Efectos */}
-                  <div className="glass-container p-4">
-                    <label className="block text-sm font-bold neon-text mb-3">
-                      Radio de la Zona: {zone.effectParams.radius ?? 2.0}
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1 relative">
-                        <input
-                          type="range"
-                          min="0.5"
-                          max="10"
-                          step="0.1"
-                          value={zone.effectParams.radius ?? 2.0}
-                          onChange={(e) => handleEffectParamChange('radius', Number(e.target.value))}
-                          className="w-full h-2 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
-                          style={{
-                            background: `linear-gradient(to right, #8b5cf6 0%, #06b6d4 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 100%)`
-                          }}
-                        />
-                      </div>
-                      <span className="text-cyan-300 font-mono text-sm min-w-[4rem] text-right bg-black/60 px-2 py-1 rounded-lg border border-cyan-500/30">
-                        {zone.effectParams.radius ?? 2.0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs text-purple-300 mt-2">
-                      <span>0.5</span>
-                      <span>10</span>
-                    </div>
-                    <p className="text-xs text-cyan-300 mt-2 bg-black/40 px-2 py-1 rounded-lg border border-cyan-500/20">
-                      Tamaño de la zona donde se aplica el efecto
-                    </p>
-                  </div>
-                  
-                  {/* Indicador de parámetro actualizado */}
-                  {lastUpdatedParam && (
-                    <div className="mb-3 p-2 bg-green-900/20 border border-green-600/50 rounded-lg">
-                      <p className="text-xs text-green-400 text-center">
-                        ✅ Parámetro <strong>{lastUpdatedParam}</strong> actualizado en tiempo real
-                      </p>
-                    </div>
-                  )}
-                  
-                  {/* Indicador de estado del efecto */}
-                  <div className="mb-3 p-2 bg-blue-900/20 border border-blue-600/50 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-blue-400">
-                        🎵 Efecto <strong>{zone.type}</strong> activo
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs text-green-400">En tiempo real</span>
-                      </div>
-                    </div>
-                  </div>
+            <EffectParametersSection 
+              zone={zone}
+              isUpdatingParams={isUpdatingParams}
+              lastUpdatedParam={lastUpdatedParam}
+              onEffectParamChange={handleEffectParamChange}
+            />
+            
+            {/* Parámetros específicos del efecto */}
+            <EffectSpecificParameters 
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
             
             {/* Frecuencia de modulación */}
             <div>
@@ -325,13 +256,13 @@ export function ParameterEditor() {
                   min="0.1"
                   max="10"
                   step="0.1"
-                  value={zone.effectParams.frequency ?? 1}
+                  value={zone?.effectParams.frequency ?? 1}
                   onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                  disabled={zone.isLocked}
+                  disabled={zone?.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.frequency ?? 1}
+                  {zone?.effectParams.frequency ?? 1}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -351,13 +282,13 @@ export function ParameterEditor() {
                   min="0.1"
                   max="8"
                   step="0.1"
-                  value={zone.effectParams.octaves ?? 2}
+                  value={zone?.effectParams.octaves ?? 2}
                   onChange={(e) => handleEffectParamChange('octaves', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                  disabled={zone.isLocked}
+                  disabled={zone?.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.octaves ?? 2}
+                  {zone?.effectParams.octaves ?? 2}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -377,13 +308,13 @@ export function ParameterEditor() {
                   min="20"
                   max="20000"
                   step="10"
-                  value={zone.effectParams.frequency ?? 200}
+                  value={zone?.effectParams.frequency ?? 200}
                   onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
                   className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                  disabled={zone.isLocked}
+                  disabled={zone?.isLocked}
                 />
                 <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                  {zone.effectParams.frequency ?? 200}
+                  {zone?.effectParams.frequency ?? 200}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -393,7 +324,8 @@ export function ParameterEditor() {
             </div>
 
             {/* Parámetros específicos del AutoFilter */}
-            {zone.type === 'autoFilter' && (
+            {/* @ts-ignore - Disabled section */}
+            {false && zone && zone?.type === 'autoFilter' && (
               <>
                 {/* Depth */}
                 <div>
@@ -406,13 +338,13 @@ export function ParameterEditor() {
                       min="0"
                       max="1"
                       step="0.01"
-                      value={zone.effectParams.depth ?? 0.5}
+                      value={zone?.effectParams.depth ?? 0.5}
                       onChange={(e) => handleEffectParamChange('depth', Number(e.target.value))}
                       className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                     <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                      {zone.effectParams.depth ?? 0.5}
+                      {zone?.effectParams.depth ?? 0.5}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -431,9 +363,9 @@ export function ParameterEditor() {
                       <button
                         key={filterType}
                         onClick={() => handleEffectParamChange('filterType', filterType)}
-                        disabled={zone.isLocked}
+                        disabled={zone?.isLocked}
                         className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                          (zone.effectParams.filterType ?? 'lowpass') === filterType
+                          (zone?.effectParams.filterType ?? 'lowpass') === filterType
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                         }`}
@@ -455,13 +387,13 @@ export function ParameterEditor() {
                       min="0.1"
                       max="10"
                       step="0.1"
-                      value={zone.effectParams.filterQ ?? 1}
+                      value={zone?.effectParams.filterQ ?? 1}
                       onChange={(e) => handleEffectParamChange('filterQ', Number(e.target.value))}
                       className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                     <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-                      {zone.effectParams.filterQ ?? 1}
+                      {zone?.effectParams.filterQ ?? 1}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -480,9 +412,9 @@ export function ParameterEditor() {
                       <button
                         key={lfoType}
                         onClick={() => handleEffectParamChange('lfoType', lfoType)}
-                        disabled={zone.isLocked}
+                        disabled={zone?.isLocked}
                         className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                          (zone.effectParams.lfoType ?? 'sine') === lfoType
+                          (zone?.effectParams.lfoType ?? 'sine') === lfoType
                             ? 'bg-green-600 text-white'
                             : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                         }`}
@@ -496,7 +428,7 @@ export function ParameterEditor() {
             )}
 
                             {/* Parámetros específicos del AutoWah */}
-                {zone.type === 'autoWah' && (
+                {false && zone && zone?.type === 'autoWah' && (
                   <>
                     {/* Sensitivity */}
                     <div>
@@ -509,13 +441,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                                                value={zone.effectParams.sensitivity ?? 0.5}
+                                                value={zone?.effectParams.sensitivity ?? 0.5}
                       onChange={(e) => handleEffectParamChange('sensitivity', Number(e.target.value))}
                       className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                                          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                      {zone.effectParams.sensitivity ?? 0.5}
+                      {zone?.effectParams.sensitivity ?? 0.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -527,7 +459,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del BitCrusher */}
-                {zone.type === 'bitCrusher' && (
+                {false && zone && zone?.type === 'bitCrusher' && (
                   <>
                     {/* Bits */}
                     <div>
@@ -540,13 +472,13 @@ export function ParameterEditor() {
                           min="1"
                           max="16"
                           step="1"
-                          value={zone.effectParams.bits ?? 4}
+                          value={zone?.effectParams.bits ?? 4}
                           onChange={(e) => handleEffectParamChange('bits', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                                                     {zone.effectParams.bits ?? 4}
+                                                     {zone?.effectParams.bits ?? 4}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -566,13 +498,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.normFreq ?? 0.5}
+                          value={zone?.effectParams.normFreq ?? 0.5}
                           onChange={(e) => handleEffectParamChange('normFreq', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                                                     {zone.effectParams.normFreq ?? 0.5}
+                                                     {zone?.effectParams.normFreq ?? 0.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -584,7 +516,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Chebyshev */}
-                {zone.type === 'chebyshev' && (
+                {false && zone && zone?.type === 'chebyshev' && (
                   <>
                     {/* Order */}
                     <div>
@@ -597,13 +529,13 @@ export function ParameterEditor() {
                           min="1"
                           max="100"
                           step="1"
-                          value={zone.effectParams.order ?? 50}
+                          value={zone?.effectParams.order ?? 50}
                           onChange={(e) => handleEffectParamChange('order', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.order ?? 50}
+                          {zone?.effectParams.order ?? 50}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -625,9 +557,9 @@ export function ParameterEditor() {
                           <button
                             key={oversampleType}
                             onClick={() => handleEffectParamChange('oversample', oversampleType)}
-                            disabled={zone.isLocked}
+                            disabled={zone?.isLocked}
                             className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                              (zone.effectParams.oversample ?? 'none') === oversampleType
+                              (zone?.effectParams.oversample ?? 'none') === oversampleType
                                 ? 'bg-indigo-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
@@ -644,7 +576,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Chorus */}
-                {zone.type === 'chorus' && (
+                {false && zone && zone?.type === 'chorus' && (
                   <>
                     {/* Frecuencia del LFO */}
                     <div>
@@ -657,13 +589,13 @@ export function ParameterEditor() {
                           min="0.1"
                           max="10"
                           step="0.1"
-                          value={zone.effectParams.chorusFrequency ?? 1.5}
+                          value={zone?.effectParams.chorusFrequency ?? 1.5}
                           onChange={(e) => handleEffectParamChange('chorusFrequency', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.chorusFrequency ?? 1.5}
+                          {zone?.effectParams.chorusFrequency ?? 1.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -686,13 +618,13 @@ export function ParameterEditor() {
                           min="2"
                           max="20"
                           step="0.1"
-                          value={zone.effectParams.delayTime ?? 3.5}
+                          value={zone?.effectParams.delayTime ?? 3.5}
                           onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.delayTime ?? 3.5}
+                          {zone?.effectParams.delayTime ?? 3.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -715,13 +647,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.chorusDepth ?? 0.7}
+                          value={zone?.effectParams.chorusDepth ?? 0.7}
                           onChange={(e) => handleEffectParamChange('chorusDepth', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.chorusDepth ?? 0.7}
+                          {zone?.effectParams.chorusDepth ?? 0.7}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -744,13 +676,13 @@ export function ParameterEditor() {
                           min="0"
                           max="0.9"
                           step="0.01"
-                          value={zone.effectParams.feedback ?? 0}
+                          value={zone?.effectParams.feedback ?? 0}
                           onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.feedback ?? 0}
+                          {zone?.effectParams.feedback ?? 0}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -773,13 +705,13 @@ export function ParameterEditor() {
                           min="0"
                           max="180"
                           step="1"
-                          value={zone.effectParams.spread ?? 180}
+                          value={zone?.effectParams.spread ?? 180}
                           onChange={(e) => handleEffectParamChange('spread', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.spread ?? 180}
+                          {zone?.effectParams.spread ?? 180}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -801,9 +733,9 @@ export function ParameterEditor() {
                           <button
                             key={lfoType}
                             onClick={() => handleEffectParamChange('chorusType', lfoType)}
-                            disabled={zone.isLocked}
+                            disabled={zone?.isLocked}
                             className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                              (zone.effectParams.chorusType ?? 'sine') === lfoType
+                              (zone?.effectParams.chorusType ?? 'sine') === lfoType
                                 ? 'bg-teal-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
@@ -820,7 +752,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Distortion */}
-                {zone && zone.type === 'distortion' && (
+                {false && zone && zone?.type === 'distortion' && (
                   <>
                     {/* Distortion amount */}
                     <div>
@@ -833,13 +765,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.distortion ?? 0.4}
+                          value={zone?.effectParams.distortion ?? 0.4}
                           onChange={(e) => handleEffectParamChange('distortion', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.distortion ?? 0.4}
+                          {zone?.effectParams.distortion ?? 0.4}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -861,9 +793,9 @@ export function ParameterEditor() {
                           <button
                             key={oversampleType}
                             onClick={() => handleEffectParamChange('oversample', oversampleType)}
-                            disabled={zone.isLocked}
+                            disabled={zone?.isLocked}
                             className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                              (zone.effectParams.oversample ?? 'none') === oversampleType
+                              (zone?.effectParams.oversample ?? 'none') === oversampleType
                                 ? 'bg-pink-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
@@ -880,7 +812,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del FeedbackDelay */}
-                {zone.type === 'feedbackDelay' && (
+                {false && zone && zone?.type === 'feedbackDelay' && (
                   <>
                     {/* Delay Time */}
                     <div>
@@ -893,13 +825,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={typeof zone.effectParams.delayTime === 'number' ? zone.effectParams.delayTime : 0.25}
+                          value={typeof zone?.effectParams.delayTime === 'number' ? zone?.effectParams.delayTime : 0.25}
                           onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {typeof zone.effectParams.delayTime === 'number' ? zone.effectParams.delayTime : '8n'}
+                          {typeof zone?.effectParams.delayTime === 'number' ? zone?.effectParams.delayTime : '8n'}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -922,13 +854,13 @@ export function ParameterEditor() {
                           min="0"
                           max="0.95"
                           step="0.01"
-                          value={zone.effectParams.feedback ?? 0.5}
+                          value={zone?.effectParams.feedback ?? 0.5}
                           onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.feedback ?? 0.5}
+                          {zone?.effectParams.feedback ?? 0.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -943,7 +875,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Freeverb */}
-                {zone.type === 'freeverb' && (
+                {false && zone && zone?.type === 'freeverb' && (
                   <>
                     {/* Room Size */}
                     <div>
@@ -956,13 +888,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.roomSize ?? 0.7}
+                          value={zone?.effectParams.roomSize ?? 0.7}
                           onChange={(e) => handleEffectParamChange('roomSize', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.roomSize ?? 0.7}
+                          {zone?.effectParams.roomSize ?? 0.7}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -985,13 +917,13 @@ export function ParameterEditor() {
                           min="500"
                           max="8000"
                           step="10"
-                          value={zone.effectParams.dampening ?? 3000}
+                          value={zone?.effectParams.dampening ?? 3000}
                           onChange={(e) => handleEffectParamChange('dampening', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.dampening ?? 3000}
+                          {zone?.effectParams.dampening ?? 3000}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1006,7 +938,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del FrequencyShifter */}
-                {zone.type === 'frequencyShifter' && (
+                {false && zone && zone?.type === 'frequencyShifter' && (
                   <>
                     {/* Frequency Shift */}
                     <div>
@@ -1019,13 +951,13 @@ export function ParameterEditor() {
                           min="-2000"
                           max="2000"
                           step="1"
-                          value={zone.effectParams.frequency ?? 0}
+                          value={zone?.effectParams.frequency ?? 0}
                           onChange={(e) => handleEffectParamChange('frequency', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.frequency ?? 0}
+                          {zone?.effectParams.frequency ?? 0}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1040,7 +972,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del JCReverb */}
-                {zone.type === 'jcReverb' && (
+                {false && zone && zone?.type === 'jcReverb' && (
                   <>
                     {/* Room Size */}
                     <div>
@@ -1053,13 +985,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.roomSize ?? 0.5}
+                          value={zone?.effectParams.roomSize ?? 0.5}
                           onChange={(e) => handleEffectParamChange('roomSize', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.roomSize ?? 0.5}
+                          {zone?.effectParams.roomSize ?? 0.5}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1074,7 +1006,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del PingPongDelay */}
-                {zone.type === 'pingPongDelay' && (
+                {false && zone && zone?.type === 'pingPongDelay' && (
                   <>
                     {/* Delay Time */}
                     <div>
@@ -1083,10 +1015,10 @@ export function ParameterEditor() {
                       </label>
                       <div className="flex items-center gap-3">
                         <select
-                          value={zone.effectParams.pingPongDelayTime ?? '4n'}
+                          value={zone?.effectParams.pingPongDelayTime ?? '4n'}
                           onChange={(e) => handleEffectParamChange('pingPongDelayTime', e.target.value)}
                           className="flex-1 px-3 py-2 bg-gray-700 text-white rounded-md border border-gray-600 focus:border-violet-500 focus:outline-none"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         >
                           <option value="1n">Nota completa (1n)</option>
                           <option value="2n">Media nota (2n)</option>
@@ -1104,7 +1036,7 @@ export function ParameterEditor() {
                     {/* Feedback */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Feedback ({(zone.effectParams.pingPongFeedback ?? 0.2) * 100}%)
+                        Feedback ({(zone?.effectParams.pingPongFeedback ?? 0.2) * 100}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1112,13 +1044,13 @@ export function ParameterEditor() {
                           min="0"
                           max="0.9"
                           step="0.05"
-                          value={zone.effectParams.pingPongFeedback ?? 0.2}
+                          value={zone?.effectParams.pingPongFeedback ?? 0.2}
                           onChange={(e) => handleEffectParamChange('pingPongFeedback', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.pingPongFeedback ?? 0.2) * 100)}%
+                          {Math.round((zone?.effectParams.pingPongFeedback ?? 0.2) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1133,7 +1065,7 @@ export function ParameterEditor() {
                     {/* Max Delay */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Max Delay ({zone.effectParams.maxDelay ?? 1.0}s)
+                        Max Delay ({zone?.effectParams.maxDelay ?? 1.0}s)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1141,13 +1073,13 @@ export function ParameterEditor() {
                           min="0.1"
                           max="2"
                           step="0.1"
-                          value={zone.effectParams.maxDelay ?? 1.0}
+                          value={zone?.effectParams.maxDelay ?? 1.0}
                           onChange={(e) => handleEffectParamChange('maxDelay', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.maxDelay ?? 1.0}s
+                          {zone?.effectParams.maxDelay ?? 1.0}s
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1162,7 +1094,7 @@ export function ParameterEditor() {
                     {/* Wet */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                        Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1170,13 +1102,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.wet ?? 0.5}
+                          value={zone?.effectParams.wet ?? 0.5}
                           onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1191,12 +1123,12 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del PitchShift */}
-                {zone.type === 'pitchShift' && (
+                {false && zone && zone?.type === 'pitchShift' && (
                   <>
                     {/* Pitch */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Pitch (Semi-tonos): {zone.effectParams.pitchShift ?? 0}
+                        Pitch (Semi-tonos): {zone?.effectParams.pitchShift ?? 0}
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1204,13 +1136,13 @@ export function ParameterEditor() {
                           min="-24"
                           max="24"
                           step="1"
-                          value={zone.effectParams.pitchShift ?? 0}
+                          value={zone?.effectParams.pitchShift ?? 0}
                           onChange={(e) => handleEffectParamChange('pitchShift', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.pitchShift ?? 0}
+                          {zone?.effectParams.pitchShift ?? 0}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1225,7 +1157,7 @@ export function ParameterEditor() {
                     {/* Window Size */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Window Size ({zone.effectParams.windowSize ?? 0.1}s)
+                        Window Size ({zone?.effectParams.windowSize ?? 0.1}s)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1233,13 +1165,13 @@ export function ParameterEditor() {
                           min="0.03"
                           max="0.1"
                           step="0.01"
-                          value={zone.effectParams.windowSize ?? 0.1}
+                          value={zone?.effectParams.windowSize ?? 0.1}
                           onChange={(e) => handleEffectParamChange('windowSize', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.windowSize ?? 0.1}s
+                          {zone?.effectParams.windowSize ?? 0.1}s
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1254,7 +1186,7 @@ export function ParameterEditor() {
                     {/* Delay Time */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Delay Time ({zone.effectParams.delayTime ?? 0}s)
+                        Delay Time ({zone?.effectParams.delayTime ?? 0}s)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1262,13 +1194,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.delayTime ?? 0}
+                          value={zone?.effectParams.delayTime ?? 0}
                           onChange={(e) => handleEffectParamChange('delayTime', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.delayTime ?? 0}s
+                          {zone?.effectParams.delayTime ?? 0}s
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1283,7 +1215,7 @@ export function ParameterEditor() {
                     {/* Feedback */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Feedback ({(zone.effectParams.feedback ?? 0) * 100}%)
+                        Feedback ({(zone?.effectParams.feedback ?? 0) * 100}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1291,13 +1223,13 @@ export function ParameterEditor() {
                           min="0"
                           max="0.9"
                           step="0.05"
-                          value={zone.effectParams.feedback ?? 0}
+                          value={zone?.effectParams.feedback ?? 0}
                           onChange={(e) => handleEffectParamChange('feedback', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.feedback ?? 0) * 100)}%
+                          {Math.round((zone?.effectParams.feedback ?? 0) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1312,12 +1244,12 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Reverb */}
-                {zone.type === 'reverb' && (
+                {false && zone && zone?.type === 'reverb' && (
                   <>
                     {/* Decay */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Decay ({zone.effectParams.decay ?? 1.5}s)
+                        Decay ({zone?.effectParams.decay ?? 1.5}s)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1325,13 +1257,13 @@ export function ParameterEditor() {
                           min="0.1"
                           max="10"
                           step="0.1"
-                          value={zone.effectParams.decay ?? 1.5}
+                          value={zone?.effectParams.decay ?? 1.5}
                           onChange={(e) => handleEffectParamChange('decay', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.decay ?? 1.5}s
+                          {zone?.effectParams.decay ?? 1.5}s
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1346,7 +1278,7 @@ export function ParameterEditor() {
                     {/* PreDelay */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        PreDelay ({zone.effectParams.preDelay ?? 0.01}s)
+                        PreDelay ({zone?.effectParams.preDelay ?? 0.01}s)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1354,13 +1286,13 @@ export function ParameterEditor() {
                           min="0"
                           max="0.1"
                           step="0.001"
-                          value={zone.effectParams.preDelay ?? 0.01}
+                          value={zone?.effectParams.preDelay ?? 0.01}
                           onChange={(e) => handleEffectParamChange('preDelay', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.preDelay ?? 0.01}s
+                          {zone?.effectParams.preDelay ?? 0.01}s
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1375,7 +1307,7 @@ export function ParameterEditor() {
                     {/* Wet */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                        Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1383,13 +1315,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.wet ?? 0.5}
+                          value={zone?.effectParams.wet ?? 0.5}
                           onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1404,12 +1336,12 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del StereoWidener */}
-                {zone.type === 'stereoWidener' && (
+                {false && zone && zone?.type === 'stereoWidener' && (
                   <>
                     {/* Width */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Width (Ancho Estéreo): {Math.round((zone.effectParams.width ?? 0.5) * 100)}%
+                        Width (Ancho Estéreo): {Math.round((zone?.effectParams.width ?? 0.5) * 100)}%
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1417,13 +1349,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.width ?? 0.5}
+                          value={zone?.effectParams.width ?? 0.5}
                           onChange={(e) => handleEffectParamChange('width', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.width ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.width ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1438,7 +1370,7 @@ export function ParameterEditor() {
                     {/* Wet */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                        Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1446,13 +1378,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.wet ?? 0.5}
+                          value={zone?.effectParams.wet ?? 0.5}
                           onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1467,12 +1399,12 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Tremolo */}
-                {zone.type === 'tremolo' && (
+                {false && zone && zone?.type === 'tremolo' && (
                   <>
                     {/* Frequency */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Frecuencia: {zone.effectParams.tremoloFrequency ?? 10} Hz
+                        Frecuencia: {zone?.effectParams.tremoloFrequency ?? 10} Hz
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1480,13 +1412,13 @@ export function ParameterEditor() {
                           min="0.1"
                           max="20"
                           step="0.1"
-                          value={zone.effectParams.tremoloFrequency ?? 10}
+                          value={zone?.effectParams.tremoloFrequency ?? 10}
                           onChange={(e) => handleEffectParamChange('tremoloFrequency', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.tremoloFrequency ?? 10} Hz
+                          {zone?.effectParams.tremoloFrequency ?? 10} Hz
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1501,7 +1433,7 @@ export function ParameterEditor() {
                     {/* Depth */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Profundidad: {Math.round((zone.effectParams.tremoloDepth ?? 0.5) * 100)}%
+                        Profundidad: {Math.round((zone?.effectParams.tremoloDepth ?? 0.5) * 100)}%
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1509,13 +1441,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.tremoloDepth ?? 0.5}
+                          value={zone?.effectParams.tremoloDepth ?? 0.5}
                           onChange={(e) => handleEffectParamChange('tremoloDepth', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.tremoloDepth ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.tremoloDepth ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1530,7 +1462,7 @@ export function ParameterEditor() {
                     {/* Spread */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Spread: {zone.effectParams.tremoloSpread ?? 180}°
+                        Spread: {zone?.effectParams.tremoloSpread ?? 180}°
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1538,13 +1470,13 @@ export function ParameterEditor() {
                           min="0"
                           max="180"
                           step="1"
-                          value={zone.effectParams.tremoloSpread ?? 180}
+                          value={zone?.effectParams.tremoloSpread ?? 180}
                           onChange={(e) => handleEffectParamChange('tremoloSpread', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.tremoloSpread ?? 180}°
+                          {zone?.effectParams.tremoloSpread ?? 180}°
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1566,9 +1498,9 @@ export function ParameterEditor() {
                           <button
                             key={waveType}
                             onClick={() => handleEffectParamChange('tremoloType', waveType)}
-                            disabled={zone.isLocked}
+                            disabled={zone?.isLocked}
                             className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                              zone.effectParams.tremoloType === waveType
+                              zone?.effectParams.tremoloType === waveType
                                 ? 'bg-purple-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
@@ -1585,7 +1517,7 @@ export function ParameterEditor() {
                     {/* Wet */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                        Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1593,13 +1525,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.wet ?? 0.5}
+                          value={zone?.effectParams.wet ?? 0.5}
                           onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1614,12 +1546,12 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Vibrato */}
-                {zone.type === 'vibrato' && (
+                {false && zone && zone?.type === 'vibrato' && (
                   <>
                     {/* Frequency */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Frecuencia: {zone.effectParams.vibratoFrequency ?? 5} Hz
+                        Frecuencia: {zone?.effectParams.vibratoFrequency ?? 5} Hz
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1627,13 +1559,13 @@ export function ParameterEditor() {
                           min="0.1"
                           max="20"
                           step="0.1"
-                          value={zone.effectParams.vibratoFrequency ?? 5}
+                          value={zone?.effectParams.vibratoFrequency ?? 5}
                           onChange={(e) => handleEffectParamChange('vibratoFrequency', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {zone.effectParams.vibratoFrequency ?? 5} Hz
+                          {zone?.effectParams.vibratoFrequency ?? 5} Hz
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1648,7 +1580,7 @@ export function ParameterEditor() {
                     {/* Depth */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Profundidad: {Math.round((zone.effectParams.vibratoDepth ?? 0.1) * 100)}%
+                        Profundidad: {Math.round((zone?.effectParams.vibratoDepth ?? 0.1) * 100)}%
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1656,13 +1588,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.01"
-                          value={zone.effectParams.vibratoDepth ?? 0.1}
+                          value={zone?.effectParams.vibratoDepth ?? 0.1}
                           onChange={(e) => handleEffectParamChange('vibratoDepth', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.vibratoDepth ?? 0.1) * 100)}%
+                          {Math.round((zone?.effectParams.vibratoDepth ?? 0.1) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1684,9 +1616,9 @@ export function ParameterEditor() {
                           <button
                             key={waveType}
                             onClick={() => handleEffectParamChange('vibratoType', waveType)}
-                            disabled={zone.isLocked}
+                            disabled={zone?.isLocked}
                             className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                              zone.effectParams.vibratoType === waveType
+                              zone?.effectParams.vibratoType === waveType
                                 ? 'bg-purple-600 text-white'
                                 : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                             }`}
@@ -1703,7 +1635,7 @@ export function ParameterEditor() {
                     {/* Max Delay */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Max Delay: {(zone.effectParams.vibratoMaxDelay ?? 0.005) * 1000} ms
+                        Max Delay: {(zone?.effectParams.vibratoMaxDelay ?? 0.005) * 1000} ms
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1711,13 +1643,13 @@ export function ParameterEditor() {
                           min="0.001"
                           max="0.02"
                           step="0.001"
-                          value={zone.effectParams.vibratoMaxDelay ?? 0.005}
+                          value={zone?.effectParams.vibratoMaxDelay ?? 0.005}
                           onChange={(e) => handleEffectParamChange('vibratoMaxDelay', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.vibratoMaxDelay ?? 0.005) * 1000)} ms
+                          {Math.round((zone?.effectParams.vibratoMaxDelay ?? 0.005) * 1000)} ms
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1732,7 +1664,7 @@ export function ParameterEditor() {
                     {/* Wet */}
                     <div>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
-                        Wet (Mezcla) ({Math.round((zone.effectParams.wet ?? 0.5) * 100)}%)
+                        Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
                       </label>
                       <div className="flex items-center gap-3">
                         <input
@@ -1740,13 +1672,13 @@ export function ParameterEditor() {
                           min="0"
                           max="1"
                           step="0.05"
-                          value={zone.effectParams.wet ?? 0.5}
+                          value={zone?.effectParams.wet ?? 0.5}
                           onChange={(e) => handleEffectParamChange('wet', Number(e.target.value))}
                           className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-                          disabled={zone.isLocked}
+                          disabled={zone?.isLocked}
                         />
                         <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-                          {Math.round((zone.effectParams.wet ?? 0.5) * 100)}%
+                          {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -1770,10 +1702,10 @@ export function ParameterEditor() {
               {(['sphere', 'cube'] as const).map((shape) => (
                 <button
                   key={shape}
-                  onClick={() => updateEffectZone(zone.id, { shape })}
-                  disabled={zone.isLocked}
+                  onClick={() => updateEffectZone(zone?.id, { shape })}
+                  disabled={zone?.isLocked}
                   className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                    zone.shape === shape
+                    zone?.shape === shape
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
                   }`}
@@ -1797,9 +1729,9 @@ export function ParameterEditor() {
               <label className="text-xs font-medium text-gray-300">Position</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { axis: 'X', color: 'bg-red-500', value: zone.position[0] },
-                  { axis: 'Y', color: 'bg-green-500', value: zone.position[1] },
-                  { axis: 'Z', color: 'bg-blue-500', value: zone.position[2] }
+                  { axis: 'X', color: 'bg-red-500', value: zone?.position[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone?.position[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone?.position[2] }
                 ].map(({ axis, color, value }, index) => (
                   <div key={axis} className="flex flex-col">
                     <div className="flex items-center gap-1 mb-1">
@@ -1812,12 +1744,12 @@ export function ParameterEditor() {
                       value={roundToDecimals(value)}
                       onChange={(e) => {
                         const newValue = parseFloat(e.target.value) || 0;
-                        const newPosition = [...zone.position] as [number, number, number];
+                        const newPosition = [...zone?.position] as [number, number, number];
                         newPosition[index] = newValue;
-                        updateEffectZone(zone.id, { position: newPosition });
+                        updateEffectZone(zone?.id, { position: newPosition });
                       }}
                       className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                   </div>
                 ))}
@@ -1829,9 +1761,9 @@ export function ParameterEditor() {
               <label className="text-xs font-medium text-gray-300">Rotation</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { axis: 'X', color: 'bg-red-500', value: zone.rotation[0] },
-                  { axis: 'Y', color: 'bg-green-500', value: zone.rotation[1] },
-                  { axis: 'Z', color: 'bg-blue-500', value: zone.rotation[2] }
+                  { axis: 'X', color: 'bg-red-500', value: zone?.rotation[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone?.rotation[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone?.rotation[2] }
                 ].map(({ axis, color, value }, index) => (
                   <div key={axis} className="flex flex-col">
                     <div className="flex items-center gap-1 mb-1">
@@ -1844,12 +1776,12 @@ export function ParameterEditor() {
                       value={roundToDecimals(value)}
                       onChange={(e) => {
                         const newValue = parseFloat(e.target.value) || 0;
-                        const newRotation = [...zone.rotation] as [number, number, number];
+                        const newRotation = [...zone?.rotation] as [number, number, number];
                         newRotation[index] = newValue;
-                        updateEffectZone(zone.id, { rotation: newRotation });
+                        updateEffectZone(zone?.id, { rotation: newRotation });
                       }}
                       className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                   </div>
                 ))}
@@ -1861,9 +1793,9 @@ export function ParameterEditor() {
               <label className="text-xs font-medium text-gray-300">Scale</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { axis: 'X', color: 'bg-red-500', value: zone.scale[0] },
-                  { axis: 'Y', color: 'bg-green-500', value: zone.scale[1] },
-                  { axis: 'Z', color: 'bg-blue-500', value: zone.scale[2] }
+                  { axis: 'X', color: 'bg-red-500', value: zone?.scale[0] },
+                  { axis: 'Y', color: 'bg-green-500', value: zone?.scale[1] },
+                  { axis: 'Z', color: 'bg-blue-500', value: zone?.scale[2] }
                 ].map(({ axis, color, value }, index) => (
                   <div key={axis} className="flex flex-col">
                     <div className="flex items-center gap-1 mb-1">
@@ -1877,12 +1809,12 @@ export function ParameterEditor() {
                       value={roundToDecimals(value)}
                       onChange={(e) => {
                         const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
-                        const newScale = [...zone.scale] as [number, number, number];
+                        const newScale = [...zone?.scale] as [number, number, number];
                         newScale[index] = newValue;
-                        updateEffectZone(zone.id, { scale: newScale });
+                        updateEffectZone(zone?.id, { scale: newScale });
                       }}
                       className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                      disabled={zone.isLocked}
+                      disabled={zone?.isLocked}
                     />
                   </div>
                 ))}
@@ -1894,7 +1826,7 @@ export function ParameterEditor() {
               <button
                 onClick={() => {
                   // Resetear a valores por defecto
-                  updateEffectZone(zone.id, { 
+                  updateEffectZone(zone?.id, { 
                     position: [0, 0, 0], 
                     rotation: [0, 0, 0],
                     scale: [1, 1, 1] 
@@ -1902,14 +1834,14 @@ export function ParameterEditor() {
                 }}
                 className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Resetear posición y tamaño a valores por defecto"
-                disabled={zone.isLocked}
+                disabled={zone?.isLocked}
               >
                 🔄 Reset
               </button>
               <button
                 onClick={() => {
                   // Copiar valores al portapapeles
-                  const transformText = `Position: [${zone.position.join(', ')}]\nRotation: [${zone.rotation.join(', ')}]\nScale: [${zone.scale.join(', ')}]`;
+                  const transformText = `Position: [${zone?.position.join(', ')}]\nRotation: [${zone?.rotation.join(', ')}]\nScale: [${zone?.scale.join(', ')}]`;
                   navigator.clipboard.writeText(transformText);
                 }}
                 className="px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
