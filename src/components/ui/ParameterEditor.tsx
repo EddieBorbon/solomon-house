@@ -8,6 +8,12 @@ import { MobileObjectEditor } from './MobileObjectEditor';
 import { type MobileObjectParams } from '../sound-objects/MobileObject';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
+import { EffectZoneCard } from './EffectZoneCard';
+import { LockControl } from './LockControl';
+import { RefreshEffectsButton } from './RefreshEffectsButton';
+import { EffectParametersSection } from './EffectParametersSection';
+import { TransformControls } from './TransformControls';
+import { EffectSpecificParameters } from './EffectSpecificParameters';
 
 export function ParameterEditor() {
   const { 
@@ -204,32 +210,7 @@ export function ParameterEditor() {
           {/* Efecto de brillo interior */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
           {/* Header con información de la zona de efecto */}
-          <div className="mb-4 relative z-10">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded bg-gradient-to-br from-black to-pink-500 shadow-lg shadow-black/50" />
-                <h3 className="text-lg font-semibold text-white">
-                  Editor de Zona de Efecto
-                </h3>
-              </div>
-              <button
-                onClick={() => {
-                  if (confirm('¿Estás seguro de que quieres eliminar esta zona de efecto?')) {
-                    removeEffectZone(zone.id);
-                  }
-                }}
-                className="px-3 py-2 bg-gradient-to-r from-red-600/80 to-red-700/80 hover:from-red-500/90 hover:to-red-600/90 text-white text-sm rounded-xl hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 border border-red-400/30 hover:border-red-300/50"
-                title="Eliminar zona de efecto"
-              >
-                🗑️
-              </button>
-            </div>
-            <div className="text-sm text-gray-400">
-              <p>Tipo: <span className="text-white">{zone.type}</span></p>
-              <p>Forma: <span className="text-white capitalize">{zone.shape}</span></p>
-              <p>ID: <span className="text-white font-mono text-xs">{zone.id.slice(0, 8)}...</span></p>
-            </div>
-          </div>
+          <EffectZoneCard zone={zone} onRemove={removeEffectZone} />
 
           {/* Control de bloqueo */}
           <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
@@ -871,7 +852,7 @@ export function ParameterEditor() {
                 )}
 
                 {/* Parámetros específicos del Distortion */}
-                {zone.type === 'distortion' && (
+                {zone && zone.type === 'distortion' && (
                   <>
                     {/* Distortion amount */}
                     <div>

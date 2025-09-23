@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -64,7 +64,16 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   const [touchedObjectId, setTouchedObjectId] = useState<string | null>(null);
   const [touchStartTime, setTouchStartTime] = useState<number>(0);
   
-  const { objects, triggerObjectAttackRelease } = useWorldStore();
+  const { grids, triggerObjectAttackRelease } = useWorldStore();
+  
+  // Obtener todos los objetos de todas las cuadrículas
+  const allObjects = useMemo(() => {
+    const objects: any[] = [];
+    grids.forEach((grid) => {
+      objects.push(...grid.objects);
+    });
+    return objects;
+  }, [grids]);
 
   // Crear geometría para la línea de activación
   const lineGeometry = new BufferGeometry().setFromPoints([
@@ -182,14 +191,25 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       position[2] + relativePos[2]
     ];
     
-    for (const obj of objects) {
+    // Debug: Log de objetos disponibles
+    if (allObjects.length > 0) {
+      console.log(`🔍 MobileObject ${id} - Detectando proximidad con ${allObjects.length} objetos`);
+    }
+    
+    for (const obj of allObjects) {
       const distance = Math.sqrt(
         Math.pow(absolutePos[0] - obj.position[0], 2) +
         Math.pow(absolutePos[1] - obj.position[1], 2) +
         Math.pow(absolutePos[2] - obj.position[2], 2)
       );
       
+      // Debug: Log de distancias
+      if (distance <= proximityThreshold * 2) { // Log si está cerca del doble del umbral
+        console.log(`📏 MobileObject ${id} - Distancia a ${obj.type}(${obj.id}): ${distance.toFixed(2)}, umbral: ${proximityThreshold}`);
+      }
+      
       if (distance <= proximityThreshold) {
+        console.log(`🎯 MobileObject ${id} - ¡ACTIVANDO objeto ${obj.type}(${obj.id}) a distancia ${distance.toFixed(2)}!`);
         return obj.id;
       }
     }
@@ -262,6 +282,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     
     if (nearbyObjectId && nearbyObjectId !== activatedObjectId) {
       // Activar objeto sonoro
+      console.log(`🎵 MobileObject ${id} - Llamando triggerObjectAttackRelease para ${nearbyObjectId}`);
       triggerObjectAttackRelease(nearbyObjectId);
       setActivatedObjectId(nearbyObjectId);
       setTouchedObjectId(nearbyObjectId);
@@ -270,7 +291,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       energyRef.current = 1;
       
       // Actualizar línea de activación
-      const targetObj = objects.find(obj => obj.id === nearbyObjectId);
+      const targetObj = allObjects.find(obj => obj.id === nearbyObjectId);
       if (targetObj) {
         updateActivationLine(targetObj.position);
         updateTouchLine(targetObj.position);
@@ -284,7 +305,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
     // Actualizar línea de toque si hay un objeto tocado
     if (touchedObjectId) {
-      const targetObj = objects.find(obj => obj.id === touchedObjectId);
+      const targetObj = allObjects.find(obj => obj.id === touchedObjectId);
       if (targetObj) {
         updateTouchLine(targetObj.position);
       }

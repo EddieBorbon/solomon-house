@@ -4,6 +4,12 @@ import { useWorldStore } from '../../state/useWorldStore';
 
 export function TransformToolbar() {
   const { selectedEntityId, transformMode, setTransformMode } = useWorldStore();
+  
+  const handleDelete = () => {
+    // Simular la acción de Delete
+    const deleteEvent = new KeyboardEvent('keydown', { key: 'Delete' });
+    window.dispatchEvent(deleteEvent);
+  };
 
   // Solo mostrar si hay un objeto seleccionado
   if (!selectedEntityId) {
@@ -56,6 +62,19 @@ export function TransformToolbar() {
             <span className="text-lg">❌</span>
             <span className="hidden sm:inline">Salir</span>
             <span className="text-xs opacity-70">(ESC)</span>
+          </button>
+          
+          {/* Botón para eliminar */}
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 rounded-md font-medium text-sm transition-all duration-200
+              bg-red-600 text-white hover:bg-red-700 hover:scale-102
+              flex items-center gap-2 min-w-[80px] justify-center"
+            title="Eliminar objeto seleccionado (SUPR)"
+          >
+            <span className="text-lg">🗑️</span>
+            <span className="hidden sm:inline">Eliminar</span>
+            <span className="text-xs opacity-70">(SUPR)</span>
           </button>
         </div>
       </div>

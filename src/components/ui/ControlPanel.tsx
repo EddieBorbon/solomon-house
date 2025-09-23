@@ -162,6 +162,9 @@ export function ControlPanel() {
               <p><strong>📷 Cámara:</strong> Click rotar, Scroll zoom</p>
               <p><strong>⌨️ WASD:</strong> Movimiento, Shift rápido</p>
               <p><strong>🎮 Click:</strong> Seleccionar objetos</p>
+              <p><strong>🗑️ SUPR:</strong> Eliminar objeto seleccionado</p>
+              <p><strong>🎮 G/R/S:</strong> Modos de transformación</p>
+              <p><strong>🎮 ESC:</strong> Salir modo edición</p>
             </div>
           </div>
         )}
