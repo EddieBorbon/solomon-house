@@ -8,7 +8,6 @@ import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
 import { EffectParametersSection } from './EffectParametersSection';
 import { EffectSpecificParameters } from './EffectSpecificParameters';
-import { NoSelectionMessage, MobileObjectEditorWrapper } from './parameter-editor';
 import { AudioControlSection } from './AudioControlSection';
 import { EffectZoneHeaderComponent } from './effect-editor/EffectZoneHeader';
 import { EffectBasicParameters } from './effect-editor/EffectBasicParameters';
@@ -22,11 +21,16 @@ import { MonoSynthParameters } from './sound-editor/MonoSynthParameters';
 import { MetalSynthParameters } from './sound-editor/MetalSynthParameters';
 import { NoiseSynthParameters } from './sound-editor/NoiseSynthParameters';
 import { PluckSynthParameters } from './sound-editor/PluckSynthParameters';
+import { PolySynthParameters } from './sound-editor/PolySynthParameters';
+import { SamplerParameters } from './sound-editor/SamplerParameters';
+import { NoSelectionMessage } from './NoSelectionMessage';
+import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
+import { useParameterHandlers } from '../../hooks/useParameterHandlers';
 
 export function ParameterEditor() {
   const { 
-    updateObject, 
-    updateEffectZone, 
+    updateObject,
+    updateEffectZone,
     removeObject, 
     removeMobileObject,
     removeEffectZone, 
@@ -34,6 +38,8 @@ export function ParameterEditor() {
     setEditingEffectZone,
     refreshAllEffects
   } = useWorldStore();
+  
+  const { isUpdatingParams, lastUpdatedParam, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
 
   // Usar el hook personalizado para la selección de entidades
   const {
@@ -57,9 +63,7 @@ export function ParameterEditor() {
   } = useTransformHandler();
 
   // Estado para mostrar cuando se están actualizando los parámetros
-  const [isUpdatingParams, setIsUpdatingParams] = React.useState(false);
   const [isRefreshingEffects, setIsRefreshingEffects] = React.useState(false);
-  const [lastUpdatedParam, setLastUpdatedParam] = React.useState<string | null>(null);
 
   // Efecto para activar/desactivar el estado de edición de zona de efectos
   // NOTA: Este estado ya no bloquea OrbitControls, solo se usa para UI
@@ -83,6 +87,10 @@ export function ParameterEditor() {
     const soundObject = getSoundObject();
     if (!soundObject) return;
 
+    // Mostrar estado de actualización
+    setIsUpdatingParams(true);
+    setLastUpdatedParam(param);
+
     const newAudioParams = {
       ...soundObject.audioParams,
       [param]: value,
@@ -91,6 +99,12 @@ export function ParameterEditor() {
     updateObject(soundObject.id, {
       audioParams: newAudioParams,
     });
+
+    // Ocultar estado de actualización después de un breve delay
+    setTimeout(() => {
+      setIsUpdatingParams(false);
+      setLastUpdatedParam(null);
+    }, 1000);
   };
 
   // Función para actualizar parámetros de zona de efecto
@@ -1966,9 +1980,12 @@ export function ParameterEditor() {
                 </div>
               </div>
           {/* Controles específicos para PolySynth (dodecahedronRing) */}
-          {selectedObject.type === 'dodecahedronRing' && (
-            <>
-              {/* Sección: Parámetros del PolySynth */}
+          <PolySynthParameters 
+            selectedObject={selectedObject}
+            onParamChange={handleParamChange}
+          />
+          
+              {/* Sección: Parámetros del PolySynth - DUPLICADA, SERÁ ELIMINADA */}
               <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-semibold text-pink-400 mb-3 flex items-center gap-2">
                   🔷 Parámetros del PolySynth
@@ -2131,13 +2148,13 @@ export function ParameterEditor() {
                   </div>
                 </div>
               </div>
-            </>
-          )}
-
           {/* Controles específicos para Sampler (spiral) */}
-          {selectedObject.type === 'spiral' && (
-            <>
-              {/* Sección: Parámetros del Sampler */}
+          <SamplerParameters 
+            selectedObject={selectedObject}
+            onParamChange={handleParamChange}
+          />
+          
+              {/* Sección: Parámetros del Sampler - DUPLICADA, SERÁ ELIMINADA */}
               <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
                   🌀 Parámetros del Sampler
@@ -2256,10 +2273,6 @@ export function ParameterEditor() {
                   </p>
                 </div>
               </div>
-            </>
-          )}
-
-
           {/* Sección de Posición y Tamaño - Movida al final */}
           <SoundTransformSection 
             selectedObject={selectedObject}
