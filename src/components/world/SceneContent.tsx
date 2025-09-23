@@ -316,11 +316,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
-    if (orbitControlsRef.current) {
+    // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
+    if (orbitControlsRef.current && selectedEntityId && !selectedEntityId.includes(',')) {
       orbitControlsRef.current.enabled = false;
       console.log('🔄 Transformación iniciada - OrbitControls deshabilitado');
     }
-  }, [orbitControlsRef]);
+  }, [orbitControlsRef, selectedEntityId]);
 
   // Función para manejar el fin de la manipulación
   const handleTransformEnd = useCallback(() => {

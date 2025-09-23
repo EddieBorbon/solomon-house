@@ -40,20 +40,7 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       position={grid.position}
       rotation={grid.rotation || [0, 0, 0]}
       scale={grid.scale || [1, 1, 1]}
-      onClick={handleClick}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        setIsHovered(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={(e) => {
-        e.stopPropagation();
-        setIsHovered(false);
-        document.body.style.cursor = 'auto';
-      }}
     >
-      {/* Sin plano invisible - la cuadrícula será seleccionable directamente */}
-      
       {/* Cuadrícula con líneas usando Grid de drei - más visible */}
       <Grid
         args={[grid.gridSize, grid.gridSize]}
@@ -71,14 +58,28 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       />
       
       
-      {/* Esferas en las esquinas - más visibles */}
+      {/* Esferas en las esquinas - clickeables para selección */}
       {[
         [-grid.gridSize/2, 0, -grid.gridSize/2],
         [grid.gridSize/2, 0, -grid.gridSize/2],
         [-grid.gridSize/2, 0, grid.gridSize/2],
         [grid.gridSize/2, 0, grid.gridSize/2]
       ].map((corner, index) => (
-        <mesh key={index} position={corner as [number, number, number]}>
+        <mesh 
+          key={index} 
+          position={corner as [number, number, number]}
+          onClick={handleClick}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setIsHovered(true);
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={(e) => {
+            e.stopPropagation();
+            setIsHovered(false);
+            document.body.style.cursor = 'auto';
+          }}
+        >
           <sphereGeometry args={[0.3, 12, 8]} />
           <meshBasicMaterial 
             color={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#888888'}
@@ -93,6 +94,65 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
           color={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#666666'}
         />
       </mesh>
+      
+      {/* Bordes clickeables adicionales para facilitar la selección */}
+      {/* Bordes horizontales */}
+      {[
+        [0, 0, -grid.gridSize/2], // Borde frontal
+        [0, 0, grid.gridSize/2]  // Borde trasero
+      ].map((edge, index) => (
+        <mesh 
+          key={`horizontal-${index}`} 
+          position={edge as [number, number, number]}
+          onClick={handleClick}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setIsHovered(true);
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={(e) => {
+            e.stopPropagation();
+            setIsHovered(false);
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          <boxGeometry args={[grid.gridSize, 0.1, 0.2]} />
+          <meshBasicMaterial 
+            color={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#888888'}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+      ))}
+      
+      {/* Bordes verticales */}
+      {[
+        [-grid.gridSize/2, 0, 0], // Borde izquierdo
+        [grid.gridSize/2, 0, 0]   // Borde derecho
+      ].map((edge, index) => (
+        <mesh 
+          key={`vertical-${index}`} 
+          position={edge as [number, number, number]}
+          onClick={handleClick}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            setIsHovered(true);
+            document.body.style.cursor = 'pointer';
+          }}
+          onPointerOut={(e) => {
+            e.stopPropagation();
+            setIsHovered(false);
+            document.body.style.cursor = 'auto';
+          }}
+        >
+          <boxGeometry args={[0.2, 0.1, grid.gridSize]} />
+          <meshBasicMaterial 
+            color={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#888888'}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+      ))}
       
       {/* Círculo de selección eliminado - solo se mantiene la iluminación verde */}
       

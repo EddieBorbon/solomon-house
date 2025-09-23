@@ -6,11 +6,11 @@ import { type AudioParams } from '../../lib/AudioManager';
 import React from 'react';
 import { MobileObjectEditor } from './MobileObjectEditor';
 import { type MobileObjectParams } from '../sound-objects/MobileObject';
+import { useEntitySelector } from '../../hooks/useEntitySelector';
+import { useTransformHandler } from '../../hooks/useTransformHandler';
 
 export function ParameterEditor() {
   const { 
-    grids,
-    selectedEntityId, 
     updateObject, 
     updateEffectZone, 
     removeObject, 
@@ -21,54 +21,31 @@ export function ParameterEditor() {
     refreshAllEffects
   } = useWorldStore();
 
+  // Usar el hook personalizado para la selección de entidades
+  const {
+    selectedEntity,
+    selectedEntityId,
+    isSoundObject,
+    isMobileObject,
+    isEffectZone,
+    getSoundObject,
+    getMobileObject,
+    getEffectZone,
+    hasSelection
+  } = useEntitySelector();
+
+  // Usar el hook personalizado para transformaciones
+  const {
+    updateTransform,
+    resetTransform,
+    roundToDecimals,
+    canTransform
+  } = useTransformHandler();
+
   // Estado para mostrar cuando se están actualizando los parámetros
   const [isUpdatingParams, setIsUpdatingParams] = React.useState(false);
   const [isRefreshingEffects, setIsRefreshingEffects] = React.useState(false);
   const [lastUpdatedParam, setLastUpdatedParam] = React.useState<string | null>(null);
-
-  // Encontrar la entidad seleccionada (objeto sonoro o zona de efecto)
-  const selectedEntity = useMemo(() => {
-    console.log(`🔍 ParameterEditor - Buscando entidad con ID: ${selectedEntityId}`);
-    console.log(`🔍 ParameterEditor - Cuadrículas disponibles:`, Array.from(grids.keys()));
-    
-    if (!selectedEntityId) {
-      console.log(`🔍 ParameterEditor - No hay entidad seleccionada`);
-      return null;
-    }
-    
-    // Buscar en todas las cuadrículas
-    for (const grid of grids.values()) {
-      console.log(`🔍 ParameterEditor - Buscando en cuadrícula ${grid.id}:`, {
-        objects: grid.objects.length,
-        mobileObjects: grid.mobileObjects.length,
-        effectZones: grid.effectZones.length
-      });
-      
-      // Buscar en objetos sonoros
-      const soundObject = grid.objects.find(obj => obj.id === selectedEntityId);
-      if (soundObject) {
-        console.log(`✅ ParameterEditor - Objeto sonoro encontrado:`, soundObject);
-        return { type: 'soundObject', data: soundObject };
-      }
-      
-      // Buscar en objetos móviles
-      const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
-      if (mobileObject) {
-        console.log(`✅ ParameterEditor - Objeto móvil encontrado:`, mobileObject);
-        return { type: 'mobileObject', data: mobileObject };
-      }
-      
-      // Buscar en zonas de efectos
-      const effectZone = grid.effectZones.find(zone => zone.id === selectedEntityId);
-      if (effectZone) {
-        console.log(`✅ ParameterEditor - Zona de efecto encontrada:`, effectZone);
-        return { type: 'effectZone', data: effectZone };
-      }
-    }
-    
-    console.log(`❌ ParameterEditor - Entidad ${selectedEntityId} no encontrada en ninguna cuadrícula`);
-    return null;
-  }, [grids, selectedEntityId]);
 
   // Efecto para activar/desactivar el estado de edición de zona de efectos
   // NOTA: Este estado ya no bloquea OrbitControls, solo se usa para UI
@@ -90,9 +67,11 @@ export function ParameterEditor() {
 
   // Función para actualizar un parámetro específico de objeto sonoro
   const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
-    if (!selectedEntity || selectedEntity.type !== 'soundObject') return;
+    if (!isSoundObject) return;
 
-    const soundObject = selectedEntity.data as unknown as { id: string; audioParams: AudioParams; [key: string]: unknown };
+    const soundObject = getSoundObject();
+    if (!soundObject) return;
+
     console.log(`🎛️ UI: Cambiando parámetro ${param} a:`, value);
     console.log(`🎛️ UI: Objeto seleccionado:`, soundObject);
 
@@ -112,9 +91,11 @@ export function ParameterEditor() {
 
   // Función para actualizar parámetros de zona de efecto
   const handleEffectParamChange = (param: string, value: number | string) => {
-    if (!selectedEntity || selectedEntity.type !== 'effectZone') return;
+    if (!isEffectZone) return;
 
-    const effectZone = selectedEntity.data as unknown as { id: string; effectParams: Record<string, unknown>; [key: string]: unknown };
+    const effectZone = getEffectZone();
+    if (!effectZone) return;
+
     console.log(`🎛️ UI: Cambiando parámetro de efecto ${param} a:`, value);
 
     // Mostrar estado de actualización
@@ -139,52 +120,8 @@ export function ParameterEditor() {
     }, 1000);
   };
 
-  // Función para actualizar transformación de la entidad
-  const handleTransformChange = (
-    property: 'position' | 'rotation' | 'scale',
-    axis: 0 | 1 | 2,
-    value: number
-  ) => {
-    if (!selectedEntity) return;
-
-    const newValues = [
-      ...selectedEntity.data[property]
-    ] as [number, number, number];
-    
-    newValues[axis] = value;
-
-    if (selectedEntity.type === 'soundObject') {
-      updateObject(selectedEntity.data.id, {
-        [property]: newValues
-      });
-    } else if (selectedEntity.type === 'effectZone') {
-      updateEffectZone(selectedEntity.data.id, {
-        [property]: newValues
-      });
-    }
-  };
-
-  // Función para resetear transformación
-  const resetTransform = () => {
-    if (!selectedEntity) return;
-
-    const resetValues = {
-      position: [0, 0, 0] as [number, number, number],
-      rotation: [0, 0, 0] as [number, number, number],
-      scale: [1, 1, 1] as [number, number, number]
-    };
-
-    if (selectedEntity.type === 'soundObject') {
-      updateObject(selectedEntity.data.id, resetValues);
-    } else if (selectedEntity.type === 'effectZone') {
-      updateEffectZone(selectedEntity.data.id, resetValues);
-    }
-  };
-
-  // Función para redondear decimales
-  const roundToDecimals = (value: number, decimals: number = 2) => {
-    return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
-  };
+  // Alias para mantener compatibilidad con el código existente
+  const handleTransformChange = updateTransform;
 
   // Si no hay entidad seleccionada, mostrar mensaje
   if (!selectedEntity) {
@@ -211,13 +148,9 @@ export function ParameterEditor() {
   }
 
   // Renderizar controles según el tipo de entidad seleccionada
-  if (selectedEntity.type === 'mobileObject') {
-    const mobileObject = selectedEntity.data as unknown as { 
-      id: string; 
-      position: [number, number, number]; 
-      mobileParams: MobileObjectParams; 
-      [key: string]: unknown 
-    };
+  if (isMobileObject) {
+    const mobileObject = getMobileObject();
+    if (!mobileObject) return null;
     
     return (
       <div className="fixed top-4 right-4 z-50">
@@ -256,8 +189,9 @@ export function ParameterEditor() {
     );
   }
   
-  if (selectedEntity.type === 'effectZone') {
-    const zone = selectedEntity.data as EffectZone; // Type assertion para zona de efecto
+  if (isEffectZone) {
+    const zone = getEffectZone();
+    if (!zone) return null;
     
     // Asegurar que effectParams existe
     if (!zone.effectParams) {
@@ -2051,7 +1985,8 @@ export function ParameterEditor() {
   }
 
   // Renderizar controles para objeto sonoro (código existente)
-  const selectedObject = selectedEntity.data as SoundObject; // Type assertion para objeto sonoro
+  const selectedObject = getSoundObject();
+  if (!selectedObject) return null;
   
   // Asegurar que audioParams existe
   if (!selectedObject.audioParams) {
