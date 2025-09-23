@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo, useState } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -16,9 +16,8 @@ interface SoundSpiralProps {
 }
 
 export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }) => {
+  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
-    const groupRef = useRef<THREE.Group>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
 
@@ -64,13 +63,13 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
 
     // Animación de rotación continua
     useFrame((state, delta) => {
-      if (groupRef.current) {
+      if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
         // Rotación lenta sobre el eje Y
-        groupRef.current.rotation.y += delta * 0.2;
+        ref.current.rotation.y += delta * 0.2;
         
         // Efecto de "respiración" sutil
         const breathing = Math.sin(state.clock.elapsedTime * 2) * 0.05 + 1;
-        groupRef.current.scale.setScalar(breathing);
+        ref.current.scale.setScalar(breathing);
       }
       
       // Actualizar tiempo del pulso
@@ -103,7 +102,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
 
     return (
       <group
-        ref={groupRef}
+        ref={ref}
         position={position}
         rotation={rotation}
         scale={scale}

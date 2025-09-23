@@ -137,23 +137,23 @@ export function PersistencePanel() {
   };
 
   return (
-    <div className="mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <span className="text-xl">💾</span>
+    <div className="mb-2">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+          <span className="text-sm">💾</span>
           Persistencia
         </h3>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-cyan-500/20"
+          className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
           title={isExpanded ? "Ocultar menú" : "Mostrar menú"}
         >
           {isExpanded ? (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
             </svg>
           ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           )}
@@ -161,121 +161,92 @@ export function PersistencePanel() {
       </div>
       
       {isExpanded && (
-        <div className="space-y-3">
-          {/* Información del estado actual */}
-          <div className="p-3 bg-gray-800/50 border border-gray-600/50 rounded-lg">
-            <div className="text-sm text-gray-300 mb-2">Estado Actual</div>
-            <div className="text-xs text-gray-400 mb-2">
-              {getGridCount()} cuadrículas, {getObjectCount()} objetos
-            </div>
-            
-            {/* Estado de sincronización en tiempo real */}
+        <div className="space-y-1">
+          {/* Información compacta del estado actual */}
+          <div className="p-2 bg-gray-800/50 border border-gray-600/50 rounded text-xs text-gray-300">
+            <div>{getGridCount()} cuadrículas, {getObjectCount()} objetos</div>
             {currentProjectId && (
-              <div className="mt-2 pt-2 border-t border-gray-600/50">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className={`w-2 h-2 rounded-full ${
-                    isConnected ? 'bg-green-500' : 'bg-red-500'
-                  }`} />
-                  <span className="text-xs text-gray-300">
-                    {isConnected ? 'Sincronización activa' : 'Sin sincronización'}
-                  </span>
-                </div>
-                
-                {isSyncing && (
-                  <div className="flex items-center gap-2 text-xs text-cyan-400">
-                    <div className="w-3 h-3 border border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                    <span>Sincronizando...</span>
-                  </div>
-                )}
-                
-                {lastSyncTime && (
-                  <div className="text-xs text-gray-500">
-                    Última sync: {lastSyncTime.toLocaleTimeString()}
-                  </div>
-                )}
-                
-                {error && (
-                  <div className="text-xs text-red-400 mt-1">
-                    Error: {error}
-                  </div>
-                )}
+              <div className="flex items-center gap-1 mt-1">
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  isConnected ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+                <span className="text-xs">
+                  {isConnected ? 'Sync activa' : 'Sin sync'}
+                </span>
               </div>
             )}
           </div>
 
-          {/* Botones de acción */}
-          <div className="space-y-2">
+          {/* Botones compactos */}
+          <div className="grid grid-cols-2 gap-1">
             <button
               onClick={() => setShowSaveDialog(true)}
               disabled={isLoading}
-              className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="px-2 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
             >
-              <span>💾</span>
-              <span>Guardar Proyecto</span>
+              💾 Guardar
             </button>
 
             <button
               onClick={() => setShowLoadDialog(true)}
               disabled={isLoading}
-              className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
             >
-              <span>📂</span>
-              <span>Cargar Proyecto</span>
+              📂 Cargar
             </button>
-
-            {currentProjectId && (
-              <button
-                onClick={handleUpdateProject}
-                disabled={isLoading}
-                className="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center space-x-2"
-              >
-                <span>🔄</span>
-                <span>Actualizar Proyecto</span>
-              </button>
-            )}
           </div>
+
+          {currentProjectId && (
+            <button
+              onClick={handleUpdateProject}
+              disabled={isLoading}
+              className="w-full px-2 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
+            >
+              🔄 Actualizar
+            </button>
+          )}
 
           {/* Diálogo de guardar */}
           {showSaveDialog && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-600 w-96">
-                <h3 className="text-lg font-semibold text-white mb-4">Guardar Proyecto</h3>
+              <div className="bg-gray-800 p-4 rounded-lg border border-gray-600 w-80">
+                <h3 className="text-sm font-semibold text-white mb-3">Guardar Proyecto</h3>
                 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">Nombre del proyecto</label>
+                    <label className="block text-xs text-gray-300 mb-1">Nombre</label>
                     <input
                       type="text"
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none"
+                      className="w-full px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none text-sm"
                       placeholder="Mi Proyecto"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">Descripción (opcional)</label>
+                    <label className="block text-xs text-gray-300 mb-1">Descripción</label>
                     <textarea
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none"
-                      placeholder="Descripción del proyecto..."
-                      rows={3}
+                      className="w-full px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none text-sm"
+                      placeholder="Descripción..."
+                      rows={2}
                     />
                   </div>
                 </div>
 
-                <div className="flex space-x-2 mt-4">
+                <div className="flex space-x-1 mt-3">
                   <button
                     onClick={handleSaveProject}
                     disabled={isLoading || !projectName.trim()}
-                    className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded transition-colors"
+                    className="flex-1 px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded text-sm transition-colors"
                   >
                     {isLoading ? 'Guardando...' : 'Guardar'}
                   </button>
                   <button
                     onClick={() => setShowSaveDialog(false)}
-                    className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+                    className="flex-1 px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm transition-colors"
                   >
                     Cancelar
                   </button>

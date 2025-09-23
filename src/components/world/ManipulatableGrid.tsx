@@ -40,29 +40,19 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       position={grid.position}
       rotation={grid.rotation || [0, 0, 0]}
       scale={grid.scale || [1, 1, 1]}
+      onClick={handleClick}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setIsHovered(true);
+        document.body.style.cursor = 'pointer';
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        setIsHovered(false);
+        document.body.style.cursor = 'auto';
+      }}
     >
-      {/* Plano invisible más grande para facilitar la selección */}
-      <mesh 
-        position={[0, 0.01, 0]}
-        onClick={handleClick}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setIsHovered(true);
-          document.body.style.cursor = 'pointer';
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setIsHovered(false);
-          document.body.style.cursor = 'auto';
-        }}
-      >
-        <planeGeometry args={[grid.gridSize + 2, grid.gridSize + 2]} />
-        <meshBasicMaterial 
-          transparent 
-          opacity={0} 
-          side={2} // DoubleSide
-        />
-      </mesh>
+      {/* Sin plano invisible - la cuadrícula será seleccionable directamente */}
       
       {/* Cuadrícula con líneas usando Grid de drei - más visible */}
       <Grid
@@ -104,18 +94,7 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
         />
       </mesh>
       
-      {/* Borde de selección más visible */}
-      {grid.isSelected && (
-        <mesh position={[0, 0.02, 0]}>
-          <ringGeometry args={[grid.gridSize/2 - 0.5, grid.gridSize/2 + 0.5, 32]} />
-          <meshBasicMaterial 
-            color="#00ff88"
-            transparent
-            opacity={0.6}
-            side={2}
-          />
-        </mesh>
-      )}
+      {/* Círculo de selección eliminado - solo se mantiene la iluminación verde */}
       
       {/* Indicador de hover */}
       {isHovered && !grid.isSelected && (

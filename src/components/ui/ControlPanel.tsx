@@ -126,29 +126,29 @@ export function ControlPanel() {
 
 
   return (
-      <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 z-50 min-w-[280px] max-w-[320px] max-h-[70vh] overflow-hidden">
+      <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl p-2 z-50 min-w-[180px] max-w-[200px] max-h-[50vh] overflow-hidden">
       {/* Efecto de brillo interior */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-xl pointer-events-none"></div>
       
       
       {/* Sección de Controles */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <span className="text-xl">💡</span>
+      <div className="mb-2">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+            <span className="text-sm">💡</span>
             Controles
           </h3>
           <button
             onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-            className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-cyan-500/20"
+            className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
             title={isControlsExpanded ? "Ocultar controles" : "Mostrar controles"}
           >
             {isControlsExpanded ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             )}
@@ -156,78 +156,35 @@ export function ControlPanel() {
         </div>
         
         {isControlsExpanded && (
-          <div className="space-y-3 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent">
-            {/* Controles de cámara */}
-            <div className="p-3 bg-gray-800/50 border border-gray-600/50 rounded-lg">
-              <h4 className="text-sm font-semibold text-gray-300 mb-2">📷 Cámara</h4>
-              <div className="space-y-1 text-xs text-gray-400">
-                <p>• <strong>Click izquierdo:</strong> Rotar cámara</p>
-                <p>• <strong>Scroll:</strong> Zoom</p>
-                <p>• <strong>Click derecho:</strong> Pan</p>
-                <p>• <strong>Click en objetos:</strong> Seleccionar</p>
-              </div>
-            </div>
-
-            {/* Controles de teclado WASD */}
-            <div className="p-3 bg-green-900/20 border border-green-700/50 rounded-lg">
-              <h4 className="text-sm font-semibold text-green-300 mb-2">⌨️ Controles WASD</h4>
-              <div className="space-y-1 text-xs text-green-200">
-                <p>• <strong>W:</strong> Mover hacia adelante</p>
-                <p>• <strong>S:</strong> Mover hacia atrás</p>
-                <p>• <strong>A:</strong> Mover a la izquierda</p>
-                <p>• <strong>D:</strong> Mover a la derecha</p>
-                <p>• <strong>Q:</strong> Mover hacia abajo</p>
-                <p>• <strong>E:</strong> Mover hacia arriba</p>
-                <p>• <strong>Shift:</strong> Movimiento rápido</p>
-              </div>
-            </div>
-
-            {/* Modos de interacción */}
-            <div className="p-3 bg-blue-900/20 border border-blue-700/50 rounded-lg">
-              <h4 className="text-sm font-semibold text-blue-300 mb-2">🎮 Modos de Interacción</h4>
-              <div className="space-y-1 text-xs text-blue-200">
-                <p>• <strong>Clic corto:</strong> Toca una nota con duración configurable</p>
-                <p>• <strong>Clic sostenido:</strong> Mantén presionado para sonido continuo (gate)</p>
-                <p>• <strong>Botón de audio:</strong> Activa/desactiva el sonido permanente</p>
-              </div>
-            </div>
-
-            {/* Información sobre zonas de efectos */}
-            <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg">
-              <h4 className="text-sm font-semibold text-purple-300 mb-2">🎛️ Zonas de Efectos</h4>
-              <div className="space-y-1 text-xs text-purple-200">
-                                    <p>• <strong>Zonas Phaser:</strong> Aplican efectos de modulación de fase</p>
-                    <p>• <strong>Zonas AutoFilter:</strong> Aplican filtros automáticos con LFO</p>
-                    <p>• <strong>Zonas AutoWah:</strong> Aplican filtros automáticos con seguimiento de amplitud</p>
-                    <p>• <strong>Zonas BitCrusher:</strong> Aplican efectos de reducción de bits y frecuencia</p>
-                    <p>• <strong>Zonas Chebyshev:</strong> Aplican efectos de distorsión polinomial</p>
-                    <p>• <strong>Zonas Chorus:</strong> Aplican efectos de coro estéreo con LFO</p>
-                    <p>• <strong>Detección automática:</strong> Los objetos dentro de la zona se procesan</p>
-                    <p>• <strong>Bloqueo:</strong> Usa el candado para proteger zonas de cambios</p>
-              </div>
+          <div className="space-y-1 max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-cyan-500/30 scrollbar-track-transparent">
+            {/* Controles básicos */}
+            <div className="p-2 bg-gray-800/50 border border-gray-600/50 rounded text-xs text-gray-300">
+              <p><strong>📷 Cámara:</strong> Click rotar, Scroll zoom</p>
+              <p><strong>⌨️ WASD:</strong> Movimiento, Shift rápido</p>
+              <p><strong>🎮 Click:</strong> Seleccionar objetos</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Sección de Añadir Objeto */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <span className="text-xl">➕</span>
-            Objetos Sonoros
+      <div className="mb-2">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+            <span className="text-sm">➕</span>
+            Objetos
           </h3>
           <button
             onClick={() => setIsAddMenuExpanded(!isAddMenuExpanded)}
-            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-purple-500/20"
+            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-purple-500/20"
             title={isAddMenuExpanded ? "Ocultar menú" : "Mostrar menú"}
           >
             {isAddMenuExpanded ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             )}
@@ -235,146 +192,42 @@ export function ControlPanel() {
         </div>
         
         {isAddMenuExpanded && (
-          <div className="space-y-3">
-
-
-            {/* Slider de navegación para objetos sonoros */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-cyan-300 mb-2">
-                <span>Objetos Disponibles</span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={scrollLeft}
-                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
-                    title="Scroll izquierda"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll</span>
-                  <button
-                    onClick={scrollRight}
-                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
-                    title="Scroll derecha"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="w-full h-1 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full"></div>
-            </div>
-
-            {/* Contenedor con scroll horizontal para los objetos */}
-            <div 
-              ref={scrollContainerRef}
-              className="flex space-x-3 overflow-x-auto scrollbar-thin scroll-smooth scroll-fade pb-2"
-            >
-              <button
-                onClick={handleAddCube}
-                className="flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>⬜</span>
-                <span>Cubo</span>
-              </button>
-              
-              <button
-                onClick={handleAddSphere}
-                className="flex-shrink-0 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔵</span>
-                <span>Esfera</span>
-              </button>
-              
-              <button
-                onClick={handleAddCylinder}
-                className="flex-shrink-0 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔶</span>
-                <span>Cilindro</span>
-              </button>
-              
-              <button
-                onClick={handleAddCone}
-                className="flex-shrink-0 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🥁</span>
-                <span>Cono</span>
-              </button>
-              
-              <button
-                onClick={handleAddPyramid}
-                className="flex-shrink-0 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔺</span>
-                <span>Pirámide</span>
-              </button>
-              
-              <button
-                onClick={handleAddIcosahedron}
-                className="flex-shrink-0 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔶</span>
-                <span>Icosaedro</span>
-              </button>
-              
-              <button
-                onClick={handleAddPlane}
-                className="flex-shrink-0 px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🟦</span>
-                <span>Plano</span>
-              </button>
-              
-              <button
-                onClick={handleAddTorus}
-                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔄</span>
-                <span>Toroide</span>
-              </button>
-
-              <button
-                onClick={handleAddDodecahedronRing}
-                className="flex-shrink-0 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🔷</span>
-                <span>Anillo de Dodecaedros</span>
-              </button>
-
-              <button
-                onClick={handleAddSpiral}
-                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🌀</span>
-                <span>Espiral de Samples</span>
-              </button>
-
+          <div className="space-y-1">
+            {/* Botones compactos en grid */}
+            <div className="grid grid-cols-2 gap-1">
+              <button onClick={handleAddCube} className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">⬜ Cubo</button>
+              <button onClick={handleAddSphere} className="px-2 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600">🔵 Esfera</button>
+              <button onClick={handleAddCylinder} className="px-2 py-1 bg-emerald-500 text-white rounded text-xs hover:bg-emerald-600">🔶 Cilindro</button>
+              <button onClick={handleAddCone} className="px-2 py-1 bg-orange-500 text-white rounded text-xs hover:bg-orange-600">🥁 Cono</button>
+              <button onClick={handleAddPyramid} className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">🔺 Pirámide</button>
+              <button onClick={handleAddIcosahedron} className="px-2 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">🔶 Icosaedro</button>
+              <button onClick={handleAddPlane} className="px-2 py-1 bg-blue-400 text-white rounded text-xs hover:bg-blue-500">🟦 Plano</button>
+              <button onClick={handleAddTorus} className="px-2 py-1 bg-cyan-500 text-white rounded text-xs hover:bg-cyan-600">🔄 Toroide</button>
+              <button onClick={handleAddDodecahedronRing} className="px-2 py-1 bg-pink-500 text-white rounded text-xs hover:bg-pink-600">🔷 Anillo</button>
+              <button onClick={handleAddSpiral} className="px-2 py-1 bg-cyan-500 text-white rounded text-xs hover:bg-cyan-600">🌀 Espiral</button>
             </div>
           </div>
         )}
       </div>
 
       {/* Sección de Zonas de Efectos */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <span className="text-xl">🎛️</span>
-            Zonas de Efectos
+      <div className="mb-2">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+            <span className="text-sm">🎛️</span>
+            Efectos
           </h3>
           <button
             onClick={() => setIsEffectsExpanded(!isEffectsExpanded)}
-            className="text-pink-400 hover:text-pink-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-pink-500/20"
+            className="text-pink-400 hover:text-pink-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-pink-500/20"
             title={isEffectsExpanded ? "Ocultar menú" : "Mostrar menú"}
           >
             {isEffectsExpanded ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             )}
@@ -382,176 +235,26 @@ export function ControlPanel() {
         </div>
         
         {isEffectsExpanded && (
-          <div className="space-y-3">
-            {/* Slider de navegación para zonas de efectos */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-cyan-300 mb-2">
-                <span>Efectos Disponibles</span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={scrollEffectsLeft}
-                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
-                    title="Scroll izquierda"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  <span className="text-xs bg-cyan-500/20 px-2 py-1 rounded-full">Scroll</span>
-                  <button
-                    onClick={scrollEffectsRight}
-                    className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
-                    title="Scroll derecha"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="w-full h-1 bg-gradient-to-r from-cyan-500/30 via-purple-500/30 to-pink-500/30 rounded-full"></div>
-            </div>
-
-            {/* Contenedor con scroll horizontal para las zonas de efectos */}
-            <div 
-              ref={effectsScrollContainerRef}
-              className="flex space-x-3 overflow-x-auto scrollbar-thin scroll-smooth scroll-fade pb-2"
-            >
-              <button
-                onClick={handleAddPhaserZone}
-                className="flex-shrink-0 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Phaser</span>
-              </button>
-              
-              <button
-                onClick={handleAddAutoFilterZone}
-                className="flex-shrink-0 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>AutoFilter</span>
-              </button>
-              
-              <button
-                onClick={handleAddAutoWahZone}
-                className="flex-shrink-0 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>AutoWah</span>
-              </button>
-              
-              <button
-                onClick={handleAddBitCrusherZone}
-                className="flex-shrink-0 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>BitCrusher</span>
-              </button>
-              
-              <button
-                onClick={handleAddChebyshevZone}
-                className="flex-shrink-0 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Chebyshev</span>
-              </button>
-              
-              <button
-                onClick={handleAddChorusZone}
-                className="flex-shrink-0 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Chorus</span>
-              </button>
-
-              <button
-                onClick={handleAddDistortionZone}
-                className="flex-shrink-0 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Distortion</span>
-              </button>
-
-              <button
-                onClick={handleAddFeedbackDelayZone}
-                className="flex-shrink-0 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>FeedbackDelay</span>
-              </button>
-
-              <button
-                onClick={handleAddFreeverbZone}
-                className="flex-shrink-0 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Freeverb</span>
-              </button>
-
-              <button
-                onClick={handleAddFrequencyShifterZone}
-                className="flex-shrink-0 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>FrequencyShifter</span>
-              </button>
-
-              <button
-                onClick={handleAddJCReverbZone}
-                className="flex-shrink-0 px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>JCReverb</span>
-              </button>
-
-              <button
-                onClick={handleAddPingPongDelayZone}
-                className="flex-shrink-0 px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>PingPongDelay</span>
-              </button>
-
-              <button
-                onClick={handleAddPitchShiftZone}
-                className="flex-shrink-0 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>PitchShift</span>
-              </button>
-
-              <button
-                onClick={handleAddReverbZone}
-                className="flex-shrink-0 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Reverb</span>
-              </button>
-
-              <button
-                onClick={handleAddStereoWidenerZone}
-                className="flex-shrink-0 px-4 py-2 bg-lime-500 text-white rounded-lg hover:bg-lime-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>StereoWidener</span>
-              </button>
-
-              <button
-                onClick={handleAddTremoloZone}
-                className="flex-shrink-0 px-4 py-2 bg-fuchsia-500 text-white rounded-lg hover:bg-fuchsia-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Tremolo</span>
-              </button>
-              
-              <button
-                onClick={handleAddVibratoZone}
-                className="flex-shrink-0 px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors flex items-center justify-center space-x-2 min-w-[120px]"
-              >
-                <span>🎛️</span>
-                <span>Vibrato</span>
-              </button>
+          <div className="space-y-1">
+            {/* Botones compactos en grid */}
+            <div className="grid grid-cols-2 gap-1">
+              <button onClick={handleAddPhaserZone} className="px-2 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600">🎛️ Phaser</button>
+              <button onClick={handleAddAutoFilterZone} className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">🎛️ AutoFilter</button>
+              <button onClick={handleAddAutoWahZone} className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">🎛️ AutoWah</button>
+              <button onClick={handleAddBitCrusherZone} className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">🎛️ BitCrusher</button>
+              <button onClick={handleAddChebyshevZone} className="px-2 py-1 bg-pink-500 text-white rounded text-xs hover:bg-pink-600">🎛️ Chebyshev</button>
+              <button onClick={handleAddChorusZone} className="px-2 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">🎛️ Chorus</button>
+              <button onClick={handleAddDistortionZone} className="px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600">🎛️ Distortion</button>
+              <button onClick={handleAddFeedbackDelayZone} className="px-2 py-1 bg-teal-500 text-white rounded text-xs hover:bg-teal-600">🎛️ FeedbackDelay</button>
+              <button onClick={handleAddFreeverbZone} className="px-2 py-1 bg-cyan-500 text-white rounded text-xs hover:bg-cyan-600">🎛️ Freeverb</button>
+              <button onClick={handleAddFrequencyShifterZone} className="px-2 py-1 bg-emerald-500 text-white rounded text-xs hover:bg-emerald-600">🎛️ FreqShift</button>
+              <button onClick={handleAddJCReverbZone} className="px-2 py-1 bg-violet-500 text-white rounded text-xs hover:bg-violet-600">🎛️ JCReverb</button>
+              <button onClick={handleAddPingPongDelayZone} className="px-2 py-1 bg-rose-500 text-white rounded text-xs hover:bg-rose-600">🎛️ PingPong</button>
+              <button onClick={handleAddPitchShiftZone} className="px-2 py-1 bg-sky-500 text-white rounded text-xs hover:bg-sky-600">🎛️ PitchShift</button>
+              <button onClick={handleAddReverbZone} className="px-2 py-1 bg-amber-500 text-white rounded text-xs hover:bg-amber-600">🎛️ Reverb</button>
+              <button onClick={handleAddStereoWidenerZone} className="px-2 py-1 bg-lime-500 text-white rounded text-xs hover:bg-lime-600">🎛️ StereoWidener</button>
+              <button onClick={handleAddTremoloZone} className="px-2 py-1 bg-fuchsia-500 text-white rounded text-xs hover:bg-fuchsia-600">🎛️ Tremolo</button>
+              <button onClick={handleAddVibratoZone} className="px-2 py-1 bg-slate-500 text-white rounded text-xs hover:bg-slate-600">🎛️ Vibrato</button>
             </div>
           </div>
         )}
@@ -561,23 +264,23 @@ export function ControlPanel() {
       <PersistencePanel />
 
       {/* Sección de Objeto Móvil */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <span className="text-xl">🚀</span>
-            Objeto Móvil
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+            <span className="text-sm">🚀</span>
+            Móvil
           </h3>
           <button
             onClick={() => setIsMobileObjectExpanded(!isMobileObjectExpanded)}
-            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-2 rounded-lg hover:bg-purple-500/20"
+            className="text-purple-400 hover:text-purple-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-purple-500/20"
             title={isMobileObjectExpanded ? "Ocultar menú" : "Mostrar menú"}
           >
             {isMobileObjectExpanded ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             )}
@@ -585,13 +288,13 @@ export function ControlPanel() {
         </div>
         
         {isMobileObjectExpanded && (
-          <div className="space-y-3">
+          <div className="space-y-1">
             <button
               onClick={handleAddMobileObject}
-              className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-3 group shadow-lg hover:shadow-purple-500/25"
+              className="w-full px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded text-xs hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center space-x-1"
             >
-              <span className="text-2xl group-hover:scale-110 transition-transform duration-200">🚀</span>
-              <span className="font-medium text-lg">Añadir Objeto Móvil</span>
+              <span className="text-sm">🚀</span>
+              <span>Añadir Móvil</span>
             </button>
           </div>
         )}
