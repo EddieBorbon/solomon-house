@@ -24,6 +24,8 @@ import { PluckSynthParameters } from './sound-editor/PluckSynthParameters';
 import { PolySynthParameters } from './sound-editor/PolySynthParameters';
 import { SoundObjectControls } from './sound-editor/SoundObjectControls';
 import { SamplerParameters } from './sound-editor/SamplerParameters';
+import { EffectZoneEditor } from './effect-editor/EffectZoneEditor';
+import { SoundObjectEditor } from './sound-editor/SoundObjectEditor';
 import { SoundObjectFooter } from './sound-editor/SoundObjectFooter';
 import { NoSelectionMessage } from './NoSelectionMessage';
 import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
