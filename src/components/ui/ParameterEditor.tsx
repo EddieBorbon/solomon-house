@@ -19,6 +19,7 @@ import { SynthSpecificParameters } from './sound-editor/SynthSpecificParameters'
 import { SoundTransformSection } from './sound-editor/SoundTransformSection';
 import { AdvancedSynthParameters } from './sound-editor/AdvancedSynthParameters';
 import { MonoSynthParameters } from './sound-editor/MonoSynthParameters';
+import { MetalSynthParameters } from './sound-editor/MetalSynthParameters';
 
 export function ParameterEditor() {
   const { 
@@ -1635,9 +1636,12 @@ export function ParameterEditor() {
           
 
           {/* Controles específicos para MetalSynth (icosaedro) */}
-          {selectedObject.type === 'icosahedron' && (
-            <>
-              {/* Sección: Parámetros del MetalSynth */}
+          <MetalSynthParameters 
+            selectedObject={selectedObject}
+            onParamChange={handleParamChange}
+          />
+          
+              {/* Sección: Parámetros del MetalSynth - DUPLICADA, SERÁ ELIMINADA */}
               <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-semibold text-indigo-400 mb-3 flex items-center gap-2">
                   🔶 Parámetros del MetalSynth
@@ -1743,8 +1747,6 @@ export function ParameterEditor() {
                   </div>
                 </div>
               </div>
-            </>
-          )}
 
           {/* Controles específicos para NoiseSynth (plano) */}
           {selectedObject.type === 'plane' && (
