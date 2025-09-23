@@ -20,6 +20,8 @@ import { SoundTransformSection } from './sound-editor/SoundTransformSection';
 import { AdvancedSynthParameters } from './sound-editor/AdvancedSynthParameters';
 import { MonoSynthParameters } from './sound-editor/MonoSynthParameters';
 import { MetalSynthParameters } from './sound-editor/MetalSynthParameters';
+import { NoiseSynthParameters } from './sound-editor/NoiseSynthParameters';
+import { PluckSynthParameters } from './sound-editor/PluckSynthParameters';
 
 export function ParameterEditor() {
   const { 
@@ -1749,9 +1751,12 @@ export function ParameterEditor() {
               </div>
 
           {/* Controles específicos para NoiseSynth (plano) */}
-          {selectedObject.type === 'plane' && (
-            <>
-              {/* Sección: Parámetros del NoiseSynth */}
+          <NoiseSynthParameters 
+            selectedObject={selectedObject}
+            onParamChange={handleParamChange}
+          />
+          
+              {/* Sección: Parámetros del NoiseSynth - DUPLICADA, SERÁ ELIMINADA */}
               <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
                   🟦 Parámetros del NoiseSynth
@@ -1873,13 +1878,13 @@ export function ParameterEditor() {
                   </div>
                 </div>
               </div>
-            </>
-          )}
-
           {/* Controles específicos para PluckSynth (torus) */}
-          {selectedObject.type === 'torus' && (
-            <>
-              {/* Sección: Parámetros del PluckSynth */}
+          <PluckSynthParameters 
+            selectedObject={selectedObject}
+            onParamChange={handleParamChange}
+          />
+          
+              {/* Sección: Parámetros del PluckSynth - DUPLICADA, SERÁ ELIMINADA */}
               <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
                 <h4 className="text-sm font-semibold text-cyan-400 mb-3 flex items-center gap-2">
                   🔄 Parámetros del PluckSynth
@@ -1960,9 +1965,6 @@ export function ParameterEditor() {
                   </div>
                 </div>
               </div>
-            </>
-          )}
-
           {/* Controles específicos para PolySynth (dodecahedronRing) */}
           {selectedObject.type === 'dodecahedronRing' && (
             <>
