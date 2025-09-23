@@ -14,7 +14,7 @@ import { RefreshEffectsButton } from './RefreshEffectsButton';
 import { EffectParametersSection } from './EffectParametersSection';
 import { TransformControls } from './TransformControls';
 import { EffectSpecificParameters } from './EffectSpecificParameters';
-import { NoSelectionMessage, MobileObjectEditorWrapper } from './parameter-editor';
+import { NoSelectionMessage, MobileObjectEditorWrapper, EffectZoneHeader } from './parameter-editor';
 
 export function ParameterEditor() {
   const { 
@@ -163,14 +163,11 @@ export function ParameterEditor() {
           {/* Efecto de brillo interior */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
           {/* Header con información de la zona de efecto */}
-          <EffectZoneCard zone={zone} onRemove={removeEffectZone} />
-
-          {/* Control de bloqueo */}
-          <LockControl zone={zone} onToggleLock={toggleLockEffectZone} />
-
-          {/* Botón de refrescar efectos */}
-          <RefreshEffectsButton 
-            isRefreshing={isRefreshingEffects}
+          <EffectZoneHeader 
+            zone={zone}
+            isRefreshingEffects={isRefreshingEffects}
+            onRemove={removeEffectZone}
+            onToggleLock={toggleLockEffectZone}
             onRefresh={() => {
               setIsRefreshingEffects(true);
               refreshAllEffects();
