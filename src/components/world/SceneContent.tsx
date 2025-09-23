@@ -253,7 +253,25 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       const updates: Record<string, unknown> = {};
       
       if (newTransform.position) {
-        updates.position = [newTransform.position.x, newTransform.position.y, newTransform.position.z];
+        // Convertir posición mundial a posición local
+        let localPosition = [newTransform.position.x, newTransform.position.y, newTransform.position.z];
+        
+        // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
+        for (const grid of grids.values()) {
+          if (grid.objects.some(obj => obj.id === entityId) ||
+              grid.mobileObjects.some(obj => obj.id === entityId) ||
+              grid.effectZones.some(zone => zone.id === entityId)) {
+            // Convertir a posición local: posición mundial - posición de la cuadrícula
+            localPosition = [
+              newTransform.position.x - grid.position[0],
+              newTransform.position.y - grid.position[1],
+              newTransform.position.z - grid.position[2]
+            ];
+            break;
+          }
+        }
+        
+        updates.position = localPosition;
       }
       
       if (newTransform.rotation) {
@@ -279,7 +297,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         }
       }
     }
-  }, [updateObject, updateMobileObject, updateEffectZone, allObjects]);
+  }, [updateObject, updateMobileObject, updateEffectZone, allObjects, grids]);
 
   // Función para manejar la selección de entidades
   const handleEntitySelect = useCallback((id: string) => {
@@ -426,13 +444,29 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // Verificar si la zona está bloqueada
         const isLocked = 'isLocked' in selectedEntity && selectedEntity.isLocked;
         
+        // Encontrar la cuadrícula que contiene este objeto para calcular la posición mundial
+        let worldPosition = selectedEntity.position;
+        for (const grid of grids.values()) {
+          if (grid.objects.some(obj => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
+              grid.effectZones.some(zone => zone.id === selectedEntityId)) {
+            // Calcular posición mundial: posición de la cuadrícula + posición local del objeto
+            worldPosition = [
+              grid.position[0] + selectedEntity.position[0],
+              grid.position[1] + selectedEntity.position[1],
+              grid.position[2] + selectedEntity.position[2]
+            ] as [number, number, number];
+            break;
+          }
+        }
+        
         return (
           <TransformControls
             key={`${selectedEntityId}-${transformMode}`}
             object={entityRefs.get(selectedEntityId)?.current || undefined}
             mode={transformMode}
+            position={worldPosition}
             // No aplicar la rotación del objeto al gizmo para que se mantenga alineado con la vista
-            position={selectedEntity.position}
             rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
             scale={selectedEntity.scale}
             enabled={!isLocked} // Deshabilitar si está bloqueada
