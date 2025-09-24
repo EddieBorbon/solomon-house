@@ -374,7 +374,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     return useGridStore.getState().activeGridId;
   },
   currentProjectId: null, // No hay proyecto cargado inicialmente
-  gridSize: 10,
+  gridSize: 20,
   renderDistance: 2,
   objects: [],
   mobileObjects: [],

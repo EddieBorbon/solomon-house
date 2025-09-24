@@ -194,108 +194,127 @@ input:focus, select:focus {
 }
 
 .futuristic-button-text {
-  @apply relative text-xs font-mono tracking-wider;
+  @apply relative text-xs font-mono tracking-wider text-white;
 }
 
-/* Estilos para sliders futuristas - FORZADOS */
+/* Estilos para sliders futuristas - FORZADOS CON MAYOR ESPECIFICIDAD */
+input[type="range"].futuristic-slider,
 .futuristic-slider {
-  @apply w-full h-2 bg-black border border-white appearance-none cursor-pointer;
+  @apply w-full h-3 bg-black border border-white appearance-none cursor-pointer;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   appearance: none !important;
   background: #000000 !important;
   border: 1px solid #ffffff !important;
+  position: relative !important;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1) !important;
 }
 
+input[type="range"].futuristic-slider::-webkit-slider-thumb,
 .futuristic-slider::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   appearance: none !important;
-  width: 16px !important;
-  height: 16px !important;
-  background: #000000 !important;
-  border: 1px solid #ffffff !important;
+  width: 18px !important;
+  height: 18px !important;
+  background: #00ffff !important;
+  border: 2px solid #ffffff !important;
   cursor: pointer !important;
-  border-radius: 0 !important;
-  transition: all 0.2s ease !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(255, 255, 255, 0.3) !important;
+  position: relative !important;
 }
 
+input[type="range"].futuristic-slider::-webkit-slider-thumb:hover,
 .futuristic-slider::-webkit-slider-thumb:hover {
-  background: #333333 !important;
-  border: 1px solid #ffffff !important;
-  transform: scale(1.1) !important;
-  box-shadow: none !important;
+  background: #00dddd !important;
+  border: 2px solid #ffffff !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.5) !important;
 }
 
+input[type="range"].futuristic-slider::-webkit-slider-track,
 .futuristic-slider::-webkit-slider-track {
   width: 100% !important;
-  height: 8px !important;
+  height: 12px !important;
   background: #000000 !important;
   border: 1px solid #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.1) !important;
 }
 
+input[type="range"].futuristic-slider::-webkit-slider-runnable-track,
 .futuristic-slider::-webkit-slider-runnable-track {
   width: 100% !important;
-  height: 8px !important;
+  height: 12px !important;
   background: #000000 !important;
   border: 1px solid #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.1) !important;
 }
 
+input[type="range"].futuristic-slider::-moz-range-thumb,
 .futuristic-slider::-moz-range-thumb {
-  width: 16px !important;
-  height: 16px !important;
-  background: #000000 !important;
-  border: 1px solid #ffffff !important;
+  width: 18px !important;
+  height: 18px !important;
+  background: #00ffff !important;
+  border: 2px solid #ffffff !important;
   cursor: pointer !important;
-  border-radius: 0 !important;
-  transition: all 0.2s ease !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(255, 255, 255, 0.3) !important;
 }
 
+input[type="range"].futuristic-slider::-moz-range-thumb:hover,
 .futuristic-slider::-moz-range-thumb:hover {
-  background: #333333 !important;
-  border: 1px solid #ffffff !important;
-  transform: scale(1.1) !important;
-  box-shadow: none !important;
+  background: #00dddd !important;
+  border: 2px solid #ffffff !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.5) !important;
 }
 
+input[type="range"].futuristic-slider::-moz-range-track,
 .futuristic-slider::-moz-range-track {
   width: 100% !important;
-  height: 8px !important;
+  height: 12px !important;
   background: #000000 !important;
   border: 1px solid #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.1) !important;
 }
 
+input[type="range"].futuristic-slider::-moz-range-progress,
 .futuristic-slider::-moz-range-progress {
-  height: 8px !important;
-  background: #ffffff !important;
+  height: 12px !important;
+  background: linear-gradient(90deg, #00ffff 0%, #0088ff 100%) !important;
   border: 1px solid #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important;
 }
 
-/* Estilos adicionales para sobrescribir cualquier estilo azul */
+/* Estilos adicionales para sobrescribir cualquier estilo azul - MAYOR ESPECIFICIDAD */
 input[type="range"].futuristic-slider {
   background: #000000 !important;
   border: 1px solid #ffffff !important;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1) !important;
 }
 
 input[type="range"].futuristic-slider::-webkit-slider-thumb {
-  background: #000000 !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: none !important;
+  background: #00ffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(255, 255, 255, 0.3) !important;
 }
 
 input[type="range"].futuristic-slider::-moz-range-thumb {
-  background: #000000 !important;
-  border: 1px solid #ffffff !important;
-  box-shadow: none !important;
+  background: #00ffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), inset 0 0 5px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estilo para el progreso del slider en WebKit */
+input[type="range"].futuristic-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, #00ffff 0%, #0088ff 100%) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4) !important;
 }
 
 /* Estilos para labels futuristas */
@@ -309,7 +328,7 @@ input[type="range"].futuristic-slider::-moz-range-thumb {
 
 /* Estilos para contenedores de parámetros */
 .futuristic-param-container {
-  @apply relative border border-white p-3 mb-3;
+  @apply relative border border-white p-3 mb-3 bg-black;
 }
 
 .futuristic-param-container::before,

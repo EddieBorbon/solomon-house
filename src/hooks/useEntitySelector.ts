@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
+import { useObjectStore } from '../stores/useObjectStore';
 
 /**
  * Tipos de entidades que pueden ser seleccionadas
@@ -39,20 +40,20 @@ export function useEntitySelector() {
       return null;
     }
     
-    // Buscar en todas las cuadrículas
+    // Buscar en objetos sonoros usando el ObjectStore
+    const objectStore = useObjectStore.getState();
+    const soundObject = objectStore.getObjectById(selectedEntityId);
+    if (soundObject) {
+      console.log(`✅ EntitySelector - Objeto sonoro encontrado en ObjectStore:`, soundObject);
+      return { type: 'soundObject', data: soundObject };
+    }
+    
+    // Buscar en objetos móviles y zonas de efectos en las cuadrículas
     for (const grid of grids.values()) {
       console.log(`🔍 EntitySelector - Buscando en cuadrícula ${grid.id}:`, {
-        objects: grid.objects.length,
         mobileObjects: grid.mobileObjects.length,
         effectZones: grid.effectZones.length
       });
-      
-      // Buscar en objetos sonoros
-      const soundObject = grid.objects.find(obj => obj.id === selectedEntityId);
-      if (soundObject) {
-        console.log(`✅ EntitySelector - Objeto sonoro encontrado:`, soundObject);
-        return { type: 'soundObject', data: soundObject };
-      }
       
       // Buscar en objetos móviles
       const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
@@ -69,7 +70,7 @@ export function useEntitySelector() {
       }
     }
     
-    console.log(`❌ EntitySelector - Entidad ${selectedEntityId} no encontrada en ninguna cuadrícula`);
+    console.log(`❌ EntitySelector - Entidad ${selectedEntityId} no encontrada`);
     return null;
   }, [grids, selectedEntityId]);
 

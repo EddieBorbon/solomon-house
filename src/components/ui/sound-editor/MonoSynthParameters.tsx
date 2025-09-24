@@ -36,7 +36,7 @@ export function MonoSynthParameters({
               step="0.001"
               value={selectedObject.audioParams.ampAttack || 0.01}
               onChange={(e) => onParamChange('ampAttack', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.ampAttack || 0.01).toFixed(3)}s
@@ -61,7 +61,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.ampDecay || 0.2}
               onChange={(e) => onParamChange('ampDecay', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.ampDecay || 0.2).toFixed(2)}s
@@ -86,7 +86,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.ampSustain || 0.1}
               onChange={(e) => onParamChange('ampSustain', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {Math.round((selectedObject.audioParams.ampSustain || 0.1) * 100)}%
@@ -111,7 +111,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.ampRelease || 0.5}
               onChange={(e) => onParamChange('ampRelease', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.ampRelease || 0.5).toFixed(2)}s
@@ -143,7 +143,7 @@ export function MonoSynthParameters({
               step="0.001"
               value={selectedObject.audioParams.filterAttack || 0.005}
               onChange={(e) => onParamChange('filterAttack', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.filterAttack || 0.005).toFixed(3)}s
@@ -168,7 +168,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.filterDecay || 0.1}
               onChange={(e) => onParamChange('filterDecay', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.filterDecay || 0.1).toFixed(2)}s
@@ -193,7 +193,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.filterSustain || 0.05}
               onChange={(e) => onParamChange('filterSustain', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {Math.round((selectedObject.audioParams.filterSustain || 0.05) * 100)}%
@@ -218,7 +218,7 @@ export function MonoSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.filterRelease || 0.2}
               onChange={(e) => onParamChange('filterRelease', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.filterRelease || 0.2).toFixed(2)}s
@@ -243,7 +243,7 @@ export function MonoSynthParameters({
               step="1"
               value={selectedObject.audioParams.filterBaseFreq || 200}
               onChange={(e) => onParamChange('filterBaseFreq', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {selectedObject.audioParams.filterBaseFreq || 200}Hz
@@ -268,7 +268,7 @@ export function MonoSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.filterOctaves || 4}
               onChange={(e) => onParamChange('filterOctaves', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.filterOctaves || 4).toFixed(1)}
@@ -293,7 +293,7 @@ export function MonoSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.filterQ || 2}
               onChange={(e) => onParamChange('filterQ', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.filterQ || 2).toFixed(1)}

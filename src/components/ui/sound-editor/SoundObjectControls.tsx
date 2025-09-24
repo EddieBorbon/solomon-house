@@ -86,7 +86,7 @@ export function SoundObjectControls({
         onParamChange={onParamChange}
       />
 
-      {/* Sección de Posición y Tamaño */}
+      {/* Sección de Posición y Tamaño - Al final */}
       <SoundTransformSection 
         selectedObject={selectedObject}
         onTransformChange={onTransformChange}

@@ -481,18 +481,39 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         
         // Encontrar la cuadrícula que contiene este objeto para calcular la posición mundial
         let worldPosition = selectedEntity.position;
-        for (const grid of grids.values()) {
-          if (grid.objects.some(obj => obj.id === selectedEntityId) ||
-              grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
-              grid.effectZones.some(zone => zone.id === selectedEntityId)) {
-            // Calcular posición mundial: posición de la cuadrícula + posición local del objeto
-            worldPosition = [
-              grid.position[0] + selectedEntity.position[0],
-              grid.position[1] + selectedEntity.position[1],
-              grid.position[2] + selectedEntity.position[2]
-            ] as [number, number, number];
-            break;
+        let foundGrid = null;
+        
+        // Para objetos sonoros, buscar en el ObjectStore para encontrar la cuadrícula
+        if (allObjects.objects.some(obj => obj.id === selectedEntityId)) {
+          const { useObjectStore } = require('../../stores/useObjectStore');
+          const objectStore = useObjectStore.getState();
+          
+          // Buscar en todas las cuadrículas para encontrar dónde está el objeto
+          for (const grid of grids.values()) {
+            const gridObjects = objectStore.getAllObjects(grid.id);
+            if (gridObjects.some(obj => obj.id === selectedEntityId)) {
+              foundGrid = grid;
+              break;
+            }
           }
+        } else {
+          // Para objetos móviles y zonas de efectos, buscar en las cuadrículas
+          for (const grid of grids.values()) {
+            if (grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
+                grid.effectZones.some(zone => zone.id === selectedEntityId)) {
+              foundGrid = grid;
+              break;
+            }
+          }
+        }
+        
+        if (foundGrid) {
+          // Calcular posición mundial: posición de la cuadrícula + posición local del objeto
+          worldPosition = [
+            foundGrid.position[0] + selectedEntity.position[0],
+            foundGrid.position[1] + selectedEntity.position[1],
+            foundGrid.position[2] + selectedEntity.position[2]
+          ] as [number, number, number];
         }
         
         return (

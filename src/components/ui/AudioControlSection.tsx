@@ -144,15 +144,6 @@ export function AudioControlSection({ selectedObject, onRemove }: AudioControlSe
               {selectedObject.audioEnabled ? 'DEACTIVATE_CONTINUOUS_AUDIO' : 'ACTIVATE_CONTINUOUS_AUDIO'}
             </span>
           </button>
-          <p className="text-[10px] font-mono text-white tracking-wider mt-2 text-center">
-            {selectedObject.audioEnabled 
-              ? 'CONTINUOUS_AUDIO_ACTIVATED_CLICK_TO_DEACTIVATE'
-              : 'CONTINUOUS_AUDIO_DEACTIVATED_CLICK_TO_ACTIVATE'
-            }
-          </p>
-         <p className="text-[8px] font-mono text-white tracking-wider mt-2 text-center">
-           AUDIO_CONTROL_INFO_FOR_SHORT_SOUNDS_CLICK_3D_OBJECT
-         </p>
         </div>
         </div>
       </div>

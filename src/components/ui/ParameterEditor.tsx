@@ -526,58 +526,6 @@ export function ParameterEditor() {
           onRemove={removeObject}
         />
 
-
-        {/* Parámetros avanzados de sintetizadores */}
-        <AdvancedSynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-        {/* Controles específicos para MonoSynth (pirámide) */}
-        <MonoSynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-
-        {/* Controles específicos para MetalSynth (icosaedro) */}
-        <MetalSynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-
-        {/* Controles específicos para NoiseSynth (plano) */}
-        <NoiseSynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-        {/* Controles específicos para PluckSynth (torus) */}
-        <PluckSynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-        {/* Controles específicos para PolySynth (dodecahedronRing) */}
-        <PolySynthParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-        {/* Controles específicos para Sampler (spiral) */}
-        <SamplerParameters
-          selectedObject={selectedObject}
-          onParamChange={handleParamChange}
-        />
-
-        {/* Sección de Posición y Tamaño - Movida al final */}
-        <SoundTransformSection
-          selectedObject={selectedObject}
-          onTransformChange={handleTransformChange}
-          onResetTransform={resetTransform}
-          roundToDecimals={roundToDecimals}
-        />
             </>
           )}
         </div>

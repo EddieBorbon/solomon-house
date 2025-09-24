@@ -59,7 +59,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
   grids: new Map(),
   currentGridCoordinates: [0, 0, 0],
   activeGridId: null,
-  gridSize: 10,
+  gridSize: 20,
   renderDistance: 2,
 
   // Acciones para cuadrículas

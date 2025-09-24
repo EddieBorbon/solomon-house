@@ -36,7 +36,7 @@ export function MetalSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.harmonicity || 5.1}
               onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.harmonicity || 5.1).toFixed(1)}
@@ -61,7 +61,7 @@ export function MetalSynthParameters({
               step="1"
               value={selectedObject.audioParams.modulationIndex || 32}
               onChange={(e) => onParamChange('modulationIndex', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {selectedObject.audioParams.modulationIndex || 32}
@@ -86,7 +86,7 @@ export function MetalSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.modulationEnvelope || 0.01}
               onChange={(e) => onParamChange('modulationEnvelope', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.modulationEnvelope || 0.01).toFixed(2)}s
@@ -111,7 +111,7 @@ export function MetalSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.resonance || 4000}
               onChange={(e) => onParamChange('resonance', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {selectedObject.audioParams.resonance || 4000}Hz
@@ -136,7 +136,7 @@ export function MetalSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.octaves || 2.5}
               onChange={(e) => onParamChange('octaves', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.octaves || 2.5).toFixed(1)}

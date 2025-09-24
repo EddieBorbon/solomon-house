@@ -52,7 +52,7 @@ export function NoiseSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.duration || 0.1}
               onChange={(e) => onParamChange('duration', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.duration || 0.1).toFixed(2)}s
@@ -77,7 +77,7 @@ export function NoiseSynthParameters({
               step="0.001"
               value={selectedObject.audioParams.attack || 0.01}
               onChange={(e) => onParamChange('attack', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.attack || 0.01).toFixed(3)}s
@@ -102,7 +102,7 @@ export function NoiseSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.decay || 0.1}
               onChange={(e) => onParamChange('decay', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.decay || 0.1).toFixed(2)}s
@@ -127,7 +127,7 @@ export function NoiseSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.sustain || 0.1}
               onChange={(e) => onParamChange('sustain', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {Math.round((selectedObject.audioParams.sustain || 0.1) * 100)}%
@@ -152,7 +152,7 @@ export function NoiseSynthParameters({
               step="0.01"
               value={selectedObject.audioParams.release || 0.2}
               onChange={(e) => onParamChange('release', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.release || 0.2).toFixed(2)}s

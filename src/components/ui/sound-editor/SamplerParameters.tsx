@@ -36,7 +36,7 @@ export function SamplerParameters({
               step="0.01"
               value={selectedObject.audioParams.attack || 0.1}
               onChange={(e) => onParamChange('attack', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.attack || 0.1).toFixed(2)}s
@@ -61,7 +61,7 @@ export function SamplerParameters({
               step="0.01"
               value={selectedObject.audioParams.release || 1.0}
               onChange={(e) => onParamChange('release', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.release || 1.0).toFixed(2)}s

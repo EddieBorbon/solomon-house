@@ -36,7 +36,7 @@ export function PolySynthParameters({
               step="1"
               value={selectedObject.audioParams.polyphony || 4}
               onChange={(e) => onParamChange('polyphony', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {selectedObject.audioParams.polyphony || 4}
@@ -95,7 +95,7 @@ export function PolySynthParameters({
               step="0.01"
               value={selectedObject.audioParams.release || 1}
               onChange={(e) => onParamChange('release', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.release || 1).toFixed(2)}s

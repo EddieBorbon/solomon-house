@@ -36,7 +36,7 @@ export function PluckSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.attackNoise || 1}
               onChange={(e) => onParamChange('attackNoise', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.attackNoise || 1).toFixed(1)}
@@ -61,7 +61,7 @@ export function PluckSynthParameters({
               step="100"
               value={selectedObject.audioParams.dampening || 4000}
               onChange={(e) => onParamChange('dampening', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {selectedObject.audioParams.dampening || 4000}Hz
@@ -86,7 +86,7 @@ export function PluckSynthParameters({
               step="0.1"
               value={selectedObject.audioParams.resonance || 0.7}
               onChange={(e) => onParamChange('resonance', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
             <span className="text-white font-mono text-sm min-w-[4rem] text-right">
               {(selectedObject.audioParams.resonance || 0.7).toFixed(1)}

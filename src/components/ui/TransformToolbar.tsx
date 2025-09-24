@@ -1,6 +1,7 @@
 'use client';
 
 import { useWorldStore } from '../../state/useWorldStore';
+import { Move, RotateCcw, Scale, X, Trash2 } from 'lucide-react';
 
 export function TransformToolbar() {
   const { selectedEntityId, transformMode, setTransformMode } = useWorldStore();
@@ -17,33 +18,57 @@ export function TransformToolbar() {
   }
 
   const modes = [
-    { key: 'translate', label: 'Mover', shortcut: 'G', icon: '↔' },
-    { key: 'rotate', label: 'Rotar', shortcut: 'R', icon: '🔄' },
-    { key: 'scale', label: 'Escalar', shortcut: 'S', icon: '⤧' },
+    { key: 'translate', label: 'Mover', shortcut: 'G', icon: Move },
+    { key: 'rotate', label: 'Rotar', shortcut: 'R', icon: RotateCcw },
+    { key: 'scale', label: 'Escalar', shortcut: 'S', icon: Scale },
   ] as const;
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-      <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-2">
-        <div className="flex gap-2">
+      {/* Contenedor principal con estilo FUI/HUD */}
+      <div className="relative bg-black border border-white p-1">
+        {/* Decoraciones de esquina cortada */}
+        <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-t border-l border-white"></div>
+        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 border-t border-r border-white"></div>
+        <div className="absolute -bottom-0.5 -left-0.5 w-2 h-2 border-b border-l border-white"></div>
+        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-b border-r border-white"></div>
+        
+        {/* Líneas decorativas internas */}
+        <div className="absolute top-0 left-2 w-4 h-px bg-white"></div>
+        <div className="absolute bottom-0 right-2 w-4 h-px bg-white"></div>
+        
+        <div className="flex gap-1">
           {modes.map((mode) => (
             <button
               key={mode.key}
               onClick={() => setTransformMode(mode.key)}
               className={`
-                px-4 py-2 rounded-md font-medium text-sm transition-all duration-200
-                flex items-center gap-2 min-w-[80px] justify-center
+                relative px-3 py-2 font-mono text-xs tracking-wider transition-all duration-200
+                flex items-center gap-1 min-w-[70px] justify-center
+                border border-white
                 ${
                   transformMode === mode.key
-                    ? 'bg-blue-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-102'
+                    ? 'bg-white text-black shadow-lg'
+                    : 'bg-black text-white hover:bg-gray-800'
                 }
               `}
               title={`${mode.label} (${mode.shortcut})`}
             >
-              <span className="text-lg">{mode.icon}</span>
-              <span className="hidden sm:inline">{mode.label}</span>
-              <span className="text-xs opacity-70">({mode.shortcut})</span>
+              {/* Decoración de esquina para botón activo */}
+              {transformMode === mode.key && (
+                <>
+                  <div className="absolute -top-0.5 -left-0.5 w-1 h-1 bg-white"></div>
+                  <div className="absolute -top-0.5 -right-0.5 w-1 h-1 bg-white"></div>
+                  <div className="absolute -bottom-0.5 -left-0.5 w-1 h-1 bg-white"></div>
+                  <div className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-white"></div>
+                </>
+              )}
+              
+              <mode.icon className="w-4 h-4" />
+              <div className="flex flex-col items-center">
+                <span className="text-xs font-mono uppercase">{mode.label}</span>
+                <span className="text-xs opacity-60">({mode.shortcut})</span>
+              </div>
             </button>
           ))}
           
@@ -54,27 +79,31 @@ export function TransformToolbar() {
               const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
               window.dispatchEvent(escapeEvent);
             }}
-            className="px-4 py-2 rounded-md font-medium text-sm transition-all duration-200
-              bg-red-100 text-red-700 hover:bg-red-200 hover:scale-102
-              flex items-center gap-2 min-w-[80px] justify-center"
+            className="relative px-3 py-2 font-mono text-xs tracking-wider transition-all duration-200
+              bg-black text-white hover:bg-gray-800 border border-white
+              flex items-center gap-1 min-w-[70px] justify-center"
             title="Salir del modo edición (ESC)"
           >
-            <span className="text-lg">❌</span>
-            <span className="hidden sm:inline">Salir</span>
-            <span className="text-xs opacity-70">(ESC)</span>
+            <X className="w-4 h-4" />
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-mono uppercase">Salir</span>
+              <span className="text-xs opacity-60">(ESC)</span>
+            </div>
           </button>
           
           {/* Botón para eliminar */}
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-md font-medium text-sm transition-all duration-200
-              bg-red-600 text-white hover:bg-red-700 hover:scale-102
-              flex items-center gap-2 min-w-[80px] justify-center"
+            className="relative px-3 py-2 font-mono text-xs tracking-wider transition-all duration-200
+              bg-black text-white hover:bg-red-900 border border-red-500
+              flex items-center gap-1 min-w-[70px] justify-center"
             title="Eliminar objeto seleccionado (SUPR)"
           >
-            <span className="text-lg">🗑️</span>
-            <span className="hidden sm:inline">Eliminar</span>
-            <span className="text-xs opacity-70">(SUPR)</span>
+            <Trash2 className="w-4 h-4" />
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-mono uppercase">Eliminar</span>
+              <span className="text-xs opacity-60">(SUPR)</span>
+            </div>
           </button>
         </div>
       </div>
