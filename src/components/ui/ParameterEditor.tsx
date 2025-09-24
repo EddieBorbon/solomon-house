@@ -75,6 +75,13 @@ export function ParameterEditor() {
     hasSelection
   } = useEntitySelector();
 
+  // Expandir automáticamente el panel cuando se selecciona una entidad
+  React.useEffect(() => {
+    if (selectedEntity) {
+      setIsPanelExpanded(true);
+    }
+  }, [selectedEntity]);
+
   // Usar el hook personalizado para transformaciones
   const {
     updateTransform,
@@ -158,9 +165,39 @@ export function ParameterEditor() {
   // Alias para mantener compatibilidad con el código existente
   const handleTransformChange = updateTransform;
 
-  // Si no hay entidad seleccionada, no mostrar nada
+  // Si no hay entidad seleccionada, mostrar solo el botón de toggle
   if (!selectedEntity) {
-    return null;
+    return (
+      <div className="fixed right-0 top-0 h-full z-50 flex">
+        {/* Panel principal */}
+        <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+          isPanelExpanded ? 'w-96' : 'w-0'
+        }`}>
+          <div className="p-4 h-full overflow-y-auto">
+            {isPanelExpanded && (
+              <NoSelectionMessage />
+            )}
+          </div>
+        </div>
+
+        {/* Botón de toggle */}
+        <button
+          onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+          className="bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl p-3 flex items-center justify-center hover:bg-black/90 transition-all duration-300"
+          title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+        >
+          {isPanelExpanded ? (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          )}
+        </button>
+      </div>
+    );
   }
 
   // Renderizar controles según el tipo de entidad seleccionada
