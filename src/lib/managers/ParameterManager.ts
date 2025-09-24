@@ -249,6 +249,30 @@ export class ParameterManager {
         result.updatedParams.push('polyphony');
       }
       
+      // Actualizar frecuencia si cambia
+      if (params.frequency !== undefined) {
+        (synth as any).frequency.value = params.frequency;
+        result.updatedParams.push('frequency');
+      }
+      
+      // Actualizar waveform si cambia
+      if (params.waveform !== undefined) {
+        (synth as any).oscillator.type = params.waveform;
+        result.updatedParams.push('waveform');
+      }
+      
+      // Actualizar chord si cambia
+      if (params.chord !== undefined) {
+        // El PolySynth maneja acordes automáticamente
+        result.updatedParams.push('chord');
+      }
+      
+      // Actualizar curve si cambia
+      if (params.curve !== undefined) {
+        (synth as any).envelope.curve = params.curve;
+        result.updatedParams.push('curve');
+      }
+      
       // Actualizar parámetros de las voces FMSynth
       if (params.harmonicity !== undefined || params.modulationIndex !== undefined || 
           params.attack !== undefined || params.release !== undefined) {

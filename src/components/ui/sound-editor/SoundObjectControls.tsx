@@ -5,7 +5,6 @@ import { type AudioParams } from '../../../lib/AudioManager';
 import { AudioControlSection } from '../AudioControlSection';
 import { SynthSpecificParameters } from './SynthSpecificParameters';
 import { AdvancedSynthParameters } from './AdvancedSynthParameters';
-import { SamplerParameters } from './SamplerParameters';
 import { SoundTransformSection } from './SoundTransformSection';
 
 interface SoundObjectControlsProps {
@@ -50,11 +49,6 @@ export function SoundObjectControls({
 
 
 
-      {/* Controles específicos para Sampler (spiral) */}
-      <SamplerParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
       {/* Sección de Posición y Tamaño - Al final */}
       <SoundTransformSection 

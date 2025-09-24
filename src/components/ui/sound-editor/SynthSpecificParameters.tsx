@@ -1142,6 +1142,98 @@ export function SynthSpecificParameters({
           </div>
         </>
       )}
+
+      {/* Controles específicos para Sampler (spiral) */}
+      {selectedObject.type === 'spiral' && (
+        <>
+          {/* Attack */}
+          <div className="mb-4">
+            <label className="futuristic-label block mb-1 text-white text-xs">
+              ATTACK
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={(selectedObject.audioParams as any).attack || 0.1}
+                onChange={(e) => onParamChange('attack' as keyof AudioParams, Number(e.target.value))}
+                className="futuristic-slider flex-1"
+              />
+              <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+                {((selectedObject.audioParams as any).attack || 0.1).toFixed(2)}s
+              </span>
+            </div>
+            <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+              <span>0s</span>
+              <span>1s</span>
+            </div>
+          </div>
+
+          {/* Release */}
+          <div className="mb-4">
+            <label className="futuristic-label block mb-1 text-white text-xs">
+              RELEASE
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min="0"
+                max="2"
+                step="0.01"
+                value={(selectedObject.audioParams as any).release || 1.0}
+                onChange={(e) => onParamChange('release' as keyof AudioParams, Number(e.target.value))}
+                className="futuristic-slider flex-1"
+              />
+              <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+                {((selectedObject.audioParams as any).release || 1.0).toFixed(2)}s
+              </span>
+            </div>
+            <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+              <span>0s</span>
+              <span>2s</span>
+            </div>
+          </div>
+
+          {/* Base URL */}
+          <div className="mb-4">
+            <label className="futuristic-label block mb-1 text-white text-xs">
+              BASE_URL
+            </label>
+            <input
+              type="text"
+              value={(selectedObject.audioParams as any).baseUrl || '/samples/piano/'}
+              onChange={(e) => onParamChange('baseUrl' as keyof AudioParams, e.target.value)}
+              className="w-full p-2 bg-black text-white border border-white focus:border-white focus:outline-none transition-colors font-mono text-xs"
+              placeholder="/samples/piano/"
+            />
+          </div>
+
+          {/* URLs */}
+          <div className="mb-4">
+            <label className="futuristic-label block mb-1 text-white text-xs">
+              URLS
+            </label>
+            <textarea
+              value={JSON.stringify((selectedObject.audioParams as any).urls || ['A4.mp3', 'C4.mp3', 'Ds4.mp3', 'Fs4.mp3'])}
+              onChange={(e) => {
+                try {
+                  const urls = JSON.parse(e.target.value);
+                  onParamChange('urls' as keyof AudioParams, urls);
+                } catch (error) {
+                  console.error('Error parsing URLs:', error);
+                }
+              }}
+              className="w-full p-2 bg-black text-white border border-white focus:border-white focus:outline-none transition-colors h-20 resize-none font-mono text-xs"
+              placeholder='["A4.mp3", "C4.mp3", "Ds4.mp3", "Fs4.mp3"]'
+            />
+            <p className="text-xs text-white mt-1 font-mono tracking-wider">
+              JSON_FORMAT: ["FILE1.MP3", "FILE2.MP3", "..."]
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
