@@ -186,7 +186,7 @@ export function ParameterEditor() {
 
     return (
       <div className="fixed top-4 right-4 z-50">
-        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
+        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-3 max-w-96 max-h-[60vh] overflow-y-auto">
           {/* Efecto de brillo interior */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
           {/* Header con información de la zona de efecto */}
@@ -360,7 +360,7 @@ export function ParameterEditor() {
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 max-w-96 max-h-[60vh] overflow-y-auto">
         {/* Header con información del objeto */}
         <SoundObjectHeader
           selectedObject={selectedObject}
