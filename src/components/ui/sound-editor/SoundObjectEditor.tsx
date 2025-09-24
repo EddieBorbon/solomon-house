@@ -1,15 +1,20 @@
 'use client';
 
+import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
+import { SoundObjectContainer } from './SoundObjectContainer';
 import { SoundObjectHeader } from './SoundObjectHeader';
 import { SoundObjectControls } from './SoundObjectControls';
+import { AdvancedSynthParameters } from './AdvancedSynthParameters';
+import { SoundObjectSynthParams } from './SoundObjectSynthParams';
+import { SoundTransformSection } from './SoundTransformSection';
 import { SoundObjectFooter } from './SoundObjectFooter';
 
 interface SoundObjectEditorProps {
   selectedObject: SoundObject;
-  onParamChange: (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => void;
-  onTransformChange: (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => void;
+  onParamChange: (param: string | number | symbol, value: string | number | string[] | Record<string, string>) => void;
+  onTransformChange: (property: "position" | "rotation" | "scale", axis: 0 | 1 | 2, value: number) => void;
   onResetTransform: () => void;
   roundToDecimals: (value: number) => number;
   onRemove: (id: string) => void;
@@ -23,8 +28,17 @@ export function SoundObjectEditor({
   roundToDecimals,
   onRemove
 }: SoundObjectEditorProps) {
+  // Asegurar que audioParams existe
+  if (!selectedObject.audioParams) {
+    selectedObject.audioParams = {
+      frequency: 440,
+      waveform: 'sine',
+      volume: 0.5
+    };
+  }
+
   return (
-    <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-6 max-w-sm max-h-[90vh] overflow-y-auto">
+    <SoundObjectContainer>
       {/* Header con información del objeto */}
       <SoundObjectHeader 
         selectedObject={selectedObject}
@@ -40,7 +54,27 @@ export function SoundObjectEditor({
         onRemove={onRemove}
       />
 
+      {/* Parámetros avanzados de sintetizadores */}
+      <AdvancedSynthParameters 
+        selectedObject={selectedObject}
+        onParamChange={onParamChange}
+      />
+
+      {/* Parámetros específicos de sintetizadores */}
+      <SoundObjectSynthParams
+        selectedObject={selectedObject}
+        onParamChange={onParamChange}
+      />
+      
+      {/* Sección de Posición y Tamaño - Movida al final */}
+      <SoundTransformSection 
+        selectedObject={selectedObject}
+        onTransformChange={onTransformChange}
+        onResetTransform={onResetTransform}
+        roundToDecimals={roundToDecimals}
+      />
+
       <SoundObjectFooter />
-    </div>
+    </SoundObjectContainer>
   );
 }

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
-import { EffectZoneHeader } from '../parameter-editor';
 
 interface EffectZoneHeaderProps {
   zone: EffectZone;
@@ -12,7 +11,7 @@ interface EffectZoneHeaderProps {
   onRefresh: () => void;
 }
 
-export function EffectZoneHeaderComponent({
+export function EffectZoneHeader({
   zone,
   isRefreshingEffects,
   onRemove,
@@ -20,7 +19,7 @@ export function EffectZoneHeaderComponent({
   onRefresh
 }: EffectZoneHeaderProps) {
   return (
-    <EffectZoneHeader 
+    <EffectZoneHeaderComponent 
       zone={zone}
       isRefreshingEffects={isRefreshingEffects}
       onRemove={onRemove}

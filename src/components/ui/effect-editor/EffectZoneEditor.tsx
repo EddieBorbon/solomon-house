@@ -1,12 +1,9 @@
 'use client';
 
+import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
-import { EffectParametersSection } from '../EffectParametersSection';
-import { EffectSpecificParameters } from '../EffectSpecificParameters';
-import { EffectZoneHeaderComponent } from './EffectZoneHeader';
-import { EffectBasicParameters } from './EffectBasicParameters';
-import { EffectShapeSelector } from './EffectShapeSelector';
-import { EffectTransformSection } from './EffectTransformSection';
+import { EffectZoneContainer } from './EffectZoneContainer';
+import { EffectZoneContent } from './EffectZoneContent';
 
 interface EffectZoneEditorProps {
   zone: EffectZone;
@@ -33,63 +30,25 @@ export function EffectZoneEditor({
   onUpdateEffectZone,
   roundToDecimals
 }: EffectZoneEditorProps) {
+  // Asegurar que effectParams existe
+  if (!zone?.effectParams) {
+    zone.effectParams = {};
+  }
+
   return (
-    <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
-      {/* Efecto de brillo interior */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
-      
-      {/* Header con información de la zona de efecto */}
-      <EffectZoneHeaderComponent 
+    <EffectZoneContainer>
+      <EffectZoneContent
         zone={zone}
         isRefreshingEffects={isRefreshingEffects}
+        isUpdatingParams={isUpdatingParams}
+        lastUpdatedParam={lastUpdatedParam}
         onRemove={onRemove}
         onToggleLock={onToggleLock}
         onRefresh={onRefresh}
-      />
-
-      {/* Controles de parámetros del efecto */}
-      <div className="space-y-4">
-        <EffectParametersSection 
-          zone={zone}
-          isUpdatingParams={isUpdatingParams}
-          lastUpdatedParam={lastUpdatedParam}
-          onEffectParamChange={onEffectParamChange}
-        />
-        
-        {/* Parámetros específicos del efecto */}
-        <EffectSpecificParameters 
-          zone={zone}
-          onEffectParamChange={onEffectParamChange}
-        />
-        
-        {/* Parámetros básicos del efecto */}
-        <EffectBasicParameters 
-          zone={zone}
-          onEffectParamChange={onEffectParamChange}
-        />
-      </div>
-
-      {/* Selector de forma */}
-      <EffectShapeSelector 
-        zone={zone}
-        onShapeChange={(shape) => onUpdateEffectZone(zone?.id, { shape })}
-      />
-
-      {/* Sección de Posición y Tamaño para Zonas de Efectos */}
-      <EffectTransformSection 
-        zone={zone}
+        onEffectParamChange={onEffectParamChange}
         onUpdateEffectZone={onUpdateEffectZone}
         roundToDecimals={roundToDecimals}
       />
-
-      {/* Información adicional */}
-      <div className="mt-6 pt-4 border-t border-gray-700">
-        <div className="p-3 bg-purple-900/20 border border-purple-700/50 rounded-lg">
-          <p className="text-xs text-purple-300 text-center">
-            💡 Los objetos sonoros dentro de esta zona se procesarán automáticamente con el efecto Phaser
-          </p>
-        </div>
-      </div>
-    </div>
+    </EffectZoneContainer>
   );
 }
