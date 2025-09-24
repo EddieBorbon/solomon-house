@@ -10,106 +10,117 @@ interface AudioControlSectionProps {
 
 export function AudioControlSection({ selectedObject, onRemove }: AudioControlSectionProps) {
   return (
-    <div className="mb-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600">
-      <div className="text-center">
-        <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${
-          selectedObject.type === 'cone' ? 'bg-orange-500' :
-          selectedObject.type === 'cube' ? 'bg-blue-500' :
-          selectedObject.type === 'sphere' ? 'bg-purple-500' :
-          selectedObject.type === 'cylinder' ? 'bg-green-500' :
-          selectedObject.type === 'pyramid' ? 'bg-red-500' :
-          selectedObject.type === 'icosahedron' ? 'bg-indigo-500' :
-          selectedObject.type === 'torus' ? 'bg-cyan-500' : 
-          selectedObject.type === 'dodecahedronRing' ? 'bg-pink-500' :
-          selectedObject.type === 'spiral' ? 'bg-cyan-500' : 'bg-gray-500'
-        }`}>
-          <span className="text-lg">
-            {selectedObject.type === 'cone' ? '🥁' :
-             selectedObject.type === 'cube' ? '🔷' :
-             selectedObject.type === 'sphere' ? '🔮' :
-             selectedObject.type === 'cylinder' ? '🔶' :
-             selectedObject.type === 'pyramid' ? '🔺' :
-             selectedObject.type === 'icosahedron' ? '🔶' :
-             selectedObject.type === 'torus' ? '🔄' : 
-             selectedObject.type === 'dodecahedronRing' ? '🔷' :
-             selectedObject.type === 'spiral' ? '🌀' : '❓'}
+    <div className="mb-6 relative">
+      {/* Contenedor con borde complejo */}
+      <div className="relative border border-white p-4">
+        {/* Decoraciones de esquina */}
+        <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+        
+        <div className="text-center">
+          <div className={`w-8 h-8 mx-auto mb-2 border border-white flex items-center justify-center ${
+            selectedObject.type === 'cone' ? 'bg-white' :
+            selectedObject.type === 'cube' ? 'bg-gray-300' :
+            selectedObject.type === 'sphere' ? 'bg-gray-400' :
+            selectedObject.type === 'cylinder' ? 'bg-gray-500' :
+            selectedObject.type === 'pyramid' ? 'bg-gray-600' :
+            selectedObject.type === 'icosahedron' ? 'bg-gray-700' :
+            selectedObject.type === 'torus' ? 'bg-gray-800' : 
+            selectedObject.type === 'dodecahedronRing' ? 'bg-gray-900' :
+            selectedObject.type === 'spiral' ? 'bg-white' : 'bg-gray-500'
+          }`}>
+            <span className="text-sm font-mono font-bold"
+              style={{ 
+                color: selectedObject.type === 'cone' || selectedObject.type === 'spiral' ? '#000000' : '#FFFFFF'
+              }}>
+              {selectedObject.type === 'cone' ? 'M' :
+               selectedObject.type === 'cube' ? 'AM' :
+               selectedObject.type === 'sphere' ? 'FM' :
+               selectedObject.type === 'cylinder' ? 'DS' :
+               selectedObject.type === 'pyramid' ? 'MS' :
+               selectedObject.type === 'icosahedron' ? 'MT' :
+               selectedObject.type === 'torus' ? 'PS' : 
+               selectedObject.type === 'dodecahedronRing' ? 'PL' :
+               selectedObject.type === 'spiral' ? 'SP' : '?'}
+            </span>
+          </div>
+          <span className="text-xs font-mono text-white tracking-wider">
+            {selectedObject.type === 'cone' ? 'MEMBRANE_SYNTH' :
+             selectedObject.type === 'cube' ? 'AM_SYNTHESIS' :
+             selectedObject.type === 'sphere' ? 'FM_SYNTHESIS' :
+             selectedObject.type === 'cylinder' ? 'DUO_SYNTH' :
+             selectedObject.type === 'pyramid' ? 'MONO_SYNTH' :
+             selectedObject.type === 'icosahedron' ? 'METAL_SYNTH' :
+             selectedObject.type === 'plane' ? 'NOISE_SYNTH' :
+             selectedObject.type === 'torus' ? 'PLUCK_SYNTH' : 
+             selectedObject.type === 'dodecahedronRing' ? 'POLY_SYNTH' :
+             selectedObject.type === 'spiral' ? 'SAMPLER' : 'SOUND_OBJECT'}
           </span>
-        </div>
-        <span className="text-sm font-medium text-gray-300">
-          {selectedObject.type === 'cone' ? 'MembraneSynth' :
-           selectedObject.type === 'cube' ? 'Síntesis AM' :
-           selectedObject.type === 'sphere' ? 'Síntesis FM' :
-           selectedObject.type === 'cylinder' ? 'DuoSynth' :
-           selectedObject.type === 'pyramid' ? 'MonoSynth' :
-           selectedObject.type === 'icosahedron' ? 'MetalSynth' :
-           selectedObject.type === 'plane' ? 'NoiseSynth' :
-           selectedObject.type === 'torus' ? 'PluckSynth' : 
-           selectedObject.type === 'dodecahedronRing' ? 'PolySynth' :
-           selectedObject.type === 'spiral' ? 'Sampler' : 'Objeto de Sonido'}
-        </span>
         
         {/* Texto informativo específico para cada tipo */}
         {selectedObject.type === 'pyramid' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
               {selectedObject.audioParams.duration === Infinity 
-                ? 'Haz clic para activar/desactivar el sonido continuo'
-                : 'Mantén presionado el clic sobre el objeto para tocar (gate)'
+                ? 'CLICK_TO_TOGGLE_CONTINUOUS_AUDIO'
+                : 'HOLD_CLICK_ON_OBJECT_FOR_GATE_CONTROL'
               }
             </p>
           </div>
         ) : selectedObject.type === 'icosahedron' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
-              Haz clic en el objeto para tocar
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Sonido percusivo metálico
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              METALLIC_PERCUSSIVE_SOUND
             </p>
           </div>
         ) : selectedObject.type === 'plane' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
-              Haz clic en el objeto para tocar
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Generador de ruido percusivo
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              PERCUSSIVE_NOISE_GENERATOR
             </p>
           </div>
         ) : selectedObject.type === 'torus' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
-              Haz clic en el objeto para tocar
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Instrumento de cuerdas percusivo
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              PERCUSSIVE_STRING_INSTRUMENT
             </p>
           </div>
         ) : selectedObject.type === 'dodecahedronRing' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
-              Haz clic para activar/desactivar el acorde continuo
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_TO_TOGGLE_CONTINUOUS_CHORD
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Instrumento polifónico para acordes
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              POLYPHONIC_CHORD_INSTRUMENT
             </p>
           </div>
         ) : selectedObject.type === 'spiral' ? (
           <div className="mt-2">
-            <p className="text-xs text-gray-400 mt-1">
-              Haz clic en el objeto para tocar
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
             </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Sampler percusivo polifónico
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              POLYPHONIC_PERCUSSIVE_SAMPLER
             </p>
           </div>
         ) : (
          <div className="mt-2">
-           <p className="text-xs text-gray-400 mt-1">
-             Control de Sonido Continuo
+           <p className="text-xs font-mono text-white tracking-wider mt-1">
+             CONTINUOUS_AUDIO_CONTROL
            </p>
-           <p className="text-xs text-gray-400 mt-1">
-             Duración: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}s
+           <p className="text-xs font-mono text-white tracking-wider mt-1">
+             DURATION: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}S
            </p>
          </div>
         )}
@@ -121,23 +132,28 @@ export function AudioControlSection({ selectedObject, onRemove }: AudioControlSe
               const { toggleObjectAudio } = useWorldStore.getState();
               toggleObjectAudio(selectedObject.id);
             }}
-            className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
-              selectedObject.audioEnabled
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-green-600 hover:bg-green-700 text-white'
+            className={`relative w-full py-2 px-4 border border-white hover:bg-white hover:text-black transition-all duration-300 group ${
+              selectedObject.audioEnabled ? 'bg-white' : 'bg-black'
             }`}
+            style={{ 
+              color: selectedObject.audioEnabled ? '#000000' : '#FFFFFF'
+            }}
           >
-            {selectedObject.audioEnabled ? '🔇 Desactivar Sonido Continuo' : '🔊 Activar Sonido Continuo'}
+            <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+            <span className="relative text-xs font-mono tracking-wider">
+              {selectedObject.audioEnabled ? 'DEACTIVATE_CONTINUOUS_AUDIO' : 'ACTIVATE_CONTINUOUS_AUDIO'}
+            </span>
           </button>
-          <p className="text-xs text-gray-400 mt-1 text-center">
+          <p className="text-[10px] font-mono text-white tracking-wider mt-2 text-center">
             {selectedObject.audioEnabled 
-              ? 'Sonido continuo activado. Haz clic para desactivar.'
-              : 'Sonido continuo desactivado. Haz clic para activar.'
+              ? 'CONTINUOUS_AUDIO_ACTIVATED_CLICK_TO_DEACTIVATE'
+              : 'CONTINUOUS_AUDIO_DEACTIVATED_CLICK_TO_ACTIVATE'
             }
           </p>
-         <p className="text-xs text-blue-400 mt-2 text-center">
-           💡 El botón controla el sonido continuo. Para sonidos cortos, haz clic en el objeto 3D.
+         <p className="text-[8px] font-mono text-white tracking-wider mt-2 text-center">
+           AUDIO_CONTROL_INFO_FOR_SHORT_SOUNDS_CLICK_3D_OBJECT
          </p>
+        </div>
         </div>
       </div>
     </div>

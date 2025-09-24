@@ -184,7 +184,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     loadGrid,
     setActiveGrid,
     getGridKey,
-    currentGridCoordinates
+    currentGridCoordinates,
+    activeGridId
   } = useWorldStore();
 
   // Inicializar la cuadrícula por defecto si no hay ninguna
@@ -198,11 +199,15 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [grids.size, loadGrid, setActiveGrid, getGridKey]);
   
-  // Obtener todos los objetos de todas las cuadrículas
+  // Obtener objetos directamente del useObjectStore organizados por cuadrícula
   const allObjects = useMemo(() => {
     const objects: SoundObject[] = [];
     const mobileObjects: MobileObjectType[] = [];
     const effectZones: EffectZoneType[] = [];
+    
+    // Obtener objetos del useObjectStore organizados por cuadrícula
+    const { useObjectStore } = require('../../stores/useObjectStore');
+    const objectStore = useObjectStore.getState();
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());
@@ -210,16 +215,21 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     console.log(`🔍 SceneContent useMemo - Procesando ${gridsArray.length} cuadrículas`);
     
     gridsArray.forEach((grid, index) => {
+      // Obtener objetos de esta cuadrícula desde el ObjectStore
+      const gridObjects = objectStore.getAllObjects(grid.id);
+      
       console.log(`🔍 Cuadrícula ${index} (${grid.id}):`, {
-        objects: grid.objects?.length || 0,
+        objectsFromStore: gridObjects.length,
+        objectsFromGrid: grid.objects?.length || 0,
         mobileObjects: grid.mobileObjects?.length || 0,
-        effectZones: grid.effectZones?.length || 0
+        effectZones: grid.effectZones?.length || 0,
+        isActive: grid.id === activeGridId
       });
       
-      // Verificar que los arrays existan antes de hacer push
-      if (Array.isArray(grid.objects)) {
-        objects.push(...grid.objects.filter(obj => obj && obj.id));
-      }
+      // Usar objetos del ObjectStore en lugar de la cuadrícula
+      objects.push(...gridObjects.filter(obj => obj && obj.id));
+      
+      // Mantener objetos móviles y zonas de efectos de la cuadrícula
       if (Array.isArray(grid.mobileObjects)) {
         mobileObjects.push(...grid.mobileObjects.filter(obj => obj && obj.id));
       }
@@ -228,14 +238,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
     });
     
-    console.log(`🔍 SceneContent useMemo - Total recopilado:`, {
+    console.log(`🔍 SceneContent useMemo - Total recopilado de ObjectStore:`, {
       objects: objects.length,
       mobileObjects: mobileObjects.length,
       effectZones: effectZones.length
     });
     
     return { objects, mobileObjects, effectZones };
-  }, [grids]);
+  }, [grids, activeGridId]);
   
   // Usar el hook de detección de zonas de efectos
   useEffectZoneDetection();
@@ -387,10 +397,19 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       {/* Renderizado de cuadrículas con sus objetos */}
       {Array.from(grids.values()).map((grid) => {
         if (!grid || !grid.id) return null;
+        
+        // Obtener objetos de esta cuadrícula desde el ObjectStore
+        const { useObjectStore } = require('../../stores/useObjectStore');
+        const objectStore = useObjectStore.getState();
+        const gridObjects = objectStore.getAllObjects(grid.id);
+        
+        // Log de depuración para cada cuadrícula
+        console.log(`🎯 Renderizando cuadrícula ${grid.id} con ${gridObjects.length} objetos del ObjectStore`);
+        
         return (
           <group key={grid.id} position={grid.position}>
-          {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {Array.isArray(grid.objects) && grid.objects.map((obj) => {
+          {/* Renderizado de objetos sonoros de esta cuadrícula desde ObjectStore */}
+          {gridObjects.map((obj) => {
             if (!obj || !obj.id) return null;
             const objectRef = entityRefs.get(obj.id);
             if (!objectRef) return null;

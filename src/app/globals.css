@@ -174,3 +174,154 @@ input:focus, select:focus {
     transform: translateY(100vh);
   }
 }
+
+/* Estilos futuristas para inputs y controles */
+.futuristic-input {
+  @apply bg-black border border-white text-white text-xs font-mono tracking-wider focus:border-white focus:outline-none focus:ring-0;
+}
+
+.futuristic-select {
+  @apply bg-black border border-white text-white text-xs font-mono tracking-wider focus:border-white focus:outline-none focus:ring-0;
+}
+
+.futuristic-button {
+  @apply relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group;
+}
+
+.futuristic-button::before {
+  content: '';
+  @apply absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300;
+}
+
+.futuristic-button-text {
+  @apply relative text-xs font-mono tracking-wider;
+}
+
+/* Estilos para sliders futuristas - FORZADOS */
+.futuristic-slider {
+  @apply w-full h-2 bg-black border border-white appearance-none cursor-pointer;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+.futuristic-slider::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-webkit-slider-thumb:hover {
+  background: #333333 !important;
+  border: 1px solid #ffffff !important;
+  transform: scale(1.1) !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-webkit-slider-track {
+  width: 100% !important;
+  height: 8px !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-webkit-slider-runnable-track {
+  width: 100% !important;
+  height: 8px !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-moz-range-thumb:hover {
+  background: #333333 !important;
+  border: 1px solid #ffffff !important;
+  transform: scale(1.1) !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-moz-range-track {
+  width: 100% !important;
+  height: 8px !important;
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.futuristic-slider::-moz-range-progress {
+  height: 8px !important;
+  background: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Estilos adicionales para sobrescribir cualquier estilo azul */
+input[type="range"].futuristic-slider {
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+input[type="range"].futuristic-slider::-webkit-slider-thumb {
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: none !important;
+}
+
+input[type="range"].futuristic-slider::-moz-range-thumb {
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* Estilos para labels futuristas */
+.futuristic-label {
+  @apply text-xs font-mono text-white tracking-wider uppercase;
+}
+
+.futuristic-text {
+  @apply text-xs font-mono text-gray-300 tracking-wider;
+}
+
+/* Estilos para contenedores de parámetros */
+.futuristic-param-container {
+  @apply relative border border-white p-3 mb-3;
+}
+
+.futuristic-param-container::before,
+.futuristic-param-container::after {
+  content: '';
+  @apply absolute w-2 h-2 border border-white;
+}
+
+.futuristic-param-container::before {
+  @apply -top-1 -left-1 border-t border-l;
+}
+
+.futuristic-param-container::after {
+  @apply -bottom-1 -right-1 border-b border-r;
+}

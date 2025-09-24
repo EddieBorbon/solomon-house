@@ -235,13 +235,13 @@ export function ControlPanel() {
         isPanelExpanded ? 'w-80' : 'w-0'
       }`}>
         {/* Grid pattern background */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-10">
           <div className="w-full h-full" style={{
             backgroundImage: `
               linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
               linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '20px 20px'
+            backgroundSize: '50px 50px'
           }}></div>
         </div>
 

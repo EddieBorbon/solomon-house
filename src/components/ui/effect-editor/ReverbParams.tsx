@@ -12,11 +12,13 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
   if (zone?.type !== 'reverb') return null;
 
   return (
-    <>
+    <div className="futuristic-param-container">
+      <h4 className="futuristic-label mb-3">REVERB_PARAMETERS</h4>
+      
       {/* Decay */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Decay ({zone?.effectParams.decay ?? 1.5}s)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-2">
+          DECAY ({zone?.effectParams.decay ?? 1.5}S)
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -26,26 +28,26 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
             step="0.1"
             value={zone?.effectParams.decay ?? 1.5}
             onChange={(e) => onEffectParamChange('decay', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.decay ?? 1.5}s
+          <span className="text-white font-mono text-xs min-w-[3rem] text-right tracking-wider">
+            {zone?.effectParams.decay ?? 1.5}S
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0.1s</span>
-          <span>10s</span>
+        <div className="flex justify-between text-xs text-gray-500 mt-1 font-mono tracking-wider">
+          <span>0.1S</span>
+          <span>10.0S</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Duración de la reverberación
+        <p className="futuristic-text mt-1">
+          DURATION_OF_REVERBERATION
         </p>
       </div>
 
       {/* PreDelay */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          PreDelay ({zone?.effectParams.preDelay ?? 0.01}s)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-2">
+          PRE_DELAY ({zone?.effectParams.preDelay ?? 0.01}S)
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -55,26 +57,26 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
             step="0.001"
             value={zone?.effectParams.preDelay ?? 0.01}
             onChange={(e) => onEffectParamChange('preDelay', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.preDelay ?? 0.01}s
+          <span className="text-white font-mono text-xs min-w-[3rem] text-right tracking-wider">
+            {zone?.effectParams.preDelay ?? 0.01}S
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0s</span>
-          <span>0.1s</span>
+        <div className="flex justify-between text-xs text-gray-500 mt-1 font-mono tracking-wider">
+          <span>0.000S</span>
+          <span>0.100S</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Tiempo antes de que la reverberación se active completamente
+        <p className="futuristic-text mt-1">
+          TIME_BEFORE_REVERB_ACTIVATION
         </p>
       </div>
 
       {/* Wet */}
       <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
+        <label className="futuristic-label block mb-2">
+          WET_MIX ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -84,21 +86,21 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
             step="0.05"
             value={zone?.effectParams.wet ?? 0.5}
             onChange={(e) => onEffectParamChange('wet', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+          <span className="text-white font-mono text-xs min-w-[3rem] text-right tracking-wider">
             {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-gray-500 mt-1 font-mono tracking-wider">
           <span>0%</span>
           <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Mezcla entre señal seca y procesada
+        <p className="futuristic-text mt-1">
+          DRY_SIGNAL_TO_PROCESSED_RATIO
         </p>
       </div>
-    </>
+    </div>
   );
 }

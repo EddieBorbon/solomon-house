@@ -14,12 +14,14 @@ export function SynthSpecificParameters({
   onParamChange
 }: SynthSpecificParametersProps) {
   return (
-    <div className="space-y-4">
+    <div className="futuristic-param-container">
+      <h4 className="futuristic-label mb-4 text-white">SYNTH_PARAMETERS</h4>
+      
       {/* Frecuencia - Para todos los objetos excepto spiral */}
       {selectedObject.type !== 'spiral' && (
-        <div>
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            {selectedObject.type === 'cone' ? 'Frecuencia (Tono)' : 'Frecuencia (Hz)'}
+        <div className="mb-4">
+          <label className="futuristic-label block mb-2 text-white">
+            {selectedObject.type === 'cone' ? 'FREQUENCY_TONE' : 'FREQUENCY_HZ'}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -29,19 +31,19 @@ export function SynthSpecificParameters({
               step="1"
               value={selectedObject.audioParams.frequency}
               onChange={(e) => onParamChange('frequency', Number(e.target.value))}
-              className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+              className="futuristic-slider flex-1"
             />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+            <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
               {selectedObject.audioParams.frequency}
             </span>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>{selectedObject.type === 'cone' ? '20 Hz' : selectedObject.type === 'icosahedron' ? '50 Hz' : selectedObject.type === 'dodecahedronRing' ? '55 Hz (A1)' : '20 Hz'}</span>
-            <span>{selectedObject.type === 'cone' ? '200 Hz' : selectedObject.type === 'icosahedron' ? '1200 Hz' : selectedObject.type === 'dodecahedronRing' ? '880 Hz (A5)' : '2000 Hz'}</span>
+          <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+            <span>{selectedObject.type === 'cone' ? '20_HZ' : selectedObject.type === 'icosahedron' ? '50_HZ' : selectedObject.type === 'dodecahedronRing' ? '55_HZ_A1' : '20_HZ'}</span>
+            <span>{selectedObject.type === 'cone' ? '200_HZ' : selectedObject.type === 'icosahedron' ? '1200_HZ' : selectedObject.type === 'dodecahedronRing' ? '880_HZ_A5' : '2000_HZ'}</span>
           </div>
           {selectedObject.type === 'dodecahedronRing' && (
-            <p className="text-xs text-pink-400 mt-1">
-              💡 La frecuencia base transpone el acorde completo
+            <p className="text-xs text-white mt-1 font-mono tracking-wider">
+              FREQUENCY_BASE_TRANSPOSES_COMPLETE_CHORD
             </p>
           )}
         </div>
@@ -49,28 +51,28 @@ export function SynthSpecificParameters({
 
       {/* Forma de Onda (Portadora) - Para todos los objetos excepto spiral */}
       {selectedObject.type !== 'spiral' && (
-        <div>
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Forma de Onda
+        <div className="mb-4">
+          <label className="futuristic-label block mb-2">
+            WAVEFORM
           </label>
           <select
             value={selectedObject.audioParams.waveform}
             onChange={(e) => onParamChange('waveform', e.target.value as OscillatorType)}
-            className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+            className="futuristic-select w-full p-2"
           >
-            <option value="sine">Seno</option>
-            <option value="square">Cuadrada</option>
-            <option value="sawtooth">Sierra</option>
-            <option value="triangle">Triangular</option>
+            <option value="sine">SINE</option>
+            <option value="square">SQUARE</option>
+            <option value="sawtooth">SAWTOOTH</option>
+            <option value="triangle">TRIANGLE</option>
           </select>
         </div>
       )}
 
       {/* Duración - Para todos los objetos excepto spiral */}
       {selectedObject.type !== 'spiral' && (
-        <div>
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Duración (segundos)
+        <div className="mb-4">
+          <label className="futuristic-label block mb-2">
+            DURATION_SECONDS
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -88,21 +90,21 @@ export function SynthSpecificParameters({
                 }
               }}
               placeholder="1.0"
-              className="flex-1 p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors font-mono"
+              className="futuristic-input flex-1 p-2 font-mono"
             />
 
-            <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-              {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}s`}
+            <span className="text-white font-mono text-xs min-w-[3rem] text-right tracking-wider">
+              {selectedObject.audioParams.duration === Infinity ? '∞' : `${(selectedObject.audioParams.duration || 1.0).toFixed(1)}S`}
             </span>
           </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.1s</span>
-            <span>60s</span>
+          <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+            <span>0.1S</span>
+            <span>60.0S</span>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-white mt-1 font-mono tracking-wider">
             {selectedObject.audioParams.duration === Infinity 
-              ? 'Sonido continuo - usa el botón "Activar Sonido Continuo" para controlar'
-              : 'Sonido con duración finita - se detiene automáticamente'
+              ? 'CONTINUOUS_AUDIO_USE_BUTTON_TO_CONTROL'
+              : 'FINITE_DURATION_AUTO_STOP'
             }
           </p>
         </div>
@@ -167,9 +169,9 @@ export function SynthSpecificParameters({
       {selectedObject.type === 'cube' && (
         <>
           {/* Harmonicity */}
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
-              Harmonicity
+          <div className="mb-4">
+            <label className="futuristic-label block mb-2">
+              HARMONICITY
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -179,32 +181,32 @@ export function SynthSpecificParameters({
                 step="0.1"
                 value={selectedObject.audioParams.harmonicity || 1.5}
                 onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
-                className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                className="futuristic-slider flex-1"
               />
-              <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+              <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
                 {selectedObject.audioParams.harmonicity || 1.5}
               </span>
             </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
               <span>0.1</span>
-              <span>10</span>
+              <span>10.0</span>
             </div>
           </div>
 
           {/* Forma de Onda (Moduladora) */}
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
-              Forma de Onda (Moduladora)
+          <div className="mb-4">
+            <label className="futuristic-label block mb-2">
+              MODULATION_WAVEFORM
             </label>
             <select
               value={selectedObject.audioParams.modulationWaveform || 'square'}
               onChange={(e) => onParamChange('modulationWaveform', e.target.value as OscillatorType)}
-              className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+              className="futuristic-select w-full p-2"
             >
-              <option value="sine">Seno</option>
-              <option value="square">Cuadrada</option>
-              <option value="sawtooth">Sierra</option>
-              <option value="triangle">Triangular</option>
+              <option value="sine">SINE</option>
+              <option value="square">SQUARE</option>
+              <option value="sawtooth">SAWTOOTH</option>
+              <option value="triangle">TRIANGLE</option>
             </select>
           </div>
         </>
@@ -212,8 +214,8 @@ export function SynthSpecificParameters({
 
       {/* Volumen - Movido al final */}
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Volumen
+        <label className="futuristic-label block mb-2">
+          VOLUME
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -227,13 +229,13 @@ export function SynthSpecificParameters({
               const actualValue = percentage / 100; // Convertir de 0-100 a 0-1
               onParamChange('volume', actualValue);
             }}
-            className="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+            className="futuristic-slider flex-1"
           />
-          <span className="text-white font-mono text-sm min-w-[4rem] text-right">
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
             {Math.round(selectedObject.audioParams.volume * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>0%</span>
           <span>100%</span>
         </div>

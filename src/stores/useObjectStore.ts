@@ -20,6 +20,7 @@ export interface SoundObject {
 // Estado específico para objetos
 export interface ObjectState {
   objects: SoundObject[];
+  objectsByGrid: Map<string, SoundObject[]>; // Objetos organizados por cuadrícula
 }
 
 // Acciones específicas para objetos
@@ -180,6 +181,7 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
 export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => ({
   // Estado inicial
   objects: [],
+  objectsByGrid: new Map(),
 
   // Acciones básicas de objetos
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => {
@@ -213,11 +215,21 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
 
     // Agregar objeto al estado local
-    set((state) => ({
-      objects: [...state.objects, newObject]
-    }));
+    set((state) => {
+      const newObjects = [...state.objects, newObject];
+      const newObjectsByGrid = new Map(state.objectsByGrid);
+      
+      // Obtener objetos existentes de la cuadrícula o crear array vacío
+      const gridObjects = newObjectsByGrid.get(gridId) || [];
+      newObjectsByGrid.set(gridId, [...gridObjects, newObject]);
+      
+      return {
+        objects: newObjects,
+        objectsByGrid: newObjectsByGrid
+      };
+    });
 
-    console.log(`🎵 ObjectStore: Objeto ${type} añadido al store`);
+    console.log(`🎵 ObjectStore: Objeto ${type} añadido al store para cuadrícula ${gridId}`);
     return newObject;
   },
 
@@ -233,22 +245,44 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
 
     // Eliminar objeto del estado local
-    set((state) => ({
-      objects: state.objects.filter(obj => obj.id !== id)
-    }));
+    set((state) => {
+      const newObjects = state.objects.filter(obj => obj.id !== id);
+      const newObjectsByGrid = new Map(state.objectsByGrid);
+      
+      // Eliminar objeto de la cuadrícula específica
+      const gridObjects = newObjectsByGrid.get(gridId) || [];
+      newObjectsByGrid.set(gridId, gridObjects.filter(obj => obj.id !== id));
+      
+      return {
+        objects: newObjects,
+        objectsByGrid: newObjectsByGrid
+      };
+    });
 
-    console.log(`🗑️ ObjectStore: Objeto ${id} eliminado del store`);
+    console.log(`🗑️ ObjectStore: Objeto ${id} eliminado del store de cuadrícula ${gridId}`);
   },
 
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>, gridId: string) => {
     console.log(`🔄 ObjectStore: Actualizando objeto ${id} en cuadrícula ${gridId} con:`, updates);
 
     // Actualizar objeto en el estado local
-    set((state) => ({
-      objects: state.objects.map(obj => 
+    set((state) => {
+      const newObjects = state.objects.map(obj => 
         obj.id === id ? { ...obj, ...updates } : obj
-      )
-    }));
+      );
+      const newObjectsByGrid = new Map(state.objectsByGrid);
+      
+      // Actualizar objeto en la cuadrícula específica
+      const gridObjects = newObjectsByGrid.get(gridId) || [];
+      newObjectsByGrid.set(gridId, gridObjects.map(obj => 
+        obj.id === id ? { ...obj, ...updates } : obj
+      ));
+      
+      return {
+        objects: newObjects,
+        objectsByGrid: newObjectsByGrid
+      };
+    });
 
     // Obtener el objeto actualizado para comunicar cambios al AudioManager
     const updatedObject = get().objects.find(obj => obj.id === id);
@@ -394,20 +428,47 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   clearAllObjects: (gridId?: string) => {
     console.log(`🧹 ObjectStore: Limpiando todos los objetos${gridId ? ` de cuadrícula ${gridId}` : ''}`);
     
-    // Eliminar todas las fuentes de sonido del AudioManager
-    const objects = get().objects;
-    objects.forEach(obj => {
-      try {
-        audioManager.removeSoundSource(obj.id);
-      } catch (error) {
-        console.error(`❌ ObjectStore: Error al eliminar fuente de sonido ${obj.id}:`, error);
-      }
-    });
+    if (gridId) {
+      // Limpiar solo objetos de una cuadrícula específica
+      const gridObjects = get().objectsByGrid.get(gridId) || [];
+      gridObjects.forEach(obj => {
+        try {
+          audioManager.removeSoundSource(obj.id);
+        } catch (error) {
+          console.error(`❌ ObjectStore: Error al eliminar fuente de sonido ${obj.id}:`, error);
+        }
+      });
 
-    // Limpiar objetos del estado local
-    set({ objects: [] });
+      set((state) => {
+        const newObjects = state.objects.filter(obj => !gridObjects.some(gridObj => gridObj.id === obj.id));
+        const newObjectsByGrid = new Map(state.objectsByGrid);
+        newObjectsByGrid.set(gridId, []);
+        
+        return {
+          objects: newObjects,
+          objectsByGrid: newObjectsByGrid
+        };
+      });
 
-    console.log(`🧹 ObjectStore: Todos los objetos eliminados`);
+      console.log(`🧹 ObjectStore: Objetos de cuadrícula ${gridId} eliminados`);
+    } else {
+      // Limpiar todos los objetos
+      const objects = get().objects;
+      objects.forEach(obj => {
+        try {
+          audioManager.removeSoundSource(obj.id);
+        } catch (error) {
+          console.error(`❌ ObjectStore: Error al eliminar fuente de sonido ${obj.id}:`, error);
+        }
+      });
+
+      set({ 
+        objects: [],
+        objectsByGrid: new Map()
+      });
+
+      console.log(`🧹 ObjectStore: Todos los objetos eliminados`);
+    }
   },
 
   getObjectById: (id: string, gridId?: string) => {
@@ -417,8 +478,14 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   },
 
   getAllObjects: (gridId?: string) => {
-    const objects = get().objects;
-    console.log(`📋 ObjectStore: Obteniendo ${objects.length} objetos${gridId ? ` de cuadrícula ${gridId}` : ''}`);
-    return objects;
+    if (gridId) {
+      const gridObjects = get().objectsByGrid.get(gridId) || [];
+      console.log(`📋 ObjectStore: Obteniendo ${gridObjects.length} objetos de cuadrícula ${gridId}`);
+      return gridObjects;
+    } else {
+      const objects = get().objects;
+      console.log(`📋 ObjectStore: Obteniendo ${objects.length} objetos de todas las cuadrículas`);
+      return objects;
+    }
   }
 }));

@@ -169,29 +169,58 @@ export function ParameterEditor() {
   if (!selectedEntity) {
     return (
       <div className="fixed right-0 top-0 h-full z-50 flex">
-        {/* Panel principal */}
-        <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+        {/* Panel principal futurista */}
+        <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
           isPanelExpanded ? 'w-96' : 'w-0'
         }`}>
-          <div className="p-4 h-full overflow-y-auto">
+          {/* Grid pattern background */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="w-full h-full" style={{
+              backgroundImage: `
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '50px 50px'
+            }}></div>
+          </div>
+
+          {/* Scanner line effect */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div 
+                className="absolute w-full h-1 bg-white shadow-lg shadow-white/80"
+                style={{
+                  animation: 'scanner 2s linear infinite',
+                  top: '-8px'
+                }}
+              ></div>
+            </div>
+          </div>
+          
+          <div className="p-4 h-full overflow-y-auto relative z-10">
             {isPanelExpanded && (
               <NoSelectionMessage />
             )}
           </div>
         </div>
 
-        {/* Botón de toggle */}
+        {/* Botón de toggle futurista */}
         <button
           onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-          className="bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl p-3 flex items-center justify-center hover:bg-black/90 transition-all duration-300"
+          className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
           title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
         >
+          {/* Decoraciones de esquina */}
+          <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
           {isPanelExpanded ? (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           )}
@@ -224,14 +253,35 @@ export function ParameterEditor() {
 
     return (
       <div className="fixed right-0 top-0 h-full z-50 flex">
-        {/* Panel principal */}
-        <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+        {/* Panel principal futurista */}
+        <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
           isPanelExpanded ? 'w-96' : 'w-0'
         }`}>
-          {/* Efecto de brillo interior */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none"></div>
+          {/* Grid pattern background */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="w-full h-full" style={{
+              backgroundImage: `
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `,
+              backgroundSize: '50px 50px'
+            }}></div>
+          </div>
+
+          {/* Scanner line effect */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div 
+                className="absolute w-full h-1 bg-white shadow-lg shadow-white/80"
+                style={{
+                  animation: 'scanner 2s linear infinite',
+                  top: '-8px'
+                }}
+              ></div>
+            </div>
+          </div>
           
-          <div className="p-3 h-full overflow-y-auto">
+          <div className="p-3 h-full overflow-y-auto relative z-10">
             {isPanelExpanded && (
               <>
           {/* Header con información de la zona de efecto */}
@@ -390,18 +440,23 @@ export function ParameterEditor() {
           </div>
         </div>
 
-        {/* Botón de toggle */}
+        {/* Botón de toggle futurista */}
         <button
           onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-          className="bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl p-3 flex items-center justify-center hover:bg-black/90 transition-all duration-300"
+          className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
           title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
         >
+          {/* Decoraciones de esquina */}
+          <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
           {isPanelExpanded ? (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           ) : (
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           )}
@@ -425,11 +480,35 @@ export function ParameterEditor() {
 
   return (
     <div className="fixed right-0 top-0 h-full z-50 flex">
-      {/* Panel principal */}
-      <div className={`bg-gray-900/90 backdrop-blur-sm border-l border-gray-700 shadow-2xl transition-all duration-300 overflow-hidden ${
+      {/* Panel principal futurista */}
+      <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
         isPanelExpanded ? 'w-96' : 'w-0'
       }`}>
-        <div className="p-4 h-full overflow-y-auto">
+        {/* Grid pattern background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="w-full h-full" style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+
+        {/* Scanner line effect */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div 
+              className="absolute w-full h-1 bg-white shadow-lg shadow-white/80"
+              style={{
+                animation: 'scanner 2s linear infinite',
+                top: '-8px'
+              }}
+            ></div>
+          </div>
+        </div>
+        
+        <div className="p-4 h-full overflow-y-auto relative z-10">
           {isPanelExpanded && (
             <>
         {/* Header con información del objeto */}
@@ -504,18 +583,23 @@ export function ParameterEditor() {
         </div>
       </div>
 
-      {/* Botón de toggle */}
+      {/* Botón de toggle futurista */}
       <button
         onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-        className="bg-gray-900/90 backdrop-blur-sm border-l border-gray-700 shadow-2xl p-3 flex items-center justify-center hover:bg-gray-800/90 transition-all duration-300"
+        className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
         title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
       >
+        {/* Decoraciones de esquina */}
+        <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
         {isPanelExpanded ? (
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         ) : (
-          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-white group-hover:text-black transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         )}

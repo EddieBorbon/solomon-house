@@ -65,7 +65,7 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
     objects: normalizedObjects,
     mobileObjects: normalizedMobileObjects,
     effectZones: normalizedEffectZones,
-    gridSize: 20, // Valor por defecto
+    gridSize: 10, // Valor por defecto
     gridColor: '#404040', // Valor por defecto
     isLoaded: true,
     isSelected: false

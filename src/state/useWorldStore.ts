@@ -374,7 +374,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     return useGridStore.getState().activeGridId;
   },
   currentProjectId: null, // No hay proyecto cargado inicialmente
-  gridSize: 20,
+  gridSize: 10,
   renderDistance: 2,
   objects: [],
   mobileObjects: [],
@@ -397,10 +397,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       return;
     }
 
-    // Crear objeto usando el useObjectStore
+    // Crear objeto usando el useObjectStore (ahora maneja la cuadrícula internamente)
     const newObject = useObjectStore.getState().addObject(type, position, activeGridId);
     
-    // Agregar objeto a la cuadrícula activa
+    // Actualizar la cuadrícula para reflejar el nuevo objeto
     const activeGrid = state.grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
