@@ -10,7 +10,10 @@ export function ControlPanel() {
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
   const [isMobileObjectExpanded, setIsMobileObjectExpanded] = useState(false);
-  const { addObject, addEffectZone, addMobileObject, activeGridId, grids } = useWorldStore();
+  const [isGridsExpanded, setIsGridsExpanded] = useState(false);
+  const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const [newGridSize, setNewGridSize] = useState<number>(20);
+  const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const effectsScrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -124,6 +127,46 @@ export function ControlPanel() {
   };
 
   const handleAddMobileObject = () => createMobileObjectInActiveGrid();
+
+  // Funciones para crear cuadrículas
+  const createGridAtPosition = (direction: 'north' | 'south' | 'east' | 'west' | 'up' | 'down') => {
+    const baseCoordinates = activeGrid ? activeGrid.coordinates : currentGridCoordinates;
+    const [x, y, z] = baseCoordinates;
+    let newCoordinates: [number, number, number];
+    
+    switch (direction) {
+      case 'north':
+        newCoordinates = [x, y, z + 1];
+        break;
+      case 'south':
+        newCoordinates = [x, y, z - 1];
+        break;
+      case 'east':
+        newCoordinates = [x + 1, y, z];
+        break;
+      case 'west':
+        newCoordinates = [x - 1, y, z];
+        break;
+      case 'up':
+        newCoordinates = [x, y + 1, z];
+        break;
+      case 'down':
+        newCoordinates = [x, y - 1, z];
+        break;
+    }
+    
+    const newPosition: [number, number, number] = [
+      newCoordinates[0] * gridSize,
+      newCoordinates[1] * gridSize,
+      newCoordinates[2] * gridSize
+    ];
+    
+    createGrid(newPosition, gridSize);
+  };
+
+  const createGridAtCustomPosition = () => {
+    createGrid(newGridPosition, newGridSize);
+  };
 
 
   return (
@@ -323,6 +366,153 @@ export function ControlPanel() {
               <span className="text-sm">🚀</span>
               <span>Añadir Móvil</span>
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Sección de Cuadrículas */}
+      <div className="mb-2">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-1">
+            <span className="text-sm">➕</span>
+            Cuadrículas
+          </h3>
+          <button
+            onClick={() => setIsGridsExpanded(!isGridsExpanded)}
+            className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
+            title={isGridsExpanded ? "Ocultar cuadrículas" : "Mostrar cuadrículas"}
+          >
+            {isGridsExpanded ? (
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            ) : (
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
+        </div>
+
+        {/* Posición actual */}
+        <div className="mb-1 p-1 bg-cyan-900/20 border border-cyan-700/50 rounded text-xs text-cyan-300">
+          <div>Pos: ({activeGrid ? activeGrid.coordinates[0] : currentGridCoordinates[0]}, {activeGrid ? activeGrid.coordinates[1] : currentGridCoordinates[1]}, {activeGrid ? activeGrid.coordinates[2] : currentGridCoordinates[2]})</div>
+          {activeGrid && (
+            <div className="text-cyan-400">
+              Activa: {activeGrid.id.slice(0, 6)}...
+            </div>
+          )}
+        </div>
+
+        {isGridsExpanded && (
+          <div className="space-y-1">
+            {/* Crear cuadrículas adyacentes */}
+            <div className="space-y-1">
+              <div className="text-xs font-semibold text-gray-300">Adyacentes</div>
+              
+              <div className="grid grid-cols-2 gap-1">
+                <button
+                  onClick={() => createGridAtPosition('west')}
+                  className="px-1 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs transition-colors"
+                  title="Oeste"
+                >
+                  ← O
+                </button>
+                <button
+                  onClick={() => createGridAtPosition('east')}
+                  className="px-1 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs transition-colors"
+                  title="Este"
+                >
+                  E →
+                </button>
+                <button
+                  onClick={() => createGridAtPosition('south')}
+                  className="px-1 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition-colors"
+                  title="Sur"
+                >
+                  ↓ S
+                </button>
+                <button
+                  onClick={() => createGridAtPosition('north')}
+                  className="px-1 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition-colors"
+                  title="Norte"
+                >
+                  N ↑
+                </button>
+                <button
+                  onClick={() => createGridAtPosition('down')}
+                  className="px-1 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs transition-colors"
+                  title="Abajo"
+                >
+                  ⬇ Abajo
+                </button>
+                <button
+                  onClick={() => createGridAtPosition('up')}
+                  className="px-1 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs transition-colors"
+                  title="Arriba"
+                >
+                  ⬆ Arriba
+                </button>
+              </div>
+            </div>
+
+            {/* Crear cuadrícula personalizada */}
+            <div className="space-y-1">
+              <div className="text-xs font-semibold text-gray-300">Personalizada</div>
+              
+              <div className="grid grid-cols-4 gap-1">
+                <div>
+                  <label className="text-xs text-gray-400 block">X</label>
+                  <input
+                    type="number"
+                    value={newGridPosition[0]}
+                    onChange={(e) => setNewGridPosition([parseInt(e.target.value) || 0, newGridPosition[1], newGridPosition[2]])}
+                    className="w-full px-1 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block">Y</label>
+                  <input
+                    type="number"
+                    value={newGridPosition[1]}
+                    onChange={(e) => setNewGridPosition([newGridPosition[0], parseInt(e.target.value) || 0, newGridPosition[2]])}
+                    className="w-full px-1 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block">Z</label>
+                  <input
+                    type="number"
+                    value={newGridPosition[2]}
+                    onChange={(e) => setNewGridPosition([newGridPosition[0], newGridPosition[1], parseInt(e.target.value) || 0])}
+                    className="w-full px-1 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                    placeholder="0"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block">T</label>
+                  <input
+                    type="number"
+                    value={newGridSize}
+                    onChange={(e) => setNewGridSize(parseInt(e.target.value) || 20)}
+                    className="w-full px-1 py-1 bg-gray-800 border border-gray-600 rounded text-white text-xs"
+                    placeholder="20"
+                    min="5"
+                    max="100"
+                  />
+                </div>
+              </div>
+              
+              <button
+                onClick={createGridAtCustomPosition}
+                className="w-full px-2 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-xs transition-colors"
+                title="Crear cuadrícula en la posición especificada"
+              >
+                🎯 Crear
+              </button>
+            </div>
           </div>
         )}
       </div>

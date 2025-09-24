@@ -31,13 +31,11 @@ export function AudioInitializer() {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-gradient-to-br from-blue-900 to-purple-900 rounded-2xl shadow-2xl border border-white/20 p-8 max-w-md mx-4">
-        <div className="text-center">
-          {/* Icono */}
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-4xl">🎵</span>
-          </div>
-          
+      <div className="bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-8 max-w-md mx-4">
+        {/* Efecto de brillo interior */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
+        
+        <div className="text-center relative">
           {/* Título */}
           <h2 className="text-2xl font-bold text-white mb-4">
             Bienvenido a La Casa de Salomón
@@ -53,10 +51,10 @@ export function AudioInitializer() {
             onClick={handleInit}
             disabled={isInitializing}
             className={`
-              w-full px-8 py-4 rounded-xl text-white font-bold text-lg
+              w-full px-8 py-4 rounded-xl text-gray-800 font-bold text-lg
               transition-all duration-300 transform hover:scale-105
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              bg-gradient-to-r from-blue-600 to-purple-600
+              focus:outline-none focus:ring-4 focus:ring-gray-300/50
+              bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-200 hover:to-gray-300
               ${isInitializing 
                 ? 'opacity-70 cursor-not-allowed' 
                 : 'hover:shadow-lg active:scale-95'
@@ -65,14 +63,11 @@ export function AudioInitializer() {
           >
             {isInitializing ? (
               <div className="flex items-center justify-center gap-3">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-gray-400/30 border-t-gray-600 rounded-full animate-spin" />
                 <span>Iniciando Experiencia Sonora...</span>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-3">
-                <span className="text-2xl">🚀</span>
-                <span>Iniciar Experiencia Sonora</span>
-              </div>
+              <span>Iniciar Experiencia Sonora</span>
             )}
           </button>
           

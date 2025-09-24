@@ -6,8 +6,6 @@ import { ControlPanel } from '../components/ui/ControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { AudioInitializer } from '../components/ui/AudioInitializer';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
-import { SpatializationDebug } from '../components/ui/SpatializationDebug';
-import { GridCreator } from '../components/ui/GridCreator';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 export default function Home() {
@@ -30,11 +28,7 @@ export default function Home() {
       {/* Inicializador de Audio */}
       <AudioInitializer />
       
-      {/* Debug de Espacialización */}
-      <SpatializationDebug />
       
-      {/* Creador de Cuadrículas */}
-      <GridCreator />
       
       
       {/* Escena 3D */}
