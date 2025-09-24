@@ -5,6 +5,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 
 export function ControlPanel() {
+  const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
@@ -126,12 +127,35 @@ export function ControlPanel() {
 
 
   return (
-      <div className="fixed top-4 left-4 bg-black/80 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl p-2 z-50 min-w-[180px] max-w-[200px] max-h-[50vh] overflow-hidden">
-      {/* Efecto de brillo interior */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-xl pointer-events-none"></div>
-      
-      
-      {/* Sección de Controles */}
+    <div className="fixed left-0 top-0 h-full z-50 flex">
+      {/* Botón de toggle */}
+      <button
+        onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+        className="bg-black/80 backdrop-blur-xl border-r border-white/10 shadow-2xl p-3 flex items-center justify-center hover:bg-black/90 transition-all duration-300"
+        title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+      >
+        {isPanelExpanded ? (
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        )}
+      </button>
+
+      {/* Panel principal */}
+      <div className={`bg-black/80 backdrop-blur-xl border-r border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+        isPanelExpanded ? 'w-64' : 'w-0'
+      }`}>
+        {/* Efecto de brillo interior */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none"></div>
+        
+        <div className="p-4 h-full overflow-y-auto">
+          {isPanelExpanded && (
+            <>
+              {/* Sección de Controles */}
       <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
           <h3 className="text-sm font-semibold text-white flex items-center gap-1">
@@ -241,23 +265,23 @@ export function ControlPanel() {
           <div className="space-y-1">
             {/* Botones compactos en grid */}
             <div className="grid grid-cols-2 gap-1">
-              <button onClick={handleAddPhaserZone} className="px-2 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600">🎛️ Phaser</button>
-              <button onClick={handleAddAutoFilterZone} className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">🎛️ AutoFilter</button>
-              <button onClick={handleAddAutoWahZone} className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">🎛️ AutoWah</button>
-              <button onClick={handleAddBitCrusherZone} className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">🎛️ BitCrusher</button>
-              <button onClick={handleAddChebyshevZone} className="px-2 py-1 bg-pink-500 text-white rounded text-xs hover:bg-pink-600">🎛️ Chebyshev</button>
-              <button onClick={handleAddChorusZone} className="px-2 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">🎛️ Chorus</button>
-              <button onClick={handleAddDistortionZone} className="px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600">🎛️ Distortion</button>
-              <button onClick={handleAddFeedbackDelayZone} className="px-2 py-1 bg-teal-500 text-white rounded text-xs hover:bg-teal-600">🎛️ FeedbackDelay</button>
-              <button onClick={handleAddFreeverbZone} className="px-2 py-1 bg-cyan-500 text-white rounded text-xs hover:bg-cyan-600">🎛️ Freeverb</button>
-              <button onClick={handleAddFrequencyShifterZone} className="px-2 py-1 bg-emerald-500 text-white rounded text-xs hover:bg-emerald-600">🎛️ FreqShift</button>
-              <button onClick={handleAddJCReverbZone} className="px-2 py-1 bg-violet-500 text-white rounded text-xs hover:bg-violet-600">🎛️ JCReverb</button>
-              <button onClick={handleAddPingPongDelayZone} className="px-2 py-1 bg-rose-500 text-white rounded text-xs hover:bg-rose-600">🎛️ PingPong</button>
-              <button onClick={handleAddPitchShiftZone} className="px-2 py-1 bg-sky-500 text-white rounded text-xs hover:bg-sky-600">🎛️ PitchShift</button>
-              <button onClick={handleAddReverbZone} className="px-2 py-1 bg-amber-500 text-white rounded text-xs hover:bg-amber-600">🎛️ Reverb</button>
-              <button onClick={handleAddStereoWidenerZone} className="px-2 py-1 bg-lime-500 text-white rounded text-xs hover:bg-lime-600">🎛️ StereoWidener</button>
-              <button onClick={handleAddTremoloZone} className="px-2 py-1 bg-fuchsia-500 text-white rounded text-xs hover:bg-fuchsia-600">🎛️ Tremolo</button>
-              <button onClick={handleAddVibratoZone} className="px-2 py-1 bg-slate-500 text-white rounded text-xs hover:bg-slate-600">🎛️ Vibrato</button>
+              <button onClick={handleAddPhaserZone} className="px-2 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600">Phaser</button>
+              <button onClick={handleAddAutoFilterZone} className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">AutoFilter</button>
+              <button onClick={handleAddAutoWahZone} className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">AutoWah</button>
+              <button onClick={handleAddBitCrusherZone} className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">BitCrusher</button>
+              <button onClick={handleAddChebyshevZone} className="px-2 py-1 bg-pink-500 text-white rounded text-xs hover:bg-pink-600">Chebyshev</button>
+              <button onClick={handleAddChorusZone} className="px-2 py-1 bg-indigo-500 text-white rounded text-xs hover:bg-indigo-600">Chorus</button>
+              <button onClick={handleAddDistortionZone} className="px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600">Distortion</button>
+              <button onClick={handleAddFeedbackDelayZone} className="px-2 py-1 bg-teal-500 text-white rounded text-xs hover:bg-teal-600">FeedbackDelay</button>
+              <button onClick={handleAddFreeverbZone} className="px-2 py-1 bg-cyan-500 text-white rounded text-xs hover:bg-cyan-600">Freeverb</button>
+              <button onClick={handleAddFrequencyShifterZone} className="px-2 py-1 bg-emerald-500 text-white rounded text-xs hover:bg-emerald-600">FreqShift</button>
+              <button onClick={handleAddJCReverbZone} className="px-2 py-1 bg-violet-500 text-white rounded text-xs hover:bg-violet-600">JCReverb</button>
+              <button onClick={handleAddPingPongDelayZone} className="px-2 py-1 bg-rose-500 text-white rounded text-xs hover:bg-rose-600">PingPong</button>
+              <button onClick={handleAddPitchShiftZone} className="px-2 py-1 bg-sky-500 text-white rounded text-xs hover:bg-sky-600">PitchShift</button>
+              <button onClick={handleAddReverbZone} className="px-2 py-1 bg-amber-500 text-white rounded text-xs hover:bg-amber-600">Reverb</button>
+              <button onClick={handleAddStereoWidenerZone} className="px-2 py-1 bg-lime-500 text-white rounded text-xs hover:bg-lime-600">StereoWidener</button>
+              <button onClick={handleAddTremoloZone} className="px-2 py-1 bg-fuchsia-500 text-white rounded text-xs hover:bg-fuchsia-600">Tremolo</button>
+              <button onClick={handleAddVibratoZone} className="px-2 py-1 bg-slate-500 text-white rounded text-xs hover:bg-slate-600">Vibrato</button>
             </div>
           </div>
         )}
@@ -301,6 +325,10 @@ export function ControlPanel() {
             </button>
           </div>
         )}
+      </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

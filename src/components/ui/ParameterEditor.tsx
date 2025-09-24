@@ -48,6 +48,7 @@ import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
 
 export function ParameterEditor() {
+  const [isPanelExpanded, setIsPanelExpanded] = React.useState(false);
   const {
     updateObject,
     updateEffectZone,
@@ -157,9 +158,9 @@ export function ParameterEditor() {
   // Alias para mantener compatibilidad con el código existente
   const handleTransformChange = updateTransform;
 
-  // Si no hay entidad seleccionada, mostrar mensaje
+  // Si no hay entidad seleccionada, no mostrar nada
   if (!selectedEntity) {
-    return <NoSelectionMessage />;
+    return null;
   }
 
   // Renderizar controles según el tipo de entidad seleccionada
@@ -185,10 +186,17 @@ export function ParameterEditor() {
     }
 
     return (
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-3 max-w-96 max-h-[60vh] overflow-y-auto">
+      <div className="fixed right-0 top-0 h-full z-50 flex">
+        {/* Panel principal */}
+        <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-300 overflow-hidden ${
+          isPanelExpanded ? 'w-96' : 'w-0'
+        }`}>
           {/* Efecto de brillo interior */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none"></div>
+          
+          <div className="p-3 h-full overflow-y-auto">
+            {isPanelExpanded && (
+              <>
           {/* Header con información de la zona de efecto */}
           <EffectZoneHeader
             zone={zone}
@@ -340,7 +348,27 @@ export function ParameterEditor() {
 
           {/* Información adicional */}
           <EffectInfoSection effectType={zone.type} />
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Botón de toggle */}
+        <button
+          onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+          className="bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl p-3 flex items-center justify-center hover:bg-black/90 transition-all duration-300"
+          title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+        >
+          {isPanelExpanded ? (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          )}
+        </button>
       </div>
     );
   }
@@ -359,8 +387,14 @@ export function ParameterEditor() {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl p-4 max-w-96 max-h-[60vh] overflow-y-auto">
+    <div className="fixed right-0 top-0 h-full z-50 flex">
+      {/* Panel principal */}
+      <div className={`bg-gray-900/90 backdrop-blur-sm border-l border-gray-700 shadow-2xl transition-all duration-300 overflow-hidden ${
+        isPanelExpanded ? 'w-96' : 'w-0'
+      }`}>
+        <div className="p-4 h-full overflow-y-auto">
+          {isPanelExpanded && (
+            <>
         {/* Header con información del objeto */}
         <SoundObjectHeader
           selectedObject={selectedObject}
@@ -428,9 +462,27 @@ export function ParameterEditor() {
           onResetTransform={resetTransform}
           roundToDecimals={roundToDecimals}
         />
+            </>
+          )}
+        </div>
       </div>
 
-      <SoundObjectFooter />
+      {/* Botón de toggle */}
+      <button
+        onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+        className="bg-gray-900/90 backdrop-blur-sm border-l border-gray-700 shadow-2xl p-3 flex items-center justify-center hover:bg-gray-800/90 transition-all duration-300"
+        title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+      >
+        {isPanelExpanded ? (
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        )}
+      </button>
     </div>
 
   );
