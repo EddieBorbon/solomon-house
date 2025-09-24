@@ -2,9 +2,11 @@
 
 import { useWorldStore } from '../../state/useWorldStore';
 import { Move, RotateCcw, Scale, X, Trash2 } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function TransformToolbar() {
   const { selectedEntityId, transformMode, setTransformMode } = useWorldStore();
+  const { t } = useLanguage();
   
   const handleDelete = () => {
     // Simular la acción de Delete
@@ -18,9 +20,9 @@ export function TransformToolbar() {
   }
 
   const modes = [
-    { key: 'translate', label: 'Mover', shortcut: 'G', icon: Move },
-    { key: 'rotate', label: 'Rotar', shortcut: 'R', icon: RotateCcw },
-    { key: 'scale', label: 'Escalar', shortcut: 'S', icon: Scale },
+    { key: 'translate', label: t('ui.move'), shortcut: 'G', icon: Move },
+    { key: 'rotate', label: t('ui.rotate'), shortcut: 'R', icon: RotateCcw },
+    { key: 'scale', label: t('ui.scale'), shortcut: 'S', icon: Scale },
   ] as const;
 
   return (

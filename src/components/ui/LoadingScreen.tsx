@@ -1,18 +1,23 @@
 "use client";
 
+import { useLanguage } from '../../contexts/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
+
 interface LoadingScreenProps {
   variant?: 'initial' | 'scene' | 'audio';
   onStart?: () => void;
 }
 
 export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenProps) {
+  const { t } = useLanguage();
+  
   const getContent = () => {
     switch (variant) {
       case 'initial':
         return {
-          systemCode: 'LA_CASA_DE_SALOMÓN',
-          welcomeMessage: 'BIENVENIDO',
-          description: 'UNA_EXPERIENCIA_SONORA_3D_INTERACTIVA_DONDE_PUEDES_CREAR_Y_MANIPULAR_OBJETOS_SONOROS_EN_TIEMPO_REAL.',
+          systemCode: t('loading.systemCode'),
+          welcomeMessage: t('loading.welcome'),
+          description: t('loading.description'),
           showButton: true,
           showInstructions: true,
           steps: []
@@ -20,37 +25,37 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
       case 'scene':
         return {
           systemCode: '003_SCENE_LOADING',
-          title: '♪ LA_CASA_DE_SALOMÓN',
+          title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
           showButton: false,
           showInstructions: false,
-          statusText: 'LOADING_3D_WORLD...',
+          statusText: t('loading.sceneLoading'),
           steps: [
-            { text: 'INITIALIZING_RENDERER', active: true },
-            { text: 'LOADING_3D_MODELS', active: false },
-            { text: 'PREPARING_AUDIO_ENGINE', active: false }
+            { text: t('loading.initRenderer'), active: true },
+            { text: t('loading.loadModels'), active: false },
+            { text: t('loading.prepareAudio'), active: false }
           ]
         };
       case 'audio':
         return {
           systemCode: '004_AUDIO_INIT',
-          title: '♪ LA_CASA_DE_SALOMÓN',
+          title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
           showButton: false,
           showInstructions: false,
-          statusText: 'INITIALIZING_AUDIO_SYSTEM...',
+          statusText: t('loading.audioInit'),
           steps: [
-            { text: 'LOADING_WEB_AUDIO_API', active: true },
-            { text: 'PREPARING_SYNTHESIZERS', active: false },
-            { text: 'CONFIGURING_SPATIAL_AUDIO', active: false }
+            { text: t('loading.loadWebAudio'), active: true },
+            { text: t('loading.prepareSynths'), active: false },
+            { text: t('loading.configSpatial'), active: false }
           ]
         };
       default:
         return {
           systemCode: '002_SYSTEM',
-          title: '♪ LA_CASA_DE_SALOMÓN',
+          title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
           showButton: false,
@@ -125,7 +130,7 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                 >
                   <div className="absolute -inset-1 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative font-mono text-sm tracking-wider">
-                    INICIAR_EXPERIENCIA_SONORA
+                    {t('loading.startButton')}
                   </span>
                 </button>
               </div>
@@ -156,29 +161,29 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
               {/* Project Information */}
               <div className="text-center space-y-2">
                 <p className="text-xs font-mono text-gray-300 tracking-wider">
-                  PROYECTO_DE_TESIS_DOCTORAL
+                  {t('loading.project')}
                 </p>
                 <p className="text-xs font-mono text-gray-300 tracking-wider">
-                  DOCTORADO_EN_COMPOSICIÓN_MUSICAL
+                  {t('loading.degree')}
                 </p>
                 
                 {/* Author */}
                 <div className="mt-4 pt-2 border-t border-gray-700">
                   <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
-                    AUTOR:
+                    {t('loading.author')}
                   </p>
                   <p className="text-sm font-mono text-white tracking-wider">
-                    EDDIE_JONATHAN_GARCÍA_BORBÓN
+                    {t('loading.authorName')}
                   </p>
                 </div>
 
                 {/* Tutor */}
                 <div className="mt-3">
                   <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
-                    TUTOR:
+                    {t('loading.tutor')}
                   </p>
                   <p className="text-sm font-mono text-white tracking-wider">
-                    PHD._MANUEL_ROCHA_ITURBIDE
+                    {t('loading.tutorName')}
                   </p>
                 </div>
               </div>
@@ -206,6 +211,11 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                     />
                   </div>
                 </div>
+              </div>
+
+              {/* Language Selector - Centered below logos */}
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <LanguageSelector variant="loading-no-flag" />
               </div>
             </div>
 

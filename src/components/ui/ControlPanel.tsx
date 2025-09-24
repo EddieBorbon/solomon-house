@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 import { 
   Cog6ToothIcon, 
   MusicalNoteIcon, 
@@ -37,6 +39,7 @@ export function ControlPanel() {
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
   const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
+  const { t } = useLanguage();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const effectsScrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -211,7 +214,7 @@ export function ControlPanel() {
       <button
         onClick={() => setIsPanelExpanded(!isPanelExpanded)}
         className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
-        title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+        title={isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel')}
       >
         {/* Decoraciones de esquina */}
         <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
@@ -275,7 +278,7 @@ export function ControlPanel() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
               <Cog6ToothIcon className="w-3 h-3" />
-              001_CONTROLES
+              {t('controls.controls')}
             </h3>
             <button
               onClick={() => setIsControlsExpanded(!isControlsExpanded)}
@@ -284,7 +287,7 @@ export function ControlPanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {isControlsExpanded ? "HIDE" : "SHOW"}
+                {isControlsExpanded ? t('controls.hide') : t('controls.show')}
               </span>
             </button>
           </div>
@@ -320,7 +323,7 @@ export function ControlPanel() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
               <MusicalNoteIcon className="w-3 h-3" />
-              002_OBJETOS_SONOROS
+              {t('controls.soundObjects')}
             </h3>
             <button
               onClick={() => setIsAddMenuExpanded(!isAddMenuExpanded)}
@@ -329,7 +332,7 @@ export function ControlPanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {isAddMenuExpanded ? "HIDE" : "SHOW"}
+                {isAddMenuExpanded ? t('controls.hide') : t('controls.show')}
               </span>
             </button>
           </div>
@@ -397,7 +400,7 @@ export function ControlPanel() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
               <SpeakerWaveIcon className="w-3 h-3" />
-              003_ZONAS_EFECTOS
+              {t('controls.effectZones')}
             </h3>
             <button
               onClick={() => setIsEffectsExpanded(!isEffectsExpanded)}
@@ -406,7 +409,7 @@ export function ControlPanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {isEffectsExpanded ? "HIDE" : "SHOW"}
+                {isEffectsExpanded ? t('controls.hide') : t('controls.show')}
               </span>
             </button>
           </div>
@@ -505,7 +508,7 @@ export function ControlPanel() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
               <RocketLaunchIcon className="w-3 h-3" />
-              004_OBJETOS_MÓVILES
+              {t('controls.mobileObjects')}
             </h3>
             <button
               onClick={() => setIsMobileObjectExpanded(!isMobileObjectExpanded)}
@@ -514,7 +517,7 @@ export function ControlPanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {isMobileObjectExpanded ? "HIDE" : "SHOW"}
+                {isMobileObjectExpanded ? t('controls.hide') : t('controls.show')}
               </span>
             </button>
           </div>
@@ -549,7 +552,7 @@ export function ControlPanel() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
               <Squares2X2Icon className="w-3 h-3" />
-              005_CUADRÍCULAS
+              {t('controls.grids')}
             </h3>
             <button
               onClick={() => setIsGridsExpanded(!isGridsExpanded)}
@@ -558,7 +561,7 @@ export function ControlPanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {isGridsExpanded ? "HIDE" : "SHOW"}
+                {isGridsExpanded ? t('controls.hide') : t('controls.show')}
               </span>
             </button>
           </div>

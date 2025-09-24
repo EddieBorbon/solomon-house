@@ -4,6 +4,7 @@ import "./tailwind.css";
 import "./neon-sliders.css";
 import "./glassmorphism.css";
 import { StoreProvider } from "../components/StoreProvider";
+import { LanguageProvider } from "../contexts/LanguageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full m-0 p-0 bg-black overflow-hidden`}
       >
-        <StoreProvider>
-          {children}
-        </StoreProvider>
+        <LanguageProvider>
+          <StoreProvider>
+            {children}
+          </StoreProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
