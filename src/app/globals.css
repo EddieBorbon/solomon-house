@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset global para eliminar espacios en blanco */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden;
+  background-color: #000000 !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 /* Estilos personalizados para el scroll horizontal */
 .scrollbar-thin {
   scrollbar-width: thin;
@@ -149,4 +163,14 @@ input:focus, select:focus {
   ring: 2px;
   ring-color: #3b82f6;
   ring-offset: 2px;
+}
+
+/* Animación del escáner */
+@keyframes scanner {
+  0% {
+    top: -8px;
+  }
+  100% {
+    top: 100%;
+  }
 }

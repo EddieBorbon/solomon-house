@@ -1,181 +1,181 @@
-import * as Tone from 'tone';
-import { AudioParams } from '../factories/SoundSourceFactory';
+import { EffectZone, SoundObject, MobileObject } from '../../state/useWorldStore';
+import { AudioParams } from '../AudioManager';
 
-// Union type for all possible synthesizer types
-export type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.MembraneSynth | Tone.PolySynth | Tone.Sampler;
-
-// Type definitions for synthesizer properties
-export interface SynthesizerWithOscillator {
-  oscillator: {
-    type: string;
-  };
+// Tipos base para el sistema de parámetros
+export interface ParameterEntity {
+  id: string;
+  type: string;
+  isSelected: boolean;
 }
 
-export interface SynthesizerWithVoice0 {
-  voice0: {
-    oscillator: {
-      type: string;
-    };
-  };
+export interface SoundObjectEntity extends ParameterEntity {
+  type: 'soundObject';
+  audioParams: AudioParams;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
 }
 
-export interface SynthesizerWithHarmonicity {
-  harmonicity: {
-    rampTo: (value: number, time: number) => void;
-  } | number;
+export interface EffectZoneEntity extends ParameterEntity {
+  type: 'effectZone';
+  effectType: EffectType;
+  effectParams: EffectZone['effectParams'];
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  isLocked: boolean;
 }
 
-export interface SynthesizerWithModulationIndex {
-  modulationIndex: {
-    rampTo: (value: number, time: number) => void;
-  } | number;
+export interface MobileObjectEntity extends ParameterEntity {
+  type: 'mobileObject';
+  mobileParams: MobileObject['mobileParams'];
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
 }
 
-export interface SynthesizerWithModulation {
-  modulation: {
-    type: string;
-  };
+// Tipos de efectos soportados
+export type EffectType = 
+  | 'reverb' 
+  | 'delay' 
+  | 'chorus' 
+  | 'distortion' 
+  | 'filter' 
+  | 'tremolo' 
+  | 'vibrato' 
+  | 'pitchShift' 
+  | 'stereoWidener' 
+  | 'pingPongDelay' 
+  | 'autoFilter' 
+  | 'autoWah' 
+  | 'bitCrusher' 
+  | 'chebyshev' 
+  | 'frequencyShifter' 
+  | 'jcReverb' 
+  | 'feedbackDelay' 
+  | 'freeverb';
+
+// Tipos de objetos de sonido soportados
+export type SoundObjectType = 
+  | 'cube' 
+  | 'sphere' 
+  | 'cylinder' 
+  | 'cone' 
+  | 'pyramid' 
+  | 'icosahedron' 
+  | 'plane' 
+  | 'torus' 
+  | 'dodecahedronRing' 
+  | 'spiral';
+
+// Interfaces para el sistema de parámetros
+export interface IParameterComponentFactory {
+  createEffectComponent(effectType: EffectType, zone: EffectZoneEntity): React.ReactElement | null;
+  createSoundObjectComponent(objectType: SoundObjectType, object: SoundObjectEntity): React.ReactElement | null;
+  createMobileObjectComponent(object: MobileObjectEntity): React.ReactElement | null;
 }
 
-export interface SynthesizerWithVoice1 {
-  voice1: {
-    oscillator: {
-      type: string;
-    };
-  };
+export interface IParameterManager {
+  updateParameter(entityId: string, param: string, value: any): void;
+  validateParameter(entityType: string, param: string, value: any): boolean;
+  getParameterInfo(entityType: string, param: string): ParameterInfo | null;
 }
 
-export interface SynthesizerWithEnvelope {
-  envelope: {
-    attack: number;
-    decay: number;
-    sustain: number;
-    release: number;
-    curve?: string;
-  };
+export interface IParameterValidator {
+  validateEffectParameter(effectType: EffectType, param: string, value: any): ValidationResult;
+  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: any): ValidationResult;
+  validateMobileObjectParameter(param: string, value: any): ValidationResult;
 }
 
-export interface SynthesizerWithFilterEnvelope {
-  filterEnvelope: {
-    attack: number;
-    decay: number;
-    sustain: number;
-    release: number;
-    baseFrequency: number;
-    octaves: number;
-  };
+// Interfaces para el sistema de UI
+export interface IParameterPanel {
+  render(entity: ParameterEntity): React.ReactElement | null;
+  isExpanded(): boolean;
+  toggleExpanded(): void;
+  setExpanded(expanded: boolean): void;
 }
 
-export interface SynthesizerWithFilter {
-  filter: {
-    Q: {
-      value: number;
-    };
-  };
+export interface IParameterSection {
+  render(entity: ParameterEntity): React.ReactElement | null;
+  getSectionTitle(): string;
+  getSectionIcon(): string;
 }
 
-export interface SynthesizerWithVibratoAmount {
-  vibratoAmount: {
-    rampTo: (value: number, time: number) => void;
-  };
+// Interfaces para el sistema de transformación
+export interface ITransformManager {
+  updateTransform(entityId: string, transform: TransformData): void;
+  resetTransform(entityId: string): void;
+  validateTransform(transform: TransformData): boolean;
 }
 
-export interface SynthesizerWithVibratoRate {
-  vibratoRate: {
-    rampTo: (value: number, time: number) => void;
-  };
+export interface TransformData {
+  position?: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: [number, number, number];
 }
 
-export interface SynthesizerWithPitchDecay {
-  pitchDecay: number;
+// Interfaces para el sistema de estado
+export interface IParameterStateManager {
+  getEntityState(entityId: string): EntityState | null;
+  updateEntityState(entityId: string, updates: Partial<EntityState>): void;
+  subscribeToChanges(callback: (entityId: string, state: EntityState) => void): () => void;
 }
 
-export interface SynthesizerWithOctaves {
-  octaves: number;
+export interface EntityState {
+  isUpdating: boolean;
+  lastUpdatedParam: string | null;
+  isRefreshing: boolean;
+  isExpanded: boolean;
 }
 
-export interface SynthesizerWithResonance {
-  resonance: number;
-}
-
-// Tipos para gestión de parámetros
-export interface ParameterUpdateResult {
-  success: boolean;
-  updatedParams: string[];
-  errors: string[];
-}
-
+// Configuración del sistema de parámetros
 export interface ParameterConfig {
-  volumeRange: {
-    min: number;
-    max: number;
-    dbRange: {
-      min: number;
-      max: number;
-    };
-  };
-  frequencyRange: {
-    min: number;
-    max: number;
-  };
-  rampTime: number;
+  enableRealTimeUpdates: boolean;
+  updateDelay: number;
+  enableValidation: boolean;
+  enableTransformControls: boolean;
+  panelWidth: number;
+  animationDuration: number;
 }
 
-// Interfaz base para validadores de parámetros
-export interface ParameterValidator {
-  validate(params: Partial<AudioParams>): ParameterValidationResult;
+// Información de parámetros
+export interface ParameterInfo {
+  name: string;
+  type: 'number' | 'string' | 'boolean' | 'array' | 'object';
+  min?: number;
+  max?: number;
+  step?: number;
+  defaultValue: any;
+  description: string;
+  category: string;
 }
 
-export interface ParameterValidationResult {
+// Resultado de validación
+export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
-  sanitizedParams: Partial<AudioParams>;
+  normalizedValue?: any;
 }
 
-// Interfaz base para actualizadores de sintetizadores
-export interface SynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<AudioParams>): ParameterUpdateResult;
-  getSupportedParams(): string[];
+// Resultado de operaciones de parámetros
+export interface ParameterOperationResult {
+  success: boolean;
+  entityId: string;
+  parameter: string;
+  operation: string;
+  message: string;
+  error?: string;
 }
 
-// Interfaz para creadores de validadores
-export interface ParameterValidatorFactory {
-  createValidator(synthType: string): ParameterValidator;
+// Estadísticas del sistema de parámetros
+export interface ParameterStats {
+  totalParameters: number;
+  activeEntities: number;
+  updateCount: number;
+  errorCount: number;
+  validationCount: number;
 }
 
-// Interfaz para creadores de actualizadores
-export interface SynthUpdaterFactory {
-  createUpdater(synthType: string): SynthParameterUpdater;
-}
-
-// Tipos específicos de sintetizadores
-export type SynthType = 
-  | 'PolySynth'
-  | 'PluckSynth' 
-  | 'DuoSynth'
-  | 'MembraneSynth'
-  | 'MonoSynth'
-  | 'MetalSynth'
-  | 'NoiseSynth'
-  | 'Sampler'
-  | 'FMSynth'
-  | 'AMSynth'
-  | 'Synth';
-
-// Configuración por defecto
-export const DEFAULT_PARAMETER_CONFIG: ParameterConfig = {
-  volumeRange: {
-    min: 0,
-    max: 1.0,
-    dbRange: {
-      min: -Infinity,
-      max: 0
-    }
-  },
-  frequencyRange: {
-    min: 20,
-    max: 20000
-  },
-  rampTime: 0.05
-};
+// Re-exportar tipos necesarios
+export type { EffectZone, SoundObject, MobileObject, AudioParams };

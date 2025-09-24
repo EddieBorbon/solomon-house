@@ -174,14 +174,29 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
 // Componente principal de la escena
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const { 
-    grids,
+    grids, 
     selectedEntityId, 
     transformMode, 
     updateObject, 
     updateMobileObject,
     updateEffectZone, 
-    selectEntity
+    selectEntity,
+    loadGrid,
+    setActiveGrid,
+    getGridKey,
+    currentGridCoordinates
   } = useWorldStore();
+
+  // Inicializar la cuadrícula por defecto si no hay ninguna
+  useEffect(() => {
+    if (grids.size === 0) {
+      console.log('🎯 Inicializando cuadrícula por defecto...');
+      loadGrid([0, 0, 0]);
+      const defaultGridKey = getGridKey([0, 0, 0]);
+      setActiveGrid(defaultGridKey);
+      console.log('🎯 Cuadrícula por defecto inicializada:', defaultGridKey);
+    }
+  }, [grids.size, loadGrid, setActiveGrid, getGridKey]);
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {

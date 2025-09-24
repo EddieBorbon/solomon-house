@@ -1,38 +1,87 @@
 import { create } from 'zustand';
-import { type SelectionActions, type BaseEntity } from '../types/world';
 
-interface SelectionState {
+// Tipos para selección y transformaciones
+export type TransformMode = 'translate' | 'rotate' | 'scale';
+
+// Estado específico para selección
+export interface SelectionState {
   selectedEntityId: string | null;
-  transformMode: 'translate' | 'rotate' | 'scale';
+  transformMode: TransformMode;
 }
 
+// Acciones específicas para selección
+export interface SelectionActions {
+  // Acciones de selección
+  selectEntity: (id: string | null) => void;
+  clearSelection: () => void;
+  
+  // Acciones de transformación
+  setTransformMode: (mode: TransformMode) => void;
+  
+  // Acciones de consulta
+  getSelectedEntityId: () => string | null;
+  getTransformMode: () => TransformMode;
+  isEntitySelected: (id: string) => boolean;
+}
+
+/**
+ * Store especializado para gestión de selección y transformaciones
+ * Implementa Single Responsibility Principle
+ */
 export const useSelectionStore = create<SelectionState & SelectionActions>((set, get) => ({
   // Estado inicial
   selectedEntityId: null,
   transformMode: 'translate',
 
-  // Acciones para gestión de selección
+  // Acciones de selección
   selectEntity: (id: string | null) => {
-    set({ selectedEntityId: id });
-    console.log(`🎯 Entidad seleccionada: ${id || 'ninguna'}`);
+    console.log(`🎯 SelectionStore: Seleccionando entidad: ${id || 'null'}`);
+    
+    set((state) => ({
+      selectedEntityId: id,
+      // Resetear el modo de transformación si no hay entidad seleccionada
+      transformMode: id === null ? 'translate' : state.transformMode,
+    }));
+
+    console.log(`🎯 SelectionStore: Entidad ${id || 'null'} seleccionada`);
   },
 
-  setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => {
+  clearSelection: () => {
+    console.log(`🧹 SelectionStore: Limpiando selección`);
+    
+    set({
+      selectedEntityId: null,
+      transformMode: 'translate',
+    });
+
+    console.log(`🧹 SelectionStore: Selección limpiada`);
+  },
+
+  // Acciones de transformación
+  setTransformMode: (mode: TransformMode) => {
+    console.log(`🔄 SelectionStore: Estableciendo modo de transformación: ${mode}`);
+    
     set({ transformMode: mode });
-    console.log(`🔄 Modo de transformación cambiado a: ${mode}`);
+
+    console.log(`🔄 SelectionStore: Modo de transformación establecido: ${mode}`);
   },
 
-  getSelectedEntity: () => {
-    const state = get();
-    // Esta función necesitará acceso a los otros stores para obtener la entidad completa
-    // Por ahora retornamos null, se implementará en el store principal
-    return null;
+  // Acciones de consulta
+  getSelectedEntityId: () => {
+    const selectedId = get().selectedEntityId;
+    console.log(`🔍 SelectionStore: ID de entidad seleccionada: ${selectedId || 'null'}`);
+    return selectedId;
   },
 
-  getSelectedEntityType: () => {
-    const state = get();
-    // Esta función necesitará acceso a los otros stores para determinar el tipo
-    // Por ahora retornamos null, se implementará en el store principal
-    return null;
+  getTransformMode: () => {
+    const mode = get().transformMode;
+    console.log(`🔍 SelectionStore: Modo de transformación: ${mode}`);
+    return mode;
   },
+
+  isEntitySelected: (id: string) => {
+    const isSelected = get().selectedEntityId === id;
+    console.log(`🔍 SelectionStore: Entidad ${id} ${isSelected ? 'está seleccionada' : 'no está seleccionada'}`);
+    return isSelected;
+  }
 }));

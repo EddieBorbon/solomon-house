@@ -1,34 +1,14 @@
 // Exportar tipos
 export * from './types';
 
-// Exportar validadores
-export { 
-  BaseParameterValidator, 
-  PolySynthValidator, 
-  PluckSynthValidator 
-} from './ParameterValidator';
+// Exportar factory
+export { ParameterComponentFactory } from './ParameterComponentFactory';
 
-// Exportar actualizadores
-export { 
-  BaseSynthParameterUpdater,
-  PolySynthParameterUpdater,
-  PluckSynthParameterUpdater,
-  DuoSynthParameterUpdater,
-  MembraneSynthParameterUpdater,
-  MetalSynthParameterUpdater,
-  NoiseSynthParameterUpdater,
-  SamplerParameterUpdater
-} from './SynthParameterUpdater';
+// Exportar manager
+export { ParameterManager } from './ParameterManager';
 
-// Exportar factories
-export { 
-  ParameterValidatorFactory, 
-  SynthUpdaterFactory, 
-  ParameterFactory 
-} from './ParameterFactory';
+// Exportar componente principal refactorizado
+export { ParameterEditorNew } from './ParameterEditorNew';
 
-// Exportar el manager principal refactorizado
-export { ParameterManagerNew } from './ParameterManagerNew';
-
-// Re-exportar el manager original para compatibilidad durante la migración
-export { ParameterManager } from '../managers/ParameterManager';
+// Re-exportar el componente original para compatibilidad durante la migración
+export { ParameterEditor } from '../../components/ui/ParameterEditor';

@@ -137,62 +137,76 @@ export function PersistencePanel() {
   };
 
   return (
-    <div className="mb-2">
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="text-sm font-semibold text-white flex items-center gap-1">
-          <span className="text-sm">💾</span>
-          Persistencia
-        </h3>
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-cyan-400 hover:text-cyan-300 transition-all duration-300 hover:scale-110 p-1 rounded-lg hover:bg-cyan-500/20"
-          title={isExpanded ? "Ocultar menú" : "Mostrar menú"}
-        >
-          {isExpanded ? (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          ) : (
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          )}
-        </button>
-      </div>
+    <div className="mb-4 relative">
+      {/* Contenedor con borde complejo */}
+      <div className="relative border border-white p-3">
+        {/* Decoraciones de esquina */}
+        <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+        <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+        
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
+            <span className="text-xs">💾</span>
+            006_PERSISTENCIA
+          </h3>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
+            title={isExpanded ? "Ocultar menú" : "Mostrar menú"}
+          >
+            <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+            <span className="relative text-xs font-mono tracking-wider">
+              {isExpanded ? "HIDE" : "SHOW"}
+            </span>
+          </button>
+        </div>
       
       {isExpanded && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {/* Información compacta del estado actual */}
-          <div className="p-2 bg-gray-800/50 border border-gray-600/50 rounded text-xs text-gray-300">
-            <div>{getGridCount()} cuadrículas, {getObjectCount()} objetos</div>
-            {currentProjectId && (
-              <div className="flex items-center gap-1 mt-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${
-                  isConnected ? 'bg-green-500' : 'bg-red-500'
-                }`} />
-                <span className="text-xs">
-                  {isConnected ? 'Sync activa' : 'Sin sync'}
-                </span>
-              </div>
-            )}
+          <div className="p-2 border border-gray-600 text-xs text-gray-300 font-mono">
+            <div className="space-y-1">
+              <p><span className="text-white">GRIDS:</span> {getGridCount()}</p>
+              <p><span className="text-white">OBJECTS:</span> {getObjectCount()}</p>
+              {currentProjectId && (
+                <div className="flex items-center gap-2 mt-1">
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    isConnected ? 'bg-white animate-pulse' : 'bg-gray-500'
+                  }`} />
+                  <span className="text-xs font-mono tracking-wider">
+                    {isConnected ? 'SYNC_ACTIVE' : 'NO_SYNC'}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Botones compactos */}
+          {/* Botones futuristas */}
           <div className="grid grid-cols-2 gap-1">
             <button
               onClick={() => setShowSaveDialog(true)}
               disabled={isLoading}
-              className="px-2 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
+              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
             >
-              💾 Guardar
+              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
+                <span>💾</span>
+                <span>SAVE</span>
+              </span>
             </button>
 
             <button
               onClick={() => setShowLoadDialog(true)}
               disabled={isLoading}
-              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
+              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
             >
-              📂 Cargar
+              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
+                <span>📂</span>
+                <span>LOAD</span>
+              </span>
             </button>
           </div>
 
@@ -200,55 +214,69 @@ export function PersistencePanel() {
             <button
               onClick={handleUpdateProject}
               disabled={isLoading}
-              className="w-full px-2 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded text-xs transition-colors"
+              className="relative w-full border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
             >
-              🔄 Actualizar
+              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
+                <span>🔄</span>
+                <span>UPDATE_PROJECT</span>
+              </span>
             </button>
           )}
 
           {/* Diálogo de guardar */}
           {showSaveDialog && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-600 w-80">
-                <h3 className="text-sm font-semibold text-white mb-3">Guardar Proyecto</h3>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="relative bg-black border border-white p-6 w-80">
+                {/* Decoraciones de esquina */}
+                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
-                <div className="space-y-2">
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">SAVE_PROJECT</h3>
+                
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Nombre</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">PROJECT_NAME</label>
                     <input
                       type="text"
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
-                      className="w-full px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none text-sm"
-                      placeholder="Mi Proyecto"
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="MY_PROJECT"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs text-gray-300 mb-1">Descripción</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">DESCRIPTION</label>
                     <textarea
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
-                      className="w-full px-2 py-1 bg-gray-700 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none text-sm"
-                      placeholder="Descripción..."
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="PROJECT_DESCRIPTION..."
                       rows={2}
                     />
                   </div>
                 </div>
 
-                <div className="flex space-x-1 mt-3">
+                <div className="flex space-x-2 mt-4">
                   <button
                     onClick={handleSaveProject}
                     disabled={isLoading || !projectName.trim()}
-                    className="flex-1 px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded text-sm transition-colors"
+                    className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
                   >
-                    {isLoading ? 'Guardando...' : 'Guardar'}
+                    <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+                    <span className="relative text-xs font-mono tracking-wider">
+                      {isLoading ? 'SAVING...' : 'SAVE'}
+                    </span>
                   </button>
                   <button
                     onClick={() => setShowSaveDialog(false)}
-                    className="flex-1 px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm transition-colors"
+                    className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                   >
-                    Cancelar
+                    <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                    <span className="relative text-xs font-mono tracking-wider">CANCEL</span>
                   </button>
                 </div>
               </div>
@@ -257,43 +285,51 @@ export function PersistencePanel() {
 
           {/* Diálogo de cargar */}
           {showLoadDialog && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-600 w-96 max-h-96 overflow-y-auto">
-                <h3 className="text-lg font-semibold text-white mb-4">Cargar Proyecto</h3>
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="relative bg-black border border-white p-6 w-96 max-h-96 overflow-y-auto">
+                {/* Decoraciones de esquina */}
+                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
+                
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">LOAD_PROJECT</h3>
                 
                 {isLoading ? (
-                  <div className="text-center text-gray-400">Cargando proyectos...</div>
+                  <div className="text-center text-gray-400 font-mono tracking-wider">LOADING_PROJECTS...</div>
                 ) : projects.length === 0 ? (
-                  <div className="text-center text-gray-400">No hay proyectos guardados</div>
+                  <div className="text-center text-gray-400 font-mono tracking-wider">NO_SAVED_PROJECTS</div>
                 ) : (
                   <div className="space-y-2">
                     {projects.map((project) => (
                       <div
                         key={project.id}
-                        className="p-3 bg-gray-700 rounded border border-gray-600 hover:border-cyan-500 transition-colors"
+                        className="p-3 border border-gray-600 hover:border-white transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <div className="text-white font-medium">{project.name}</div>
+                            <div className="text-white font-mono text-sm tracking-wider">{project.name}</div>
                             {project.description && (
-                              <div className="text-sm text-gray-400">{project.description}</div>
+                              <div className="text-xs text-gray-400 font-mono">{project.description}</div>
                             )}
-                            <div className="text-xs text-gray-500">
-                              {project.grids.length} cuadrículas
+                            <div className="text-xs text-gray-500 font-mono">
+                              {project.grids.length} GRIDS
                             </div>
                           </div>
                           <div className="flex space-x-1">
                             <button
                               onClick={() => handleLoadProject(project.id)}
-                              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                             >
-                              Cargar
+                              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                              <span className="relative text-xs font-mono tracking-wider">LOAD</span>
                             </button>
                             <button
                               onClick={() => handleDeleteProject(project.id)}
-                              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+                              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                             >
-                              Eliminar
+                              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                              <span className="relative text-xs font-mono tracking-wider">DELETE</span>
                             </button>
                           </div>
                         </div>
@@ -305,9 +341,10 @@ export function PersistencePanel() {
                 <div className="flex justify-end mt-4">
                   <button
                     onClick={() => setShowLoadDialog(false)}
-                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+                    className="relative border border-white px-4 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                   >
-                    Cerrar
+                    <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                    <span className="relative text-xs font-mono tracking-wider">CLOSE</span>
                   </button>
                 </div>
               </div>
@@ -315,6 +352,7 @@ export function PersistencePanel() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
