@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos FeedbackDelay
@@ -13,9 +13,10 @@ export class DelayFactory implements IEffectFactory {
    * Crea un nuevo nodo FeedbackDelay con parámetros por defecto
    * @returns El nodo FeedbackDelay creado
    */
-  createEffect(): Tone.FeedbackDelay {
+  createEffect(): EffectNode {
     const effectNode = new Tone.FeedbackDelay('8n', 0.5);
 
+    console.log(`🎛️ DelayFactory: FeedbackDelay creado con parámetros iniciales:`, {
       delayTime: effectNode.delayTime,
       feedback: effectNode.feedback
     });

@@ -78,7 +78,6 @@ export class EffectManager {
    * MIGRADO: Ahora delega al manager refactorizado usando Strategy Pattern
    */
   public refreshGlobalEffect(effectId: string): void {
-    // console.log(`🔄 EffectManager: Delegando refresco del efecto ${effectId} al manager refactorizado`);
     
     // Delegar al manager refactorizado (usa Strategy Pattern internamente)
     this.refactoredManager.refreshGlobalEffect(effectId);
@@ -89,7 +88,6 @@ export class EffectManager {
    * MIGRADO: Ahora delega al manager refactorizado
    */
   public removeGlobalEffect(effectId: string): void {
-    // console.log(`🔄 EffectManager: Delegando eliminación del efecto ${effectId} al manager refactorizado`);
     
     // Delegar al manager refactorizado
     this.refactoredManager.removeGlobalEffect(effectId);
@@ -99,7 +97,6 @@ export class EffectManager {
     this.effectZoneRadii.delete(effectId);
     this.lastEffectIntensities.delete(effectId);
     
-    // console.log(`✅ EffectManager: Estado local limpiado para efecto ${effectId}`);
   }
 
   /**
@@ -107,7 +104,6 @@ export class EffectManager {
    * MIGRADO: Ahora delega al manager refactorizado
    */
   public refreshAllGlobalEffects(): void {
-    // console.log(`🔄 EffectManager: Delegando refresco de todos los efectos al manager refactorizado`);
     
     // Delegar al manager refactorizado
     this.refactoredManager.refreshAllGlobalEffects();
@@ -119,7 +115,6 @@ export class EffectManager {
   public forceEffectUpdate(effectId: string, paramName: string, newValue: number | string): void {
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
-      // console.warn(`⚠️ EffectManager: No se encontró efecto global con ID ${effectId} para forzar actualización`);
       return;
     }
 
@@ -136,7 +131,6 @@ export class EffectManager {
       }
       
     } catch (error) {
-       console.error(`❌ EffectManager: Error al forzar actualización del efecto:`, error);
     }
   }
 
@@ -153,7 +147,6 @@ export class EffectManager {
         if (current && current[pathParts[i]]) {
           current = current[pathParts[i]] as Record<string, unknown>;
         } else {
-          // console.log(`ℹ️ EffectManager: Path ${paramPath} no válido en ${effectNode.constructor.name}`);
           return false;
         }
       }
@@ -172,15 +165,12 @@ export class EffectManager {
           current[lastPart] = newValue;
           return true;
         } else {
-          // console.log(`ℹ️ EffectManager: Parámetro ${paramPath} no es configurable en tiempo real`);
           return false;
         }
       } else {
-        // console.log(`ℹ️ EffectManager: Parámetro ${paramPath} no encontrado`);
         return false;
       }
     } catch (error) {
-      // console.log(`ℹ️ EffectManager: Error al actualizar ${paramPath}:`, error);
       return false;
     }
   }
@@ -190,7 +180,6 @@ export class EffectManager {
    */
   public setEffectZoneRadius(effectId: string, radius: number): void {
     this.effectZoneRadii.set(effectId, radius);
-    // console.log(`🎛️ EffectManager: Radio de zona de efecto ${effectId} configurado a ${radius} unidades`);
   }
 
   /**
@@ -198,7 +187,6 @@ export class EffectManager {
    */
   public getEffectZoneRadius(effectId: string): number {
     const radius = this.effectZoneRadii.get(effectId) || 2.0;
-    // console.log(`📏 EffectManager: Radio para zona de efecto ${effectId}: ${radius} unidades`);
     return radius;
   }
 
@@ -207,7 +195,6 @@ export class EffectManager {
    * MIGRADO: Ahora delega al manager refactorizado
    */
   public updateEffectZonePosition(id: string, position: [number, number, number]): void {
-    // console.log(`🔄 EffectManager: Delegando actualización de posición del efecto ${id} al manager refactorizado`);
     
     // Delegar al manager refactorizado
     this.refactoredManager.updateEffectZonePosition(id, position);
@@ -216,7 +203,6 @@ export class EffectManager {
     const refactoredEffect = this.refactoredManager.getGlobalEffect(id);
     if (refactoredEffect && this.globalEffects.has(id)) {
       this.globalEffects.set(id, refactoredEffect);
-      // console.log(`✅ EffectManager: Estado local sincronizado para efecto ${id}`);
     }
   }
 
@@ -232,7 +218,6 @@ export class EffectManager {
    * MIGRADO: Ahora delega al manager refactorizado
    */
   public cleanup(): void {
-    // console.log(`🔄 EffectManager: Delegando limpieza completa al manager refactorizado`);
     
     // Delegar al manager refactorizado
     this.refactoredManager.cleanup();
@@ -242,6 +227,5 @@ export class EffectManager {
     this.effectZoneRadii.clear();
     this.lastEffectIntensities.clear();
     
-    // console.log(`✅ EffectManager: Limpieza completada y estado local limpiado`);
   }
 }

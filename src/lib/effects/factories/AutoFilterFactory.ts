@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos AutoFilter
@@ -13,7 +13,7 @@ export class AutoFilterFactory implements IEffectFactory {
    * Crea un nuevo nodo AutoFilter con parámetros por defecto
    * @returns El nodo AutoFilter creado
    */
-  createEffect(): Tone.AutoFilter {
+  createEffect(): EffectNode {
     const effectNode = new Tone.AutoFilter({
       frequency: 0.5,
       baseFrequency: 200,
@@ -27,6 +27,7 @@ export class AutoFilterFactory implements IEffectFactory {
       type: 'sine',
     });
 
+    console.log(`🎛️ AutoFilterFactory: AutoFilter creado con parámetros iniciales:`, {
       frequency: effectNode.frequency.value,
       baseFrequency: effectNode.baseFrequency,
       octaves: effectNode.octaves,

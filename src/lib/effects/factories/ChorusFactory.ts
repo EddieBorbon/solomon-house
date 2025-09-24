@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos Chorus
@@ -13,7 +13,7 @@ export class ChorusFactory implements IEffectFactory {
    * Crea un nuevo nodo Chorus con parámetros por defecto
    * @returns El nodo Chorus creado
    */
-  createEffect(): Tone.Chorus {
+  createEffect(): EffectNode {
     const effectNode = new Tone.Chorus(1.5, 3.5, 0.7);
     
     try {
@@ -25,6 +25,7 @@ export class ChorusFactory implements IEffectFactory {
     
     effectNode.start();
 
+    console.log(`🎛️ ChorusFactory: Chorus creado con parámetros iniciales:`, {
       frequency: effectNode.frequency.value,
       delayTime: effectNode.delayTime,
       depth: effectNode.depth,

@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos Phaser
@@ -13,7 +13,7 @@ export class PhaserFactory implements IEffectFactory {
    * Crea un nuevo nodo Phaser con parámetros por defecto
    * @returns El nodo Phaser creado
    */
-  createEffect(): Tone.Phaser {
+  createEffect(): EffectNode {
     const effectNode = new Tone.Phaser({
       frequency: 0.5,
       octaves: 2.2,

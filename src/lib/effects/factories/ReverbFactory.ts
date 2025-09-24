@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos Reverb
@@ -13,12 +13,13 @@ export class ReverbFactory implements IEffectFactory {
    * Crea un nuevo nodo Reverb con parámetros por defecto
    * @returns El nodo Reverb creado
    */
-  createEffect(): Tone.Reverb {
+  createEffect(): EffectNode {
     const effectNode = new Tone.Reverb({
       decay: 1.5,
       preDelay: 0.01
     });
 
+    console.log(`🎛️ ReverbFactory: Reverb creado con parámetros iniciales:`, {
       decay: effectNode.decay,
       preDelay: effectNode.preDelay,
       wet: effectNode.wet.value

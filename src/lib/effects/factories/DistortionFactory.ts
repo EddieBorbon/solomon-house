@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { IEffectFactory } from '../interfaces/IEffectFactory';
-import { EffectType } from '../../managers/EffectManager';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
  * Factory para crear efectos Distortion
@@ -13,7 +13,7 @@ export class DistortionFactory implements IEffectFactory {
    * Crea un nuevo nodo Distortion con parámetros por defecto
    * @returns El nodo Distortion creado
    */
-  createEffect(): Tone.Distortion {
+  createEffect(): EffectNode {
     const effectNode = new Tone.Distortion(0.4);
     try {
       effectNode.oversample = 'none';
@@ -21,6 +21,7 @@ export class DistortionFactory implements IEffectFactory {
       // Ignorar si no se puede configurar
     }
 
+    console.log(`🎛️ DistortionFactory: Distortion creado con parámetros iniciales:`, {
       distortion: effectNode.distortion,
       oversample: effectNode.oversample
     });
