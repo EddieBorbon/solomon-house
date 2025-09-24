@@ -165,12 +165,12 @@ input:focus, select:focus {
   ring-offset: 2px;
 }
 
-/* Animación del escáner */
+/* Animación de scanner para efectos futuristas */
 @keyframes scanner {
   0% {
-    top: -8px;
+    transform: translateY(-100vh);
   }
   100% {
-    top: 100%;
+    transform: translateY(100vh);
   }
 }

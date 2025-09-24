@@ -5,6 +5,7 @@ import { persistenceService } from '../../lib/persistenceService';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import type { FirebaseProject } from '../../lib/firebaseService';
+import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
 
 export function PersistencePanel() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -148,7 +149,7 @@ export function PersistencePanel() {
         
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-            <span className="text-xs">💾</span>
+            <CloudArrowUpIcon className="w-3 h-3" />
             006_PERSISTENCIA
           </h3>
           <button
@@ -192,7 +193,7 @@ export function PersistencePanel() {
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
-                <span>💾</span>
+                <CloudArrowUpIcon className="w-3 h-3" />
                 <span>SAVE</span>
               </span>
             </button>

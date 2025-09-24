@@ -3,6 +3,29 @@
 import { useState, useRef } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
+import { 
+  Cog6ToothIcon, 
+  MusicalNoteIcon, 
+  SpeakerWaveIcon, 
+  RocketLaunchIcon, 
+  Squares2X2Icon,
+  CameraIcon,
+  ComputerDesktopIcon,
+  CursorArrowRaysIcon,
+  TrashIcon,
+  CommandLineIcon,
+  XMarkIcon
+} from '@heroicons/react/24/outline';
+import { 
+  Box, 
+  Circle, 
+  Square, 
+  Hexagon, 
+  Triangle,
+  RotateCcw,
+  CircleDot,
+  Loader2
+} from 'lucide-react';
 
 export function ControlPanel() {
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
@@ -130,6 +153,11 @@ export function ControlPanel() {
 
   // Funciones para crear cuadrículas
   const createGridAtPosition = (direction: 'north' | 'south' | 'east' | 'west' | 'up' | 'down') => {
+    console.log(`🎯 createGridAtPosition llamado con dirección: ${direction}`);
+    console.log(`🎯 activeGrid:`, activeGrid);
+    console.log(`🎯 currentGridCoordinates:`, currentGridCoordinates);
+    console.log(`🎯 gridSize:`, gridSize);
+    
     const baseCoordinates = activeGrid ? activeGrid.coordinates : currentGridCoordinates;
     const [x, y, z] = baseCoordinates;
     let newCoordinates: [number, number, number];
@@ -161,11 +189,19 @@ export function ControlPanel() {
       newCoordinates[2] * gridSize
     ];
     
+    console.log(`🎯 Nuevas coordenadas:`, newCoordinates);
+    console.log(`🎯 Nueva posición:`, newPosition);
+    
     createGrid(newPosition, gridSize);
+    console.log(`🎯 createGrid llamado con posición:`, newPosition, `y tamaño:`, gridSize);
   };
 
   const createGridAtCustomPosition = () => {
+    console.log(`🎯 createGridAtCustomPosition llamado`);
+    console.log(`🎯 newGridPosition:`, newGridPosition);
+    console.log(`🎯 newGridSize:`, newGridSize);
     createGrid(newGridPosition, newGridSize);
+    console.log(`🎯 createGrid llamado con posición personalizada:`, newGridPosition, `y tamaño:`, newGridSize);
   };
 
 
@@ -211,8 +247,16 @@ export function ControlPanel() {
 
         {/* Scan lines effect */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute w-full h-px bg-white opacity-10 top-1/3 animate-pulse"></div>
-          <div className="absolute w-full h-px bg-white opacity-10 top-2/3 animate-pulse" style={{animationDelay: '1s'}}></div>
+          {/* Scanner line effect */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div 
+              className="absolute w-full h-1 bg-white shadow-lg shadow-white/80"
+              style={{
+                animation: 'scanner 2s linear infinite',
+                top: '-8px'
+              }}
+            ></div>
+          </div>
         </div>
         
         <div className="p-4 h-full overflow-y-auto">
@@ -230,7 +274,7 @@ export function ControlPanel() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-              <span className="text-xs">⚙️</span>
+              <Cog6ToothIcon className="w-3 h-3" />
               001_CONTROLES
             </h3>
             <button
@@ -250,12 +294,12 @@ export function ControlPanel() {
               {/* Controles básicos */}
               <div className="p-2 border border-gray-600 text-xs text-gray-300 font-mono">
                 <div className="space-y-1">
-                  <p><span className="text-white">📷 CAMERA:</span> CLICK_ROTATE_SCROLL_ZOOM</p>
-                  <p><span className="text-white">⌨️ WASD:</span> MOVEMENT_SHIFT_FAST</p>
-                  <p><span className="text-white">🎮 CLICK:</span> SELECT_OBJECTS</p>
-                  <p><span className="text-white">🗑️ DELETE:</span> REMOVE_SELECTED</p>
-                  <p><span className="text-white">🎮 G/R/S:</span> TRANSFORM_MODES</p>
-                  <p><span className="text-white">🎮 ESC:</span> EXIT_EDIT_MODE</p>
+                  <p className="flex items-center gap-2"><CameraIcon className="w-3 h-3" /><span className="text-white">CAMERA:</span> CLICK_ROTATE_SCROLL_ZOOM</p>
+                  <p className="flex items-center gap-2"><ComputerDesktopIcon className="w-3 h-3" /><span className="text-white">WASD:</span> MOVEMENT_SHIFT_FAST</p>
+                  <p className="flex items-center gap-2"><CursorArrowRaysIcon className="w-3 h-3" /><span className="text-white">CLICK:</span> SELECT_OBJECTS</p>
+                  <p className="flex items-center gap-2"><TrashIcon className="w-3 h-3" /><span className="text-white">DELETE:</span> REMOVE_SELECTED</p>
+                  <p className="flex items-center gap-2"><CommandLineIcon className="w-3 h-3" /><span className="text-white">G/R/S:</span> TRANSFORM_MODES</p>
+                  <p className="flex items-center gap-2"><XMarkIcon className="w-3 h-3" /><span className="text-white">ESC:</span> EXIT_EDIT_MODE</p>
                 </div>
               </div>
             </div>
@@ -275,7 +319,7 @@ export function ControlPanel() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-              <span className="text-xs">🎵</span>
+              <MusicalNoteIcon className="w-3 h-3" />
               002_OBJETOS_SONOROS
             </h3>
             <button
@@ -296,43 +340,43 @@ export function ControlPanel() {
               <div className="grid grid-cols-2 gap-1">
                 <button onClick={handleAddCube} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">⬜ CUBE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Box className="w-3 h-3" />CUBE</span>
                 </button>
                 <button onClick={handleAddSphere} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔵 SPHERE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Circle className="w-3 h-3" />SPHERE</span>
                 </button>
                 <button onClick={handleAddCylinder} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔶 CYLINDER</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />CYLINDER</span>
                 </button>
                 <button onClick={handleAddCone} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🥁 CONE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />CONE</span>
                 </button>
                 <button onClick={handleAddPyramid} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔺 PYRAMID</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />PYRAMID</span>
                 </button>
                 <button onClick={handleAddIcosahedron} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔶 ICOSAHEDRON</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Hexagon className="w-3 h-3" />ICOSAHEDRON</span>
                 </button>
                 <button onClick={handleAddPlane} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🟦 PLANE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />PLANE</span>
                 </button>
                 <button onClick={handleAddTorus} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔄 TORUS</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><RotateCcw className="w-3 h-3" />TORUS</span>
                 </button>
                 <button onClick={handleAddDodecahedronRing} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🔷 RING</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><CircleDot className="w-3 h-3" />RING</span>
                 </button>
                 <button onClick={handleAddSpiral} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">🌀 SPIRAL</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Loader2 className="w-3 h-3" />SPIRAL</span>
                 </button>
               </div>
             </div>
@@ -352,7 +396,7 @@ export function ControlPanel() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-              <span className="text-xs">🎛️</span>
+              <SpeakerWaveIcon className="w-3 h-3" />
               003_ZONAS_EFECTOS
             </h3>
             <button
@@ -460,7 +504,7 @@ export function ControlPanel() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-              <span className="text-xs">🚀</span>
+              <RocketLaunchIcon className="w-3 h-3" />
               004_OBJETOS_MÓVILES
             </h3>
             <button
@@ -504,7 +548,7 @@ export function ControlPanel() {
           
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-              <span className="text-xs">📐</span>
+              <Squares2X2Icon className="w-3 h-3" />
               005_CUADRÍCULAS
             </h3>
             <button

@@ -959,6 +959,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   loadGrid: (coordinates: [number, number, number]) => {
     useGridStore.getState().loadGrid(coordinates);
+    
+    // Sincronizar el estado local
+    const gridStoreState = useGridStore.getState();
+    set((state) => ({
+      grids: new Map(gridStoreState.grids)
+    }));
   },
 
   unloadGrid: (coordinates: [number, number, number]) => {
@@ -967,6 +973,14 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   moveToGrid: (coordinates: [number, number, number]) => {
     useGridStore.getState().moveToGrid(coordinates);
+    
+    // Sincronizar el estado local
+    const gridStoreState = useGridStore.getState();
+    set((state) => ({
+      grids: new Map(gridStoreState.grids),
+      currentGridCoordinates: gridStoreState.currentGridCoordinates,
+      activeGridId: gridStoreState.activeGridId
+    }));
     // Deseleccionar al cambiar de cuadrícula
     set(() => ({
       selectedEntityId: null,
@@ -979,11 +993,30 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acciones para manipulación de cuadrículas - Delegadas al useGridStore
   createGrid: (position: [number, number, number], size: number = 20) => {
+    console.log(`🎯 useWorldStore.createGrid llamado con posición:`, position, `y tamaño:`, size);
     useGridStore.getState().createGrid(position, size);
+    
+    // Sincronizar el estado local con el useGridStore
+    const gridStoreState = useGridStore.getState();
+    set((state) => ({
+      grids: new Map(gridStoreState.grids),
+      currentGridCoordinates: gridStoreState.currentGridCoordinates,
+      activeGridId: gridStoreState.activeGridId,
+      gridSize: gridStoreState.gridSize
+    }));
+    
+    console.log(`🎯 Estado sincronizado después de createGrid`);
   },
 
   selectGrid: (gridId: string | null) => {
     useGridStore.getState().selectGrid(gridId);
+    
+    // Sincronizar el estado local
+    const gridStoreState = useGridStore.getState();
+    set((state) => ({
+      grids: new Map(gridStoreState.grids),
+      activeGridId: gridStoreState.activeGridId
+    }));
   },
 
   setActiveGrid: (gridId: string | null) => {
