@@ -185,7 +185,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
   // Acciones básicas de objetos
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => {
-    console.log(`🎯 ObjectStore: Creando objeto ${type} en posición [${position.join(', ')}] para cuadrícula ${gridId}`);
 
     const newObject: SoundObject = {
       id: uuidv4(),
@@ -198,7 +197,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       audioEnabled: false,
     };
 
-    console.log(`➕ ObjectStore: Objeto ${type} creado con parámetros:`, newObject.audioParams);
 
     // Crear la fuente de sonido en el AudioManager
     try {
@@ -208,9 +206,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         newObject.audioParams,
         newObject.position
       );
-      console.log(`✅ ObjectStore: createSoundSource completado para ${type}`);
     } catch (error) {
-      console.error(`❌ ObjectStore: Error en createSoundSource para ${type}:`, error);
       throw error;
     }
 
@@ -229,19 +225,15 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       };
     });
 
-    console.log(`🎵 ObjectStore: Objeto ${type} añadido al store para cuadrícula ${gridId}`);
     return newObject;
   },
 
   removeObject: (id: string, gridId: string) => {
-    console.log(`🗑️ ObjectStore: Eliminando objeto ${id} de cuadrícula ${gridId}`);
 
     // Eliminar la fuente de sonido del AudioManager
     try {
       audioManager.removeSoundSource(id);
-      console.log(`✅ ObjectStore: Fuente de sonido ${id} eliminada del AudioManager`);
     } catch (error) {
-      console.error(`❌ ObjectStore: Error al eliminar fuente de sonido:`, error);
     }
 
     // Eliminar objeto del estado local
@@ -259,11 +251,9 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       };
     });
 
-    console.log(`🗑️ ObjectStore: Objeto ${id} eliminado del store de cuadrícula ${gridId}`);
   },
 
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>, gridId: string) => {
-    console.log(`🔄 ObjectStore: Actualizando objeto ${id} en cuadrícula ${gridId} con:`, updates);
 
     // Actualizar objeto en el estado local
     set((state) => {
@@ -289,31 +279,25 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     if (updatedObject) {
       // Comunicar cambios al AudioManager
       if (updates.position) {
-        console.log(`📍 ObjectStore: Actualizando posición para ${id}`);
         audioManager.updateSoundPosition(id, updatedObject.position);
       }
       if (updates.audioParams) {
-        console.log(`🎵 ObjectStore: Actualizando parámetros de audio para ${id}:`, updatedObject.audioParams);
         audioManager.updateSoundParams(id, updatedObject.audioParams);
       }
     }
 
-    console.log(`🔄 ObjectStore: Objeto ${id} actualizado`);
   },
 
   // Acciones de audio
   toggleObjectAudio: (id: string, forceState?: boolean, gridId?: string) => {
-    console.log(`🎵 ObjectStore: toggleObjectAudio llamado para ${id} con forceState:`, forceState);
 
     const currentObject = get().objects.find(obj => obj.id === id);
     if (!currentObject) {
-      console.log(`🎵 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
     // Ignorar los tipos percusivos ya que no necesitan toggle de audio
     if (currentObject.type === 'cone' || currentObject.type === 'icosahedron' || currentObject.type === 'torus') {
-      console.log(`🎵 ObjectStore: Objeto ${id} es de tipo '${currentObject.type}', ignorando toggleObjectAudio`);
       return;
     }
 
@@ -329,10 +313,8 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Controlar el audio en el AudioManager
     if (newAudioEnabled) {
-      console.log(`🎵 ObjectStore: Activando audio para ${id}`);
       audioManager.startContinuousSound(id, currentObject.audioParams);
     } else {
-      console.log(`🎵 ObjectStore: Desactivando audio para ${id}`);
       audioManager.stopSound(id);
     }
   },
@@ -340,34 +322,28 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   triggerObjectNote: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
-      console.log(`🥁 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
     // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
     if (object.audioEnabled) {
-      console.log(`🥁 ObjectStore: Objeto ${id} tiene sonido continuo activo, ignorando nota percusiva`);
       return;
     }
 
-    console.log(`🥁 ObjectStore: Disparando nota percusiva para ${id}`);
     audioManager.triggerNoteAttack(id, object.audioParams);
   },
 
   triggerObjectPercussion: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
-      console.log(`🥁 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
     // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
     if (object.audioEnabled) {
-      console.log(`🥁 ObjectStore: Objeto ${id} tiene sonido continuo activo, ignorando objeto percusivo`);
       return;
     }
 
-    console.log(`🥁 ObjectStore: Disparando objeto percusivo para ${id}`);
     if (object.type === 'plane') {
       audioManager.triggerNoiseAttack(id, object.audioParams);
     } else {
@@ -378,55 +354,45 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   triggerObjectAttackRelease: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
-      console.log(`🎵 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
     // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
     if (object.audioEnabled) {
-      console.log(`🎵 ObjectStore: Objeto ${id} tiene sonido continuo activo, ignorando clic`);
       return;
     }
 
-    console.log(`🎵 ObjectStore: Disparando nota con duración para ${id}`);
     audioManager.triggerAttackRelease(id, object.audioParams);
   },
 
   startObjectGate: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
-      console.log(`🎵 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
-    console.log(`🎵 ObjectStore: Iniciando gate para ${id}`);
     // Solo iniciar gate si no está en modo de sonido continuo
     if (!object.audioEnabled) {
       audioManager.startSound(id, object.audioParams);
     } else {
-      console.log(`🎵 ObjectStore: Objeto ${id} tiene sonido continuo activo, ignorando gate`);
     }
   },
 
   stopObjectGate: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
-      console.log(`🎵 ObjectStore: Objeto ${id} no encontrado`);
       return;
     }
 
-    console.log(`🎵 ObjectStore: Deteniendo gate para ${id}`);
     // Solo detener gate si no está en modo de sonido continuo
     if (!object.audioEnabled) {
       audioManager.stopSound(id);
     } else {
-      console.log(`🎵 ObjectStore: Objeto ${id} tiene sonido continuo activo, ignorando stop gate`);
     }
   },
 
   // Acciones de gestión
   clearAllObjects: (gridId?: string) => {
-    console.log(`🧹 ObjectStore: Limpiando todos los objetos${gridId ? ` de cuadrícula ${gridId}` : ''}`);
     
     if (gridId) {
       // Limpiar solo objetos de una cuadrícula específica
@@ -435,7 +401,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         try {
           audioManager.removeSoundSource(obj.id);
         } catch (error) {
-          console.error(`❌ ObjectStore: Error al eliminar fuente de sonido ${obj.id}:`, error);
         }
       });
 
@@ -450,7 +415,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         };
       });
 
-      console.log(`🧹 ObjectStore: Objetos de cuadrícula ${gridId} eliminados`);
     } else {
       // Limpiar todos los objetos
       const objects = get().objects;
@@ -458,7 +422,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         try {
           audioManager.removeSoundSource(obj.id);
         } catch (error) {
-          console.error(`❌ ObjectStore: Error al eliminar fuente de sonido ${obj.id}:`, error);
         }
       });
 
@@ -467,24 +430,20 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         objectsByGrid: new Map()
       });
 
-      console.log(`🧹 ObjectStore: Todos los objetos eliminados`);
     }
   },
 
   getObjectById: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
-    console.log(`🔍 ObjectStore: Objeto ${id} ${object ? 'encontrado' : 'no encontrado'}`);
     return object || null;
   },
 
   getAllObjects: (gridId?: string) => {
     if (gridId) {
       const gridObjects = get().objectsByGrid.get(gridId) || [];
-      console.log(`📋 ObjectStore: Obteniendo ${gridObjects.length} objetos de cuadrícula ${gridId}`);
       return gridObjects;
     } else {
       const objects = get().objects;
-      console.log(`📋 ObjectStore: Obteniendo ${objects.length} objetos de todas las cuadrículas`);
       return objects;
     }
   }

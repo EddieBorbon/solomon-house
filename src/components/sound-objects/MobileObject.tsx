@@ -193,7 +193,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     
     // Debug: Log de objetos disponibles
     if (allObjects.length > 0) {
-      console.log(`🔍 MobileObject ${id} - Detectando proximidad con ${allObjects.length} objetos`);
     }
     
     for (const obj of allObjects) {
@@ -205,11 +204,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       
       // Debug: Log de distancias
       if (distance <= proximityThreshold * 2) { // Log si está cerca del doble del umbral
-        console.log(`📏 MobileObject ${id} - Distancia a ${obj.type}(${obj.id}): ${distance.toFixed(2)}, umbral: ${proximityThreshold}`);
       }
       
       if (distance <= proximityThreshold) {
-        console.log(`🎯 MobileObject ${id} - ¡ACTIVANDO objeto ${obj.type}(${obj.id}) a distancia ${distance.toFixed(2)}!`);
         return obj.id;
       }
     }
@@ -282,7 +279,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     
     if (nearbyObjectId && nearbyObjectId !== activatedObjectId) {
       // Activar objeto sonoro
-      console.log(`🎵 MobileObject ${id} - Llamando triggerObjectAttackRelease para ${nearbyObjectId}`);
       triggerObjectAttackRelease(nearbyObjectId);
       setActivatedObjectId(nearbyObjectId);
       setTouchedObjectId(nearbyObjectId);

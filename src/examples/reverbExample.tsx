@@ -24,9 +24,7 @@ export const ReverbExample = () => {
           [0, 0, 0] // Posición del efecto en el espacio 3D
         );
         setIsEffectCreated(true);
-        console.log('🎛️ Reverb creado exitosamente');
       } catch (error) {
-        console.error('❌ Error al crear Reverb:', error);
       }
     }
   }, [isEffectCreated, reverbEffectId]);
@@ -63,7 +61,6 @@ export const ReverbExample = () => {
       release: 0.8
     });
 
-    console.log(`🔊 Sonido de prueba creado: ${soundId}`);
   };
 
   // Actualizar parámetros del Reverb
@@ -73,9 +70,7 @@ export const ReverbExample = () => {
     
     try {
       audioManager.updateGlobalEffect(reverbEffectId, { [paramName]: value });
-      console.log(`🎛️ Parámetro ${paramName} actualizado a:`, value);
     } catch (error) {
-      console.error(`❌ Error al actualizar parámetro ${paramName}:`, error);
     }
   };
 

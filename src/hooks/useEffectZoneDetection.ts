@@ -84,7 +84,6 @@ export function useEffectZoneDetection() {
           const zoneCenter = new THREE.Vector3(...effectZone.position);
           const distance = zoneCenter.distanceTo(objectPoint);
           
-          console.log(`🎛️ Debug zona ${zoneType}: ${effectZone.id} | Objeto: ${soundObject.id} | Distancia: ${distance.toFixed(2)} | Radio: ${zoneRadius} | Dentro: ${isInside} | Amount: ${effectAmount.toFixed(2)}`);
         }
 
         // APLICAR EFECTO CON AMOUNT VARIABLE para transiciones suaves
@@ -104,7 +103,6 @@ export function useEffectZoneDetection() {
         });
         
         if (shouldDebug) {
-          console.log(`🎛️ Objeto ${soundObject.id} no está en ninguna zona - todos los efectos desconectados`);
         }
       }
     });

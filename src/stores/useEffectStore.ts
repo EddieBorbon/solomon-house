@@ -247,7 +247,6 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
 
   // Acciones básicas de efectos
   addEffectZone: (type: EffectType, position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere', gridId?: string) => {
-    console.log(`🎛️ EffectStore: Creando zona de efecto ${type} en posición [${position.join(', ')}]`);
 
     // Obtener parámetros por defecto
     const defaultParams = getDefaultEffectParams(type);
@@ -267,14 +266,11 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       effectParams: defaultParams,
     };
 
-    console.log(`➕ EffectStore: Zona de efecto ${type} creada con parámetros:`, newEffectZone.effectParams);
 
     // Crear el efecto global en el AudioManager
     try {
       audioManager.createGlobalEffect(newEffectZone.id, type, newEffectZone.position);
-      console.log(`✅ EffectStore: Efecto global creado para zona ${newEffectZone.id}`);
     } catch (error) {
-      console.error(`❌ EffectStore: Error al crear efecto global:`, error);
       throw error;
     }
 
@@ -283,19 +279,15 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       effectZones: [...state.effectZones, newEffectZone]
     }));
 
-    console.log(`🎛️ EffectStore: Zona de efecto ${type} añadida al store`);
     return newEffectZone;
   },
 
   removeEffectZone: (id: string, gridId?: string) => {
-    console.log(`🗑️ EffectStore: Eliminando zona de efecto ${id}`);
 
     // Eliminar el efecto global del AudioManager
     try {
       audioManager.removeGlobalEffect(id);
-      console.log(`✅ EffectStore: Efecto global eliminado para zona ${id}`);
     } catch (error) {
-      console.error(`❌ EffectStore: Error al eliminar efecto global:`, error);
     }
 
     // Eliminar zona de efecto del estado local
@@ -303,19 +295,15 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       effectZones: state.effectZones.filter(zone => zone.id !== id)
     }));
 
-    console.log(`🗑️ EffectStore: Zona de efecto ${id} eliminada del store`);
   },
 
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>, gridId?: string) => {
-    console.log(`🔄 EffectStore: Actualizando zona de efecto ${id} con:`, updates);
 
     // Si se actualiza la posición, actualizar también en el AudioManager
     if (updates.position) {
       try {
         audioManager.updateEffectZonePosition(id, updates.position);
-        console.log(`✅ EffectStore: Posición de zona de efecto ${id} actualizada en AudioManager`);
       } catch (error) {
-        console.error(`❌ EffectStore: Error al actualizar posición de zona de efecto:`, error);
       }
     }
 
@@ -325,14 +313,11 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
         // Si se cambió el radio, actualizarlo en el AudioManager
         if (updates.effectParams.radius !== undefined) {
           audioManager.setEffectZoneRadius(id, updates.effectParams.radius);
-          console.log(`✅ EffectStore: Radio de zona de efecto ${id} actualizado a ${updates.effectParams.radius}`);
         }
         
         // Actualizar otros parámetros del efecto
         audioManager.updateGlobalEffect(id, updates.effectParams);
-        console.log(`✅ EffectStore: Parámetros del efecto global actualizados para zona ${id}`);
       } catch (error) {
-        console.error(`❌ EffectStore: Error al actualizar efecto global:`, error);
       }
     }
 
@@ -343,12 +328,10 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       )
     }));
 
-    console.log(`🔄 EffectStore: Zona de efecto ${id} actualizada`);
   },
 
   // Acciones de gestión de efectos
   toggleLockEffectZone: (id: string, gridId?: string) => {
-    console.log(`🔒 EffectStore: Alternando bloqueo de zona de efecto ${id}`);
 
     set((state) => ({
       effectZones: state.effectZones.map(zone =>
@@ -356,48 +339,38 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       )
     }));
 
-    console.log(`🔒 EffectStore: Estado de bloqueo de zona de efecto ${id} alternado`);
   },
 
   setEditingEffectZone: (isEditing: boolean) => {
-    console.log(`✏️ EffectStore: Modo de edición de zona de efecto: ${isEditing ? 'activado' : 'desactivado'}`);
     set({ isEditingEffectZone: isEditing });
   },
 
   refreshAllEffects: () => {
-    console.log(`🔄 EffectStore: Refrescando todos los efectos...`);
     try {
       audioManager.refreshAllGlobalEffects();
-      console.log(`✅ EffectStore: Todos los efectos han sido refrescados`);
     } catch (error) {
-      console.error(`❌ EffectStore: Error al refrescar efectos:`, error);
     }
   },
 
   debugAudioChain: (soundId: string) => {
-    console.log(`🔍 EffectStore: Debug de cadena de audio para sonido ${soundId}`);
     try {
       audioManager.debugAudioChain(soundId);
     } catch (error) {
-      console.error(`❌ EffectStore: Error al hacer debug de cadena de audio:`, error);
     }
   },
 
   // Acciones de consulta
   getEffectZoneById: (id: string, gridId?: string) => {
     const zone = get().effectZones.find(zone => zone.id === id);
-    console.log(`🔍 EffectStore: Zona de efecto ${id} ${zone ? 'encontrada' : 'no encontrada'}`);
     return zone || null;
   },
 
   getAllEffectZones: (gridId?: string) => {
     const zones = get().effectZones;
-    console.log(`📋 EffectStore: Obteniendo ${zones.length} zonas de efectos${gridId ? ` de cuadrícula ${gridId}` : ''}`);
     return zones;
   },
 
   clearAllEffectZones: (gridId?: string) => {
-    console.log(`🧹 EffectStore: Limpiando todas las zonas de efectos${gridId ? ` de cuadrícula ${gridId}` : ''}`);
     
     // Eliminar todas las zonas de efectos del AudioManager
     const zones = get().effectZones;
@@ -405,13 +378,11 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       try {
         audioManager.removeGlobalEffect(zone.id);
       } catch (error) {
-        console.error(`❌ EffectStore: Error al eliminar zona de efecto ${zone.id}:`, error);
       }
     });
 
     // Limpiar zonas de efectos del estado local
     set({ effectZones: [] });
 
-    console.log(`🧹 EffectStore: Todas las zonas de efectos eliminadas`);
   }
 }));

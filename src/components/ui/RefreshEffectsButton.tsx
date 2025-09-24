@@ -9,7 +9,6 @@ interface RefreshEffectsButtonProps {
 
 export function RefreshEffectsButton({ isRefreshing, onRefresh }: RefreshEffectsButtonProps) {
   const handleRefresh = () => {
-    console.log('🔄 Forzando actualización de todos los efectos...');
     onRefresh();
   };
 

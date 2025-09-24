@@ -118,6 +118,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'icosahedron' ? (
           <SoundIcosahedron
@@ -191,11 +192,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   // Inicializar la cuadrícula por defecto si no hay ninguna
   useEffect(() => {
     if (grids.size === 0) {
-      console.log('🎯 Inicializando cuadrícula por defecto...');
       loadGrid([0, 0, 0]);
       const defaultGridKey = getGridKey([0, 0, 0]);
       setActiveGrid(defaultGridKey);
-      console.log('🎯 Cuadrícula por defecto inicializada:', defaultGridKey);
     }
   }, [grids.size, loadGrid, setActiveGrid, getGridKey]);
   
@@ -212,13 +211,11 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());
     
-    console.log(`🔍 SceneContent useMemo - Procesando ${gridsArray.length} cuadrículas`);
     
     gridsArray.forEach((grid, index) => {
       // Obtener objetos de esta cuadrícula desde el ObjectStore
       const gridObjects = objectStore.getAllObjects(grid.id);
       
-      console.log(`🔍 Cuadrícula ${index} (${grid.id}):`, {
         objectsFromStore: gridObjects.length,
         objectsFromGrid: grid.objects?.length || 0,
         mobileObjects: grid.mobileObjects?.length || 0,
@@ -238,7 +235,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
     });
     
-    console.log(`🔍 SceneContent useMemo - Total recopilado de ObjectStore:`, {
       objects: objects.length,
       mobileObjects: mobileObjects.length,
       effectZones: effectZones.length
@@ -326,9 +322,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Función para manejar la selección de entidades
   const handleEntitySelect = useCallback((id: string) => {
-    console.log(`🎯 Seleccionando entidad: ${id}`);
     selectEntity(id);
-    console.log(`🎯 Entidad seleccionada: ${id}`);
   }, [selectEntity]);
 
   // Función para manejar clic en el espacio vacío
@@ -344,7 +338,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
     if (orbitControlsRef.current && selectedEntityId && !selectedEntityId.includes(',')) {
       orbitControlsRef.current.enabled = false;
-      console.log('🔄 Transformación iniciada - OrbitControls deshabilitado');
     }
   }, [orbitControlsRef, selectedEntityId]);
 
@@ -352,7 +345,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const handleTransformEnd = useCallback(() => {
     if (orbitControlsRef.current) {
       orbitControlsRef.current.enabled = true;
-      console.log('✅ Transformación completada - OrbitControls habilitado');
     }
   }, [orbitControlsRef]);
 
@@ -364,16 +356,11 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       // El estado isEditingEffectZone no debería bloquear la cámara
       // Mantener OrbitControls habilitado para permitir movimiento de cámara
       orbitControlsRef.current.enabled = true;
-      console.log('🎛️ OrbitControls siempre habilitados para permitir movimiento de cámara');
     }
   }, [orbitControlsRef]);
 
   // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {
-    console.log('🎵 SceneContent - Objetos en el mundo:', allObjects.objects.length);
-    console.log('🚀 SceneContent - Objetos móviles:', allObjects.mobileObjects.length);
-    console.log('🎛️ SceneContent - Zonas de efectos:', allObjects.effectZones.length);
-    console.log('📐 SceneContent - Cuadrículas disponibles:', grids.size);
   }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
 
   return (
@@ -404,7 +391,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         const gridObjects = objectStore.getAllObjects(grid.id);
         
         // Log de depuración para cada cuadrícula
-        console.log(`🎯 Renderizando cuadrícula ${grid.id} con ${gridObjects.length} objetos del ObjectStore`);
         
         return (
           <group key={grid.id} position={grid.position}>

@@ -25,9 +25,7 @@ export const PingPongDelayExample = () => {
           [0, 0, 0] // Posición del efecto en el espacio 3D
         );
         setIsEffectCreated(true);
-        console.log('🎛️ PingPongDelay creado exitosamente');
       } catch (error) {
-        console.error('❌ Error al crear PingPongDelay:', error);
       }
     }
   }, [isEffectCreated, pingPongEffectId]);
@@ -64,7 +62,6 @@ export const PingPongDelayExample = () => {
       release: 0.8
     });
 
-    console.log(`🔊 Sonido de prueba creado: ${soundId}`);
   };
 
   // Actualizar parámetros del PingPongDelay
@@ -74,9 +71,7 @@ export const PingPongDelayExample = () => {
     
     try {
       audioManager.updateGlobalEffect(pingPongEffectId, { [paramName]: value });
-      console.log(`🎛️ Parámetro ${paramName} actualizado a:`, value);
     } catch (error) {
-      console.error(`❌ Error al actualizar parámetro ${paramName}:`, error);
     }
   };
 

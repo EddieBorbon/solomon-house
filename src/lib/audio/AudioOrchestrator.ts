@@ -46,7 +46,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   async executeCommand(command: AudioCommand): Promise<AudioOperationResult> {
     try {
-      console.log(`🎼 AudioOrchestrator: Ejecutando comando ${command.getType()} con ID ${command.getId()}`);
       
       const success = await command.execute();
       
@@ -91,7 +90,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    * Ejecuta múltiples comandos en secuencia
    */
   async executeCommandBatch(commands: AudioCommand[]): Promise<AudioOperationResult[]> {
-    console.log(`🎼 AudioOrchestrator: Ejecutando lote de ${commands.length} comandos`);
     
     const results: AudioOperationResult[] = [];
     
@@ -101,12 +99,10 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       
       // Si un comando falla, continuar con los demás pero registrar el error
       if (!result.success) {
-        console.warn(`⚠️ AudioOrchestrator: Comando ${command.getId()} falló, continuando con el siguiente`);
       }
     }
     
     const successCount = results.filter(r => r.success).length;
-    console.log(`🎼 AudioOrchestrator: Lote completado - ${successCount}/${commands.length} comandos exitosos`);
     
     return results;
   }
@@ -116,7 +112,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   queueCommand(command: AudioCommand): void {
     this.commandQueue.push(command);
-    console.log(`🎼 AudioOrchestrator: Comando ${command.getId()} agregado a la cola (${this.commandQueue.length} en cola)`);
   }
 
   /**
@@ -124,17 +119,14 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   async processCommandQueue(): Promise<AudioOperationResult[]> {
     if (this.isProcessingQueue) {
-      console.warn(`⚠️ AudioOrchestrator: Ya se está procesando la cola de comandos`);
       return [];
     }
 
     if (this.commandQueue.length === 0) {
-      console.log(`🎼 AudioOrchestrator: No hay comandos en la cola`);
       return [];
     }
 
     this.isProcessingQueue = true;
-    console.log(`🎼 AudioOrchestrator: Procesando ${this.commandQueue.length} comandos en cola`);
 
     try {
       const commands = [...this.commandQueue];
@@ -142,7 +134,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       
       const results = await this.executeCommandBatch(commands);
       
-      console.log(`🎼 AudioOrchestrator: Cola procesada exitosamente`);
       return results;
     } finally {
       this.isProcessingQueue = false;
@@ -168,12 +159,10 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   async initialize(): Promise<boolean> {
     try {
-      console.log(`🎼 AudioOrchestrator: Inicializando sistema de audio`);
       
       // Iniciar contexto de audio
       const contextStarted = await this.audioContextManager.startContext();
       if (!contextStarted) {
-        console.error(`❌ AudioOrchestrator: No se pudo iniciar el contexto de audio`);
         return false;
       }
 
@@ -184,10 +173,8 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       this.isInitialized = true;
       this.contextState = 'running';
       
-      console.log(`✅ AudioOrchestrator: Sistema de audio inicializado exitosamente`);
       return true;
     } catch (error) {
-      console.error(`❌ AudioOrchestrator: Error inicializando sistema de audio:`, error);
       return false;
     }
   }
@@ -197,7 +184,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   async cleanup(): Promise<boolean> {
     try {
-      console.log(`🎼 AudioOrchestrator: Limpiando sistema de audio`);
       
       // Detener todos los sonidos
       this.soundPlaybackManager.stopAllSounds(this.soundSources);
@@ -218,10 +204,8 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       this.isInitialized = false;
       this.contextState = 'closed';
       
-      console.log(`✅ AudioOrchestrator: Sistema de audio limpiado exitosamente`);
       return true;
     } catch (error) {
-      console.error(`❌ AudioOrchestrator: Error limpiando sistema de audio:`, error);
       return false;
     }
   }
@@ -231,7 +215,6 @@ export class AudioOrchestrator implements IAudioOrchestrator {
    */
   async undoLastCommand(): Promise<boolean> {
     if (this.commandHistory.length === 0) {
-      console.warn(`⚠️ AudioOrchestrator: No hay comandos para deshacer`);
       return false;
     }
 
@@ -243,14 +226,11 @@ export class AudioOrchestrator implements IAudioOrchestrator {
     try {
       const success = await lastCommand.undo();
       if (success) {
-        console.log(`✅ AudioOrchestrator: Comando ${lastCommand.getType()} deshecho exitosamente`);
         this.updateSystemState();
       } else {
-        console.warn(`⚠️ AudioOrchestrator: No se pudo deshacer comando ${lastCommand.getType()}`);
       }
       return success;
     } catch (error) {
-      console.error(`❌ AudioOrchestrator: Error deshaciendo comando:`, error);
       return false;
     }
   }

@@ -16,6 +16,7 @@ interface SoundConeProps {
     frequency: number;
     volume: number;
     waveform: OscillatorType;
+    color?: string;
     pitchDecay?: number;
     octaves?: number;
     duration?: number;
@@ -52,18 +53,39 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
         const pulseScale = 1 + energyRef.current * 0.3;
         meshRef.current.scale.set(pulseScale, pulseScale, pulseScale);
         
-        // Cambiar el color basado en la energía (naranja intenso a naranja suave)
+        // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const orangeColor = new THREE.Color(1, 0.5 - intensity * 0.3, 0);
-        materialRef.current.color.copy(orangeColor);
+        const baseColor = new THREE.Color(audioParams.color || '#ff6b35');
+        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(intensifiedColor);
         
         // Emisión basada en la energía
         materialRef.current.emissiveIntensity = intensity * 0.5;
       } else {
         // Resetear a valores por defecto
         meshRef.current.scale.set(scale[0], scale[1], scale[2]);
-        materialRef.current.color.setHex(0xff6b35); // Naranja por defecto
+        materialRef.current.color.setHex(audioParams.color || '#ff6b35'); // Usar color del audioParams
         materialRef.current.emissiveIntensity = 0;
+      }
+
+      // Solo ejecutar animaciones cuando el audio está activo o hay energía de clic
+      if (audioEnabled || energyRef.current > 0) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          meshRef.current.rotation.y += (rotationSpeed * 0.01);
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          meshRef.current.scale.setScalar(pulseScale);
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        meshRef.current.scale.setScalar(1);
       }
     });
 
@@ -83,11 +105,10 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     useEffect(() => {
       if (materialRef.current) {
         try {
-          materialRef.current.color.setHex(0xff6b35); // Naranja por defecto
+          materialRef.current.color.setHex(audioParams.color || '#ff6b35'); // Usar color del audioParams
           materialRef.current.emissive.setHex(0x000000);
           materialRef.current.emissiveIntensity = 0;
         } catch (error) {
-          console.warn('Error al inicializar material del cono:', error);
         }
       }
     }, []);
@@ -99,13 +120,18 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
           <coneGeometry args={[0.7, 1.5, 32]} />
           <meshStandardMaterial
             ref={materialRef}
-            color="#ff6b35"
-            metalness={0.3}
-            roughness={0.35}
+            color={audioParams.color || "#000000"}
+            metalness={audioParams.metalness || 0.3}
+            roughness={audioParams.roughness || 0.35}
             transparent
-            opacity={0.95}
-            emissive="#000000"
-            emissiveIntensity={0}
+            opacity={audioParams.opacity || 0.95}
+            emissive={audioParams.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams.emissiveIntensity || 0}
+            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                     THREE.NormalBlending}
+            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.0}
           />
         </mesh>

@@ -16,6 +16,10 @@ export function EffectParametersSection({
   lastUpdatedParam, 
   onEffectParamChange 
 }: EffectParametersSectionProps) {
+  // No renderizar para efectos que tienen sus propios componentes específicos
+  const excludedTypes = ['phaser', 'autoFilter', 'autoWah', 'chebyshev', 'chorus', 'distortion', 'feedbackDelay', 'freeverb', 'frequencyShifter', 'jcReverb', 'pingPongDelay', 'pitchShift', 'reverb', 'stereoWidener', 'tremolo', 'vibrato'];
+  if (excludedTypes.includes(zone?.type || '')) return null;
+  
   const getEffectTypeColor = (type: string) => {
     switch (type) {
       case 'phaser': return 'text-purple-400';
@@ -39,69 +43,29 @@ export function EffectParametersSection({
   };
 
   return (
-    <>
-      <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${getEffectTypeColor(zone.type)}`}>
-        🎛️ Parámetros del {getEffectTypeName(zone.type)}
+    <div className="relative border border-white p-4 mb-4">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 flex items-center justify-center gap-2 text-white">
+        {getEffectTypeName(zone.type).toUpperCase()}_PARAMETERS
         {isUpdatingParams && (
-          <span className="text-yellow-400 animate-pulse">🔄</span>
+          <span className="text-white animate-pulse">🔄</span>
         )}
       </h4>
 
-      {/* Control de Radio de la Zona de Efectos */}
-      <div className="glass-container p-4">
-        <label className="block text-sm font-bold neon-text mb-3">
-          Radio de la Zona: {zone.effectParams.radius ?? 2.0}
-        </label>
-        <div className="flex items-center gap-4">
-          <div className="flex-1 relative">
-            <input
-              type="range"
-              min="0.5"
-              max="10"
-              step="0.1"
-              value={zone.effectParams.radius ?? 2.0}
-              onChange={(e) => onEffectParamChange('radius', Number(e.target.value))}
-              className="w-full h-2 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-              disabled={zone.isLocked}
-              style={{
-                background: `linear-gradient(to right, #8b5cf6 0%, #06b6d4 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 ${((zone.effectParams.radius ?? 2.0) - 0.5) / 9.5 * 100}%, #1f2937 100%)`
-              }}
-            />
-          </div>
-          <span className="text-cyan-300 font-mono text-sm min-w-[4rem] text-right bg-black/60 px-2 py-1 rounded-lg border border-cyan-500/30">
-            {zone.effectParams.radius ?? 2.0}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-purple-300 mt-2">
-          <span>0.5</span>
-          <span>10</span>
-        </div>
-        <p className="text-xs text-cyan-300 mt-2 bg-black/40 px-2 py-1 rounded-lg border border-cyan-500/20">
-          Tamaño de la zona donde se aplica el efecto
-        </p>
-      </div>
-      
+
       {/* Indicador de parámetro actualizado */}
       {lastUpdatedParam && (
-        <div className="mb-3 p-2 bg-green-900/20 border border-green-600/50 rounded-lg">
-          <p className="text-xs text-green-400 text-center">
-            ✅ Parámetro <strong>{lastUpdatedParam}</strong> actualizado en tiempo real
+        <div className="mb-3 p-2 bg-black border border-white rounded-lg">
+          <p className="text-xs text-white text-center font-mono tracking-wider">
+            ✅ PARAMETER <strong>{lastUpdatedParam.toUpperCase()}</strong> UPDATED_REALTIME
           </p>
         </div>
       )}
-      
-      {/* Indicador de estado del efecto */}
-      <div className="mb-3 p-2 bg-blue-900/20 border border-blue-600/50 rounded-lg">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-blue-400">
-            🎵 Efecto <strong>{zone.type}</strong> activo
-          </span>
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs text-green-400">En tiempo real</span>
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

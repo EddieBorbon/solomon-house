@@ -25,9 +25,7 @@ export const PitchShiftExample = () => {
           [0, 0, 0] // Posición del efecto en el espacio 3D
         );
         setIsEffectCreated(true);
-        console.log('🎛️ PitchShift creado exitosamente');
       } catch (error) {
-        console.error('❌ Error al crear PitchShift:', error);
       }
     }
   }, [isEffectCreated, pitchShiftEffectId]);
@@ -64,7 +62,6 @@ export const PitchShiftExample = () => {
       release: 0.8
     });
 
-    console.log(`🔊 Sonido de prueba creado: ${soundId}`);
   };
 
   // Actualizar parámetros del PitchShift
@@ -74,9 +71,7 @@ export const PitchShiftExample = () => {
     
     try {
       audioManager.updateGlobalEffect(pitchShiftEffectId, { [paramName]: value });
-      console.log(`🎛️ Parámetro ${paramName} actualizado a:`, value);
     } catch (error) {
-      console.error(`❌ Error al actualizar parámetro ${paramName}:`, error);
     }
   };
 

@@ -71,10 +71,11 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
         const pulseScale = 1 + energyRef.current * 0.2;
         meshRef.current.scale.set(pulseScale, pulseScale, pulseScale);
         
-        // Cambiar el color basado en la energía (verde intenso a verde suave)
+        // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const greenColor = new THREE.Color(0.1 + intensity * 0.2, 0.7 + intensity * 0.3, 0.3 + intensity * 0.2);
-        materialRef.current.color.copy(greenColor);
+        const baseColor = new THREE.Color(audioParams.color || '#22c55e');
+        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(intensifiedColor);
         
         // Emisión intensa durante el clic
         materialRef.current.emissiveIntensity = intensity * 0.6;
@@ -121,7 +122,6 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
               
               lastMaterialUpdateRef.current = timeRef.current;
             } catch (error) {
-              console.warn('Error al actualizar material del cilindro:', error);
             }
           }
         } else {
@@ -130,16 +130,35 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           
           try {
             if (materialRef.current.color && materialRef.current.color.setHex) {
-              materialRef.current.color.setHex(0x22c55e); // Verde por defecto
+              materialRef.current.color.setHex(audioParams.color || '#22c55e'); // Usar color del audioParams
             }
             
             if (materialRef.current.emissiveIntensity !== undefined) {
               materialRef.current.emissiveIntensity = 0;
             }
           } catch (error) {
-            console.warn('Error al resetear material del cilindro:', error);
           }
         }
+      }
+
+      // Solo ejecutar animaciones cuando el audio está activo
+      if (audioEnabled) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          meshRef.current.rotation.y += (rotationSpeed * 0.01);
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(timeRef.current * pulseSpeed) * pulseIntensity * 0.2;
+          meshRef.current.scale.setScalar(pulseScale);
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        meshRef.current.scale.setScalar(1);
       }
     });
 
@@ -151,7 +170,7 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
         try {
           // Establecer valores iniciales seguros
           if (materialRef.current.color && materialRef.current.color.setHex) {
-            materialRef.current.color.setHex(0x22c55e);
+            materialRef.current.color.setHex(audioParams.color || '#22c55e');
           }
           if (materialRef.current.emissive && materialRef.current.emissive.setHex) {
             materialRef.current.emissive.setHex(0x000000);
@@ -160,7 +179,6 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
             materialRef.current.emissiveIntensity = 0;
           }
         } catch (error) {
-          console.warn('Error al inicializar material del cilindro:', error);
         }
       }
     }, []);
@@ -172,13 +190,18 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           <cylinderGeometry args={[0.5, 0.5, 2, 32]} />
           <meshStandardMaterial
             ref={materialRef}
-            color="#22c55e"
-            metalness={0.4}
-            roughness={0.25}
+            color={audioParams.color || "#000000"}
+            metalness={audioParams.metalness || 0.4}
+            roughness={audioParams.roughness || 0.25}
             transparent
-            opacity={0.95}
-            emissive="#000000"
-            emissiveIntensity={0}
+            opacity={audioParams.opacity || 0.95}
+            emissive={audioParams.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams.emissiveIntensity || 0}
+            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                     THREE.NormalBlending}
+            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.1}
           />
         </mesh>

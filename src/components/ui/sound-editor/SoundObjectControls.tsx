@@ -6,6 +6,7 @@ import { AudioControlSection } from '../AudioControlSection';
 import { SynthSpecificParameters } from './SynthSpecificParameters';
 import { AdvancedSynthParameters } from './AdvancedSynthParameters';
 import { SoundTransformSection } from './SoundTransformSection';
+import { ColorSection } from './ColorSection';
 
 interface SoundObjectControlsProps {
   selectedObject: SoundObject;
@@ -40,6 +41,12 @@ export function SoundObjectControls({
 
       {/* Parámetros avanzados de sintetizadores */}
       <AdvancedSynthParameters 
+        selectedObject={selectedObject}
+        onParamChange={onParamChange}
+      />
+
+      {/* Sección de color */}
+      <ColorSection
         selectedObject={selectedObject}
         onParamChange={onParamChange}
       />

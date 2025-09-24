@@ -39,7 +39,6 @@ export function useAudioContext() {
         setContextState('running');
       }
     } catch (error) {
-      console.error('Error starting audio context:', error);
     } finally {
       setIsInitializing(false);
     }
@@ -50,7 +49,6 @@ export function useAudioContext() {
     setContextState(state.state);
     setIsAudioContextStarted(audioManager.isContextStarted());
     
-    console.log('Audio Context State:', {
       state: state.state,
       isRunning: state.isRunning,
       sampleRate: state.sampleRate,
@@ -64,7 +62,6 @@ export function useAudioContext() {
       setIsAudioContextStarted(false);
       setContextState('suspended');
     } catch (error) {
-      console.error('Error suspending audio context:', error);
     }
   }, []);
 
@@ -74,7 +71,6 @@ export function useAudioContext() {
       setIsAudioContextStarted(true);
       setContextState('running');
     } catch (error) {
-      console.error('Error resuming audio context:', error);
     }
   }, []);
 
@@ -84,7 +80,6 @@ export function useAudioContext() {
       setIsAudioContextStarted(false);
       setContextState('closed');
     } catch (error) {
-      console.error('Error closing audio context:', error);
     }
   }, []);
 

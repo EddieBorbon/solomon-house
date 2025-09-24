@@ -32,11 +32,8 @@ export function useEntitySelector() {
 
   // Encontrar la entidad seleccionada (objeto sonoro, objeto móvil o zona de efecto)
   const selectedEntity = useMemo((): SelectedEntity | null => {
-    console.log(`🔍 EntitySelector - Buscando entidad con ID: ${selectedEntityId}`);
-    console.log(`🔍 EntitySelector - Cuadrículas disponibles:`, Array.from(grids.keys()));
     
     if (!selectedEntityId) {
-      console.log(`🔍 EntitySelector - No hay entidad seleccionada`);
       return null;
     }
     
@@ -44,13 +41,11 @@ export function useEntitySelector() {
     const objectStore = useObjectStore.getState();
     const soundObject = objectStore.getObjectById(selectedEntityId);
     if (soundObject) {
-      console.log(`✅ EntitySelector - Objeto sonoro encontrado en ObjectStore:`, soundObject);
       return { type: 'soundObject', data: soundObject };
     }
     
     // Buscar en objetos móviles y zonas de efectos en las cuadrículas
     for (const grid of grids.values()) {
-      console.log(`🔍 EntitySelector - Buscando en cuadrícula ${grid.id}:`, {
         mobileObjects: grid.mobileObjects.length,
         effectZones: grid.effectZones.length
       });
@@ -58,19 +53,16 @@ export function useEntitySelector() {
       // Buscar en objetos móviles
       const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
       if (mobileObject) {
-        console.log(`✅ EntitySelector - Objeto móvil encontrado:`, mobileObject);
         return { type: 'mobileObject', data: mobileObject };
       }
       
       // Buscar en zonas de efectos
       const effectZone = grid.effectZones.find(zone => zone.id === selectedEntityId);
       if (effectZone) {
-        console.log(`✅ EntitySelector - Zona de efecto encontrada:`, effectZone);
         return { type: 'effectZone', data: effectZone };
       }
     }
     
-    console.log(`❌ EntitySelector - Entidad ${selectedEntityId} no encontrada`);
     return null;
   }, [grids, selectedEntityId]);
 

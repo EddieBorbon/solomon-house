@@ -15,12 +15,13 @@ interface SoundPlaneProps {
     frequency?: number;
     volume?: number;
     waveform?: OscillatorType;
+    color?: string;
     duration?: number;
   };
 }
 
 export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
-  ({ id, position, rotation, scale, isSelected }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
     const { selectEntity, triggerObjectPercussion } = useWorldStore();
@@ -82,6 +83,32 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
           materialRef.current.opacity = 0.8;
         }
       }
+
+      // Solo ejecutar animaciones cuando el audio está activo o hay animación activa
+      if (audioEnabled || isAnimating) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          if (meshRef.current) {
+            meshRef.current.rotation.y += (rotationSpeed * 0.01);
+          }
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          if (meshRef.current) {
+            meshRef.current.scale.setScalar(pulseScale);
+          }
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        if (meshRef.current) {
+          meshRef.current.scale.setScalar(1);
+        }
+      }
     });
 
     // Efecto para limpiar la animación cuando se desmonta
@@ -103,14 +130,19 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
           <planeGeometry args={[2.5, 2.5, 32, 32]} />
           <meshStandardMaterial
             ref={materialRef}
-            color={isSelected ? "#60a5fa" : "#3b82f6"}
+            color={audioParams.color || "#000000"}
             transparent
-            opacity={0.9}
+            opacity={audioParams.opacity || 0.9}
             side={THREE.DoubleSide}
-            metalness={0.4}
-            roughness={0.25}
-            emissive={isSelected ? "#1e40af" : "#1e3a8a"}
-            emissiveIntensity={isSelected ? 0.5 : 0.2}
+            metalness={audioParams.metalness || 0.4}
+            roughness={audioParams.roughness || 0.25}
+            emissive={audioParams.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams.emissiveIntensity || (isSelected ? 0.5 : 0.2)}
+            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                     THREE.NormalBlending}
+            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.1}
           />
         </mesh>

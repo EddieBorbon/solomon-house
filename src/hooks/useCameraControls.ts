@@ -100,7 +100,6 @@ export function useCameraControls() {
     // Debug: verificar si hay controles activos
     const hasActiveControls = Object.values(controls.current).some(Boolean);
     if (hasActiveControls) {
-      console.log('🎮 Controles de cámara activos:', controls.current);
     }
 
     const currentSpeed = controls.current.fast ? fastMoveSpeed.current : moveSpeed.current;

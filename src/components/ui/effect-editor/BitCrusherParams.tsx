@@ -12,11 +12,13 @@ export function BitCrusherParams({ zone, onEffectParamChange }: BitCrusherParams
   if (zone?.type !== 'bitCrusher') return null;
 
   return (
-    <>
+    <div className="futuristic-param-container">
+      <h4 className="futuristic-label mb-3">BIT_CRUSHER_PARAMETERS</h4>
+      
       {/* Bits */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Bits
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          BITS
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -26,23 +28,23 @@ export function BitCrusherParams({ zone, onEffectParamChange }: BitCrusherParams
             step="1"
             value={zone?.effectParams.bits ?? 4}
             onChange={(e) => onEffectParamChange('bits', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.bits ?? 4}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {zone?.effectParams.bits ?? 4}BIT
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>1</span>
-          <span>16</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>1BIT</span>
+          <span>16BIT</span>
         </div>
       </div>
 
       {/* NormFreq */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Frecuencia Normalizada
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          NORM_FREQUENCY
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -52,18 +54,18 @@ export function BitCrusherParams({ zone, onEffectParamChange }: BitCrusherParams
             step="0.01"
             value={zone?.effectParams.normFreq ?? 0.5}
             onChange={(e) => onEffectParamChange('normFreq', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.normFreq ?? 0.5}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {((zone?.effectParams.normFreq ?? 0.5) * 100).toFixed(0)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0</span>
-          <span>1</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0%</span>
+          <span>100%</span>
         </div>
       </div>
-    </>
+    </div>
   );
 }

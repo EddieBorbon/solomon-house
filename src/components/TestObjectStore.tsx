@@ -15,7 +15,6 @@ export function TestObjectStore() {
     const activeGridId = worldStore.activeGridId;
     
     if (!activeGridId) {
-      console.warn('No hay cuadrícula activa');
       return;
     }
     

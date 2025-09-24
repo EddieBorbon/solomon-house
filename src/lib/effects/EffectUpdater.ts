@@ -6,7 +6,6 @@ class PhaserUpdater implements EffectUpdater {
   update(effectNode: Tone.Phaser, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ PhaserUpdater: Aplicando ${paramName} ${params[paramName]} al phaser`);
         this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
       }
     });
@@ -28,7 +27,6 @@ class PhaserUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ PhaserUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -37,7 +35,6 @@ class AutoFilterUpdater implements EffectUpdater {
   update(effectNode: Tone.AutoFilter, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ AutoFilterUpdater: Aplicando ${paramName} ${params[paramName]} al autoFilter`);
         const value = params[paramName];
         
         if (paramName === 'filterType' && effectNode.filter) {
@@ -71,7 +68,6 @@ class AutoFilterUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ AutoFilterUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -80,7 +76,6 @@ class AutoWahUpdater implements EffectUpdater {
   update(effectNode: Tone.AutoWah, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ AutoWahUpdater: Aplicando ${paramName} ${params[paramName]} al autoWah`);
         this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
       }
     });
@@ -102,7 +97,6 @@ class AutoWahUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ AutoWahUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -111,10 +105,8 @@ class BitCrusherUpdater implements EffectUpdater {
   update(effectNode: Tone.BitCrusher, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ BitCrusherUpdater: Aplicando ${paramName} ${params[paramName]} al bitCrusher`);
         
         if (paramName === 'bits') {
-          console.log(`ℹ️ BitCrusherUpdater: Los bits del BitCrusher no se pueden cambiar después de la creación`);
         } else {
           this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
         }
@@ -136,7 +128,6 @@ class BitCrusherUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ BitCrusherUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -145,7 +136,6 @@ class ChorusUpdater implements EffectUpdater {
   update(effectNode: Tone.Chorus, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ ChorusUpdater: Aplicando ${paramName} ${params[paramName]} al chorus`);
         const value = params[paramName];
         
         if (paramName === 'chorusFrequency') {
@@ -180,7 +170,6 @@ class ChorusUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ ChorusUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -189,7 +178,6 @@ class DistortionUpdater implements EffectUpdater {
   update(effectNode: Tone.Distortion, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ DistortionUpdater: Aplicando ${paramName} ${params[paramName]} al distortion`);
         const value = params[paramName];
         
         if (paramName === 'distortion') {
@@ -218,7 +206,6 @@ class DistortionUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ DistortionUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }
@@ -228,7 +215,6 @@ class GenericUpdater implements EffectUpdater {
   update(effectNode: EffectNode, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        console.log(`🎛️ GenericUpdater: Aplicando ${paramName} ${params[paramName]} al efecto`);
         this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
       }
     });
@@ -250,7 +236,6 @@ class GenericUpdater implements EffectUpdater {
         node[paramName] = value;
       }
     } catch (error) {
-      console.warn(`⚠️ GenericUpdater: No se pudo actualizar ${paramName}:`, error);
     }
   }
 }

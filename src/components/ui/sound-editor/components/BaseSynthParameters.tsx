@@ -4,6 +4,8 @@ import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
 
+type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
+
 interface BaseSynthParametersProps {
   selectedObject: SoundObject;
   onParamChange: (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => void;
@@ -64,7 +66,17 @@ export function BaseSynthParameters({
   const frequencyLabels = getFrequencyLabels();
 
   return (
-    <>
+    <div className="relative border border-white p-4 mb-4">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        AUDIO_PARAMETERS
+      </h4>
+
       {/* Volumen - Siempre en primer lugar */}
       <div className="mb-4">
         <label className="futuristic-label block mb-1 text-white text-xs">
@@ -206,6 +218,6 @@ export function BaseSynthParameters({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

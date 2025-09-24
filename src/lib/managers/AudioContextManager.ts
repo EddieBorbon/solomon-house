@@ -41,7 +41,6 @@ export class AudioContextManager {
       
       // Nota: updateInterval no es una propiedad configurable en Tone.Transport
 
-      console.log(`🎵 AudioContextManager: Contexto inicializado con configuración:`, {
         latencyHint: this.contextConfig.latencyHint,
         sampleRate: Tone.context.sampleRate,
         contextState: Tone.context.state
@@ -54,7 +53,6 @@ export class AudioContextManager {
       this.setupBrowserEventListeners();
 
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al inicializar contexto:`, error);
     }
   }
 
@@ -64,14 +62,12 @@ export class AudioContextManager {
   private setupStateChangeListeners(): void {
     try {
       Tone.context.on('statechange', (newState) => {
-        console.log(`🔄 AudioContextManager: Estado del contexto cambiado a: ${newState}`);
         
         // Notificar a todos los listeners registrados
         this.stateChangeListeners.forEach(listener => {
           try {
             listener(newState);
           } catch (error) {
-            console.error(`❌ AudioContextManager: Error en listener de cambio de estado:`, error);
           }
         });
 
@@ -81,9 +77,7 @@ export class AudioContextManager {
         }
       });
 
-      console.log(`🎵 AudioContextManager: Event listeners de cambio de estado configurados`);
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al configurar event listeners de estado:`, error);
     }
   }
 
@@ -95,25 +89,20 @@ export class AudioContextManager {
       if (typeof window !== 'undefined') {
         // Limpieza cuando se cierre la ventana
         window.addEventListener('beforeunload', () => {
-          console.log(`🧹 AudioContextManager: Limpieza por cierre de ventana`);
           this.triggerCleanup();
         });
 
         // Limpieza cuando la página pierda el foco (opcional)
         window.addEventListener('blur', () => {
-          console.log(`🧹 AudioContextManager: Limpieza por pérdida de foco`);
           this.triggerCleanup();
         });
 
         // Limpieza cuando la página vuelva a tener foco
         window.addEventListener('focus', () => {
-          console.log(`🎵 AudioContextManager: Página recuperó el foco`);
         });
 
-        console.log(`🎵 AudioContextManager: Event listeners del navegador configurados`);
       }
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al configurar event listeners del navegador:`, error);
     }
   }
 
@@ -122,10 +111,8 @@ export class AudioContextManager {
    */
   private handleContextSuspension(): void {
     try {
-      console.log(`⏸️ AudioContextManager: Contexto suspendido, ejecutando limpieza automática`);
       this.triggerCleanup();
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al manejar suspensión del contexto:`, error);
     }
   }
 
@@ -138,11 +125,9 @@ export class AudioContextManager {
         try {
           listener();
         } catch (error) {
-          console.error(`❌ AudioContextManager: Error en listener de limpieza:`, error);
         }
       });
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al disparar limpieza:`, error);
     }
   }
 
@@ -152,19 +137,15 @@ export class AudioContextManager {
   public async startContext(): Promise<boolean> {
     try {
       if (Tone.context.state !== 'running') {
-        console.log(`🎵 AudioContextManager: Iniciando contexto de audio...`);
         
         await Tone.start();
         this.isContextStarted = true;
         
-        console.log(`✅ AudioContextManager: Contexto iniciado exitosamente`);
         return true;
       } else {
-        console.log(`ℹ️ AudioContextManager: Contexto ya está ejecutándose`);
         return true;
       }
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al iniciar contexto:`, error);
       return false;
     }
   }
@@ -175,19 +156,15 @@ export class AudioContextManager {
   public async suspendContext(): Promise<boolean> {
     try {
       if (Tone.context.state === 'running') {
-        console.log(`⏸️ AudioContextManager: Suspendiéndo contexto de audio...`);
         
         // Solo cambiar el estado interno, no hay método suspend en Tone
         this.isContextStarted = false;
         
-        console.log(`✅ AudioContextManager: Contexto suspendido exitosamente`);
         return true;
       } else {
-        console.log(`ℹ️ AudioContextManager: Contexto ya está suspendido`);
         return true;
       }
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al suspender contexto:`, error);
       return false;
     }
   }
@@ -198,20 +175,16 @@ export class AudioContextManager {
   public async resumeContext(): Promise<boolean> {
     try {
       if (Tone.context.state === 'suspended') {
-        console.log(`▶️ AudioContextManager: Reanudando contexto de audio...`);
         
         // Reiniciar el contexto ya que no hay método resume en Tone
         await this.startContext();
         this.isContextStarted = true;
         
-        console.log(`✅ AudioContextManager: Contexto reanudado exitosamente`);
         return true;
       } else {
-        console.log(`ℹ️ AudioContextManager: Contexto no está suspendido`);
         return true;
       }
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al reanudar contexto:`, error);
       return false;
     }
   }
@@ -221,15 +194,12 @@ export class AudioContextManager {
    */
   public async closeContext(): Promise<boolean> {
     try {
-      console.log(`🔒 AudioContextManager: Cerrando contexto de audio...`);
       
       // Solo cambiar el estado interno, no hay método close en Tone
       this.isContextStarted = false;
       
-      console.log(`✅ AudioContextManager: Contexto cerrado exitosamente`);
       return true;
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al cerrar contexto:`, error);
       return false;
     }
   }
@@ -322,9 +292,7 @@ export class AudioContextManager {
       // Nota: Las propiedades del contexto de Tone no se pueden modificar después de la inicialización
       // Solo actualizamos la configuración interna para futuras inicializaciones
 
-      console.log(`⚙️ AudioContextManager: Configuración actualizada:`, this.contextConfig);
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error al actualizar configuración:`, error);
     }
   }
 
@@ -380,9 +348,7 @@ export class AudioContextManager {
         window.removeEventListener('focus', () => {});
       }
 
-      console.log(`🧹 AudioContextManager: Limpieza completada`);
     } catch (error) {
-      console.error(`❌ AudioContextManager: Error durante la limpieza:`, error);
     }
   }
 }

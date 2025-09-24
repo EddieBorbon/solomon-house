@@ -58,10 +58,8 @@ export class FirebaseService {
         updatedAt: now
       });
       
-      console.log('✅ Proyecto guardado en Firebase:', projectRef.id);
       return projectRef.id;
     } catch (error) {
-      console.error('❌ Error al guardar proyecto:', error);
       throw error;
     }
   }
@@ -75,9 +73,7 @@ export class FirebaseService {
         updatedAt: Timestamp.now()
       });
       
-      console.log('✅ Proyecto actualizado en Firebase:', projectId);
     } catch (error) {
-      console.error('❌ Error al actualizar proyecto:', error);
       throw error;
     }
   }
@@ -90,14 +86,11 @@ export class FirebaseService {
       
       if (projectSnap.exists()) {
         const projectData = { id: projectSnap.id, ...projectSnap.data() } as FirebaseProject;
-        console.log('✅ Proyecto cargado desde Firebase:', projectId);
         return projectData;
       } else {
-        console.log('⚠️ Proyecto no encontrado:', projectId);
         return null;
       }
     } catch (error) {
-      console.error('❌ Error al cargar proyecto:', error);
       throw error;
     }
   }
@@ -117,10 +110,8 @@ export class FirebaseService {
         projects.push({ id: doc.id, ...doc.data() } as FirebaseProject);
       });
       
-      console.log('✅ Proyectos cargados desde Firebase:', projects.length);
       return projects;
     } catch (error) {
-      console.error('❌ Error al cargar proyectos:', error);
       throw error;
     }
   }
@@ -135,10 +126,8 @@ export class FirebaseService {
         updatedAt: now
       });
       
-      console.log('✅ Cuadrícula guardada en Firebase:', gridRef.id);
       return gridRef.id;
     } catch (error) {
-      console.error('❌ Error al guardar cuadrícula:', error);
       throw error;
     }
   }
@@ -152,9 +141,7 @@ export class FirebaseService {
         updatedAt: Timestamp.now()
       });
       
-      console.log('✅ Cuadrícula actualizada en Firebase:', gridId);
     } catch (error) {
-      console.error('❌ Error al actualizar cuadrícula:', error);
       throw error;
     }
   }
@@ -167,14 +154,11 @@ export class FirebaseService {
       
       if (gridSnap.exists()) {
         const gridData = { id: gridSnap.id, ...gridSnap.data() } as FirebaseGrid;
-        console.log('✅ Cuadrícula cargada desde Firebase:', gridId);
         return gridData;
       } else {
-        console.log('⚠️ Cuadrícula no encontrada:', gridId);
         return null;
       }
     } catch (error) {
-      console.error('❌ Error al cargar cuadrícula:', error);
       throw error;
     }
   }
@@ -185,9 +169,7 @@ export class FirebaseService {
       const projectRef = doc(db, this.projectsCollection, projectId);
       await deleteDoc(projectRef);
       
-      console.log('✅ Proyecto eliminado de Firebase:', projectId);
     } catch (error) {
-      console.error('❌ Error al eliminar proyecto:', error);
       throw error;
     }
   }
@@ -198,9 +180,7 @@ export class FirebaseService {
       const gridRef = doc(db, this.gridsCollection, gridId);
       await deleteDoc(gridRef);
       
-      console.log('✅ Cuadrícula eliminada de Firebase:', gridId);
     } catch (error) {
-      console.error('❌ Error al eliminar cuadrícula:', error);
       throw error;
     }
   }

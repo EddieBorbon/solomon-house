@@ -23,9 +23,7 @@ export const StereoWidenerExample = () => {
           [0, 0, 0] // Posición del efecto en el espacio 3D
         );
         setIsEffectCreated(true);
-        console.log('🎛️ StereoWidener creado exitosamente');
       } catch (error) {
-        console.error('❌ Error al crear StereoWidener:', error);
       }
     }
   }, [isEffectCreated, stereoWidenerEffectId]);
@@ -62,7 +60,6 @@ export const StereoWidenerExample = () => {
       release: 0.8
     });
 
-    console.log(`🔊 Sonido de prueba creado: ${soundId}`);
   };
 
   // Actualizar parámetros del StereoWidener
@@ -72,9 +69,7 @@ export const StereoWidenerExample = () => {
     
     try {
       audioManager.updateGlobalEffect(stereoWidenerEffectId, { [paramName]: value });
-      console.log(`🎛️ Parámetro ${paramName} actualizado a:`, value);
     } catch (error) {
-      console.error(`❌ Error al actualizar parámetro ${paramName}:`, error);
     }
   };
 

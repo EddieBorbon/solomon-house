@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, Group, MeshStandardMaterial, Color } from 'three';
+import { Mesh, Group, MeshStandardMaterial, Color, AdditiveBlending, SubtractiveBlending, MultiplyBlending, NormalBlending } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 
 interface SoundCubeProps {
@@ -76,6 +76,8 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current || !audioParams) return;
 
+    const time = state.clock.elapsedTime;
+
     // Decaer la energía del clic/gate
     if (energyRef.current > 0) {
       // Calcular la velocidad de decaimiento basada en la duración del sonido
@@ -93,18 +95,39 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
       const pulseScale = 1 + energyRef.current * 0.2;
       meshRef.current.scale.set(pulseScale, pulseScale, pulseScale);
       
-      // Cambiar el color basado en la energía (azul intenso a azul suave)
+      // Cambiar el color basado en la energía (intensificar el color base)
       const intensity = energyRef.current;
-      const blueColor = new Color(0.3, 0.8 + intensity * 0.2, 0.8 + intensity * 0.2);
-      materialRef.current.color.copy(blueColor);
+      const baseColor = new Color(audioParams.color || '#000000');
+      const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.2);
+      materialRef.current.color.copy(intensifiedColor);
       
       // Emisión basada en la energía
       materialRef.current.emissiveIntensity = intensity * 0.3;
     } else {
       // Resetear a valores por defecto
       meshRef.current.scale.set(scale[0], scale[1], scale[2]);
-      materialRef.current.color.setHex(0x4ecdc4); // Azul por defecto
+      materialRef.current.color.setHex(parseInt(audioParams.color?.replace('#', '') || '000000', 16));
       materialRef.current.emissiveIntensity = 0;
+    }
+
+    // Solo ejecutar animaciones cuando el audio está activo o hay energía de clic
+    if (audioEnabled || energyRef.current > 0) {
+      // Rotación automática
+      if (audioParams.autoRotate) {
+        const rotationSpeed = audioParams.rotationSpeed || 1.0;
+        meshRef.current.rotation.y += (rotationSpeed * 0.01);
+      }
+      
+      // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+      if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+        const pulseSpeed = audioParams.pulseSpeed || 2.0;
+        const pulseIntensity = audioParams.pulseIntensity || 0.3;
+        const pulseScale = 1 + Math.sin(time * pulseSpeed) * pulseIntensity * 0.2;
+        meshRef.current.scale.setScalar(pulseScale);
+      }
+    } else {
+      // Resetear escala cuando no hay audio
+      meshRef.current.scale.setScalar(1);
     }
   });
 
@@ -113,8 +136,8 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
       {/* Cubo principal */}
       <mesh
         ref={meshRef}
-        castShadow
-        receiveShadow
+        castShadow={audioParams.shadowCasting !== false}
+        receiveShadow={audioParams.shadowReceiving !== false}
         onClick={handleClick}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
@@ -123,13 +146,18 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial
           ref={materialRef}
-          color="#4ecdc4"
+          color={audioParams.color || "#000000"}
           transparent
-          opacity={0.9}
-          roughness={0.2}
-          metalness={0.3}
-          emissive="#000000"
-          emissiveIntensity={0}
+          opacity={audioParams.opacity || 0.9}
+          roughness={audioParams.roughness || 0.2}
+          metalness={audioParams.metalness || 0.3}
+          emissive={audioParams.emissiveColor || "#000000"}
+          emissiveIntensity={audioParams.emissiveIntensity || 0}
+          blending={audioParams.blendingMode === 'AdditiveBlending' ? AdditiveBlending : 
+                   audioParams.blendingMode === 'SubtractiveBlending' ? SubtractiveBlending :
+                   audioParams.blendingMode === 'MultiplyBlending' ? MultiplyBlending : 
+                   NormalBlending}
+          premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
           envMapIntensity={1.0}
         />
       </mesh>

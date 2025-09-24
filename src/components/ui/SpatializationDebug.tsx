@@ -28,7 +28,6 @@ export function SpatializationDebug() {
         };
         setDebugInfo(info);
       } catch (error) {
-        console.error('Error al obtener info de debug:', error);
       }
     };
 

@@ -63,7 +63,6 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
     const commonProps = {
       zone: zone as any, // Cast necesario por compatibilidad
       onEffectParamChange: (param: string, value: any) => {
-        console.log(`🎛️ ParameterComponentFactory: Actualizando parámetro ${param} del efecto ${effectType}`);
       }
     };
 
@@ -118,11 +117,9 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
           return <VibratoParams {...commonProps} />;
 
         default:
-          console.warn(`🎛️ ParameterComponentFactory: Tipo de efecto no soportado: ${effectType}`);
           return null;
       }
     } catch (error) {
-      console.error(`❌ ParameterComponentFactory: Error creando componente de efecto ${effectType}:`, error);
       return null;
     }
   }
@@ -134,7 +131,6 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
     const commonProps = {
       object: object as any, // Cast necesario por compatibilidad
       onParamChange: (param: string, value: any) => {
-        console.log(`🎵 ParameterComponentFactory: Actualizando parámetro ${param} del objeto ${objectType}`);
       }
     };
 
@@ -154,11 +150,9 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
           return <AdvancedSynthParameters {...commonProps} />;
 
         default:
-          console.warn(`🎵 ParameterComponentFactory: Tipo de objeto no soportado: ${objectType}`);
           return null;
       }
     } catch (error) {
-      console.error(`❌ ParameterComponentFactory: Error creando componente de objeto ${objectType}:`, error);
       return null;
     }
   }
@@ -172,12 +166,10 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
         <MobileObjectEditor
           mobileObject={object as any} // Cast necesario por compatibilidad
           onRemove={(id: string) => {
-            console.log(`🚀 ParameterComponentFactory: Eliminando objeto móvil ${id}`);
           }}
         />
       );
     } catch (error) {
-      console.error(`❌ ParameterComponentFactory: Error creando componente de objeto móvil:`, error);
       return null;
     }
   }

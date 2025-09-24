@@ -12,11 +12,21 @@ export function ChorusParams({ zone, onEffectParamChange }: ChorusParamsProps) {
   if (zone?.type !== 'chorus') return null;
 
   return (
-    <>
-      {/* Frecuencia del LFO */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Frecuencia del LFO (Hz)
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        CHORUS_PARAMETERS
+      </h4>
+
+      {/* LFO Frequency */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          LFO_FREQUENCY
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -24,57 +34,51 @@ export function ChorusParams({ zone, onEffectParamChange }: ChorusParamsProps) {
             min="0.1"
             max="10"
             step="0.1"
-            value={zone?.effectParams.chorusFrequency ?? 1.5}
+            value={zone?.effectParams.chorusFrequency ?? 1}
             onChange={(e) => onEffectParamChange('chorusFrequency', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.chorusFrequency ?? 1.5}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(zone?.effectParams.chorusFrequency ?? 1).toFixed(1)}HZ
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0.1 Hz</span>
-          <span>10 Hz</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.1HZ</span>
+          <span>10.0HZ</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Velocidad de modulación del efecto
-        </p>
       </div>
 
-      {/* Tiempo de Delay */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Tiempo de Delay (ms)
+      {/* Delay Time */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          DELAY_TIME
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="2"
-            max="20"
-            step="0.1"
-            value={zone?.effectParams.delayTime ?? 3.5}
-            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            min="0.1"
+            max="1"
+            step="0.01"
+            value={zone?.effectParams.chorusDelayTime ?? 0.3}
+            onChange={(e) => onEffectParamChange('chorusDelayTime', Number(e.target.value))}
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.delayTime ?? 3.5}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(zone?.effectParams.chorusDelayTime ?? 0.3).toFixed(2)}S
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>2 ms</span>
-          <span>20 ms</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.10S</span>
+          <span>1.00S</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Tiempo base del delay del chorus
-        </p>
       </div>
 
-      {/* Profundidad */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Profundidad
+      {/* Depth */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          DEPTH
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -82,57 +86,51 @@ export function ChorusParams({ zone, onEffectParamChange }: ChorusParamsProps) {
             min="0"
             max="1"
             step="0.01"
-            value={zone?.effectParams.chorusDepth ?? 0.7}
+            value={zone?.effectParams.chorusDepth ?? 0.5}
             onChange={(e) => onEffectParamChange('chorusDepth', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.chorusDepth ?? 0.7}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {Math.round((zone?.effectParams.chorusDepth ?? 0.5) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0</span>
-          <span>1</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0%</span>
+          <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Intensidad de la modulación del delay
-        </p>
       </div>
 
       {/* Feedback */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Feedback
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          FEEDBACK
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min="0"
-            max="0.9"
+            max="1"
             step="0.01"
-            value={zone?.effectParams.feedback ?? 0}
+            value={zone?.effectParams.feedback ?? 0.2}
             onChange={(e) => onEffectParamChange('feedback', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.feedback ?? 0}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0</span>
-          <span>0.9</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0%</span>
+          <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Cantidad de retroalimentación (0 = chorus, mayor a 0 = flanger)
-        </p>
       </div>
 
       {/* Spread */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Spread Estéreo (grados)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          SPREAD
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -140,49 +138,43 @@ export function ChorusParams({ zone, onEffectParamChange }: ChorusParamsProps) {
             min="0"
             max="180"
             step="1"
-            value={zone?.effectParams.spread ?? 180}
+            value={zone?.effectParams.spread ?? 0}
             onChange={(e) => onEffectParamChange('spread', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.spread ?? 180}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {zone?.effectParams.spread ?? 0}°
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>0°</span>
           <span>180°</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          0° = central, 180° = estéreo completo
-        </p>
       </div>
 
-      {/* Tipo de LFO */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Tipo de LFO
+      {/* LFO Type */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          LFO_TYPE
         </label>
         <div className="grid grid-cols-2 gap-2">
-          {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((lfoType) => (
+          {['sine', 'square', 'triangle', 'sawtooth'].map((type) => (
             <button
-              key={lfoType}
-              onClick={() => onEffectParamChange('chorusType', lfoType)}
+              key={type}
+              onClick={() => onEffectParamChange('chorusType', type)}
               disabled={zone?.isLocked}
               className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                (zone?.effectParams.chorusType ?? 'sine') === lfoType
-                  ? 'bg-teal-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                (zone?.effectParams.chorusType ?? 'sine') === type
+                  ? 'bg-white text-black'
+                  : 'bg-black text-white border border-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              <span className="capitalize">{lfoType}</span>
+              <span className="uppercase">{type}</span>
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Forma de onda del LFO para la modulación
-        </p>
       </div>
-    </>
+    </div>
   );
 }

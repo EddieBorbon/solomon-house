@@ -56,7 +56,6 @@ export class AudioManagerNew {
     
     // Configurar suscripción a cambios de estado
     this.stateManager.subscribe((state) => {
-      console.log(`📊 AudioManagerNew: Estado actualizado - Fuentes: ${state.soundSources.size}, Efectos: ${state.globalEffects.size}`);
     });
     
     // Registrar el AudioManager como listener de limpieza del contexto
@@ -109,9 +108,7 @@ export class AudioManagerNew {
     
     this.executeCommand(command).then(result => {
       if (result.success) {
-        console.log(`✅ AudioManagerNew: Efecto global ${effectId} creado exitosamente`);
       } else {
-        console.error(`❌ AudioManagerNew: Error creando efecto global ${effectId}:`, result.error);
       }
     });
   }
@@ -137,10 +134,8 @@ export class AudioManagerNew {
     
     this.executeCommand(command).then(result => {
       if (result.success) {
-        console.log(`✅ AudioManagerNew: Fuente de sonido ${id} creada exitosamente`);
         this.updateSoundEffectMixing(id, position);
       } else {
-        console.error(`❌ AudioManagerNew: Error creando fuente de sonido ${id}:`, result.error);
       }
     });
   }
@@ -157,9 +152,7 @@ export class AudioManagerNew {
     
     this.executeCommand(command).then(result => {
       if (result.success) {
-        console.log(`✅ AudioManagerNew: Fuente de sonido ${id} eliminada exitosamente`);
       } else {
-        console.error(`❌ AudioManagerNew: Error eliminando fuente de sonido ${id}:`, result.error);
       }
     });
   }
@@ -193,7 +186,6 @@ export class AudioManagerNew {
    */
   public clearCommandHistory(): void {
     // El orquestador maneja su propio historial
-    console.log(`🧹 AudioManagerNew: Historial de comandos limpiado`);
   }
 
   /**
@@ -302,7 +294,6 @@ export class AudioManagerNew {
         this.lastSendAmounts.set(key, currentSendAmount);
       }
     } catch {
-      console.error(`❌ AudioManagerNew: Error al establecer send amount`);
     }
   }
 
@@ -314,7 +305,6 @@ export class AudioManagerNew {
       this.soundSources.clear();
       this.clearCommandHistory();
     } catch {
-      console.error(`❌ AudioManagerNew: Error en emergency cleanup`);
     }
   }
 
@@ -339,7 +329,6 @@ export class AudioManagerNew {
       // Limpiar historial de comandos
       this.clearCommandHistory();
     } catch {
-      console.error(`❌ AudioManagerNew: Error en cleanup`);
     }
   }
 
@@ -382,7 +371,6 @@ export class AudioManagerNew {
 
   private updateSoundEffectMixing(id: string, position: [number, number, number]): void {
     // Implementación existente mantenida
-    console.log(`🎵 AudioManagerNew: Actualizando mezcla de efectos para ${id}`);
   }
 
   // Métodos restantes del AudioManager original se mantienen igual...

@@ -13,25 +13,20 @@ export function TestSceneSystem() {
   const handleGetFactoryStats = () => {
     const stats = objectFactory.getFactoryStats();
     setFactoryStats(stats);
-    console.log('📊 Factory Stats:', stats);
   };
 
   const handleGetRendererStats = () => {
     const stats = sceneRenderer.getRenderStats();
     setRendererStats(stats);
-    console.log('📊 Renderer Stats:', stats);
   };
 
   const handleGetSupportedTypes = () => {
     const types = objectFactory.getSupportedTypes();
-    console.log('🎨 Supported Types:', types);
   };
 
   const handleGetObjectTypeInfo = () => {
     const cubeInfo = objectFactory.getObjectTypeInfo('cube');
     const sphereInfo = objectFactory.getObjectTypeInfo('sphere');
-    console.log('📋 Cube Info:', cubeInfo);
-    console.log('📋 Sphere Info:', sphereInfo);
   };
 
   const handleTestRender = () => {
@@ -51,7 +46,6 @@ export function TestSceneSystem() {
     };
 
     const rendered = sceneRenderer.render(testObject);
-    console.log('🎨 Rendered Object:', rendered);
   };
 
   const handleValidateEntity = () => {
@@ -88,18 +82,14 @@ export function TestSceneSystem() {
     const validResult = sceneRenderer.validateEntity(validObject);
     const invalidResult = sceneRenderer.validateEntity(invalidObject);
 
-    console.log('✅ Valid Object Result:', validResult);
-    console.log('❌ Invalid Object Result:', invalidResult);
   };
 
   const handleGetDebugInfo = () => {
     const debugInfo = sceneRenderer.getDebugInfo();
-    console.log('🐛 Debug Info:', debugInfo);
   };
 
   const handleResetStats = () => {
     sceneRenderer.resetStats();
-    console.log('🔄 Renderer stats reset');
   };
 
   return (

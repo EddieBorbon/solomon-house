@@ -66,11 +66,9 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
 
   async execute(): Promise<boolean> {
     try {
-      console.log(`🎵 CreateSoundSourceCommand: Ejecutando creación de fuente ${this.id}`);
       
       // Verificar si ya existe
       if (this.soundSources.has(this.id)) {
-        console.warn(`⚠️ CreateSoundSourceCommand: Fuente ${this.id} ya existe`);
         return false;
       }
 
@@ -86,22 +84,18 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
       // Almacenar en el mapa
       this.soundSources.set(this.id, soundSource);
       
-      console.log(`✅ CreateSoundSourceCommand: Fuente ${this.id} creada exitosamente`);
       return true;
       
     } catch (error) {
-      console.error(`❌ CreateSoundSourceCommand: Error al crear fuente ${this.id}:`, error);
       return false;
     }
   }
 
   async undo(): Promise<boolean> {
     try {
-      console.log(`🔄 CreateSoundSourceCommand: Deshaciendo creación de fuente ${this.id}`);
       
       // Verificar si existe
       if (!this.soundSources.has(this.id)) {
-        console.warn(`⚠️ CreateSoundSourceCommand: Fuente ${this.id} no existe para deshacer`);
         return false;
       }
 
@@ -126,11 +120,9 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
       // Eliminar del mapa
       this.soundSources.delete(this.id);
       
-      console.log(`✅ CreateSoundSourceCommand: Fuente ${this.id} eliminada exitosamente`);
       return true;
       
     } catch (error) {
-      console.error(`❌ CreateSoundSourceCommand: Error al deshacer creación de fuente ${this.id}:`, error);
       return false;
     }
   }
@@ -155,11 +147,9 @@ export class RemoveSoundSourceCommand extends BaseAudioCommand {
 
   async execute(): Promise<boolean> {
     try {
-      console.log(`🗑️ RemoveSoundSourceCommand: Ejecutando eliminación de fuente ${this.id}`);
       
       const source = this.soundSources.get(this.id);
       if (!source) {
-        console.warn(`⚠️ RemoveSoundSourceCommand: Fuente ${this.id} no encontrada`);
         return false;
       }
 
@@ -185,11 +175,9 @@ export class RemoveSoundSourceCommand extends BaseAudioCommand {
       // Eliminar del mapa
       this.soundSources.delete(this.id);
       
-      console.log(`✅ RemoveSoundSourceCommand: Fuente ${this.id} eliminada exitosamente`);
       return true;
       
     } catch (error) {
-      console.error(`❌ RemoveSoundSourceCommand: Error al eliminar fuente ${this.id}:`, error);
       return false;
     }
   }
@@ -197,7 +185,6 @@ export class RemoveSoundSourceCommand extends BaseAudioCommand {
   async undo(): Promise<boolean> {
     // Para deshacer una eliminación, necesitaríamos recrear la fuente
     // Esto requeriría almacenar los parámetros originales
-    console.warn(`⚠️ RemoveSoundSourceCommand: Deshacer eliminación no implementado para ${this.id}`);
     return false;
   }
 }
@@ -227,7 +214,6 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
 
   async execute(): Promise<boolean> {
     try {
-      console.log(`🎛️ CreateGlobalEffectCommand: Ejecutando creación de efecto ${this.effectId}`);
       
       // Crear el efecto usando el EffectManager existente
       this.effectManager.createGlobalEffect(this.effectId, this.type, this.position);
@@ -238,21 +224,17 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
         this.soundSources.forEach((source, sourceId) => {
           this.addEffectSendToSource(sourceId, this.effectId, effectData.effectNode.input.input);
         });
-        console.log(`🎛️ CreateGlobalEffectCommand: Sends creados para ${this.soundSources.size} fuentes de sonido`);
       }
       
-      console.log(`✅ CreateGlobalEffectCommand: Efecto ${this.effectId} creado exitosamente`);
       return true;
       
     } catch (error) {
-      console.error(`❌ CreateGlobalEffectCommand: Error al crear efecto ${this.effectId}:`, error);
       return false;
     }
   }
 
   async undo(): Promise<boolean> {
     try {
-      console.log(`🔄 CreateGlobalEffectCommand: Deshaciendo creación de efecto ${this.effectId}`);
       
       // Limpiar todas las conexiones a fuentes de sonido
       this.cleanupEffectSourceConnections(this.effectId);
@@ -260,11 +242,9 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
       // Eliminar el efecto usando el EffectManager
       this.effectManager.removeGlobalEffect(this.effectId);
       
-      console.log(`✅ CreateGlobalEffectCommand: Efecto ${this.effectId} eliminado exitosamente`);
       return true;
       
     } catch (error) {
-      console.error(`❌ CreateGlobalEffectCommand: Error al deshacer creación de efecto ${this.effectId}:`, error);
       return false;
     }
   }
@@ -273,7 +253,6 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
     try {
       const source = this.soundSources.get(sourceId);
       if (!source) {
-        console.warn(`⚠️ CreateGlobalEffectCommand: No se encontró fuente de sonido ${sourceId} para crear send de efecto`);
         return;
       }
 
@@ -285,9 +264,7 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
       source.synth.connect(send);
       send.connect(effectNode);
       
-      console.log(`🎛️ CreateGlobalEffectCommand: Send de efecto ${effectId} creado para fuente ${sourceId}`);
     } catch {
-      console.error(`❌ CreateGlobalEffectCommand: Error al crear send de efecto`);
     }
   }
 

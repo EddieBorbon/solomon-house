@@ -130,14 +130,12 @@ class TransformHandler implements ITransformHandler {
     // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
     if (this.orbitControlsRef.current) {
       this.orbitControlsRef.current.enabled = false;
-      console.log('🔄 TransformHandler: Transformación iniciada - OrbitControls deshabilitado');
     }
   }
 
   handleTransformEnd(): void {
     if (this.orbitControlsRef.current) {
       this.orbitControlsRef.current.enabled = true;
-      console.log('✅ TransformHandler: Transformación completada - OrbitControls habilitado');
     }
   }
 }
@@ -149,7 +147,6 @@ class SelectionHandler implements ISelectionHandler {
   constructor(private selectEntity: (id: string | null) => void) {}
 
   handleEntitySelect(id: string): void {
-    console.log(`🎯 SelectionHandler: Seleccionando entidad: ${id}`);
     this.selectEntity(id);
   }
 
@@ -242,10 +239,8 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
     
     const gridsArray = Array.from(grids.values());
     
-    console.log(`🔍 SceneContentNew useMemo - Procesando ${gridsArray.length} cuadrículas`);
     
     gridsArray.forEach((grid, index) => {
-      console.log(`🔍 Cuadrícula ${index} (${grid.id}):`, {
         objects: grid.objects?.length || 0,
         mobileObjects: grid.mobileObjects?.length || 0,
         effectZones: grid.effectZones?.length || 0
@@ -262,7 +257,6 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
       }
     });
     
-    console.log(`🔍 SceneContentNew useMemo - Total recopilado:`, {
       objects: objects.length,
       mobileObjects: mobileObjects.length,
       effectZones: effectZones.length
@@ -343,16 +337,11 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
   React.useEffect(() => {
     if (orbitControlsRef.current) {
       orbitControlsRef.current.enabled = true;
-      console.log('🎛️ SceneContentNew: OrbitControls siempre habilitados para permitir movimiento de cámara');
     }
   }, [orbitControlsRef]);
 
   // Log para verificar que está leyendo el estado correctamente
   useEffect(() => {
-    console.log('🎵 SceneContentNew - Objetos en el mundo:', allObjects.objects.length);
-    console.log('🚀 SceneContentNew - Objetos móviles:', allObjects.mobileObjects.length);
-    console.log('🎛️ SceneContentNew - Zonas de efectos:', allObjects.effectZones.length);
-    console.log('📐 SceneContentNew - Cuadrículas disponibles:', grids.size);
   }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
 
   return (

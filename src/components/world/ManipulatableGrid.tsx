@@ -30,8 +30,6 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
     selectGrid(grid.id);
     setActiveGrid(grid.id); // Establecer como cuadrícula activa para crear objetos
     
-    console.log(`🎯 Cuadrícula ${grid.id} seleccionada y activada. Coordenadas:`, grid.coordinates);
-    console.log(`🎯 Posición 3D de la cuadrícula:`, grid.position);
   };
 
   return (

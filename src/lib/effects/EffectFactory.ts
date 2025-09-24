@@ -15,7 +15,6 @@ class PhaserCreator implements EffectCreator {
       octaves: 2.2,
       baseFrequency: 1000,
     });
-    console.log(`🎛️ PhaserCreator: Phaser creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -38,7 +37,6 @@ class AutoFilterCreator implements EffectCreator {
       },
       type: 'sine',
     });
-    console.log(`🎛️ AutoFilterCreator: AutoFilter creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -54,7 +52,6 @@ class AutoWahCreator implements EffectCreator {
       octaves: 2.6,
       sensitivity: 0.5,
     });
-    console.log(`🎛️ AutoWahCreator: AutoWah creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -66,7 +63,6 @@ class AutoWahCreator implements EffectCreator {
 class BitCrusherCreator implements EffectCreator {
   create(): Tone.BitCrusher {
     const effectNode = new Tone.BitCrusher(4);
-    console.log(`🎛️ BitCrusherCreator: BitCrusher creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -79,7 +75,6 @@ class ChebyshevCreator implements EffectCreator {
   create(): Tone.Chebyshev {
     const effectNode = new Tone.Chebyshev(50);
     effectNode.oversample = 'none';
-    console.log(`🎛️ ChebyshevCreator: Chebyshev creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -96,10 +91,8 @@ class ChorusCreator implements EffectCreator {
       effectNode.spread = 180;
       effectNode.type = 'sine';
     } catch (error) {
-      console.log(`ℹ️ ChorusCreator: Algunos parámetros no se pudieron configurar inicialmente:`, error);
     }
     effectNode.start();
-    console.log(`🎛️ ChorusCreator: Chorus creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -116,7 +109,6 @@ class DistortionCreator implements EffectCreator {
     } catch {
       // Ignorar
     }
-    console.log(`🎛️ DistortionCreator: Distortion creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -128,7 +120,6 @@ class DistortionCreator implements EffectCreator {
 class FeedbackDelayCreator implements EffectCreator {
   create(): Tone.FeedbackDelay {
     const effectNode = new Tone.FeedbackDelay('8n', 0.5);
-    console.log(`🎛️ FeedbackDelayCreator: FeedbackDelay creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -140,7 +131,6 @@ class FeedbackDelayCreator implements EffectCreator {
 class FreeverbCreator implements EffectCreator {
   create(): Tone.Freeverb {
     const effectNode = new Tone.Freeverb({ roomSize: 0.7, dampening: 3000 });
-    console.log(`🎛️ FreeverbCreator: Freeverb creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -152,7 +142,6 @@ class FreeverbCreator implements EffectCreator {
 class FrequencyShifterCreator implements EffectCreator {
   create(): Tone.FrequencyShifter {
     const effectNode = new Tone.FrequencyShifter(0);
-    console.log(`🎛️ FrequencyShifterCreator: FrequencyShifter creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -164,7 +153,6 @@ class FrequencyShifterCreator implements EffectCreator {
 class JCReverbCreator implements EffectCreator {
   create(): Tone.JCReverb {
     const effectNode = new Tone.JCReverb({ roomSize: 0.5 });
-    console.log(`🎛️ JCReverbCreator: JCReverb creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -180,7 +168,6 @@ class PingPongDelayCreator implements EffectCreator {
       feedback: 0.2,
       maxDelay: 1
     });
-    console.log(`🎛️ PingPongDelayCreator: PingPongDelay creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -197,7 +184,6 @@ class PitchShiftCreator implements EffectCreator {
       delayTime: 0,
       feedback: 0
     });
-    console.log(`🎛️ PitchShiftCreator: PitchShift creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -212,7 +198,6 @@ class ReverbCreator implements EffectCreator {
       decay: 1.5,
       preDelay: 0.01
     });
-    console.log(`🎛️ ReverbCreator: Reverb creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -226,7 +211,6 @@ class StereoWidenerCreator implements EffectCreator {
     const effectNode = new Tone.StereoWidener({
       width: 0.5
     });
-    console.log(`🎛️ StereoWidenerCreator: StereoWidener creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -243,7 +227,6 @@ class TremoloCreator implements EffectCreator {
       type: 'sine',
       spread: 180
     });
-    console.log(`🎛️ TremoloCreator: Tremolo creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -260,7 +243,6 @@ class VibratoCreator implements EffectCreator {
       type: 'sine',
       maxDelay: 0.005
     });
-    console.log(`🎛️ VibratoCreator: Vibrato creado con parámetros iniciales`);
     return effectNode;
   }
 
@@ -303,7 +285,6 @@ export class EffectFactory {
       throw new Error(`Tipo de efecto no soportado: ${type}`);
     }
     
-    console.log(`🎛️ EffectFactory: Creando efecto ${type}`);
     return creator.create();
   }
 

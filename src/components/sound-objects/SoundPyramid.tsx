@@ -12,11 +12,12 @@ interface SoundPyramidProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
+  audioParams?: { color?: string };
   duration?: number;
 }
 
 export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
-  ({ id, position, rotation, scale, isSelected, audioEnabled, duration }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams, duration }, ref) => {
     const { selectEntity, toggleObjectAudio } = useWorldStore();
     const meshRef = useRef<THREE.Mesh>(null);
     const wireframeRef = useRef<THREE.Mesh>(null);
@@ -50,6 +51,32 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
           material.color.setRGB(1, 0.5, 0.2);
         }
       }
+
+      // Solo ejecutar animaciones cuando el audio está activo o hay sonido reproduciéndose
+      if (audioEnabled || isSoundPlaying) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          if (meshRef.current) {
+            meshRef.current.rotation.y += (rotationSpeed * 0.01);
+          }
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          if (meshRef.current) {
+            meshRef.current.scale.setScalar(pulseScale);
+          }
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        if (meshRef.current) {
+          meshRef.current.scale.setScalar(1);
+        }
+      }
     });
 
          // Manejador para cuando se presiona el clic
@@ -58,7 +85,6 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
        
        if (isGateMode) {
          // Modo gate: activar sonido mientras se mantiene presionado
-         console.log(`🔺 PointerDown en pirámide ${id} - Modo gate: Activando sonido`);
          setIsSoundPlaying(true);
          // En modo gate, solo activar el sonido (no toggle)
          if (!audioEnabled) {
@@ -66,7 +92,6 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
          }
        } else {
          // Modo continuo: alternar estado del audio
-         console.log(`🔺 PointerDown en pirámide ${id} - Modo continuo: Alternando audio`);
          const newState = !audioEnabled;
          setIsSoundPlaying(newState);
          toggleObjectAudio(id);
@@ -79,7 +104,6 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
        
        if (isGateMode) {
          // Modo gate: desactivar sonido al soltar
-         console.log(`🔺 PointerUp en pirámide ${id} - Modo gate: Desactivando sonido`);
          setIsSoundPlaying(false);
          // En modo gate, desactivar el sonido
          if (audioEnabled) {
@@ -95,7 +119,6 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
        
        if (isGateMode) {
          // Modo gate: desactivar sonido al salir
-         console.log(`🔺 PointerLeave en pirámide ${id} - Modo gate: Desactivando sonido`);
          setIsSoundPlaying(false);
          // En modo gate, desactivar el sonido
          if (audioEnabled) {
@@ -126,11 +149,18 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
         <mesh ref={meshRef}>
           <coneGeometry args={[0.8, 1.5, 4]} />
           <meshStandardMaterial
-            color={isSelected ? '#ef4444' : '#dc2626'}
-            metalness={0.4}
-            roughness={0.3}
-            emissive={isSelected ? '#7f1d1d' : '#000000'}
-            emissiveIntensity={isSelected ? 0.3 : 0}
+            color={audioParams.color || "#000000"}
+            metalness={audioParams.metalness || 0.4}
+            roughness={audioParams.roughness || 0.3}
+            transparent
+            opacity={audioParams.opacity || 0.9}
+            emissive={audioParams.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams.emissiveIntensity || (isSelected ? 0.3 : 0)}
+            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                     THREE.NormalBlending}
+            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.2}
           />
         </mesh>

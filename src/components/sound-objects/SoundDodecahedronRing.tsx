@@ -111,6 +111,32 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
           });
         }
       }
+
+      // Solo ejecutar animaciones cuando el audio está activo
+      if (audioEnabled) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          if (groupRef.current) {
+            groupRef.current.rotation.y += (rotationSpeed * 0.01);
+          }
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          if (groupRef.current) {
+            groupRef.current.scale.setScalar(pulseScale);
+          }
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        if (groupRef.current) {
+          groupRef.current.scale.setScalar(1);
+        }
+      }
     });
 
     // Crear array de dodecaedros distribuidos en círculo
@@ -134,13 +160,18 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
               ref={(el) => {
                 if (el) materialRefs.current[index] = el;
               }}
-              color="#ec4899" // Color rosa base
-              metalness={0.3}
-              roughness={0.1}
+              color={audioParams.color || "#000000"} // Color negro base
+              metalness={audioParams.metalness || 0.3}
+              roughness={audioParams.roughness || 0.1}
               transparent
-              opacity={0.9}
-              emissive="#be185d"
-              emissiveIntensity={audioEnabled ? 0.2 : 0}
+              opacity={audioParams.opacity || 0.95}
+              emissive={audioParams.emissiveColor || "#000000"}
+              emissiveIntensity={audioParams.emissiveIntensity || (audioEnabled ? 0.2 : 0)}
+              blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                       audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                       audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                       THREE.NormalBlending}
+              premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
               envMapIntensity={1.5}
             />
           </mesh>

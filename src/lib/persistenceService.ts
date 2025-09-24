@@ -109,10 +109,8 @@ export class PersistenceService {
 
       const projectId = await firebaseService.saveProject(projectData);
       
-      console.log('✅ Mundo guardado como proyecto:', projectName, 'ID:', projectId);
       return projectId;
     } catch (error) {
-      console.error('❌ Error al guardar mundo como proyecto:', error);
       throw error;
     }
   }
@@ -126,23 +124,15 @@ export class PersistenceService {
         throw new Error('Proyecto no encontrado');
       }
 
-      console.log('🔍 Proyecto cargado desde Firebase:', project);
-      console.log('🔍 Cuadrículas en el proyecto:', project.grids.length);
 
       // Convertir las cuadrículas de Firebase al formato del store
       const grids = new Map<string, Grid>();
       
       for (const firebaseGrid of project.grids) {
-        console.log('🔍 Procesando cuadrícula Firebase:', firebaseGrid);
         const grid = firebaseToGrid(firebaseGrid);
-        console.log('🔍 Cuadrícula convertida:', grid);
-        console.log('🔍 Objetos en la cuadrícula:', grid.objects.length);
-        console.log('🔍 Objetos móviles en la cuadrícula:', grid.mobileObjects.length);
-        console.log('🔍 Zonas de efectos en la cuadrícula:', grid.effectZones.length);
         grids.set(grid.id, grid);
       }
 
-      console.log('🔍 Total de cuadrículas procesadas:', grids.size);
 
       // Actualizar el store con los datos cargados
       useWorldStore.setState({
@@ -153,9 +143,7 @@ export class PersistenceService {
           [0, 0, 0]
       });
 
-      console.log('✅ Proyecto cargado:', project.name);
     } catch (error) {
-      console.error('❌ Error al cargar proyecto:', error);
       throw error;
     }
   }
@@ -164,10 +152,8 @@ export class PersistenceService {
   async loadAllProjects(): Promise<FirebaseProject[]> {
     try {
       const projects = await firebaseService.loadAllProjects();
-      console.log('✅ Proyectos cargados:', projects.length);
       return projects;
     } catch (error) {
-      console.error('❌ Error al cargar proyectos:', error);
       throw error;
     }
   }
@@ -185,10 +171,8 @@ export class PersistenceService {
       const firebaseGrid = gridToFirebase(grid);
       const savedGridId = await firebaseService.saveGrid(firebaseGrid);
       
-      console.log('✅ Cuadrícula guardada:', gridId, '->', savedGridId);
       return savedGridId;
     } catch (error) {
-      console.error('❌ Error al guardar cuadrícula:', error);
       throw error;
     }
   }
@@ -209,9 +193,7 @@ export class PersistenceService {
         grids: new Map(state.grids.set(gridId, grid))
       }));
 
-      console.log('✅ Cuadrícula cargada:', gridId);
     } catch (error) {
-      console.error('❌ Error al cargar cuadrícula:', error);
       throw error;
     }
   }
@@ -242,9 +224,7 @@ export class PersistenceService {
 
       await firebaseService.updateProject(projectId, updateData);
       
-      console.log('✅ Proyecto actualizado:', projectId);
     } catch (error) {
-      console.error('❌ Error al actualizar proyecto:', error);
       throw error;
     }
   }
@@ -253,20 +233,16 @@ export class PersistenceService {
   async deleteProject(projectId: string): Promise<void> {
     try {
       await firebaseService.deleteProject(projectId);
-      console.log('✅ Proyecto eliminado:', projectId);
     } catch (error) {
-      console.error('❌ Error al eliminar proyecto:', error);
       throw error;
     }
   }
 
   // Sincronizar automáticamente los cambios con Firebase
   startAutoSync(projectId: string): () => void {
-    console.log('🔄 Iniciando sincronización automática para proyecto:', projectId);
     
     const unsubscribe = firebaseService.subscribeToProject(projectId, (project) => {
       if (project) {
-        console.log('📡 Recibiendo actualización del proyecto en tiempo real:', project.name);
         
         // Convertir las cuadrículas de Firebase al formato del store
         const grids = new Map<string, Grid>();
@@ -297,11 +273,9 @@ export class PersistenceService {
           }
           
           if (!hasChanges) {
-            console.log('📡 No hay cambios en los datos, omitiendo actualización');
             return currentState;
           }
           
-          console.log('✅ Proyecto sincronizado en tiempo real con cambios');
           
           // Marcar que estamos actualizando desde Firebase para evitar bucles
           setTimeout(() => {
@@ -325,7 +299,6 @@ export class PersistenceService {
 
   // Detener la sincronización automática
   stopAutoSync(unsubscribe: () => void): void {
-    console.log('🛑 Deteniendo sincronización automática');
     unsubscribe();
   }
 }

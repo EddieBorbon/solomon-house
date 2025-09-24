@@ -549,9 +549,7 @@ export class SoundPlaybackManager {
     try {
       this.playingSounds.clear();
       this.playbackStates.clear();
-      console.log(`🧹 SoundPlaybackManager: Limpieza completada`);
     } catch (error) {
-      console.error(`❌ SoundPlaybackManager: Error durante la limpieza:`, error);
     }
   }
 }

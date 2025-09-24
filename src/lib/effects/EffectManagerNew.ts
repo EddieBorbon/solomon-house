@@ -26,7 +26,6 @@ export class EffectManagerNew {
     position: [number, number, number]
   ): void {
     try {
-      console.log(`🎛️ EffectManagerNew: Creando efecto global ${type} con ID ${effectId} en posición [${position.join(', ')}]`);
       
       // Crear el nodo del efecto usando el factory
       const effectNode = this.effectFactory.createEffect(type);
@@ -38,10 +37,8 @@ export class EffectManagerNew {
       const testConfig = this.effectFactory.getTestOscillatorConfig(type);
       this.testOscillatorManager.createTestOscillatorForEffect(effectId, effectNode, testConfig);
       
-      console.log(`✅ EffectManagerNew: Efecto global ${type} creado exitosamente`);
       
     } catch (error) {
-      console.error(`❌ EffectManagerNew: Error al crear efecto global:`, error);
     }
   }
 
@@ -51,13 +48,11 @@ export class EffectManagerNew {
   public updateGlobalEffect(effectId: string, params: EffectParams): void {
     const effectData = this.spatialEffectManager.getGlobalEffect(effectId);
     if (!effectData) {
-      console.warn(`⚠️ EffectManagerNew: No se encontró efecto global con ID ${effectId}`);
       return;
     }
 
     try {
       const { effectNode } = effectData;
-      console.log(`🎛️ EffectManagerNew: Actualizando parámetros del efecto ${effectId}:`, params);
       
       // Determinar el tipo de efecto para usar el actualizador correcto
       const effectType = this.getEffectTypeFromNode(effectNode);
@@ -68,10 +63,8 @@ export class EffectManagerNew {
       // Refrescar el efecto para asegurar que los cambios se apliquen
       this.refreshGlobalEffect(effectId);
       
-      console.log(`✅ EffectManagerNew: Parámetros del efecto ${effectId} actualizados y refrescados`);
       
     } catch (error) {
-      console.error(`❌ EffectManagerNew: Error al actualizar parámetros del efecto:`, error);
     }
   }
 
@@ -107,10 +100,8 @@ export class EffectManagerNew {
       // Eliminar efecto espacial
       this.spatialEffectManager.removeSpatialEffect(effectId);
       
-      console.log(`✅ EffectManagerNew: Efecto global ${effectId} eliminado`);
       
     } catch (error) {
-      console.error(`❌ EffectManagerNew: Error al eliminar efecto global:`, error);
     }
   }
 
@@ -126,9 +117,7 @@ export class EffectManagerNew {
         effectData.panner.positionY.value = effectData.panner.positionY.value;
         effectData.panner.positionZ.value = effectData.panner.positionZ.value;
         
-        console.log(`🎛️ EffectManagerNew: Efecto ${effectId} refrescado`);
       } catch (error) {
-        console.error(`❌ EffectManagerNew: Error al refrescar efecto ${effectId}:`, error);
       }
     }
   }
@@ -138,7 +127,6 @@ export class EffectManagerNew {
    */
   public refreshAllGlobalEffects(): void {
     this.spatialEffectManager.refreshAllGlobalEffects();
-    console.log(`🎛️ EffectManagerNew: Todos los efectos globales refrescados`);
   }
 
   /**
@@ -189,7 +177,6 @@ export class EffectManagerNew {
   public clearAllEffects(): void {
     this.testOscillatorManager.clearAllTestOscillators();
     this.spatialEffectManager.clearAllSpatialEffects();
-    console.log(`🎛️ EffectManagerNew: Todos los efectos y osciladores eliminados`);
   }
 
   /**

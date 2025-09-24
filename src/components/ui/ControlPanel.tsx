@@ -49,7 +49,6 @@ export function ControlPanel() {
   // Función helper para crear objetos en la cuadrícula activa
   const createObjectInActiveGrid = (type: string) => {
     if (!activeGrid) {
-      console.warn('No hay cuadrícula activa para crear objetos');
       return;
     }
     
@@ -57,13 +56,11 @@ export function ControlPanel() {
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
     addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', [x, 0.5, z]);
-    console.log(`🎯 Creando ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 0.5, z]);
   };
 
   // Función helper para crear zonas de efecto en la cuadrícula activa
   const createEffectZoneInActiveGrid = (type: string) => {
     if (!activeGrid) {
-      console.warn('No hay cuadrícula activa para crear zonas de efecto');
       return;
     }
     
@@ -71,16 +68,12 @@ export function ControlPanel() {
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
     addEffectZone(type as 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', [x, 1, z], 'sphere');
-    console.log(`🎯 Creando zona de efecto ${type} en cuadrícula activa ${activeGridId} en posición relativa:`, [x, 1, z]);
   };
 
   // Función helper para crear objetos móviles en la cuadrícula activa
   const createMobileObjectInActiveGrid = () => {
-    console.log(`🚀 createMobileObjectInActiveGrid llamado - Cuadrícula activa: ${activeGridId}`);
-    console.log(`🚀 activeGrid:`, activeGrid);
     
     if (!activeGrid) {
-      console.warn('No hay cuadrícula activa para crear objetos móviles');
       return;
     }
     
@@ -89,11 +82,8 @@ export function ControlPanel() {
     const z = (Math.random() - 0.5) * 10;
     const finalPosition: [number, number, number] = [x, 0.5, z];
     
-    console.log(`🚀 Posición de la cuadrícula:`, activeGrid.position);
-    console.log(`🚀 Posición relativa del objeto móvil:`, finalPosition);
     
     addMobileObject(finalPosition);
-    console.log(`🎯 Creando objeto móvil en cuadrícula activa ${activeGridId} en posición relativa:`, finalPosition);
   };
 
   const handleAddCube = () => createObjectInActiveGrid('cube');
@@ -156,10 +146,6 @@ export function ControlPanel() {
 
   // Funciones para crear cuadrículas
   const createGridAtPosition = (direction: 'north' | 'south' | 'east' | 'west' | 'up' | 'down') => {
-    console.log(`🎯 createGridAtPosition llamado con dirección: ${direction}`);
-    console.log(`🎯 activeGrid:`, activeGrid);
-    console.log(`🎯 currentGridCoordinates:`, currentGridCoordinates);
-    console.log(`🎯 gridSize:`, gridSize);
     
     const baseCoordinates = activeGrid ? activeGrid.coordinates : currentGridCoordinates;
     const [x, y, z] = baseCoordinates;
@@ -192,19 +178,12 @@ export function ControlPanel() {
       newCoordinates[2] * gridSize
     ];
     
-    console.log(`🎯 Nuevas coordenadas:`, newCoordinates);
-    console.log(`🎯 Nueva posición:`, newPosition);
     
     createGrid(newPosition, gridSize);
-    console.log(`🎯 createGrid llamado con posición:`, newPosition, `y tamaño:`, gridSize);
   };
 
   const createGridAtCustomPosition = () => {
-    console.log(`🎯 createGridAtCustomPosition llamado`);
-    console.log(`🎯 newGridPosition:`, newGridPosition);
-    console.log(`🎯 newGridSize:`, newGridSize);
     createGrid(newGridPosition, newGridSize);
-    console.log(`🎯 createGrid llamado con posición personalizada:`, newGridPosition, `y tamaño:`, newGridSize);
   };
 
 
@@ -297,12 +276,12 @@ export function ControlPanel() {
               {/* Controles básicos */}
               <div className="p-2 border border-gray-600 text-xs text-gray-300 font-mono">
                 <div className="space-y-1">
-                  <p className="flex items-center gap-2"><CameraIcon className="w-3 h-3" /><span className="text-white">CAMERA:</span> CLICK_ROTATE_SCROLL_ZOOM</p>
-                  <p className="flex items-center gap-2"><ComputerDesktopIcon className="w-3 h-3" /><span className="text-white">WASD:</span> MOVEMENT_SHIFT_FAST</p>
-                  <p className="flex items-center gap-2"><CursorArrowRaysIcon className="w-3 h-3" /><span className="text-white">CLICK:</span> SELECT_OBJECTS</p>
-                  <p className="flex items-center gap-2"><TrashIcon className="w-3 h-3" /><span className="text-white">DELETE:</span> REMOVE_SELECTED</p>
-                  <p className="flex items-center gap-2"><CommandLineIcon className="w-3 h-3" /><span className="text-white">G/R/S:</span> TRANSFORM_MODES</p>
-                  <p className="flex items-center gap-2"><XMarkIcon className="w-3 h-3" /><span className="text-white">ESC:</span> EXIT_EDIT_MODE</p>
+                  <p className="flex items-center gap-2"><CameraIcon className="w-3 h-3" /><span className="text-white">{t('controls.camera')}</span> {t('controls.clickRotateScrollZoom')}</p>
+                  <p className="flex items-center gap-2"><ComputerDesktopIcon className="w-3 h-3" /><span className="text-white">{t('controls.wasd')}</span> {t('controls.movementShiftFast')}</p>
+                  <p className="flex items-center gap-2"><CursorArrowRaysIcon className="w-3 h-3" /><span className="text-white">{t('controls.click')}</span> {t('controls.selectObjects')}</p>
+                  <p className="flex items-center gap-2"><TrashIcon className="w-3 h-3" /><span className="text-white">{t('controls.delete')}</span> {t('controls.removeSelected')}</p>
+                  <p className="flex items-center gap-2"><CommandLineIcon className="w-3 h-3" /><span className="text-white">{t('controls.grs')}</span> {t('controls.transformModes')}</p>
+                  <p className="flex items-center gap-2"><XMarkIcon className="w-3 h-3" /><span className="text-white">{t('controls.esc')}</span> {t('controls.exitEditMode')}</p>
                 </div>
               </div>
             </div>
@@ -343,39 +322,39 @@ export function ControlPanel() {
               <div className="grid grid-cols-2 gap-1">
                 <button onClick={handleAddCube} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Box className="w-3 h-3" />CUBE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Box className="w-3 h-3" />{t('controls.cube')}</span>
                 </button>
                 <button onClick={handleAddSphere} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Circle className="w-3 h-3" />SPHERE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Circle className="w-3 h-3" />{t('controls.sphere')}</span>
                 </button>
                 <button onClick={handleAddCylinder} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />CYLINDER</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />{t('controls.cylinder')}</span>
                 </button>
                 <button onClick={handleAddCone} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />CONE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />{t('controls.cone')}</span>
                 </button>
                 <button onClick={handleAddPyramid} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />PYRAMID</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Triangle className="w-3 h-3" />{t('controls.pyramid')}</span>
                 </button>
                 <button onClick={handleAddIcosahedron} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Hexagon className="w-3 h-3" />ICOSAHEDRON</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Hexagon className="w-3 h-3" />{t('controls.icosahedron')}</span>
                 </button>
                 <button onClick={handleAddPlane} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />PLANE</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Square className="w-3 h-3" />{t('controls.plane')}</span>
                 </button>
                 <button onClick={handleAddTorus} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><RotateCcw className="w-3 h-3" />TORUS</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><RotateCcw className="w-3 h-3" />{t('controls.torus')}</span>
                 </button>
                 <button onClick={handleAddDodecahedronRing} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><CircleDot className="w-3 h-3" />RING</span>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><CircleDot className="w-3 h-3" />{t('controls.ring')}</span>
                 </button>
                 <button onClick={handleAddSpiral} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
@@ -420,71 +399,71 @@ export function ControlPanel() {
               <div className="grid grid-cols-2 gap-1">
                 <button onClick={handleAddPhaserZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">PHASER</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.phaser')}</span>
                 </button>
                 <button onClick={handleAddAutoFilterZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">AUTO_FILTER</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.autoFilter')}</span>
                 </button>
                 <button onClick={handleAddAutoWahZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">AUTO_WAH</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.autoWah')}</span>
                 </button>
                 <button onClick={handleAddBitCrusherZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">BIT_CRUSHER</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.bitCrusher')}</span>
                 </button>
                 <button onClick={handleAddChebyshevZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">CHEBYSHEV</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.chebyshev')}</span>
                 </button>
                 <button onClick={handleAddChorusZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">CHORUS</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.chorus')}</span>
                 </button>
                 <button onClick={handleAddDistortionZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">DISTORTION</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.distortion')}</span>
                 </button>
                 <button onClick={handleAddFeedbackDelayZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">FEEDBACK_DELAY</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.feedbackDelay')}</span>
                 </button>
                 <button onClick={handleAddFreeverbZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">FREEVERB</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.freeverb')}</span>
                 </button>
                 <button onClick={handleAddFrequencyShifterZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">FREQ_SHIFTER</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.freqShifter')}</span>
                 </button>
                 <button onClick={handleAddJCReverbZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">JC_REVERB</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.jcReverb')}</span>
                 </button>
                 <button onClick={handleAddPingPongDelayZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">PING_PONG</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.pingPong')}</span>
                 </button>
                 <button onClick={handleAddPitchShiftZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">PITCH_SHIFT</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.pitchShift')}</span>
                 </button>
                 <button onClick={handleAddReverbZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">REVERB</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.reverb')}</span>
                 </button>
                 <button onClick={handleAddStereoWidenerZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">STEREO_WIDENER</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.stereoWidener')}</span>
                 </button>
                 <button onClick={handleAddTremoloZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">TREMOLO</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.trem')}</span>
                 </button>
                 <button onClick={handleAddVibratoZone} className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">VIBRATO</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.vibrato')}</span>
                 </button>
               </div>
             </div>
@@ -529,9 +508,8 @@ export function ControlPanel() {
                 className="relative w-full border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
               >
                 <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-2">
-                  <span className="text-sm">🚀</span>
-                  <span>CREATE_MOBILE_OBJECT</span>
+                <span className="relative text-xs font-mono tracking-wider flex items-center justify-center">
+                  <span>{t('controls.createMobileObject')}</span>
                 </span>
               </button>
             </div>
@@ -569,9 +547,9 @@ export function ControlPanel() {
           {/* Posición actual */}
           <div className="mb-2 p-2 border border-gray-600 text-xs text-gray-300 font-mono">
             <div className="space-y-1">
-              <p><span className="text-white">POS:</span> ({activeGrid ? activeGrid.coordinates[0] : currentGridCoordinates[0]}, {activeGrid ? activeGrid.coordinates[1] : currentGridCoordinates[1]}, {activeGrid ? activeGrid.coordinates[2] : currentGridCoordinates[2]})</p>
+              <p><span className="text-white">{t('controls.pos')}</span> ({activeGrid ? activeGrid.coordinates[0] : currentGridCoordinates[0]}, {activeGrid ? activeGrid.coordinates[1] : currentGridCoordinates[1]}, {activeGrid ? activeGrid.coordinates[2] : currentGridCoordinates[2]})</p>
               {activeGrid && (
-                <p><span className="text-white">ACTIVE:</span> {activeGrid.id.slice(0, 6)}...</p>
+                <p><span className="text-white">{t('controls.active')}</span> {activeGrid.id.slice(0, 6)}...</p>
               )}
             </div>
           </div>
@@ -580,7 +558,7 @@ export function ControlPanel() {
           <div className="space-y-2">
             {/* Crear cuadrículas adyacentes */}
             <div className="space-y-1">
-              <div className="text-xs font-mono font-bold text-white tracking-wider">ADJACENT_GRIDS</div>
+              <div className="text-xs font-mono font-bold text-white tracking-wider">{t('controls.adjacentGrids')}</div>
               
               <div className="grid grid-cols-2 gap-1">
                 <button
@@ -589,7 +567,7 @@ export function ControlPanel() {
                   title="Oeste"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">← WEST</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.west')}</span>
                 </button>
                 <button
                   onClick={() => createGridAtPosition('east')}
@@ -597,7 +575,7 @@ export function ControlPanel() {
                   title="Este"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">EAST →</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.east')}</span>
                 </button>
                 <button
                   onClick={() => createGridAtPosition('south')}
@@ -605,7 +583,7 @@ export function ControlPanel() {
                   title="Sur"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">↓ SOUTH</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.south')}</span>
                 </button>
                 <button
                   onClick={() => createGridAtPosition('north')}
@@ -613,7 +591,7 @@ export function ControlPanel() {
                   title="Norte"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">NORTH ↑</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.north')}</span>
                 </button>
                 <button
                   onClick={() => createGridAtPosition('down')}
@@ -621,7 +599,7 @@ export function ControlPanel() {
                   title="Abajo"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">⬇ DOWN</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.down')}</span>
                 </button>
                 <button
                   onClick={() => createGridAtPosition('up')}
@@ -629,14 +607,14 @@ export function ControlPanel() {
                   title="Arriba"
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative text-xs font-mono tracking-wider">⬆ UP</span>
+                  <span className="relative text-xs font-mono tracking-wider">{t('controls.up')}</span>
                 </button>
               </div>
             </div>
 
             {/* Crear cuadrícula personalizada */}
             <div className="space-y-1">
-              <div className="text-xs font-mono font-bold text-white tracking-wider">CUSTOM_GRID</div>
+              <div className="text-xs font-mono font-bold text-white tracking-wider">{t('controls.customGrid')}</div>
               
               <div className="grid grid-cols-4 gap-1">
                 <div>
@@ -670,7 +648,7 @@ export function ControlPanel() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 block font-mono tracking-wider">SIZE</label>
+                  <label className="text-xs text-gray-400 block font-mono tracking-wider">{t('controls.size')}</label>
                   <input
                     type="number"
                     value={newGridSize}
@@ -691,7 +669,7 @@ export function ControlPanel() {
                 <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                 <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
                   <span>🎯</span>
-                  <span>CREATE_GRID</span>
+                  <span>{t('controls.createGridButton')}</span>
                 </span>
               </button>
             </div>

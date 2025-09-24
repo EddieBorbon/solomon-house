@@ -180,7 +180,6 @@ export default function AudioEffectsDashboard() {
             parameters={effect.parameters}
             className="h-64"
             onClick={() => {
-              console.log(`Clicked on ${effect.title}`);
               // Aquí puedes agregar la lógica para activar/desactivar el efecto
             }}
           />

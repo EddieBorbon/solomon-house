@@ -46,12 +46,10 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
    */
   public updateParameter(entityId: string, param: string, value: any): void {
     try {
-      console.log(`🎛️ ParameterManager: Actualizando parámetro ${param} de entidad ${entityId}`);
       
       // Validar el parámetro
       const validation = this.validateParameter('unknown', param, value);
       if (!validation.isValid) {
-        console.warn(`⚠️ ParameterManager: Parámetro ${param} no válido:`, validation.errors);
         this.stats.errorCount++;
         return;
       }
@@ -74,9 +72,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
         });
       }, 1000);
 
-      console.log(`✅ ParameterManager: Parámetro ${param} actualizado exitosamente`);
     } catch (error) {
-      console.error(`❌ ParameterManager: Error actualizando parámetro ${param}:`, error);
       this.stats.errorCount++;
     }
   }
@@ -398,7 +394,6 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
       try {
         callback(entityId, state);
       } catch (error) {
-        console.error(`❌ ParameterManager: Error notificando suscriptor:`, error);
       }
     });
   }

@@ -134,7 +134,6 @@ export class SynthesizerUpdaterFacade {
   ): void {
     // Implementar lógica genérica para sintetizadores no específicos
     // Por ahora, solo log
-    console.log('Updating generic synthesizer:', synth.constructor.name);
   }
 
   /**

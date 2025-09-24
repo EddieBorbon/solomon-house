@@ -15,105 +15,105 @@ export function EffectTransformSection({
   roundToDecimals
 }: EffectTransformSectionProps) {
   return (
-    <div className="mt-6 pt-4 border-t border-gray-700">
-      <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
-        📍 Posición y Tamaño
+    <div className="relative border border-white p-4 mb-4">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        POSITION_AND_SIZE
       </h4>
       
-      {/* Position */}
-      <div className="space-y-2 mb-4">
-        <label className="text-xs font-medium text-gray-300">Position</label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { axis: 'X', color: 'bg-red-500', value: zone?.position[0] },
-            { axis: 'Y', color: 'bg-green-500', value: zone?.position[1] },
-            { axis: 'Z', color: 'bg-blue-500', value: zone?.position[2] }
-          ].map(({ axis, color, value }, index) => (
-            <div key={axis} className="flex flex-col">
-              <div className="flex items-center gap-1 mb-1">
-                <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                <span className="text-xs text-gray-400">{axis}</span>
+      {/* Position, Rotation, Scale - Todo junto */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        {/* Position */}
+        <div>
+          <label className="futuristic-label block mb-2 text-white text-center">POSITION</label>
+          <div className="space-y-1">
+            {[
+              { axis: 'X', value: zone?.position[0] },
+              { axis: 'Y', value: zone?.position[1] },
+              { axis: 'Z', value: zone?.position[2] }
+            ].map(({ axis, value }, index) => (
+              <div key={axis} className="flex items-center gap-1">
+                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={roundToDecimals(value)}
+                  onChange={(e) => {
+                    const newValue = parseFloat(e.target.value) || 0;
+                    const newPosition = [...zone?.position] as [number, number, number];
+                    newPosition[index] = newValue;
+                    onUpdateEffectZone(zone?.id, { position: newPosition });
+                  }}
+                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  disabled={zone?.isLocked}
+                />
               </div>
-              <input
-                type="number"
-                step="0.1"
-                value={roundToDecimals(value)}
-                onChange={(e) => {
-                  const newValue = parseFloat(e.target.value) || 0;
-                  const newPosition = [...zone?.position] as [number, number, number];
-                  newPosition[index] = newValue;
-                  onUpdateEffectZone(zone?.id, { position: newPosition });
-                }}
-                className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                disabled={zone?.isLocked}
-              />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Rotation */}
-      <div className="space-y-2 mb-4">
-        <label className="text-xs font-medium text-gray-300">Rotation</label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { axis: 'X', color: 'bg-red-500', value: zone?.rotation[0] },
-            { axis: 'Y', color: 'bg-green-500', value: zone?.rotation[1] },
-            { axis: 'Z', color: 'bg-blue-500', value: zone?.rotation[2] }
-          ].map(({ axis, color, value }, index) => (
-            <div key={axis} className="flex flex-col">
-              <div className="flex items-center gap-1 mb-1">
-                <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                <span className="text-xs text-gray-400">{axis}</span>
+        {/* Rotation */}
+        <div>
+          <label className="futuristic-label block mb-2 text-white text-center">ROTATION</label>
+          <div className="space-y-1">
+            {[
+              { axis: 'X', value: zone?.rotation[0] },
+              { axis: 'Y', value: zone?.rotation[1] },
+              { axis: 'Z', value: zone?.rotation[2] }
+            ].map(({ axis, value }, index) => (
+              <div key={axis} className="flex items-center gap-1">
+                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+                <input
+                  type="number"
+                  step="1"
+                  value={roundToDecimals(value)}
+                  onChange={(e) => {
+                    const newValue = parseFloat(e.target.value) || 0;
+                    const newRotation = [...zone?.rotation] as [number, number, number];
+                    newRotation[index] = newValue;
+                    onUpdateEffectZone(zone?.id, { rotation: newRotation });
+                  }}
+                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  disabled={zone?.isLocked}
+                />
               </div>
-              <input
-                type="number"
-                step="1"
-                value={roundToDecimals(value)}
-                onChange={(e) => {
-                  const newValue = parseFloat(e.target.value) || 0;
-                  const newRotation = [...zone?.rotation] as [number, number, number];
-                  newRotation[index] = newValue;
-                  onUpdateEffectZone(zone?.id, { rotation: newRotation });
-                }}
-                className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                disabled={zone?.isLocked}
-              />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Scale */}
-      <div className="space-y-2 mb-4">
-        <label className="text-xs font-medium text-gray-300">Scale</label>
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { axis: 'X', color: 'bg-red-500', value: zone?.scale[0] },
-            { axis: 'Y', color: 'bg-green-500', value: zone?.scale[1] },
-            { axis: 'Z', color: 'bg-blue-500', value: zone?.scale[2] }
-          ].map(({ axis, color, value }, index) => (
-            <div key={axis} className="flex flex-col">
-              <div className="flex items-center gap-1 mb-1">
-                <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                <span className="text-xs text-gray-400">{axis}</span>
+        {/* Scale */}
+        <div>
+          <label className="futuristic-label block mb-2 text-white text-center">SCALE</label>
+          <div className="space-y-1">
+            {[
+              { axis: 'X', value: zone?.scale[0] },
+              { axis: 'Y', value: zone?.scale[1] },
+              { axis: 'Z', value: zone?.scale[2] }
+            ].map(({ axis, value }, index) => (
+              <div key={axis} className="flex items-center gap-1">
+                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0.1"
+                  value={roundToDecimals(value)}
+                  onChange={(e) => {
+                    const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+                    const newScale = [...zone?.scale] as [number, number, number];
+                    newScale[index] = newValue;
+                    onUpdateEffectZone(zone?.id, { scale: newScale });
+                  }}
+                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  disabled={zone?.isLocked}
+                />
               </div>
-              <input
-                type="number"
-                step="0.1"
-                min="0.1"
-                value={roundToDecimals(value)}
-                onChange={(e) => {
-                  const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
-                  const newScale = [...zone?.scale] as [number, number, number];
-                  newScale[index] = newValue;
-                  onUpdateEffectZone(zone?.id, { scale: newScale });
-                }}
-                className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                disabled={zone?.isLocked}
-              />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -128,11 +128,12 @@ export function EffectTransformSection({
               scale: [1, 1, 1] 
             });
           }}
-          className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Resetear posición y tamaño a valores por defecto"
+          className="relative bg-black border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group flex items-center gap-2 flex-1 justify-center"
+          title="Resetear transformación a valores por defecto"
           disabled={zone?.isLocked}
         >
-          🔄 Reset
+          <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+          <span className="relative text-xs font-mono tracking-wider uppercase">RESET</span>
         </button>
         <button
           onClick={() => {
@@ -140,10 +141,11 @@ export function EffectTransformSection({
             const transformText = `Position: [${zone?.position.join(', ')}]\nRotation: [${zone?.rotation.join(', ')}]\nScale: [${zone?.scale.join(', ')}]`;
             navigator.clipboard.writeText(transformText);
           }}
-          className="px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
+          className="relative bg-black border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group flex items-center gap-2 flex-1 justify-center"
           title="Copiar valores al portapapeles"
         >
-          📋
+          <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+          <span className="relative text-xs font-mono tracking-wider uppercase">COPY</span>
         </button>
       </div>
     </div>

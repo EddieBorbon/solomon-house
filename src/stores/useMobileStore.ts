@@ -36,17 +36,14 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
       },
     };
 
-    console.log(`➕ Creando objeto móvil en posición:`, newMobileObject.position);
 
     set((state) => ({
       mobileObjects: [...state.mobileObjects, newMobileObject]
     }));
 
-    console.log(`🚀 Añadiendo objeto móvil en posición ${position}`);
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
-    console.log(`🔄 Store: Actualizando objeto móvil ${id} con:`, updates);
     
     set((state) => ({
       mobileObjects: state.mobileObjects.map(obj =>

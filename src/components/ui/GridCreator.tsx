@@ -17,7 +17,6 @@ export function GridCreator() {
     const [x, y, z] = baseCoordinates;
     let newCoordinates: [number, number, number];
     
-    console.log(`📐 Creando cuadrícula adyacente desde cuadrícula activa: ${baseCoordinates}`);
     
     switch (direction) {
       case 'north':
@@ -48,12 +47,10 @@ export function GridCreator() {
     ];
     
     createGrid(newPosition, gridSize);
-    console.log(`📐 Creando cuadrícula en coordenadas: ${newCoordinates}, posición 3D: ${newPosition}`);
   };
 
   const createGridAtCustomPosition = () => {
     createGrid(newGridPosition, newGridSize);
-    console.log(`📐 Creando cuadrícula personalizada en: ${newGridPosition} con tamaño ${newGridSize}`);
   };
 
   return (

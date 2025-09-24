@@ -138,11 +138,9 @@ export class SceneObjectFactory implements ISceneObjectRenderer {
           );
 
         default:
-          console.warn(`🎨 SceneObjectFactory: Tipo de objeto no soportado: ${object.type}`);
           return null;
       }
     } catch (error) {
-      console.error(`❌ SceneObjectFactory: Error renderizando objeto ${object.id}:`, error);
       return null;
     }
   }

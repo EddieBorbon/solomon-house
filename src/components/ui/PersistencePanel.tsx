@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { persistenceService } from '../../lib/persistenceService';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import type { FirebaseProject } from '../../lib/firebaseService';
 import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
@@ -18,6 +19,7 @@ export function PersistencePanel() {
 
   const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
   const { isConnected, isSyncing, lastSyncTime, error } = useRealtimeSync(currentProjectId);
+  const { t } = useLanguage();
 
   // Cargar proyectos al montar el componente
   useEffect(() => {
@@ -30,7 +32,6 @@ export function PersistencePanel() {
       const loadedProjects = await persistenceService.loadAllProjects();
       setProjects(loadedProjects);
     } catch (error) {
-      console.error('Error al cargar proyectos:', error);
     } finally {
       setIsLoading(false);
     }
@@ -55,9 +56,7 @@ export function PersistencePanel() {
       setProjectDescription('');
       await loadProjects(); // Recargar la lista de proyectos
       
-      console.log('✅ Proyecto guardado exitosamente');
     } catch (error) {
-      console.error('Error al guardar proyecto:', error);
       alert('Error al guardar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -71,9 +70,7 @@ export function PersistencePanel() {
       setCurrentProjectId(projectId);
       setShowLoadDialog(false);
       
-      console.log('✅ Proyecto cargado exitosamente');
     } catch (error) {
-      console.error('Error al cargar proyecto:', error);
       alert('Error al cargar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -93,9 +90,7 @@ export function PersistencePanel() {
       
       await loadProjects(); // Recargar la lista de proyectos
       
-      console.log('✅ Proyecto actualizado exitosamente');
     } catch (error) {
-      console.error('Error al actualizar proyecto:', error);
       alert('Error al actualizar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -116,9 +111,7 @@ export function PersistencePanel() {
         setCurrentProjectId(null);
       }
       
-      console.log('✅ Proyecto eliminado exitosamente');
     } catch (error) {
-      console.error('Error al eliminar proyecto:', error);
       alert('Error al eliminar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -150,7 +143,7 @@ export function PersistencePanel() {
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
             <CloudArrowUpIcon className="w-3 h-3" />
-            006_PERSISTENCIA
+            {t('controls.persistence')}
           </h3>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -159,7 +152,7 @@ export function PersistencePanel() {
           >
             <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
             <span className="relative text-xs font-mono tracking-wider">
-              {isExpanded ? "HIDE" : "SHOW"}
+                {isExpanded ? t('controls.hide') : t('controls.show')}
             </span>
           </button>
         </div>
@@ -169,8 +162,8 @@ export function PersistencePanel() {
           {/* Información compacta del estado actual */}
           <div className="p-2 border border-gray-600 text-xs text-gray-300 font-mono">
             <div className="space-y-1">
-              <p><span className="text-white">GRIDS:</span> {getGridCount()}</p>
-              <p><span className="text-white">OBJECTS:</span> {getObjectCount()}</p>
+              <p><span className="text-white">{t('controls.gridsCount')}</span> {getGridCount()}</p>
+              <p><span className="text-white">{t('controls.objectsCount')}</span> {getObjectCount()}</p>
               {currentProjectId && (
                 <div className="flex items-center gap-2 mt-1">
                   <div className={`w-1.5 h-1.5 rounded-full ${
@@ -194,7 +187,7 @@ export function PersistencePanel() {
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
                 <CloudArrowUpIcon className="w-3 h-3" />
-                <span>SAVE</span>
+                <span>{t('controls.save')}</span>
               </span>
             </button>
 
@@ -235,7 +228,7 @@ export function PersistencePanel() {
                 <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
-                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">SAVE_PROJECT</h3>
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">{t('controls.saveProject')}</h3>
                 
                 <div className="space-y-3">
                   <div>
@@ -269,7 +262,7 @@ export function PersistencePanel() {
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
                     <span className="relative text-xs font-mono tracking-wider">
-                      {isLoading ? 'SAVING...' : 'SAVE'}
+                      {isLoading ? t('controls.saving') : t('controls.save')}
                     </span>
                   </button>
                   <button
@@ -297,9 +290,9 @@ export function PersistencePanel() {
                 <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">LOAD_PROJECT</h3>
                 
                 {isLoading ? (
-                  <div className="text-center text-gray-400 font-mono tracking-wider">LOADING_PROJECTS...</div>
+                  <div className="text-center text-gray-400 font-mono tracking-wider">{t('controls.loadingProjects')}</div>
                 ) : projects.length === 0 ? (
-                  <div className="text-center text-gray-400 font-mono tracking-wider">NO_SAVED_PROJECTS</div>
+                  <div className="text-center text-gray-400 font-mono tracking-wider">{t('controls.noSavedProjects')}</div>
                 ) : (
                   <div className="space-y-2">
                     {projects.map((project) => (

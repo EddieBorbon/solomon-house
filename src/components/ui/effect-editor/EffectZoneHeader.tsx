@@ -5,18 +5,14 @@ import { type EffectZone } from '../../../state/useWorldStore';
 
 interface EffectZoneHeaderProps {
   zone: EffectZone;
-  isRefreshingEffects: boolean;
   onRemove: (id: string) => void;
   onToggleLock: (id: string) => void;
-  onRefresh: () => void;
 }
 
 export function EffectZoneHeader({
   zone,
-  isRefreshingEffects,
   onRemove,
-  onToggleLock,
-  onRefresh
+  onToggleLock
 }: EffectZoneHeaderProps) {
   return (
     <div className="mb-6 relative">
@@ -53,29 +49,26 @@ export function EffectZoneHeader({
               002_EFFECT_ZONE_EDITOR
             </h3>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={onRefresh}
-              disabled={isRefreshingEffects}
-              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:opacity-50 transition-all duration-300 group"
-              title="Actualizar efectos"
-            >
-              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-              <span className="relative text-xs font-mono tracking-wider">
-                {isRefreshingEffects ? 'SYNC' : 'REFRESH'}
-              </span>
-            </button>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => onToggleLock(zone.id)}
-              className={`relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group ${
+              className={`relative border border-white p-2 text-white hover:bg-white hover:text-black transition-all duration-300 group ${
                 zone.isLocked ? 'bg-white text-black' : ''
               }`}
               title={zone.isLocked ? "Desbloquear zona" : "Bloquear zona"}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-              <span className="relative text-xs font-mono tracking-wider">
-                {zone.isLocked ? 'LOCK' : 'UNLOCK'}
-              </span>
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                {zone.isLocked ? (
+                  <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM15.1 8H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                  </svg>
+                ) : (
+                  <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                )}
+              </div>
             </button>
             <button
               onClick={() => {
@@ -83,11 +76,15 @@ export function EffectZoneHeader({
                   onRemove(zone.id);
                 }
               }}
-              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
+              className="relative border border-white p-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
               title="Eliminar zona de efecto"
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-              <span className="relative text-xs font-mono tracking-wider">DELETE</span>
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+              </div>
             </button>
           </div>
         </div>

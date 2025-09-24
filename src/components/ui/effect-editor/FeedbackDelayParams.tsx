@@ -12,11 +12,47 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
   if (zone?.type !== 'feedbackDelay') return null;
 
   return (
-    <>
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        FEEDBACK_DELAY_PARAMETERS
+      </h4>
+
       {/* Delay Time */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Tiempo de Delay
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          DELAY_TIME
+        </label>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.01"
+            value={zone?.effectParams.delayTime ?? 0.3}
+            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
+            className="futuristic-slider flex-1"
+            disabled={zone?.isLocked}
+          />
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(Number(zone?.effectParams.delayTime) || 0.3).toFixed(2)}S
+          </span>
+        </div>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.10S</span>
+          <span>1.00S</span>
+        </div>
+      </div>
+
+      {/* Feedback */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          FEEDBACK
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -24,52 +60,20 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
             min="0"
             max="1"
             step="0.01"
-            value={typeof zone?.effectParams.delayTime === 'number' ? zone?.effectParams.delayTime : 0.25}
-            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {typeof zone?.effectParams.delayTime === 'number' ? zone?.effectParams.delayTime : '8n'}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0 s</span>
-          <span>1 s</span>
-        </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Retraso en segundos (puedes usar también valores musicales como '8n')
-        </p>
-      </div>
-
-      {/* Feedback */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Feedback
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="0.95"
-            step="0.01"
-            value={zone?.effectParams.feedback ?? 0.5}
+            value={zone?.effectParams.feedback ?? 0.2}
             onChange={(e) => onEffectParamChange('feedback', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.feedback ?? 0.5}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0</span>
-          <span>0.95</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0%</span>
+          <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Proporción de señal realimentada
-        </p>
       </div>
-    </>
+    </div>
   );
 }

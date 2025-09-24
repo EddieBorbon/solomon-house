@@ -48,7 +48,6 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
       return renderedObject;
     } catch (error) {
       this.renderStats.errors++;
-      console.error(`❌ SceneRenderer: Error renderizando objeto ${object.id}:`, error);
       return null;
     }
   }
@@ -73,17 +72,14 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
           }}
           onUpdatePosition={(id, position) => {
             // Esta función será manejada por el componente padre
-            console.log(`🔄 SceneRenderer: Actualizando posición de objeto móvil ${id}:`, position);
           }}
           onSelect={(id) => {
             // Esta función será manejada por el componente padre
-            console.log(`🎯 SceneRenderer: Seleccionando objeto móvil ${id}`);
           }}
         />
       );
     } catch (error) {
       this.renderStats.errors++;
-      console.error(`❌ SceneRenderer: Error renderizando objeto móvil ${object.id}:`, error);
       return null;
     }
   }
@@ -100,13 +96,11 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
           zone={zone as any} // Cast necesario por compatibilidad con el componente existente
           onSelect={(id) => {
             // Esta función será manejada por el componente padre
-            console.log(`🎯 SceneRenderer: Seleccionando zona de efecto ${id}`);
           }}
         />
       );
     } catch (error) {
       this.renderStats.errors++;
-      console.error(`❌ SceneRenderer: Error renderizando zona de efecto ${zone.id}:`, error);
       return null;
     }
   }

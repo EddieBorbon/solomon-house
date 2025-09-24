@@ -54,9 +54,7 @@ export class SpatialAudioManager {
     try {
       // Configurar el listener con valores iniciales
       this.updateListener(this.listenerState.position, this.listenerState.forward);
-      console.log(`🎧 SpatialAudioManager: Listener inicializado en posición [${this.listenerState.position.x}, ${this.listenerState.position.y}, ${this.listenerState.position.z}]`);
     } catch (error) {
-      console.error(`❌ SpatialAudioManager: Error al inicializar listener:`, error);
     }
   }
 
@@ -88,10 +86,8 @@ export class SpatialAudioManager {
       const currentPos = `${Math.round(position.x * 2) / 2},${Math.round(position.y * 2) / 2},${Math.round(position.z * 2) / 2}`;
       if (this.lastListenerPosition !== currentPos) {
         this.lastListenerPosition = currentPos;
-        console.log(`🎧 SpatialAudioManager: Listener actualizado a posición [${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}]`);
       }
     } catch (error) {
-      console.error(`❌ SpatialAudioManager: Error al actualizar listener:`, error);
     }
   }
 
@@ -110,7 +106,6 @@ export class SpatialAudioManager {
 
       const panner = new Tone.Panner3D(pannerConfig);
       
-      console.log(`🎧 SpatialAudioManager: Panner 3D creado en posición [${position.join(', ')}] con configuración:`, {
         panningModel: pannerConfig.panningModel,
         distanceModel: pannerConfig.distanceModel,
         refDistance: pannerConfig.refDistance,
@@ -120,7 +115,6 @@ export class SpatialAudioManager {
 
       return panner;
     } catch (error) {
-      console.error(`❌ SpatialAudioManager: Error al crear panner 3D:`, error);
       throw error;
     }
   }
@@ -131,9 +125,7 @@ export class SpatialAudioManager {
   public updatePannerPosition(panner: Tone.Panner3D, position: [number, number, number]): void {
     try {
       panner.setPosition(position[0], position[1], position[2]);
-      console.log(`📍 SpatialAudioManager: Panner actualizado a posición [${position.join(', ')}]`);
     } catch (error) {
-      console.error(`❌ SpatialAudioManager: Error al actualizar posición del panner:`, error);
     }
   }
 
@@ -230,7 +222,6 @@ export class SpatialAudioManager {
    */
   public updateSpatialConfig(config: Partial<SpatialAudioConfig>): void {
     this.spatialConfig = { ...this.spatialConfig, ...config };
-    console.log(`⚙️ SpatialAudioManager: Configuración espacial actualizada:`, this.spatialConfig);
   }
 
   /**
@@ -304,9 +295,7 @@ export class SpatialAudioManager {
     try {
       // Resetear el listener a posición neutral
       this.updateListener(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1));
-      console.log(`🧹 SpatialAudioManager: Limpieza completada`);
     } catch (error) {
-      console.error(`❌ SpatialAudioManager: Error durante la limpieza:`, error);
     }
   }
 }

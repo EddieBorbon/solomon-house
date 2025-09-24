@@ -12,11 +12,21 @@ export function FrequencyShifterParams({ zone, onEffectParamChange }: FrequencyS
   if (zone?.type !== 'frequencyShifter') return null;
 
   return (
-    <>
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        FREQUENCY_SHIFTER_PARAMETERS
+      </h4>
+
       {/* Frequency Shift */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Frecuencia de Shift (Hz)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          FREQUENCY_SHIFT
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -26,21 +36,18 @@ export function FrequencyShifterParams({ zone, onEffectParamChange }: FrequencyS
             step="1"
             value={zone?.effectParams.frequency ?? 0}
             onChange={(e) => onEffectParamChange('frequency', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.frequency ?? 0}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {zone?.effectParams.frequency ?? 0}HZ
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>-2000 Hz</span>
-          <span>2000 Hz</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>-2000HZ</span>
+          <span>2000HZ</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Desplaza todas las frecuencias por un valor fijo
-        </p>
       </div>
-    </>
+    </div>
   );
 }

@@ -39,9 +39,7 @@ export function useRealtimeSync(projectId: string | null) {
         lastSyncTime: new Date()
       }));
       
-      console.log('✅ Sincronización en tiempo real iniciada');
     } catch (error) {
-      console.error('❌ Error al iniciar sincronización:', error);
       setSyncState(prev => ({
         ...prev,
         isSyncing: false,
@@ -62,7 +60,6 @@ export function useRealtimeSync(projectId: string | null) {
         isSyncing: false
       }));
       
-      console.log('🛑 Sincronización en tiempo real detenida');
     }
   };
 
@@ -72,7 +69,6 @@ export function useRealtimeSync(projectId: string | null) {
 
     const now = Date.now();
     if (now - lastSyncRef.current < 5000) { // Evitar sincronizaciones muy frecuentes
-      console.log('⏳ Sincronización omitida - muy reciente');
       return;
     }
 
@@ -88,9 +84,7 @@ export function useRealtimeSync(projectId: string | null) {
         lastSyncTime: new Date()
       }));
       
-      console.log('📤 Cambios sincronizados con Firebase');
     } catch (error) {
-      console.error('❌ Error al sincronizar cambios:', error);
       setSyncState(prev => ({
         ...prev,
         isSyncing: false,

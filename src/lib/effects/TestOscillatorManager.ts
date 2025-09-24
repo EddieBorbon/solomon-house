@@ -13,7 +13,6 @@ export class TestOscillatorManager {
     config: TestOscillatorConfig
   ): void {
     try {
-      console.log(`🎛️ TestOscillatorManager: Creando oscilador de prueba para ${effectId}`);
       
       // Crear un oscilador de prueba optimizado para el tipo de efecto
       const testOsc = new Tone.Oscillator({
@@ -28,13 +27,11 @@ export class TestOscillatorManager {
       // Iniciar el oscilador
       testOsc.start();
       
-      console.log(`🎛️ TestOscillatorManager: Oscilador de prueba creado para ${effectNode.constructor.name} (${effectId}) - Frecuencia: ${config.frequency}Hz, Tipo: ${config.type}, Volumen: ${config.volume}dB`);
       
       // Almacenar el oscilador para poder limpiarlo después
       this.testOscillators.set(effectId, testOsc);
       
     } catch (error) {
-      console.error(`❌ TestOscillatorManager: Error al crear oscilador de prueba:`, error);
     }
   }
 
@@ -48,9 +45,7 @@ export class TestOscillatorManager {
         testOsc.stop();
         testOsc.disconnect();
         this.testOscillators.delete(effectId);
-        console.log(`🎛️ TestOscillatorManager: Oscilador de prueba ${effectId} eliminado`);
       } catch (error) {
-        console.error(`❌ TestOscillatorManager: Error al eliminar oscilador de prueba:`, error);
       }
     }
   }
@@ -76,9 +71,7 @@ export class TestOscillatorManager {
     this.testOscillators.forEach((testOsc, effectId) => {
       try {
         testOsc.stop();
-        console.log(`🎛️ TestOscillatorManager: Oscilador de prueba ${effectId} detenido`);
       } catch (error) {
-        console.error(`❌ TestOscillatorManager: Error al detener oscilador ${effectId}:`, error);
       }
     });
   }
@@ -90,7 +83,6 @@ export class TestOscillatorManager {
     this.testOscillators.forEach((testOsc, effectId) => {
       this.removeTestOscillator(effectId);
     });
-    console.log(`🎛️ TestOscillatorManager: Todos los osciladores de prueba eliminados`);
   }
 
   /**
@@ -101,9 +93,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.frequency.value = frequency;
-        console.log(`🎛️ TestOscillatorManager: Frecuencia del oscilador ${effectId} actualizada a ${frequency}Hz`);
       } catch (error) {
-        console.error(`❌ TestOscillatorManager: Error al actualizar frecuencia:`, error);
       }
     }
   }
@@ -116,9 +106,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.volume.value = volume;
-        console.log(`🎛️ TestOscillatorManager: Volumen del oscilador ${effectId} actualizado a ${volume}dB`);
       } catch (error) {
-        console.error(`❌ TestOscillatorManager: Error al actualizar volumen:`, error);
       }
     }
   }
@@ -131,9 +119,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.type = type;
-        console.log(`🎛️ TestOscillatorManager: Tipo de onda del oscilador ${effectId} actualizado a ${type}`);
       } catch (error) {
-        console.error(`❌ TestOscillatorManager: Error al actualizar tipo de onda:`, error);
       }
     }
   }

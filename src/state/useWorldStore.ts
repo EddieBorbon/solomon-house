@@ -234,6 +234,18 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 220,
         volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'sine', // Forma de onda de la portadora
+        color: '#000000', // Color negro por defecto
+        metalness: 0.3, // Material semi-metálico por defecto
+        roughness: 0.2, // Material liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 2.0, // Velocidad de pulsación moderada por defecto
+        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
+        rotationSpeed: 1.0, // Velocidad de rotación lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
         harmonicity: 1.5,
         modulationWaveform: 'square', // Forma de onda de la moduladora
         duration: 2.0, // Duración de 2 segundos para sonidos continuos
@@ -243,6 +255,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 300,
         volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'sine',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.2, // Material menos metálico por defecto
+        roughness: 0.15, // Material muy liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.95, // Opacidad muy alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 1.5, // Velocidad de pulsación lenta por defecto
+        pulseIntensity: 0.4, // Intensidad de pulsación alta por defecto
+        rotationSpeed: 0.8, // Velocidad de rotación muy lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.3, // Resplandor moderado por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         modulationWaveform: 'sine',
         harmonicity: 2, // Ratio de octava
         modulationIndex: 10, // Valor alto para un timbre rico y metálico
@@ -253,6 +282,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 220,
         volume: 0.6, // Volumen aumentado para mejor audibilidad
         waveform: 'triangle',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.4, // Material más metálico por defecto
+        roughness: 0.25, // Material semi-rugoso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.95, // Opacidad muy alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 2.5, // Velocidad de pulsación rápida por defecto
+        pulseIntensity: 0.2, // Intensidad de pulsación baja por defecto
+        rotationSpeed: 1.2, // Velocidad de rotación moderada por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.1, // Resplandor suave por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         waveform2: 'sine', // La segunda voz puede ser diferente
         harmonicity: 1.5,
         vibratoAmount: 0.2,
@@ -264,6 +310,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 50, // Frecuencia baja para un bombo
         volume: 0.6,   // Volumen aumentado para mejor audibilidad
         waveform: 'sine',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.3, // Material semi-metálico por defecto
+        roughness: 0.35, // Material rugoso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.95, // Opacidad muy alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 3.0, // Velocidad de pulsación muy rápida por defecto
+        pulseIntensity: 0.5, // Intensidad de pulsación alta por defecto
+        rotationSpeed: 0.5, // Velocidad de rotación muy lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.4, // Resplandor intenso por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         pitchDecay: 0.05,
         octaves: 10,
         duration: 0.5, // Duración corta para sonidos percusivos
@@ -273,6 +336,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 110,
         volume: 0.9,
         waveform: 'sawtooth',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.4, // Material metálico por defecto
+        roughness: 0.3, // Material semi-rugoso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 4.0, // Velocidad de pulsación muy rápida por defecto
+        pulseIntensity: 0.6, // Intensidad de pulsación muy alta por defecto
+        rotationSpeed: 2.0, // Velocidad de rotación rápida por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.5, // Resplandor intenso por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         // Envolvente de Amplitud (corta y percusiva)
         ampAttack: 0.01,
         ampDecay: 0.2,
@@ -292,6 +372,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 200,
         volume: 0.8,
         waveform: 'sine',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.9, // Material muy metálico por defecto
+        roughness: 0.05, // Material muy liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.95, // Opacidad muy alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 1.0, // Velocidad de pulsación muy lenta por defecto
+        pulseIntensity: 0.1, // Intensidad de pulsación muy baja por defecto
+        rotationSpeed: 0.3, // Velocidad de rotación muy lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.6, // Resplandor muy intenso por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         harmonicity: 5.1,
         modulationIndex: 32,
         resonance: 4000,
@@ -303,6 +400,18 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 0, // NoiseSynth no usa frecuencia
         volume: 0.7,
         waveform: 'sine', // No se usa en NoiseSynth pero es requerido por AudioParams
+        color: '#000000', // Color negro por defecto
+        metalness: 0.4, // Material semi-metálico por defecto
+        roughness: 0.25, // Material semi-liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 2.5, // Velocidad de pulsación rápida por defecto
+        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
+        rotationSpeed: 1.5, // Velocidad de rotación moderada por defecto
+        autoRotate: false, // Sin rotación automática por defecto
         noiseType: 'white',
         attack: 0.001,
         decay: 0.1,
@@ -314,6 +423,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 440,
         volume: 0.9,
         waveform: 'sine', // No se usa en PluckSynth pero es requerido por AudioParams
+        color: '#000000', // Color negro por defecto
+        metalness: 0.3, // Material semi-metálico por defecto
+        roughness: 0.4, // Material rugoso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 3.5, // Velocidad de pulsación muy rápida por defecto
+        pulseIntensity: 0.4, // Intensidad de pulsación alta por defecto
+        rotationSpeed: 1.8, // Velocidad de rotación rápida por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.3, // Resplandor moderado por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         attackNoise: 1,
         dampening: 4000,
         resonance: 0.9,
@@ -323,6 +449,23 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 220, // Frecuencia base A3 para transponer acordes
         volume: 0.7,
         waveform: 'sine',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.3, // Material semi-metálico por defecto
+        roughness: 0.1, // Material muy liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.95, // Opacidad muy alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 1.8, // Velocidad de pulsación moderada por defecto
+        pulseIntensity: 0.2, // Intensidad de pulsación baja por defecto
+        rotationSpeed: 0.7, // Velocidad de rotación lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
+        // Efectos de iluminación
+        glowIntensity: 0.4, // Resplandor intenso por defecto
+        glowColor: '#ffffff', // Resplandor blanco por defecto
+        shadowCasting: true, // Proyectar sombras por defecto
+        shadowReceiving: true, // Recibir sombras por defecto
         polyphony: 4,
         chord: ["C4", "E4", "G4", "B4"], // Un acorde de Cmaj7
         attack: 1.5, // Ataque lento
@@ -338,6 +481,13 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         attack: 0.1,
         release: 1.0,
         curve: 'exponential',
+        color: '#000000', // Color negro por defecto
+        metalness: 0.2, // Material menos metálico por defecto
+        roughness: 0.3, // Material semi-rugoso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
         notes: ["C4", "E4", "G4"], // Toca un acorde de C Mayor por defecto
         duration: 1,
         // Mapeo de samples
@@ -357,6 +507,18 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 330,
         waveform: 'sine',
         volume: 0.6, // Volumen aumentado para mejor audibilidad
+        color: '#000000', // Color negro por defecto
+        metalness: 0.3, // Material semi-metálico por defecto
+        roughness: 0.2, // Material liso por defecto
+        emissiveColor: '#000000', // Sin emisión por defecto
+        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
+        opacity: 0.9, // Opacidad alta por defecto
+        blendingMode: 'NormalBlending', // Modo normal por defecto
+        // Propiedades de animación
+        pulseSpeed: 2.0, // Velocidad de pulsación moderada por defecto
+        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
+        rotationSpeed: 1.0, // Velocidad de rotación lenta por defecto
+        autoRotate: false, // Sin rotación automática por defecto
       };
   }
 };
@@ -393,7 +555,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const activeGridId = state.activeGridId;
     
     if (!activeGridId) {
-      console.warn('No hay cuadrícula activa para crear objetos');
       return;
     }
 
@@ -412,9 +573,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         grids: new Map(state.grids.set(activeGridId, updatedGrid)),
       }));
 
-      console.log(`🎵 Objeto ${type} añadido a la cuadrícula ${activeGridId}`);
     } else {
-      console.error(`❌ Cuadrícula activa ${activeGridId} no encontrada`);
     }
   },
 
@@ -686,7 +845,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const activeGridId = state.activeGridId;
     
     if (!activeGridId) {
-      console.warn('No hay cuadrícula activa para crear zonas de efectos');
       return;
     }
 
@@ -705,7 +863,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         grids: new Map(state.grids.set(activeGridId, updatedGrid)),
       }));
 
-      console.log(`🎛️ Zona de efecto ${type} añadida a la cuadrícula ${activeGridId}`);
     }
   },
 
@@ -822,11 +979,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const state = get();
     const activeGridId = state.activeGridId;
     
-    console.log(`🚀 addMobileObject llamado - Cuadrícula activa: ${activeGridId}`);
-    console.log(`🚀 Cuadrículas disponibles:`, Array.from(state.grids.keys()));
     
     if (!activeGridId) {
-      console.warn('No hay cuadrícula activa para crear objetos móviles');
       return;
     }
 
@@ -854,12 +1008,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       },
     };
 
-    console.log(`➕ Creando objeto móvil en posición:`, newMobileObject.position);
 
     // Agregar objeto móvil a la cuadrícula activa
     const activeGrid = state.grids.get(activeGridId);
     if (activeGrid) {
-      console.log(`🚀 Cuadrícula activa encontrada:`, activeGrid);
       const updatedGrid = {
         ...activeGrid,
         mobileObjects: [...activeGrid.mobileObjects, newMobileObject]
@@ -868,19 +1020,14 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       set((state) => {
         const newGrids = new Map(state.grids);
         newGrids.set(activeGridId, updatedGrid);
-        console.log(`🚀 Actualizando grids - Cuadrícula ${activeGridId} actualizada:`, updatedGrid);
-        console.log(`🚀 Total de cuadrículas después de actualizar:`, newGrids.size);
         return { grids: newGrids };
       });
 
-      console.log(`🚀 Añadiendo objeto móvil en posición ${position} a la cuadrícula ${activeGridId}`);
     } else {
-      console.error(`❌ Cuadrícula activa ${activeGridId} no encontrada en el mapa de cuadrículas`);
     }
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
-    console.log(`🔄 Store: Actualizando objeto móvil ${id} con:`, updates);
     
     set((state) => {
       const newGrids = new Map(state.grids);
@@ -993,7 +1140,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acciones para manipulación de cuadrículas - Delegadas al useGridStore
   createGrid: (position: [number, number, number], size: number = 20) => {
-    console.log(`🎯 useWorldStore.createGrid llamado con posición:`, position, `y tamaño:`, size);
     useGridStore.getState().createGrid(position, size);
     
     // Sincronizar el estado local con el useGridStore
@@ -1005,7 +1151,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       gridSize: gridStoreState.gridSize
     }));
     
-    console.log(`🎯 Estado sincronizado después de createGrid`);
   },
 
   selectGrid: (gridId: string | null) => {
@@ -1045,7 +1190,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para establecer el proyecto actual
   setCurrentProjectId: (projectId: string | null) => {
     set({ currentProjectId: projectId });
-    console.log(`📡 Proyecto actual establecido: ${projectId || 'ninguno'}`);
   },
 
   rotateGrid: (gridId: string, rotation: [number, number, number]) => {
@@ -1069,14 +1213,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       currentWorldId: newWorld.id
     });
     
-    console.log(`🌍 Mundo creado: ${name} (ID: ${newWorld.id})`);
   },
 
   deleteWorld: (id: string) => {
     const state = get();
     
     if (id === 'default') {
-      console.warn('⚠️ No se puede eliminar el mundo por defecto');
       return;
     }
     
@@ -1088,7 +1230,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       currentWorldId: newCurrentWorldId
     });
     
-    console.log(`🗑️ Mundo eliminado: ${id}`);
   },
 
   switchWorld: (id: string) => {
@@ -1097,9 +1238,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     if (world) {
       set({ currentWorldId: id });
-      console.log(`🔄 Cambiando a mundo: ${world.name} (ID: ${id})`);
     } else {
-      console.warn(`⚠️ Mundo no encontrado: ${id}`);
     }
   },
 

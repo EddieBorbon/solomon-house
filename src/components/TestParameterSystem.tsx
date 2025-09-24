@@ -14,37 +14,29 @@ export function TestParameterSystem() {
   const handleGetFactoryStats = () => {
     const stats = parameterFactory.getFactoryStats();
     setFactoryStats(stats);
-    console.log('📊 Factory Stats:', stats);
   };
 
   const handleGetManagerStats = () => {
     const stats = parameterManager.getStats();
     setManagerStats(stats);
-    console.log('📊 Manager Stats:', stats);
   };
 
   const handleGetSupportedEffectTypes = () => {
     const types = parameterFactory.getSupportedEffectTypes();
-    console.log('🎛️ Supported Effect Types:', types);
   };
 
   const handleGetSupportedSoundObjectTypes = () => {
     const types = parameterFactory.getSupportedSoundObjectTypes();
-    console.log('🎵 Supported Sound Object Types:', types);
   };
 
   const handleGetEffectTypeInfo = () => {
     const reverbInfo = parameterFactory.getEffectTypeInfo('reverb');
     const chorusInfo = parameterFactory.getEffectTypeInfo('chorus');
-    console.log('📋 Reverb Info:', reverbInfo);
-    console.log('📋 Chorus Info:', chorusInfo);
   };
 
   const handleGetSoundObjectTypeInfo = () => {
     const cubeInfo = parameterFactory.getSoundObjectTypeInfo('cube');
     const sphereInfo = parameterFactory.getSoundObjectTypeInfo('sphere');
-    console.log('📋 Cube Info:', cubeInfo);
-    console.log('📋 Sphere Info:', sphereInfo);
   };
 
   const handleTestValidation = () => {
@@ -63,10 +55,6 @@ export function TestParameterSystem() {
       invalidCube: invalidCubeValidation
     });
     
-    console.log('✅ Reverb Validation:', reverbValidation);
-    console.log('❌ Invalid Reverb Validation:', invalidValidation);
-    console.log('✅ Cube Validation:', cubeValidation);
-    console.log('❌ Invalid Cube Validation:', invalidCubeValidation);
   };
 
   const handleTestParameterUpdate = () => {
@@ -75,7 +63,6 @@ export function TestParameterSystem() {
     parameterManager.updateParameter('test-entity-2', 'roomSize', 0.7);
     parameterManager.updateParameter('test-entity-3', 'volume', 0.8);
     
-    console.log('🔄 Parameter updates sent');
   };
 
   const handleTestEntityState = () => {
@@ -96,7 +83,6 @@ export function TestParameterSystem() {
       });
     }, 2000);
     
-    console.log('🔄 Entity state updated');
   };
 
   const handleGetParameterInfo = () => {
@@ -104,19 +90,14 @@ export function TestParameterSystem() {
     const cubeFrequency = parameterManager.getParameterInfo('soundObject', 'frequency');
     const mobileSpeed = parameterManager.getParameterInfo('mobileObject', 'speed');
     
-    console.log('📋 Reverb Room Size Info:', reverbRoomSize);
-    console.log('📋 Cube Frequency Info:', cubeFrequency);
-    console.log('📋 Mobile Speed Info:', mobileSpeed);
   };
 
   const handleGetDebugInfo = () => {
     const debugInfo = parameterManager.getDebugInfo();
-    console.log('🐛 Debug Info:', debugInfo);
   };
 
   const handleResetStats = () => {
     parameterManager.resetStats();
-    console.log('🔄 Manager stats reset');
   };
 
   const handleTestComponentCreation = () => {
@@ -146,8 +127,6 @@ export function TestParameterSystem() {
     const effectComponent = parameterFactory.createEffectComponent('reverb', testEffectZone as any);
     const soundComponent = parameterFactory.createSoundObjectComponent('cube', testSoundObject as any);
     
-    console.log('🎛️ Effect Component Created:', effectComponent);
-    console.log('🎵 Sound Component Created:', soundComponent);
   };
 
   return (

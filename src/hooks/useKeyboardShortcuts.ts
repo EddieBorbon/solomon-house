@@ -36,7 +36,6 @@ export function useKeyboardShortcuts() {
 
       // Log para debug de atajos de teclado
       if (['delete', 'backspace', 'escape', 'g', 'r', 's'].includes(event.key.toLowerCase())) {
-        console.log(`⌨️ Tecla presionada: ${event.key}`);
       }
 
       switch (event.key.toLowerCase()) {
@@ -67,7 +66,6 @@ export function useKeyboardShortcuts() {
             const soundObject = allObjects.objects.find(obj => obj.id === selectedEntityId);
             if (soundObject) {
               removeObject(selectedEntityId);
-              console.log(`🗑️ Objeto sonoro eliminado: ${selectedEntityId}`);
               return;
             }
             
@@ -75,7 +73,6 @@ export function useKeyboardShortcuts() {
             const effectZone = allObjects.effectZones.find(zone => zone.id === selectedEntityId);
             if (effectZone) {
               removeEffectZone(selectedEntityId);
-              console.log(`🗑️ Zona de efecto eliminada: ${selectedEntityId}`);
               return;
             }
             
@@ -83,11 +80,9 @@ export function useKeyboardShortcuts() {
             const mobileObject = allObjects.mobileObjects.find(obj => obj.id === selectedEntityId);
             if (mobileObject) {
               removeMobileObject(selectedEntityId);
-              console.log(`🗑️ Objeto móvil eliminado: ${selectedEntityId}`);
               return;
             }
             
-            console.log(`⚠️ No se pudo encontrar entidad con ID: ${selectedEntityId}`);
           }
           break;
         // Controles de cámara WASD - no interceptar, dejar que se manejen en useCameraControls

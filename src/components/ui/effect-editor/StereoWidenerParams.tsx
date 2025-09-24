@@ -12,64 +12,68 @@ export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidener
   if (zone?.type !== 'stereoWidener') return null;
 
   return (
-    <>
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        STEREO_WIDENER_PARAMETERS
+      </h4>
+
       {/* Width */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Width (Ancho Estéreo): {Math.round((zone?.effectParams.width ?? 0.5) * 100)}%
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          STEREO_WIDTH
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min="0"
-            max="1"
-            step="0.05"
-            value={zone?.effectParams.width ?? 0.5}
+            max="2"
+            step="0.01"
+            value={zone?.effectParams.width ?? 1}
             onChange={(e) => onEffectParamChange('width', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {Math.round((zone?.effectParams.width ?? 0.5) * 100)}%
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(zone?.effectParams.width ?? 1).toFixed(2)}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0% (Mono)</span>
-          <span>100% (Estéreo)</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.00</span>
+          <span>2.00</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Ancho del campo estéreo (0 = mono, 0.5 = sin cambio, 1 = estéreo máximo)
-        </p>
       </div>
 
-      {/* Wet */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Wet (Mezcla) ({Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%)
+      {/* Wet Mix */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          WET_MIX
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min="0"
             max="1"
-            step="0.05"
+            step="0.01"
             value={zone?.effectParams.wet ?? 0.5}
             onChange={(e) => onEffectParamChange('wet', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
             {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>0%</span>
           <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Mezcla entre señal seca y procesada
-        </p>
       </div>
-    </>
+    </div>
   );
 }

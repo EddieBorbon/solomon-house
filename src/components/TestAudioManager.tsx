@@ -63,9 +63,7 @@ export function TestAudioManager() {
   const handleUndoLastCommand = async () => {
     const success = await audioManager.undoLastCommand();
     if (success) {
-      console.log('✅ Comando deshecho exitosamente');
     } else {
-      console.warn('⚠️ No se pudo deshacer el comando');
     }
     
     // Actualizar historial y estadísticas
@@ -83,9 +81,7 @@ export function TestAudioManager() {
   const handleStartContext = async () => {
     const success = await audioManager.startContext();
     if (success) {
-      console.log('✅ Contexto de audio iniciado');
     } else {
-      console.warn('⚠️ Error iniciando contexto de audio');
     }
   };
 

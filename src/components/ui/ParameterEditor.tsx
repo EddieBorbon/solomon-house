@@ -15,20 +15,20 @@ import { AutoFilterParams } from './effect-editor/AutoFilterParams';
 import { AutoWahParams } from './effect-editor/AutoWahParams';
 import { BitCrusherParams } from './effect-editor/BitCrusherParams';
 import { ChebyshevParams } from './effect-editor/ChebyshevParams';
+import { ChorusParams } from './effect-editor/ChorusParams';
 import { DistortionParams } from './effect-editor/DistortionParams';
-import { FrequencyShifterParams } from './effect-editor/FrequencyShifterParams';
-import { JCReverbParams } from './effect-editor/JCReverbParams';
 import { FeedbackDelayParams } from './effect-editor/FeedbackDelayParams';
 import { FreeverbParams } from './effect-editor/FreeverbParams';
-import { StereoWidenerParams } from './effect-editor/StereoWidenerParams';
-import { ReverbParams } from './effect-editor/ReverbParams';
-import { TremoloParams } from './effect-editor/TremoloParams';
-import { VibratoParams } from './effect-editor/VibratoParams';
-import { ChorusParams } from './effect-editor/ChorusParams';
+import { FrequencyShifterParams } from './effect-editor/FrequencyShifterParams';
+import { JCReverbParams } from './effect-editor/JCReverbParams';
 import { PingPongDelayParams } from './effect-editor/PingPongDelayParams';
 import { PitchShiftParams } from './effect-editor/PitchShiftParams';
+import { ReverbParams } from './effect-editor/ReverbParams';
+import { StereoWidenerParams } from './effect-editor/StereoWidenerParams';
+import { TremoloParams } from './effect-editor/TremoloParams';
+import { VibratoParams } from './effect-editor/VibratoParams';
+import { PhaserParams } from './effect-editor/PhaserParams';
 import { EffectInfoSection } from './effect-editor/EffectInfoSection';
-import { EffectShapeSelector } from './effect-editor/EffectShapeSelector';
 import { EffectTransformSection } from './effect-editor/EffectTransformSection';
 import { SoundObjectHeader } from './sound-editor/SoundObjectHeader';
 import { SynthSpecificParameters } from './sound-editor/SynthSpecificParameters';
@@ -90,8 +90,6 @@ export function ParameterEditor() {
     canTransform
   } = useTransformHandler();
 
-  // Estado para mostrar cuando se están actualizando los parámetros
-  const [isRefreshingEffects, setIsRefreshingEffects] = React.useState(false);
 
   // Efecto para activar/desactivar el estado de edición de zona de efectos
   // NOTA: Este estado ya no bloquea OrbitControls, solo se usa para UI
@@ -287,18 +285,8 @@ export function ParameterEditor() {
           {/* Header con información de la zona de efecto */}
           <EffectZoneHeader
             zone={zone}
-            isRefreshingEffects={isRefreshingEffects}
             onRemove={removeEffectZone}
             onToggleLock={toggleLockEffectZone}
-            onRefresh={() => {
-              setIsRefreshingEffects(true);
-              refreshAllEffects();
-
-              // Ocultar estado después de un delay
-              setTimeout(() => {
-                setIsRefreshingEffects(false);
-              }, 1000);
-            }}
           />
 
 
@@ -317,15 +305,20 @@ export function ParameterEditor() {
               onEffectParamChange={handleEffectParamChange}
             />
 
-
-            {/* Parámetros específicos del AutoFilter */}
-            <AutoFilterParams
+            {/* Parámetros específicos del Phaser */}
+            <PhaserParams
               zone={zone}
               onEffectParamChange={handleEffectParamChange}
             />
 
             {/* Parámetros específicos del AutoWah */}
             <AutoWahParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del AutoFilter */}
+            <AutoFilterParams
               zone={zone}
               onEffectParamChange={handleEffectParamChange}
             />
@@ -343,13 +336,78 @@ export function ParameterEditor() {
             />
 
             {/* Parámetros específicos del Chorus */}
-            <ChorusParams 
+            <ChorusParams
               zone={zone}
               onEffectParamChange={handleEffectParamChange}
             />
 
-
             {/* Parámetros específicos del Distortion */}
+            <DistortionParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del FeedbackDelay */}
+            <FeedbackDelayParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del Freeverb */}
+            <FreeverbParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del FrequencyShifter */}
+            <FrequencyShifterParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del JCReverb */}
+            <JCReverbParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del PingPongDelay */}
+            <PingPongDelayParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del PitchShift */}
+            <PitchShiftParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del Reverb */}
+            <ReverbParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del StereoWidener */}
+            <StereoWidenerParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del Tremolo */}
+            <TremoloParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del Vibrato */}
+            <VibratoParams
+              zone={zone}
+              onEffectParamChange={handleEffectParamChange}
+            />
+
+            {/* Parámetros específicos del Distortion (original) */}
             <DistortionParams
               zone={zone}
               onEffectParamChange={handleEffectParamChange}
@@ -420,11 +478,6 @@ export function ParameterEditor() {
 
           </div>
 
-          {/* Selector de forma */}
-          <EffectShapeSelector
-            zone={zone}
-            onShapeChange={(shape) => updateEffectZone(zone?.id, { shape })}
-          />
 
           {/* Sección de Posición y Tamaño para Zonas de Efectos */}
           <EffectTransformSection

@@ -83,17 +83,18 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
         const pulseScale = 1 + energyRef.current * 0.3;
         meshRef.current.scale.setScalar(pulseScale);
         
-        // Cambiar el color basado en la energía (morado intenso a morado suave)
+        // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const purpleColor = new THREE.Color(0.5 + intensity * 0.3, 0.3 + intensity * 0.2, 0.9 + intensity * 0.1);
-        materialRef.current.color.copy(purpleColor);
+        const baseColor = new THREE.Color(audioParams.color || '#8b5cf6');
+        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(intensifiedColor);
         
         // Emisión intensa durante el clic
         materialRef.current.emissiveIntensity = intensity * 0.8;
       } else {
         // Resetear a valores por defecto
         meshRef.current.scale.setScalar(1);
-        materialRef.current.color.setHex(0x8b5cf6); // Morado por defecto
+        materialRef.current.color.setHex(parseInt(audioParams.color?.replace('#', '') || '000000', 16)); // Usar color del audioParams
         
         // Efectos de audio cuando no hay clic
         if (audioEnabled) {
@@ -119,6 +120,26 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
           materialRef.current.emissiveIntensity = 0;
         }
       }
+
+      // Solo ejecutar animaciones cuando el audio está activo o hay energía de clic
+      if (audioEnabled || energyRef.current > 0) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          meshRef.current.rotation.y += (rotationSpeed * 0.01);
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          meshRef.current.scale.setScalar(pulseScale);
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        meshRef.current.scale.setScalar(1);
+      }
     });
 
     return (
@@ -134,13 +155,18 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
         >
           <meshStandardMaterial
             ref={materialRef}
-            color="#8b5cf6" // Color morado base
-            metalness={0.2}
-            roughness={0.15}
+            color={audioParams.color || "#000000"} // Color negro base
+            metalness={audioParams.metalness || 0.2}
+            roughness={audioParams.roughness || 0.15}
             transparent
-            opacity={0.95}
-            emissive="#4c1d95"
-            emissiveIntensity={audioEnabled ? 0.3 : 0}
+            opacity={audioParams.opacity || 0.95}
+            emissive={audioParams.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams.emissiveIntensity || (audioEnabled ? 0.3 : 0)}
+            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+                     THREE.NormalBlending}
+            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.2}
           />
         </mesh>

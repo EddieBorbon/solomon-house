@@ -25,7 +25,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
   const triggerAttack = useCallback(async () => {
     try {
       if (!audioManager.isContextValid()) {
-        console.warn('Audio context not valid, starting context first...');
         await audioManager.startContext();
       }
 
@@ -57,7 +56,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       }, 2000); // 2 seconds default duration
 
     } catch (error) {
-      console.error('Error triggering attack:', error);
     }
   }, [objectId, params]);
 
@@ -66,7 +64,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       audioManager.stopSound(objectId);
       setIsPlaying(false);
     } catch (error) {
-      console.error('Error triggering release:', error);
     }
   }, [objectId]);
 
@@ -84,7 +81,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       // Update the sound source parameters
       audioManager.updateSoundParams(objectId, audioParams);
     } catch (error) {
-      console.error('Error updating params:', error);
     }
   }, [objectId]);
 
@@ -120,7 +116,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       audioManager.startContinuousSound(objectId, audioParams);
       setIsPlaying(true);
     } catch (error) {
-      console.error('Error starting continuous sound:', error);
     }
   }, [objectId, params]);
 
@@ -129,7 +124,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       audioManager.stopSound(objectId);
       setIsPlaying(false);
     } catch (error) {
-      console.error('Error stopping continuous sound:', error);
     }
   }, [objectId]);
 
@@ -139,7 +133,6 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
       try {
         audioManager.removeSoundSource(objectId);
       } catch (error) {
-        console.error('Error cleaning up sound source:', error);
       }
     };
   }, [objectId]);

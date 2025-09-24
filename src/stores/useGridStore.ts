@@ -64,7 +64,6 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
   // Acciones para cuadrículas
   moveToGrid: (coordinates: [number, number, number]) => {
-    console.log(`🗺️ GridStore: Moviendo a cuadrícula [${coordinates.join(', ')}]`);
     
     set((state) => ({
       currentGridCoordinates: coordinates,
@@ -119,7 +118,6 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula [${coordinates.join(', ')}] cargada`);
   },
 
   unloadGrid: (coordinates: [number, number, number]) => {
@@ -139,7 +137,6 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       return state;
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula [${coordinates.join(', ')}] descargada`);
   },
 
   getGridKey: (coordinates: [number, number, number]) => {
@@ -192,7 +189,6 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       grids: new Map(state.grids.set(gridId, newGrid))
     }));
 
-    console.log(`🗺️ GridStore: Nueva cuadrícula creada en [${coordinates.join(', ')}]`);
   },
 
   selectGrid: (gridId: string | null) => {
@@ -213,13 +209,11 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       return { grids: newGrids };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId || 'null'} seleccionada`);
   },
 
   updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => {
     set((state) => {
       if (!state.grids.has(gridId)) {
-        console.warn(`⚠️ GridStore: Cuadrícula ${gridId} no encontrada`);
         return state;
       }
 
@@ -231,7 +225,6 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} actualizada`);
   },
 
   deleteGrid: (gridId: string) => {
@@ -245,13 +238,11 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} eliminada`);
   },
 
   resizeGrid: (gridId: string, newSize: number) => {
     set((state) => {
       if (!state.grids.has(gridId)) {
-        console.warn(`⚠️ GridStore: Cuadrícula ${gridId} no encontrada`);
         return state;
       }
 
@@ -263,13 +254,11 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} redimensionada a ${newSize}`);
   },
 
   moveGrid: (gridId: string, position: [number, number, number]) => {
     set((state) => {
       if (!state.grids.has(gridId)) {
-        console.warn(`⚠️ GridStore: Cuadrícula ${gridId} no encontrada`);
         return state;
       }
 
@@ -281,13 +270,11 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} movida a [${position.join(', ')}]`);
   },
 
   rotateGrid: (gridId: string, rotation: [number, number, number]) => {
     set((state) => {
       if (!state.grids.has(gridId)) {
-        console.warn(`⚠️ GridStore: Cuadrícula ${gridId} no encontrada`);
         return state;
       }
 
@@ -299,13 +286,11 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} rotada a [${rotation.join(', ')}]`);
   },
 
   scaleGrid: (gridId: string, scale: [number, number, number]) => {
     set((state) => {
       if (!state.grids.has(gridId)) {
-        console.warn(`⚠️ GridStore: Cuadrícula ${gridId} no encontrada`);
         return state;
       }
 
@@ -317,12 +302,10 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       };
     });
 
-    console.log(`🗺️ GridStore: Cuadrícula ${gridId} escalada a [${scale.join(', ')}]`);
   },
 
   // Acciones para proyecto actual
   setActiveGrid: (gridId: string | null) => {
     set({ activeGridId: gridId });
-    console.log(`🗺️ GridStore: Cuadrícula activa establecida: ${gridId || 'null'}`);
   }
 }));

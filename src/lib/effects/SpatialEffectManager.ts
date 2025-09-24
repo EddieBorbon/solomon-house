@@ -15,7 +15,6 @@ export class SpatialEffectManager {
     position: [number, number, number]
   ): void {
     try {
-      console.log(`Creating spatial effect ${effectId} at [${position.join(', ')}]`);
       
       // Crear panner 3D independiente para el efecto
       const effectPanner = new Tone.Panner3D({
@@ -34,7 +33,6 @@ export class SpatialEffectManager {
       
       // Conectar efecto -> panner -> destination
       effectNode.chain(effectPanner, Tone.Destination);
-      console.log(`Effect connected to audio chain`);
       
       // Almacenar tanto el nodo del efecto como su panner y posición
       this.globalEffects.set(effectId, { 
@@ -42,14 +40,11 @@ export class SpatialEffectManager {
         panner: effectPanner, 
         position: position 
       });
-      console.log(`Effect stored. Total effects: ${this.globalEffects.size}`);
       
       // Configurar radio inicial para la zona de efectos
       this.setEffectZoneRadius(effectId, 2.0);
-      console.log(`Initial radius set for effect zone ${effectId}: 2.0`);
       
     } catch (error) {
-      console.error(`Error creating spatial effect:`, error);
     }
   }
 
@@ -59,7 +54,6 @@ export class SpatialEffectManager {
   public updateEffectPosition(effectId: string, position: [number, number, number]): void {
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
-      console.warn(`Spatial effect not found with ID ${effectId}`);
       return;
     }
 
@@ -75,9 +69,7 @@ export class SpatialEffectManager {
       effectData.position = position;
       this.globalEffects.set(effectId, effectData);
       
-      console.log(`Effect ${effectId} position updated to [${position.join(', ')}]`);
     } catch (error) {
-      console.error(`Error updating effect position:`, error);
     }
   }
 
@@ -86,7 +78,6 @@ export class SpatialEffectManager {
    */
   public setEffectZoneRadius(effectId: string, radius: number): void {
     this.effectZoneRadii.set(effectId, radius);
-    console.log(`Effect zone ${effectId} radius set to ${radius}`);
   }
 
   /**
@@ -139,7 +130,6 @@ export class SpatialEffectManager {
           (effectData.effectNode as any).wet.value = intensity;
         }
       } catch (error) {
-        console.warn(`Could not update effect intensity ${effectId}:`, error);
       }
     });
   }
@@ -174,9 +164,7 @@ export class SpatialEffectManager {
         this.effectZoneRadii.delete(effectId);
         this.lastEffectIntensities.delete(effectId);
         
-        console.log(`Spatial effect ${effectId} removed`);
       } catch (error) {
-        console.error(`Error removing spatial effect:`, error);
       }
     }
   }
@@ -192,9 +180,7 @@ export class SpatialEffectManager {
         effectData.panner.positionY.value = effectData.panner.positionY.value;
         effectData.panner.positionZ.value = effectData.panner.positionZ.value;
         
-        console.log(`Effect ${effectId} refreshed`);
       } catch (error) {
-        console.error(`Error refreshing effect ${effectId}:`, error);
       }
     });
   }
@@ -219,6 +205,5 @@ export class SpatialEffectManager {
     this.globalEffects.forEach((effectData, effectId) => {
       this.removeSpatialEffect(effectId);
     });
-    console.log(`All spatial effects cleared`);
   }
 }

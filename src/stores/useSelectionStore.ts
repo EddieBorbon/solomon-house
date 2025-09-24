@@ -35,7 +35,6 @@ export const useSelectionStore = create<SelectionState & SelectionActions>((set,
 
   // Acciones de selección
   selectEntity: (id: string | null) => {
-    console.log(`🎯 SelectionStore: Seleccionando entidad: ${id || 'null'}`);
     
     set((state) => ({
       selectedEntityId: id,
@@ -43,45 +42,37 @@ export const useSelectionStore = create<SelectionState & SelectionActions>((set,
       transformMode: id === null ? 'translate' : state.transformMode,
     }));
 
-    console.log(`🎯 SelectionStore: Entidad ${id || 'null'} seleccionada`);
   },
 
   clearSelection: () => {
-    console.log(`🧹 SelectionStore: Limpiando selección`);
     
     set({
       selectedEntityId: null,
       transformMode: 'translate',
     });
 
-    console.log(`🧹 SelectionStore: Selección limpiada`);
   },
 
   // Acciones de transformación
   setTransformMode: (mode: TransformMode) => {
-    console.log(`🔄 SelectionStore: Estableciendo modo de transformación: ${mode}`);
     
     set({ transformMode: mode });
 
-    console.log(`🔄 SelectionStore: Modo de transformación establecido: ${mode}`);
   },
 
   // Acciones de consulta
   getSelectedEntityId: () => {
     const selectedId = get().selectedEntityId;
-    console.log(`🔍 SelectionStore: ID de entidad seleccionada: ${selectedId || 'null'}`);
     return selectedId;
   },
 
   getTransformMode: () => {
     const mode = get().transformMode;
-    console.log(`🔍 SelectionStore: Modo de transformación: ${mode}`);
     return mode;
   },
 
   isEntitySelected: (id: string) => {
     const isSelected = get().selectedEntityId === id;
-    console.log(`🔍 SelectionStore: Entidad ${id} ${isSelected ? 'está seleccionada' : 'no está seleccionada'}`);
     return isSelected;
   }
 }));

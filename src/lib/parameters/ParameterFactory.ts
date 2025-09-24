@@ -47,7 +47,6 @@ export class ParameterValidatorFactory implements ParameterValidatorFactory {
       case 'Synth':
         return new BaseParameterValidator(this.config);
       default:
-        console.warn(`Unknown synth type: ${synthType}, using base validator`);
         return new BaseParameterValidator(this.config);
     }
   }
@@ -99,7 +98,6 @@ export class SynthUpdaterFactory implements SynthUpdaterFactory {
       case 'Synth':
         return new BaseSynthParameterUpdater(this.config);
       default:
-        console.warn(`Unknown synth type: ${synthType}, using base updater`);
         return new BaseSynthParameterUpdater(this.config);
     }
   }

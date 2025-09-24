@@ -12,11 +12,12 @@ interface SoundSpiralProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
+  audioEnabled: boolean;
   audioParams: AudioParams;
 }
 
 export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
@@ -75,6 +76,32 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
       // Actualizar tiempo del pulso
       if (isPlaying) {
         setPulseTime(prev => prev + delta);
+      }
+
+      // Solo ejecutar animaciones cuando el audio está activo o hay sonido reproduciéndose
+      if (audioEnabled || isPlaying) {
+        // Rotación automática
+        if (audioParams.autoRotate) {
+          const rotationSpeed = audioParams.rotationSpeed || 1.0;
+          if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
+            ref.current.rotation.y += (rotationSpeed * 0.01);
+          }
+        }
+        
+        // Efecto de pulsación basado en pulseSpeed y pulseIntensity
+        if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          const pulseSpeed = audioParams.pulseSpeed || 2.0;
+          const pulseIntensity = audioParams.pulseIntensity || 0.3;
+          const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
+          if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
+            ref.current.scale.setScalar(pulseScale);
+          }
+        }
+      } else {
+        // Resetear escala cuando no hay audio
+        if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
+          ref.current.scale.setScalar(1);
+        }
       }
     });
 
@@ -138,9 +165,9 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
           <mesh position={[0, 0, 0]}>
             <sphereGeometry args={[2.5, 16, 16]} />
             <meshBasicMaterial
-              color="#00ffff"
+              color={audioParams.color || "#000000"}
               transparent
-              opacity={0.1}
+              opacity={audioParams.opacity || 0.9}
               wireframe
             />
           </mesh>
@@ -163,7 +190,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
                 >
                   <sphereGeometry args={[0.05, 8, 8]} />
                   <meshBasicMaterial
-                    color="#00ffff"
+                    color={audioParams.color || "#000000"}
                     transparent
                     opacity={1 - pulseTime}
                   />

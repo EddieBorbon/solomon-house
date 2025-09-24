@@ -43,11 +43,9 @@ export class ParameterManagerNew {
       
       if (!validationResult.isValid) {
         result.errors.push(...validationResult.errors);
-        console.warn(`Parameter validation failed:`, validationResult.errors);
       }
 
       if (validationResult.warnings.length > 0) {
-        console.warn(`Parameter validation warnings:`, validationResult.warnings);
       }
 
       // Usar parámetros sanitizados para la actualización
@@ -61,12 +59,10 @@ export class ParameterManagerNew {
       result.updatedParams.push(...updateResult.updatedParams);
       result.errors.push(...updateResult.errors);
 
-      console.log(`ParameterManagerNew: Updated ${result.updatedParams.length} parameters for ${synthType}`);
       
     } catch (error) {
       result.success = false;
       result.errors.push(`General error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      console.error(`ParameterManagerNew: Error updating parameters:`, error);
     }
 
     return result;
@@ -99,7 +95,6 @@ export class ParameterManagerNew {
     } else if (synth instanceof Tone.Synth) {
       return 'Synth';
     } else {
-      console.warn(`Unknown synthesizer type:`, synth.constructor.name);
       return 'Synth'; // Fallback
     }
   }
@@ -155,7 +150,6 @@ export class ParameterManagerNew {
     this.config = { ...this.config, ...newConfig };
     // Recrear el factory con la nueva configuración
     this.parameterFactory = new ParameterFactory(this.config);
-    console.log(`ParameterManagerNew: Configuration updated`);
   }
 
   /**
@@ -196,6 +190,5 @@ export class ParameterManagerNew {
   public reset(): void {
     this.config = { ...DEFAULT_PARAMETER_CONFIG };
     this.parameterFactory = new ParameterFactory(this.config);
-    console.log(`ParameterManagerNew: Manager reset to default configuration`);
   }
 }

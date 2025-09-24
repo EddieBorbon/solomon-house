@@ -8,6 +8,20 @@ export interface AudioParams {
   frequency: number;
   waveform: OscillatorType;
   volume: number;
+  color?: string; // Color del objeto sonoro en formato hexadecimal
+  // Propiedades visuales del material
+  metalness?: number; // Qué tan metálico se ve el objeto (0-1)
+  roughness?: number; // Qué tan rugoso/liso es el objeto (0-1)
+  emissiveColor?: string; // Color que emite luz propia
+  emissiveIntensity?: number; // Intensidad de la luz emitida (0-1)
+  // Propiedades de transparencia
+  opacity?: number; // Transparencia del objeto (0-1)
+  blendingMode?: 'NormalBlending' | 'AdditiveBlending' | 'SubtractiveBlending' | 'MultiplyBlending'; // Modo de mezcla de Three.js
+  // Propiedades de animación
+  pulseSpeed?: number; // Velocidad de pulsación cuando suena (0-10)
+  pulseIntensity?: number; // Intensidad de la pulsación (0-1)
+  rotationSpeed?: number; // Velocidad de rotación automática (0-10)
+  autoRotate?: boolean; // Activar/desactivar rotación automática
   harmonicity?: number;
   modulationWaveform?: OscillatorType;
   modulationIndex?: number;
@@ -68,7 +82,6 @@ export class SoundSourceFactory {
   ): SoundSource {
     // Verificar si ya existe una fuente con este ID
     if (id) {
-      console.log(`🎵 SoundSourceFactory: Creando fuente de sonido ${id} de tipo ${type}`);
     }
 
     try {
@@ -88,7 +101,6 @@ export class SoundSourceFactory {
         effectSends,
       };
     } catch (error) {
-      console.error(`❌ SoundSourceFactory: Error al crear fuente de sonido:`, error);
       throw error;
     }
   }

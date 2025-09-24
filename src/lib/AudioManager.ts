@@ -59,7 +59,6 @@ export class AudioManager {
         this.soundSources.forEach((source, sourceId) => {
         this.addEffectSendToSource(sourceId, effectId, effectData.effectNode.input.input);
         });
-        console.log(`🎛️ AudioManager: Sends creados para ${this.soundSources.size} fuentes de sonido`);
     }
   }
 
@@ -70,7 +69,6 @@ export class AudioManager {
     try {
       const source = this.soundSources.get(sourceId);
       if (!source) {
-        console.warn(`⚠️ AudioManager: No se encontró fuente de sonido ${sourceId} para crear send de efecto`);
         return;
       }
 
@@ -82,9 +80,7 @@ export class AudioManager {
       source.synth.connect(send);
       send.connect(effectNode);
       
-      console.log(`🎛️ AudioManager: Send de efecto ${effectId} creado para fuente ${sourceId}`);
     } catch {
-      console.error(`❌ AudioManager: Error al crear send de efecto`);
     }
   }
 
@@ -206,7 +202,6 @@ export class AudioManager {
         this.lastSendAmounts.set(key, currentSendAmount);
       }
     } catch {
-      console.error(`❌ AudioManager: Error al establecer send amount`);
     }
   }
 
@@ -220,7 +215,6 @@ export class AudioManager {
       this.effectManager.cleanup();
       this.soundSources.clear();
     } catch {
-      console.error(`❌ AudioManager: Error en emergency cleanup`);
     }
   }
 
@@ -245,7 +239,6 @@ export class AudioManager {
       // Limpiar el Map de send amounts
       this.lastSendAmounts.clear();
     } catch {
-      console.error(`❌ AudioManager: Error en cleanup`);
     }
   }
 
@@ -279,7 +272,6 @@ export class AudioManager {
       this.soundSources.set(id, soundSource);
       this.updateSoundEffectMixing(id, position);
     } catch {
-      console.error(`❌ AudioManager: Error al crear fuente de sonido`);
     }
   }
 
@@ -320,7 +312,6 @@ export class AudioManager {
       this.soundSources.delete(id);
       this.soundPlaybackManager.removePlaybackState(id);
     } catch {
-      console.error(`❌ AudioManager: Error al eliminar fuente de sonido`);
     }
   }
 
@@ -481,7 +472,6 @@ export class AudioManager {
       // Actualizar la mezcla de efectos basada en la nueva posición
       this.updateSoundEffectMixing(id, position);
     } catch {
-      console.error(`❌ AudioManager: Error al actualizar posición de sonido`);
     }
   }
 
@@ -537,7 +527,6 @@ export class AudioManager {
         }
       });
     } catch {
-      console.error(`❌ AudioManager: Error al actualizar mezcla de efectos`);
     }
   }
 
@@ -736,23 +725,16 @@ export class AudioManager {
   public debugAudioChain(soundId: string): void {
     const source = this.soundSources.get(soundId);
     if (!source) {
-      console.log(`❌ Debug: No se encontró fuente de sonido ${soundId}`);
       return;
     }
 
-    console.log(`🔍 DEBUG COMPLETO - Fuente de sonido ${soundId}:`);
-    console.log(`📍 Posición del panner: [${source.panner.positionX.value}, ${source.panner.positionY.value}, ${source.panner.positionZ.value}]`);
-    console.log(`🔊 Dry Gain: ${source.dryGain.gain.value}`);
-    console.log(`🎛️ Effect Sends: ${source.effectSends.size}`);
     
     source.effectSends.forEach((send, effectId) => {
-      console.log(`  └─ Send ${effectId}: Gain = ${send.gain.value}`);
     });
 
     // Verificar efectos globales
     const globalEffects = this.effectManager.getAllGlobalEffects();
     globalEffects.forEach((effectData, effectId) => {
-      console.log(`🎛️ Efecto ${effectId}:`, {
         tipo: effectData.effectNode.constructor.name,
         posicion: effectData.position,
         radio: this.getEffectZoneRadius(effectId)

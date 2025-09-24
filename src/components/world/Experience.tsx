@@ -39,7 +39,6 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
       // Actualizar el listener de audio con la nueva posición y orientación
       audioManager.updateListener(position, forwardVector.current);
     } catch (error) {
-      console.error('❌ Error al actualizar listener de audio:', error);
     }
   });
 
@@ -50,7 +49,6 @@ export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { currentProjectId } = useWorldStore();
   
-  console.log('🎬 Experience component rendering...');
 
   return (
     <div className="w-full h-screen">

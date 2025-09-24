@@ -22,7 +22,6 @@ export const useWorldStoreNew = create<MainWorldState & WorldActions>((set, get)
   // Acciones de proyecto
   setCurrentProjectId: (projectId: string | null) => {
     set({ currentProjectId: projectId });
-    console.log(`📡 Proyecto actual establecido: ${projectId || 'ninguno'}`);
   },
 
   // Acciones de mundos
@@ -38,14 +37,12 @@ export const useWorldStoreNew = create<MainWorldState & WorldActions>((set, get)
       currentWorldId: newWorld.id
     });
     
-    console.log(`🌍 Mundo creado: ${name} (ID: ${newWorld.id})`);
   },
 
   deleteWorld: (id: string) => {
     const state = get();
     
     if (id === 'default') {
-      console.warn('⚠️ No se puede eliminar el mundo por defecto');
       return;
     }
     
@@ -57,7 +54,6 @@ export const useWorldStoreNew = create<MainWorldState & WorldActions>((set, get)
       currentWorldId: newCurrentWorldId
     });
     
-    console.log(`🗑️ Mundo eliminado: ${id}`);
   },
 
   switchWorld: (id: string) => {
@@ -66,9 +62,7 @@ export const useWorldStoreNew = create<MainWorldState & WorldActions>((set, get)
     
     if (world) {
       set({ currentWorldId: id });
-      console.log(`🔄 Cambiando a mundo: ${world.name} (ID: ${id})`);
     } else {
-      console.warn(`⚠️ Mundo no encontrado: ${id}`);
     }
   },
 
@@ -156,15 +150,12 @@ export const useWorldStoreNew = create<MainWorldState & WorldActions>((set, get)
   // Implementación de EntityActions para compatibilidad
   add: (entity) => {
     // Esta función necesitará ser más específica según el tipo de entidad
-    console.warn('⚠️ Usar métodos específicos como addObject, addMobileObject, addEffectZone');
   },
   update: (id, updates) => {
     // Esta función necesitará ser más específica según el tipo de entidad
-    console.warn('⚠️ Usar métodos específicos como updateObject, updateMobileObject, updateEffectZone');
   },
   remove: (id) => {
     // Esta función necesitará ser más específica según el tipo de entidad
-    console.warn('⚠️ Usar métodos específicos como removeObject, removeMobileObject, removeEffectZone');
   },
   select: (id) => {
     get().selectEntity(id);

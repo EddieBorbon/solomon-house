@@ -18,7 +18,6 @@ export function TestAllStores() {
   const worldStore = useWorldStore();
 
   const handleTestGridOperations = () => {
-    console.log('🧪 Testing Grid Operations...');
     
     // Crear una cuadrícula
     worldStore.createGrid([0, 0, 0], 20);
@@ -29,11 +28,9 @@ export function TestAllStores() {
       worldStore.selectGrid(grids[0].id);
     }
     
-    console.log('✅ Grid operations completed');
   };
 
   const handleTestObjectOperations = () => {
-    console.log('🧪 Testing Object Operations...');
     
     // Crear un objeto
     worldStore.addObject('cube', [0, 0, 0]);
@@ -44,11 +41,9 @@ export function TestAllStores() {
       worldStore.selectEntity(objects[0].id);
     }
     
-    console.log('✅ Object operations completed');
   };
 
   const handleTestEffectOperations = () => {
-    console.log('🧪 Testing Effect Operations...');
     
     // Crear una zona de efecto
     worldStore.addEffectZone('reverb', [0, 0, 0], 'sphere');
@@ -59,11 +54,9 @@ export function TestAllStores() {
       worldStore.selectEntity(effects[0].id);
     }
     
-    console.log('✅ Effect operations completed');
   };
 
   const handleTestSelectionOperations = () => {
-    console.log('🧪 Testing Selection Operations...');
     
     // Cambiar modo de transformación
     worldStore.setTransformMode('rotate');
@@ -71,29 +64,24 @@ export function TestAllStores() {
     // Limpiar selección
     worldStore.selectEntity(null);
     
-    console.log('✅ Selection operations completed');
   };
 
   const handleTestAllOperations = () => {
-    console.log('🧪 Testing All Operations...');
     
     handleTestGridOperations();
     setTimeout(() => handleTestObjectOperations(), 100);
     setTimeout(() => handleTestEffectOperations(), 200);
     setTimeout(() => handleTestSelectionOperations(), 300);
     
-    console.log('✅ All operations completed');
   };
 
   const handleClearAll = () => {
-    console.log('🧹 Clearing all stores...');
     
     // Limpiar todos los stores
     objectStore.clearAllObjects();
     effectStore.clearAllEffectZones();
     selectionStore.clearSelection();
     
-    console.log('✅ All stores cleared');
   };
 
   return (

@@ -55,7 +55,6 @@ export class AudioStateManager implements IAudioStateManager {
     // Notificar a los suscriptores
     this.notifySubscribers();
 
-    console.log(`📊 AudioStateManager: Estado actualizado - Fuentes: ${this.state.soundSources.size}, Efectos: ${this.state.globalEffects.size}`);
   }
 
   /**
@@ -77,7 +76,6 @@ export class AudioStateManager implements IAudioStateManager {
    * Resetea el estado a los valores iniciales
    */
   reset(): void {
-    console.log(`🔄 AudioStateManager: Reseteando estado del sistema`);
     
     this.addToHistory(this.state);
     
@@ -105,14 +103,12 @@ export class AudioStateManager implements IAudioStateManager {
    */
   restoreFromHistory(index: number): boolean {
     if (index < 0 || index >= this.stateHistory.length) {
-      console.warn(`⚠️ AudioStateManager: Índice de historial inválido: ${index}`);
       return false;
     }
 
     const previousState = this.stateHistory[index];
     this.updateState(previousState);
     
-    console.log(`🔄 AudioStateManager: Estado restaurado desde historial índice ${index}`);
     return true;
   }
 
@@ -161,7 +157,6 @@ export class AudioStateManager implements IAudioStateManager {
    */
   clearHistory(): void {
     this.stateHistory = [];
-    console.log(`🧹 AudioStateManager: Historial de estados limpiado`);
   }
 
   /**
@@ -224,7 +219,6 @@ export class AudioStateManager implements IAudioStateManager {
       try {
         callback(currentState);
       } catch (error) {
-        console.error(`❌ AudioStateManager: Error notificando suscriptor:`, error);
       }
     });
   }

@@ -13,9 +13,15 @@ export function EffectShapeSelector({
   onShapeChange
 }: EffectShapeSelectorProps) {
   return (
-    <div className="mt-4 space-y-3">
-      <h4 className="text-xs font-semibold text-purple-400 mb-2 flex items-center gap-2">
-        🔷 Cambiar Forma
+    <div className="relative border border-white p-4 mb-4">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label text-white text-xs mb-3 text-center">
+        SHAPE_SELECTOR
       </h4>
       <div className="grid grid-cols-2 gap-2">
         {(['sphere', 'cube'] as const).map((shape) => (
@@ -23,15 +29,15 @@ export function EffectShapeSelector({
             key={shape}
             onClick={() => onShapeChange(shape)}
             disabled={zone?.isLocked}
-            className={`px-2 py-1 text-xs rounded-md transition-colors ${
+            className={`px-2 py-1 text-xs rounded-md transition-colors font-mono tracking-wider ${
               zone?.shape === shape
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                ? 'bg-white text-black'
+                : 'bg-black text-white border border-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed'
             }`}
           >
             {shape === 'sphere' && '🔵'}
             {shape === 'cube' && '🟦'}
-            <span className="ml-1 capitalize">{shape}</span>
+            <span className="ml-1 uppercase">{shape}</span>
           </button>
         ))}
       </div>

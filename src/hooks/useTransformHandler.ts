@@ -52,21 +52,18 @@ export function useTransformHandler() {
     value: number
   ) => {
     if (!hasSelection) {
-      console.warn('🎯 TransformHandler: No hay entidad seleccionada');
       return;
     }
 
     if (isSoundObject) {
       const soundObject = getSoundObject();
       if (!soundObject) {
-        console.warn('🎯 TransformHandler: No se pudo obtener objeto sonoro');
         return;
       }
 
       const newValues = [...soundObject[property]] as [number, number, number];
       newValues[axis] = value;
 
-      console.log(`🎯 TransformHandler: Actualizando ${property}[${axis}] de objeto sonoro a:`, value);
       
       updateObject(soundObject.id, {
         [property]: newValues
@@ -74,20 +71,17 @@ export function useTransformHandler() {
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (!effectZone) {
-        console.warn('🎯 TransformHandler: No se pudo obtener zona de efecto');
         return;
       }
 
       const newValues = [...effectZone[property]] as [number, number, number];
       newValues[axis] = value;
 
-      console.log(`🎯 TransformHandler: Actualizando ${property}[${axis}] de zona de efecto a:`, value);
       
       updateEffectZone(effectZone.id, {
         [property]: newValues
       });
     } else {
-      console.warn('🎯 TransformHandler: Tipo de entidad no soportado para transformaciones');
     }
   }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
 
@@ -96,23 +90,19 @@ export function useTransformHandler() {
    */
   const resetTransform = useCallback(() => {
     if (!hasSelection) {
-      console.warn('🎯 TransformHandler: No hay entidad seleccionada para resetear');
       return;
     }
 
-    console.log('🎯 TransformHandler: Reseteando transformaciones a valores por defecto');
 
     if (isSoundObject) {
       const soundObject = getSoundObject();
       if (soundObject) {
         updateObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
-        console.log('🎯 TransformHandler: Transformaciones de objeto sonoro reseteadas');
       }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (effectZone) {
         updateEffectZone(effectZone.id, DEFAULT_TRANSFORM_VALUES);
-        console.log('🎯 TransformHandler: Transformaciones de zona de efecto reseteadas');
       }
     }
   }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
@@ -127,11 +117,9 @@ export function useTransformHandler() {
     values: [number, number, number]
   ) => {
     if (!hasSelection) {
-      console.warn('🎯 TransformHandler: No hay entidad seleccionada');
       return;
     }
 
-    console.log(`🎯 TransformHandler: Estableciendo ${property} completo a:`, values);
 
     if (isSoundObject) {
       const soundObject = getSoundObject();

@@ -99,7 +99,6 @@ export function SamplerParameters({
                 const urls = JSON.parse(e.target.value);
                 onParamChange('urls', urls);
               } catch (error) {
-                console.error('Error parsing URLs:', error);
               }
             }}
             className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none transition-colors h-20 resize-none"

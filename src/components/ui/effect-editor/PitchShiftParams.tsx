@@ -12,69 +12,99 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
   if (zone?.type !== 'pitchShift') return null;
 
   return (
-    <>
-      {/* Pitch */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Pitch (Semi-tonos): {zone?.effectParams.pitchShift ?? 0}
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        PITCH_SHIFT_PARAMETERS
+      </h4>
+
+      {/* Pitch Shift */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          PITCH_SHIFT
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="-24"
-            max="24"
-            step="1"
+            min="-12"
+            max="12"
+            step="0.1"
             value={zone?.effectParams.pitchShift ?? 0}
             onChange={(e) => onEffectParamChange('pitchShift', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.pitchShift ?? 0}
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(zone?.effectParams.pitchShift ?? 0).toFixed(1)}ST
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>-24 (2 octavas abajo)</span>
-          <span>+24 (2 octavas arriba)</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>-12.0ST</span>
+          <span>12.0ST</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Intervalo de transposición en semi-tonos
-        </p>
       </div>
 
       {/* Window Size */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Window Size ({zone?.effectParams.windowSize ?? 0.1}s)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          WINDOW_SIZE
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0.03"
+            min="0.01"
             max="0.1"
-            step="0.01"
-            value={zone?.effectParams.windowSize ?? 0.1}
+            step="0.001"
+            value={zone?.effectParams.windowSize ?? 0.02}
             onChange={(e) => onEffectParamChange('windowSize', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.windowSize ?? 0.1}s
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(zone?.effectParams.windowSize ?? 0.02).toFixed(3)}S
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0.03s</span>
-          <span>0.1s</span>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.010S</span>
+          <span>0.100S</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Tamaño de ventana para el pitch shifting (menor = menos delay, mayor = más suave)
-        </p>
       </div>
 
       {/* Delay Time */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Delay Time ({zone?.effectParams.delayTime ?? 0}s)
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          DELAY_TIME
+        </label>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min="0"
+            max="0.1"
+            step="0.001"
+            value={zone?.effectParams.delayTime ?? 0}
+            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
+            className="futuristic-slider flex-1"
+            disabled={zone?.isLocked}
+          />
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
+            {(Number(zone?.effectParams.delayTime) || 0).toFixed(3)}S
+          </span>
+        </div>
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
+          <span>0.000S</span>
+          <span>0.100S</span>
+        </div>
+      </div>
+
+      {/* Feedback */}
+      <div className="mb-4">
+        <label className="futuristic-label block mb-1 text-white text-xs">
+          FEEDBACK
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -82,52 +112,20 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
             min="0"
             max="1"
             step="0.01"
-            value={zone?.effectParams.delayTime ?? 0}
-            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
-            {zone?.effectParams.delayTime ?? 0}s
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>0s</span>
-          <span>1s</span>
-        </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Tiempo de delay en la señal de entrada
-        </p>
-      </div>
-
-      {/* Feedback */}
-      <div>
-        <label className="block text-xs font-medium text-gray-300 mb-1">
-          Feedback ({(zone?.effectParams.feedback ?? 0) * 100}%)
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="0.9"
-            step="0.05"
             value={zone?.effectParams.feedback ?? 0}
             onChange={(e) => onEffectParamChange('feedback', Number(e.target.value))}
-            className="flex-1 h-1.5 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg appearance-none cursor-pointer slider-thumb-neon"
+            className="futuristic-slider flex-1"
             disabled={zone?.isLocked}
           />
-          <span className="text-white font-mono text-xs min-w-[3rem] text-right">
+          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
             {Math.round((zone?.effectParams.feedback ?? 0) * 100)}%
           </span>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>0%</span>
-          <span>90%</span>
+          <span>100%</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          Cantidad de señal que se retroalimenta
-        </p>
       </div>
-    </>
+    </div>
   );
 }

@@ -33,12 +33,10 @@ export function TestParameterManager() {
 
   const handleGetSupportedParams = () => {
     const params = parameterManager.getSupportedParams(selectedSynthType);
-    console.log(`Supported params for ${selectedSynthType}:`, params);
   };
 
   const handleGetSynthInfo = () => {
     const info = parameterManager.getSynthTypeInfo(selectedSynthType);
-    console.log(`Synth info for ${selectedSynthType}:`, info);
   };
 
   const handleUpdateConfig = () => {
@@ -51,12 +49,10 @@ export function TestParameterManager() {
       }
     };
     parameterManager.updateConfig(newConfig);
-    console.log('Configuration updated');
   };
 
   const handleReset = () => {
     parameterManager.reset();
-    console.log('Manager reset');
   };
 
   return (
