@@ -609,6 +609,10 @@ export class ParameterManager {
         synth.envelope.sustain = params.sustain;
         result.updatedParams.push('sustain');
       }
+      if (params.release !== undefined) {
+        synth.envelope.release = params.release;
+        result.updatedParams.push('release');
+      }
     } catch (error) {
       result.errors.push(`NoiseSynth params: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

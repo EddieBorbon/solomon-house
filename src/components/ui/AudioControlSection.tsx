@@ -114,6 +114,33 @@ export function AudioControlSection({ selectedObject, onRemove }: AudioControlSe
               POLYPHONIC_PERCUSSIVE_SAMPLER
             </p>
           </div>
+        ) : selectedObject.type === 'cone' ? (
+          <div className="mt-2">
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
+            </p>
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              PERCUSSIVE_DRUM_SYNTHESIZER
+            </p>
+          </div>
+        ) : (selectedObject.type as string) === 'icosahedron' ? (
+          <div className="mt-2">
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
+            </p>
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              PERCUSSIVE_METAL_SYNTHESIZER
+            </p>
+          </div>
+        ) : (selectedObject.type as string) === 'torus' ? (
+          <div className="mt-2">
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              CLICK_OBJECT_TO_PLAY
+            </p>
+            <p className="text-xs font-mono text-white tracking-wider mt-1">
+              PERCUSSIVE_PLUCK_SYNTHESIZER
+            </p>
+          </div>
         ) : (
          <div className="mt-2">
            <p className="text-xs font-mono text-white tracking-wider mt-1">
@@ -125,26 +152,28 @@ export function AudioControlSection({ selectedObject, onRemove }: AudioControlSe
          </div>
         )}
         
-        {/* Botón de activación/desactivación de audio */}
-        <div className="mt-4">
-          <button
-            onClick={() => {
-              const { toggleObjectAudio } = useWorldStore.getState();
-              toggleObjectAudio(selectedObject.id);
-            }}
-            className={`relative w-full py-2 px-4 border border-white hover:bg-white hover:text-black transition-all duration-300 group ${
-              selectedObject.audioEnabled ? 'bg-white' : 'bg-black'
-            }`}
-            style={{ 
-              color: selectedObject.audioEnabled ? '#000000' : '#FFFFFF'
-            }}
-          >
-            <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-            <span className="relative text-xs font-mono tracking-wider">
-              {selectedObject.audioEnabled ? 'DEACTIVATE_CONTINUOUS_AUDIO' : 'ACTIVATE_CONTINUOUS_AUDIO'}
-            </span>
-          </button>
-        </div>
+        {/* Botón de activación/desactivación de audio - No disponible para sintetizadores percusivos */}
+        {selectedObject.type !== 'cone' && selectedObject.type !== 'icosahedron' && selectedObject.type !== 'torus' && (
+          <div className="mt-4">
+            <button
+              onClick={() => {
+                const { toggleObjectAudio } = useWorldStore.getState();
+                toggleObjectAudio(selectedObject.id);
+              }}
+              className={`relative w-full py-2 px-4 border border-white hover:bg-white hover:text-black transition-all duration-300 group ${
+                selectedObject.audioEnabled ? 'bg-white' : 'bg-black'
+              }`}
+              style={{ 
+                color: selectedObject.audioEnabled ? '#000000' : '#FFFFFF'
+              }}
+            >
+              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+              <span className="relative text-xs font-mono tracking-wider">
+                {selectedObject.audioEnabled ? 'DEACTIVATE_CONTINUOUS_AUDIO' : 'ACTIVATE_CONTINUOUS_AUDIO'}
+              </span>
+            </button>
+          </div>
+        )}
         </div>
       </div>
     </div>

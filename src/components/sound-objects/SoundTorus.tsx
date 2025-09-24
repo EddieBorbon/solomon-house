@@ -50,43 +50,27 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
       lastTriggerTimeRef.current = Date.now();
     };
 
-    // Animación de vibración
+    // Animación de vibración (solo cambio de color, sin deformación)
     useFrame((state) => {
       if (meshRef.current && energyRef.current > 0) {
         // Decrementar la energía con el tiempo
         energyRef.current *= 0.95;
         
-        // Aplicar deformación sutil basada en la energía
-        const geometry = meshRef.current.geometry as THREE.TorusGeometry;
-        const positions = geometry.attributes.position;
-        const time = state.clock.elapsedTime;
-        
-        // Crear una deformación ondulante
-        for (let i = 0; i < positions.count; i++) {
-          const x = positions.getX(i);
-          const y = positions.getY(i);
-          const z = positions.getZ(i);
-          
-          // Aplicar deformación sinusoidal
-          const deformation = Math.sin(time * 10 + i * 0.1) * energyRef.current * 0.1;
-          positions.setXYZ(
-            i,
-            x + deformation * 0.1,
-            y + deformation * 0.05,
-            z + deformation * 0.1
-          );
+        // Solo cambiar el color/emisión sin deformar la geometría
+        if (meshRef.current.material) {
+          const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+          const intensity = energyRef.current * 0.5;
+          mat.emissiveIntensity = intensity;
         }
-        
-        positions.needsUpdate = true;
-        
-        // Rotación rápida que se va frenando
-        const rotationSpeed = energyRef.current * 0.5;
-        meshRef.current.rotation.x += rotationSpeed;
-        meshRef.current.rotation.y += rotationSpeed * 0.7;
         
         // Detener la animación cuando la energía sea muy baja
         if (energyRef.current < 0.01) {
           energyRef.current = 0;
+          // Restaurar el estado original del material
+          if (meshRef.current.material) {
+            const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+            mat.emissiveIntensity = 0;
+          }
         }
       }
     });

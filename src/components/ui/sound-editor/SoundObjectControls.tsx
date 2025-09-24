@@ -5,11 +5,6 @@ import { type AudioParams } from '../../../lib/AudioManager';
 import { AudioControlSection } from '../AudioControlSection';
 import { SynthSpecificParameters } from './SynthSpecificParameters';
 import { AdvancedSynthParameters } from './AdvancedSynthParameters';
-import { MonoSynthParameters } from './MonoSynthParameters';
-import { MetalSynthParameters } from './MetalSynthParameters';
-import { NoiseSynthParameters } from './NoiseSynthParameters';
-import { PluckSynthParameters } from './PluckSynthParameters';
-import { PolySynthParameters } from './PolySynthParameters';
 import { SamplerParameters } from './SamplerParameters';
 import { SoundTransformSection } from './SoundTransformSection';
 
@@ -50,35 +45,10 @@ export function SoundObjectControls({
         onParamChange={onParamChange}
       />
 
-      {/* Controles específicos para MonoSynth (pirámide) */}
-      <MonoSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
-      {/* Controles específicos para MetalSynth (icosaedro) */}
-      <MetalSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
-      {/* Controles específicos para NoiseSynth (plano) */}
-      <NoiseSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
-      {/* Controles específicos para PluckSynth (torus) */}
-      <PluckSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
-      {/* Controles específicos para PolySynth (dodecahedronRing) */}
-      <PolySynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
-      />
 
       {/* Controles específicos para Sampler (spiral) */}
       <SamplerParameters 

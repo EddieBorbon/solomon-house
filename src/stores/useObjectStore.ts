@@ -312,7 +312,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
 
     // Ignorar los tipos percusivos ya que no necesitan toggle de audio
-    if (currentObject.type === 'plane' || currentObject.type === 'torus') {
+    if (currentObject.type === 'cone' || currentObject.type === 'icosahedron' || currentObject.type === 'torus') {
       console.log(`🎵 ObjectStore: Objeto ${id} es de tipo '${currentObject.type}', ignorando toggleObjectAudio`);
       return;
     }
