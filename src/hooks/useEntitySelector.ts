@@ -46,6 +46,7 @@ export function useEntitySelector() {
     
     // Buscar en objetos móviles y zonas de efectos en las cuadrículas
     for (const grid of grids.values()) {
+      console.log(`Grid ${grid.id}:`, {
         mobileObjects: grid.mobileObjects.length,
         effectZones: grid.effectZones.length
       });

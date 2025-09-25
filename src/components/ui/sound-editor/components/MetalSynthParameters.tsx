@@ -53,9 +53,6 @@ export function MetalSynthParameters({
           <span>0.1</span>
           <span>20.0</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_MODULATOR_FREQUENCY_RATIO
-        </p>
       </div>
 
       {/* Modulation Index */}
@@ -81,9 +78,6 @@ export function MetalSynthParameters({
           <span>0</span>
           <span>100</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_MODULATION_DEPTH_INTENSITY
-        </p>
       </div>
 
       {/* Resonance */}
@@ -109,9 +103,6 @@ export function MetalSynthParameters({
           <span>1000 Hz</span>
           <span>8000 Hz</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_RESONANCE_FREQUENCY
-        </p>
       </div>
 
       {/* Octaves */}
@@ -137,9 +128,6 @@ export function MetalSynthParameters({
           <span>0.5</span>
           <span>5.0</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_HARMONIC_OCTAVE_RANGE
-        </p>
       </div>
     </div>
   );

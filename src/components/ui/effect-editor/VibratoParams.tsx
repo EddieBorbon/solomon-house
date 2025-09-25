@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface VibratoParamsProps {
   zone: EffectZone;
@@ -24,55 +25,33 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
       </h4>
 
       {/* Frequency */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FREQUENCY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="20"
-            step="0.1"
-            value={zone?.effectParams.vibratoFrequency ?? 4}
-            onChange={(e) => onEffectParamChange('vibratoFrequency', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.vibratoFrequency ?? 4).toFixed(1)}HZ
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1HZ</span>
-          <span>20.0HZ</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="FREQUENCY"
+          value={Number(zone?.effectParams.vibratoFrequency) || 4}
+          min={0.1}
+          max={20}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('vibratoFrequency', value)}
+          disabled={zone?.isLocked}
+          unit="HZ"
+          displayValue={Number(zone?.effectParams.vibratoFrequency ?? 4).toFixed(1)}
+        />
       </div>
 
       {/* Depth */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DEPTH
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.vibratoDepth ?? 0.5}
-            onChange={(e) => onEffectParamChange('vibratoDepth', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.vibratoDepth ?? 0.5) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DEPTH"
+          value={Number(zone?.effectParams.vibratoDepth) || 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('vibratoDepth', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.vibratoDepth ?? 0.5) * 100)}
+        />
       </div>
 
       {/* Wave Type */}
@@ -115,7 +94,7 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
             disabled={zone?.isLocked}
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.vibratoMaxDelay ?? 0.01).toFixed(3)}S
+            {Number(zone?.effectParams.vibratoMaxDelay ?? 0.01).toFixed(3)}S
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

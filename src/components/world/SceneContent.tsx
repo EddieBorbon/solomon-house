@@ -216,6 +216,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       // Obtener objetos de esta cuadrícula desde el ObjectStore
       const gridObjects = objectStore.getAllObjects(grid.id);
       
+      console.log(`Grid ${grid.id}:`, {
         objectsFromStore: gridObjects.length,
         objectsFromGrid: grid.objects?.length || 0,
         mobileObjects: grid.mobileObjects?.length || 0,
@@ -235,6 +236,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
     });
     
+    console.log('Total objects:', {
       objects: objects.length,
       mobileObjects: mobileObjects.length,
       effectZones: effectZones.length

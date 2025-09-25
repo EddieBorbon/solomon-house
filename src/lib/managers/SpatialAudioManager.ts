@@ -106,6 +106,7 @@ export class SpatialAudioManager {
 
       const panner = new Tone.Panner3D(pannerConfig);
       
+      console.log('Panner3D creado:', {
         panningModel: pannerConfig.panningModel,
         distanceModel: pannerConfig.distanceModel,
         refDistance: pannerConfig.refDistance,

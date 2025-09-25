@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface DistortionParamsProps {
   zone: EffectZone;
@@ -24,29 +25,18 @@ export function DistortionParams({ zone, onEffectParamChange }: DistortionParams
       </h4>
 
       {/* Distortion Amount */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DISTORTION_AMOUNT
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.distortion ?? 0.4}
-            onChange={(e) => onEffectParamChange('distortion', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.distortion ?? 0.4) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DISTORTION_AMOUNT"
+          value={zone?.effectParams.distortion ?? 0.4}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('distortion', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.distortion ?? 0.4) * 100)}
+        />
       </div>
 
       {/* Oversampling */}

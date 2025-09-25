@@ -53,9 +53,6 @@ export function MonoSynthParameters({
           <span>50 Hz</span>
           <span>2000 Hz</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_FILTER_BASE_FREQUENCY
-        </p>
       </div>
 
       {/* Filter Octaves */}
@@ -81,9 +78,6 @@ export function MonoSynthParameters({
           <span>1</span>
           <span>8</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_FILTER_OCTAVE_RANGE
-        </p>
       </div>
 
       {/* Filter Q */}
@@ -109,9 +103,6 @@ export function MonoSynthParameters({
           <span>0.1</span>
           <span>10.0</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_FILTER_RESONANCE_Q
-        </p>
       </div>
     </div>
   );

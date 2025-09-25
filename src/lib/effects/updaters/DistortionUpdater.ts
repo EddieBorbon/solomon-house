@@ -30,6 +30,7 @@ export class DistortionUpdater implements IEffectUpdater<Tone.Distortion> {
       }
     });
     
+    console.log('Distortion actualizado:', {
       distortion: effect.distortion,
       oversample: effect.oversample
     });

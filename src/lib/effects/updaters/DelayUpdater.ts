@@ -30,6 +30,7 @@ export class DelayUpdater implements IEffectUpdater<Tone.FeedbackDelay> {
       }
     });
     
+    console.log('Delay actualizado:', {
       delayTime: effect.delayTime,
       feedback: effect.feedback
     });

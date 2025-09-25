@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface StereoWidenerParamsProps {
   zone: EffectZone;
@@ -24,55 +25,32 @@ export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidener
       </h4>
 
       {/* Width */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          STEREO_WIDTH
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="2"
-            step="0.01"
-            value={zone?.effectParams.width ?? 1}
-            onChange={(e) => onEffectParamChange('width', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.width ?? 1).toFixed(2)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00</span>
-          <span>2.00</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="STEREO_WIDTH"
+          value={Number(zone?.effectParams.width) || 1}
+          min={0}
+          max={2}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('width', value)}
+          disabled={zone?.isLocked}
+          displayValue={Number(zone?.effectParams.width ?? 1).toFixed(2)}
+        />
       </div>
 
       {/* Wet Mix */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WET_MIX
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.wet ?? 0.5}
-            onChange={(e) => onEffectParamChange('wet', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="WET_MIX"
+          value={Number(zone?.effectParams.wet) || 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('wet', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.wet ?? 0.5) * 100)}
+        />
       </div>
     </div>
   );

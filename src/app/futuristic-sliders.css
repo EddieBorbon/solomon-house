@@ -1,0 +1,70 @@
+/* Estilos para sliders futuristas */
+.futuristic-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.futuristic-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #000000;
+  transition: all 0.2s ease;
+}
+
+.futuristic-slider::-webkit-slider-thumb:hover {
+  background: #f0f0f0;
+  border: 2px solid #f0f0f0;
+  transform: scale(1.1);
+}
+
+.futuristic-slider::-webkit-slider-thumb:active {
+  background: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  transform: scale(1.2);
+}
+
+.futuristic-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px #000000;
+  transition: all 0.2s ease;
+}
+
+.futuristic-slider::-moz-range-thumb:hover {
+  background: #f0f0f0;
+  border: 2px solid #f0f0f0;
+  transform: scale(1.1);
+}
+
+.futuristic-slider::-moz-range-thumb:active {
+  background: #e0e0e0;
+  border: 2px solid #e0e0e0;
+  transform: scale(1.2);
+}
+
+/* Estilos para sliders deshabilitados */
+.futuristic-slider:disabled::-webkit-slider-thumb {
+  background: #666666;
+  border: 2px solid #666666;
+  cursor: not-allowed;
+}
+
+.futuristic-slider:disabled::-moz-range-thumb {
+  background: #666666;
+  border: 2px solid #666666;
+  cursor: not-allowed;
+}

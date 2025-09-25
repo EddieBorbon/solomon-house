@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./tailwind.css";
 import "./neon-sliders.css";
 import "./glassmorphism.css";
+import "./futuristic-sliders.css";
 import { StoreProvider } from "../components/StoreProvider";
 import { LanguageProvider } from "../contexts/LanguageContext";
 

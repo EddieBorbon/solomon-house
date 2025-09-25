@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface ReverbParamsProps {
   zone: EffectZone;
@@ -24,55 +25,33 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
       </h4>
 
       {/* Decay */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DECAY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="20"
-            step="0.1"
-            value={zone?.effectParams.decay ?? 1.5}
-            onChange={(e) => onEffectParamChange('decay', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.decay ?? 1.5).toFixed(1)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.0S</span>
-          <span>20.0S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DECAY"
+          value={zone?.effectParams.decay ?? 1.5}
+          min={0}
+          max={20}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('decay', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={Number(zone?.effectParams.decay ?? 1.5).toFixed(1)}
+        />
       </div>
 
       {/* Pre Delay */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          PRE_DELAY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.preDelay ?? 0.01}
-            onChange={(e) => onEffectParamChange('preDelay', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.preDelay ?? 0.01).toFixed(2)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00S</span>
-          <span>1.00S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="PRE_DELAY"
+          value={zone?.effectParams.preDelay ?? 0.01}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('preDelay', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={Number(zone?.effectParams.preDelay ?? 0.01).toFixed(2)}
+        />
       </div>
     </div>
   );

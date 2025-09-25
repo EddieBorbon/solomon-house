@@ -53,9 +53,6 @@ export function DuoSynthParameters({
           <span>0.5</span>
           <span>4</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_FREQUENCY_RATIO_BETWEEN_VOICES
-        </p>
       </div>
 
       {/* Velocidad de Vibrato */}
@@ -81,9 +78,6 @@ export function DuoSynthParameters({
           <span>1 Hz</span>
           <span>20 Hz</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_VIBRATO_FREQUENCY_SPEED
-        </p>
       </div>
 
       {/* Cantidad de Vibrato */}
@@ -109,9 +103,6 @@ export function DuoSynthParameters({
           <span>0%</span>
           <span>100%</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_VIBRATO_DEPTH_INTENSITY
-        </p>
       </div>
 
       {/* Attack */}
@@ -137,9 +128,6 @@ export function DuoSynthParameters({
           <span>0.001s</span>
           <span>2s</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_ATTACK_TIME_ENVELOPE
-        </p>
       </div>
 
       {/* Release */}
@@ -165,9 +153,6 @@ export function DuoSynthParameters({
           <span>0.01s</span>
           <span>4s</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_RELEASE_TIME_ENVELOPE
-        </p>
       </div>
     </div>
   );

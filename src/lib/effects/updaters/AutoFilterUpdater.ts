@@ -30,6 +30,7 @@ export class AutoFilterUpdater implements IEffectUpdater<Tone.AutoFilter> {
       }
     });
     
+    console.log('AutoFilter actualizado:', {
       frequency: effect.frequency?.value || 'N/A',
       baseFrequency: effect.baseFrequency || 'N/A',
       octaves: effect.octaves || 'N/A',

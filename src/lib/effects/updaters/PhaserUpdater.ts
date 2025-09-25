@@ -24,6 +24,7 @@ export class PhaserUpdater implements IEffectUpdater<Tone.Phaser> {
       }
     });
     
+    console.log('Phaser actualizado:', {
       frequency: effect.frequency?.value || 'N/A',
       octaves: effect.octaves || 'N/A',
       baseFrequency: effect.baseFrequency || 'N/A'

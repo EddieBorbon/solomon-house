@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface PhaserParamsProps {
   zone: EffectZone;
@@ -24,133 +25,75 @@ export function PhaserParams({ zone, onEffectParamChange }: PhaserParamsProps) {
       </h4>
 
       {/* Frequency */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FREQUENCY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="10"
-            step="0.1"
-            value={zone?.effectParams.frequency ?? 0.5}
-            onChange={(e) => onEffectParamChange('frequency', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.frequency ?? 0.5).toFixed(1)}HZ
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1HZ</span>
-          <span>10.0HZ</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="FREQUENCY"
+          value={zone?.effectParams.frequency ?? 0.5}
+          min={0.1}
+          max={10}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('frequency', value)}
+          disabled={zone?.isLocked}
+          unit="HZ"
+          displayValue={Number(zone?.effectParams.frequency ?? 0.5).toFixed(1)}
+        />
       </div>
 
       {/* Octaves */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          OCTAVES
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.5"
-            value={zone?.effectParams.octaves ?? 3}
-            onChange={(e) => onEffectParamChange('octaves', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.octaves ?? 3).toFixed(1)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>1.0</span>
-          <span>10.0</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="OCTAVES"
+          value={zone?.effectParams.octaves ?? 3}
+          min={1}
+          max={10}
+          step={0.5}
+          onChange={(value) => onEffectParamChange('octaves', value)}
+          disabled={zone?.isLocked}
+          displayValue={Number(zone?.effectParams.octaves ?? 3).toFixed(1)}
+        />
       </div>
 
       {/* Stages */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          STAGES
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="20"
-            step="1"
-            value={zone?.effectParams.stages ?? 10}
-            onChange={(e) => onEffectParamChange('stages', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {zone?.effectParams.stages ?? 10}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>1</span>
-          <span>20</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="STAGES"
+          value={zone?.effectParams.stages ?? 10}
+          min={1}
+          max={20}
+          step={1}
+          onChange={(value) => onEffectParamChange('stages', value)}
+          disabled={zone?.isLocked}
+          displayValue={zone?.effectParams.stages ?? 10}
+        />
       </div>
 
       {/* Q Factor */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          Q_FACTOR
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="30"
-            step="0.1"
-            value={zone?.effectParams.Q ?? 10}
-            onChange={(e) => onEffectParamChange('Q', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.Q ?? 10).toFixed(1)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1</span>
-          <span>30.0</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="Q_FACTOR"
+          value={zone?.effectParams.Q ?? 10}
+          min={0.1}
+          max={30}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('Q', value)}
+          disabled={zone?.isLocked}
+          displayValue={Number(zone?.effectParams.Q ?? 10).toFixed(1)}
+        />
       </div>
 
       {/* Wet Mix */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WET_MIX
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.wet ?? 0.5}
-            onChange={(e) => onEffectParamChange('wet', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.wet ?? 0.5) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="WET_MIX"
+          value={zone?.effectParams.wet ?? 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('wet', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.wet ?? 0.5) * 100)}
+        />
       </div>
     </div>
   );

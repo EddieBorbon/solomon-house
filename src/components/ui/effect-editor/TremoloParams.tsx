@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface TremoloParamsProps {
   zone: EffectZone;
@@ -24,81 +25,48 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
       </h4>
 
       {/* Frequency */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FREQUENCY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="20"
-            step="0.1"
-            value={zone?.effectParams.tremoloFrequency ?? 4}
-            onChange={(e) => onEffectParamChange('tremoloFrequency', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.tremoloFrequency ?? 4).toFixed(1)}HZ
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1HZ</span>
-          <span>20.0HZ</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="FREQUENCY"
+          value={Number(zone?.effectParams.tremoloFrequency) || 4}
+          min={0.1}
+          max={20}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('tremoloFrequency', value)}
+          disabled={zone?.isLocked}
+          unit="HZ"
+          displayValue={Number(zone?.effectParams.tremoloFrequency ?? 4).toFixed(1)}
+        />
       </div>
 
       {/* Depth */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DEPTH
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.tremoloDepth ?? 0.5}
-            onChange={(e) => onEffectParamChange('tremoloDepth', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.tremoloDepth ?? 0.5) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DEPTH"
+          value={Number(zone?.effectParams.tremoloDepth) || 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('tremoloDepth', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.tremoloDepth ?? 0.5) * 100)}
+        />
       </div>
 
       {/* Spread */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          SPREAD
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="180"
-            step="1"
-            value={zone?.effectParams.tremoloSpread ?? 0}
-            onChange={(e) => onEffectParamChange('tremoloSpread', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {zone?.effectParams.tremoloSpread ?? 0}°
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0°</span>
-          <span>180°</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="SPREAD"
+          value={Number(zone?.effectParams.tremoloSpread) || 0}
+          min={0}
+          max={180}
+          step={1}
+          onChange={(value) => onEffectParamChange('tremoloSpread', value)}
+          disabled={zone?.isLocked}
+          unit="°"
+          displayValue={zone?.effectParams.tremoloSpread ?? 0}
+        />
       </div>
 
       {/* Wave Type */}

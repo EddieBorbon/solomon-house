@@ -3,6 +3,7 @@
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface MonoSynthParametersProps {
   selectedObject: SoundObject;
@@ -24,103 +25,59 @@ export function MonoSynthParameters({
         </h4>
         
         {/* Amp Attack */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Attack (Ataque)
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.001"
-              max="2"
-              step="0.001"
-              value={selectedObject.audioParams.ampAttack || 0.01}
-              onChange={(e) => onParamChange('ampAttack', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.ampAttack || 0.01).toFixed(3)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.001s</span>
-            <span>2s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="ATTACK"
+            value={selectedObject.audioParams.ampAttack || 0.01}
+            min={0.001}
+            max={2}
+            step={0.001}
+            onChange={(value) => onParamChange('ampAttack', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.ampAttack || 0.01).toFixed(3)}
+          />
         </div>
 
         {/* Amp Decay */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Decay (Caída)
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.01"
-              max="2"
-              step="0.01"
-              value={selectedObject.audioParams.ampDecay || 0.2}
-              onChange={(e) => onParamChange('ampDecay', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.ampDecay || 0.2).toFixed(2)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.01s</span>
-            <span>2s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="DECAY"
+            value={selectedObject.audioParams.ampDecay || 0.2}
+            min={0.01}
+            max={2}
+            step={0.01}
+            onChange={(value) => onParamChange('ampDecay', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.ampDecay || 0.2).toFixed(2)}
+          />
         </div>
 
         {/* Amp Sustain */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Sustain (Sostenido)
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={selectedObject.audioParams.ampSustain || 0.1}
-              onChange={(e) => onParamChange('ampSustain', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {Math.round((selectedObject.audioParams.ampSustain || 0.1) * 100)}%
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0%</span>
-            <span>100%</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="SUSTAIN"
+            value={selectedObject.audioParams.ampSustain || 0.1}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={(value) => onParamChange('ampSustain', value)}
+            unit="%"
+            displayValue={Math.round((selectedObject.audioParams.ampSustain || 0.1) * 100)}
+          />
         </div>
 
         {/* Amp Release */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Release (Liberación)
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.01"
-              max="4"
-              step="0.01"
-              value={selectedObject.audioParams.ampRelease || 0.5}
-              onChange={(e) => onParamChange('ampRelease', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.ampRelease || 0.5).toFixed(2)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.01s</span>
-            <span>4s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="RELEASE"
+            value={selectedObject.audioParams.ampRelease || 0.5}
+            min={0.01}
+            max={4}
+            step={0.01}
+            onChange={(value) => onParamChange('ampRelease', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.ampRelease || 0.5).toFixed(2)}
+          />
         </div>
       </div>
 
@@ -131,103 +88,59 @@ export function MonoSynthParameters({
         </h4>
         
         {/* Filter Attack */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Filter Attack
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.001"
-              max="1"
-              step="0.001"
-              value={selectedObject.audioParams.filterAttack || 0.005}
-              onChange={(e) => onParamChange('filterAttack', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.filterAttack || 0.005).toFixed(3)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.001s</span>
-            <span>1s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="FILTER_ATTACK"
+            value={selectedObject.audioParams.filterAttack || 0.005}
+            min={0.001}
+            max={1}
+            step={0.001}
+            onChange={(value) => onParamChange('filterAttack', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.filterAttack || 0.005).toFixed(3)}
+          />
         </div>
 
         {/* Filter Decay */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Filter Decay
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.01"
-              max="2"
-              step="0.01"
-              value={selectedObject.audioParams.filterDecay || 0.1}
-              onChange={(e) => onParamChange('filterDecay', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.filterDecay || 0.1).toFixed(2)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.01s</span>
-            <span>2s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="FILTER_DECAY"
+            value={selectedObject.audioParams.filterDecay || 0.1}
+            min={0.01}
+            max={2}
+            step={0.01}
+            onChange={(value) => onParamChange('filterDecay', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.filterDecay || 0.1).toFixed(2)}
+          />
         </div>
 
         {/* Filter Sustain */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Filter Sustain
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={selectedObject.audioParams.filterSustain || 0.05}
-              onChange={(e) => onParamChange('filterSustain', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {Math.round((selectedObject.audioParams.filterSustain || 0.05) * 100)}%
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0%</span>
-            <span>100%</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="FILTER_SUSTAIN"
+            value={selectedObject.audioParams.filterSustain || 0.05}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={(value) => onParamChange('filterSustain', value)}
+            unit="%"
+            displayValue={Math.round((selectedObject.audioParams.filterSustain || 0.05) * 100)}
+          />
         </div>
 
         {/* Filter Release */}
-        <div className="mb-3">
-          <label className="block text-xs font-medium text-gray-300 mb-1">
-            Filter Release
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0.01"
-              max="2"
-              step="0.01"
-              value={selectedObject.audioParams.filterRelease || 0.2}
-              onChange={(e) => onParamChange('filterRelease', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-sm min-w-[4rem] text-right">
-              {(selectedObject.audioParams.filterRelease || 0.2).toFixed(2)}s
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>0.01s</span>
-            <span>2s</span>
-          </div>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="FILTER_RELEASE"
+            value={selectedObject.audioParams.filterRelease || 0.2}
+            min={0.01}
+            max={2}
+            step={0.01}
+            onChange={(value) => onParamChange('filterRelease', value)}
+            unit="s"
+            displayValue={(selectedObject.audioParams.filterRelease || 0.2).toFixed(2)}
+          />
         </div>
 
         {/* Filter Base Frequency */}

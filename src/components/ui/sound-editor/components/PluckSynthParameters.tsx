@@ -53,9 +53,6 @@ export function PluckSynthParameters({
           <span>0.1</span>
           <span>20</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_NOISE_AMPLITUDE_AT_ATTACK
-        </p>
       </div>
 
       {/* Dampening */}
@@ -81,9 +78,6 @@ export function PluckSynthParameters({
           <span>500 Hz</span>
           <span>7000 Hz</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_FREQUENCY_DAMPENING_FILTER
-        </p>
       </div>
 
       {/* Resonance */}
@@ -109,9 +103,6 @@ export function PluckSynthParameters({
           <span>0.1</span>
           <span>20</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_RESONANCE_QUALITY_FILTER
-        </p>
       </div>
 
       {/* Release */}
@@ -137,9 +128,6 @@ export function PluckSynthParameters({
           <span>0.01s</span>
           <span>2s</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_RELEASE_TIME_ENVELOPE
-        </p>
       </div>
     </div>
   );

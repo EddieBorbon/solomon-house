@@ -87,7 +87,7 @@ export function EffectSpecificParameters({ zone, onEffectParamChange }: EffectSp
 
   const renderEffectSpecificParams = () => {
     switch (zone.type) {
-      case 'bitCrusher': return renderBitCrusherParams();
+      // bitCrusher se maneja en EffectParametersSection, no aquí
       default: return null;
     }
   };

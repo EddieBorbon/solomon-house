@@ -92,7 +92,7 @@ export function AutoWahParams({ zone, onEffectParamChange }: AutoWahParamsProps)
             disabled={zone?.isLocked}
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.octaves ?? 2).toFixed(1)}
+            {Number(zone?.effectParams.octaves ?? 2).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

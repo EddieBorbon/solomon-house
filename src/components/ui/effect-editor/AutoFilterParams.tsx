@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface AutoFilterParamsProps {
   zone: EffectZone;
@@ -24,29 +25,18 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
       </h4>
       
       {/* Depth */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          MODULATION_DEPTH
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.depth ?? 0.5}
-            onChange={(e) => onEffectParamChange('depth', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((zone?.effectParams.depth ?? 0.5) * 100).toFixed(0)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="MODULATION_DEPTH"
+          value={zone?.effectParams.depth ?? 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('depth', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={((zone?.effectParams.depth ?? 0.5) * 100).toFixed(0)}
+        />
       </div>
 
       {/* Filter Type */}
@@ -73,29 +63,17 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
       </div>
 
       {/* Filter Q */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          RESONANCE_Q
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="10"
-            step="0.1"
-            value={zone?.effectParams.filterQ ?? 1}
-            onChange={(e) => onEffectParamChange('filterQ', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.filterQ ?? 1).toFixed(1)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1</span>
-          <span>10.0</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="RESONANCE_Q"
+          value={zone?.effectParams.filterQ ?? 1}
+          min={0.1}
+          max={10}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('filterQ', value)}
+          disabled={zone?.isLocked}
+          displayValue={(zone?.effectParams.filterQ ?? 1).toFixed(1)}
+        />
       </div>
 
       {/* LFO Type */}

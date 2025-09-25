@@ -53,9 +53,6 @@ export function MembraneSynthParameters({
           <span>0.001</span>
           <span>0.100</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_PITCH_DECAY_RATE
-        </p>
       </div>
 
       {/* Octaves */}
@@ -81,9 +78,6 @@ export function MembraneSynthParameters({
           <span>1</span>
           <span>20</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_HARMONIC_OCTAVE_RANGE
-        </p>
       </div>
     </div>
   );

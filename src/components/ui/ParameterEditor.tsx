@@ -13,7 +13,6 @@ import { EffectZoneEditor } from './effect-editor/EffectZoneEditor';
 import { EffectZoneHeader } from './effect-editor/EffectZoneHeader';
 import { AutoFilterParams } from './effect-editor/AutoFilterParams';
 import { AutoWahParams } from './effect-editor/AutoWahParams';
-import { BitCrusherParams } from './effect-editor/BitCrusherParams';
 import { ChebyshevParams } from './effect-editor/ChebyshevParams';
 import { ChorusParams } from './effect-editor/ChorusParams';
 import { DistortionParams } from './effect-editor/DistortionParams';
@@ -323,11 +322,7 @@ export function ParameterEditor() {
               onEffectParamChange={handleEffectParamChange}
             />
 
-            {/* Parámetros específicos del BitCrusher */}
-            <BitCrusherParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
+            {/* Parámetros específicos del BitCrusher - manejados en EffectParametersSection */}
 
             {/* Parámetros específicos del Chebyshev */}
             <ChebyshevParams
@@ -403,75 +398,6 @@ export function ParameterEditor() {
 
             {/* Parámetros específicos del Vibrato */}
             <VibratoParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del Distortion (original) */}
-            <DistortionParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del FeedbackDelay */}
-            <FeedbackDelayParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del Freeverb */}
-            <FreeverbParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del FrequencyShifter */}
-            <FrequencyShifterParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del JCReverb */}
-            <JCReverbParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del PingPongDelay */}
-            <PingPongDelayParams 
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del PitchShift */}
-            <PitchShiftParams 
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-            {/* Parámetros específicos del Reverb */}
-            <ReverbParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-
-            {/* Parámetros específicos del StereoWidener */}
-            <StereoWidenerParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-
-            {/* Parámetros específicos del Tremolo */}
-            <TremoloParams
-              zone={zone}
-              onEffectParamChange={handleEffectParamChange}
-            />
-
-
-            {/* Parámetros específicos del Vibrato */}
-            <VibratoParams 
               zone={zone}
               onEffectParamChange={handleEffectParamChange}
             />

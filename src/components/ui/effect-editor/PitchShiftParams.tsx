@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface PitchShiftParamsProps {
   zone: EffectZone;
@@ -24,81 +25,48 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
       </h4>
 
       {/* Pitch Shift */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          PITCH_SHIFT
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="-12"
-            max="12"
-            step="0.1"
-            value={zone?.effectParams.pitchShift ?? 0}
-            onChange={(e) => onEffectParamChange('pitchShift', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.pitchShift ?? 0).toFixed(1)}ST
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>-12.0ST</span>
-          <span>12.0ST</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="PITCH_SHIFT"
+          value={Number(zone?.effectParams.pitchShift) || 0}
+          min={-12}
+          max={12}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('pitchShift', value)}
+          disabled={zone?.isLocked}
+          unit="ST"
+          displayValue={Number(zone?.effectParams.pitchShift ?? 0).toFixed(1)}
+        />
       </div>
 
       {/* Window Size */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WINDOW_SIZE
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.01"
-            max="0.1"
-            step="0.001"
-            value={zone?.effectParams.windowSize ?? 0.02}
-            onChange={(e) => onEffectParamChange('windowSize', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.windowSize ?? 0.02).toFixed(3)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.010S</span>
-          <span>0.100S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="WINDOW_SIZE"
+          value={Number(zone?.effectParams.windowSize) || 0.02}
+          min={0.01}
+          max={0.1}
+          step={0.001}
+          onChange={(value) => onEffectParamChange('windowSize', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={Number(zone?.effectParams.windowSize ?? 0.02).toFixed(3)}
+        />
       </div>
 
       {/* Delay Time */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DELAY_TIME
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="0.1"
-            step="0.001"
-            value={zone?.effectParams.delayTime ?? 0}
-            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(Number(zone?.effectParams.delayTime) || 0).toFixed(3)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.000S</span>
-          <span>0.100S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DELAY_TIME"
+          value={Number(zone?.effectParams.delayTime) || 0}
+          min={0}
+          max={0.1}
+          step={0.001}
+          onChange={(value) => onEffectParamChange('delayTime', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={(Number(zone?.effectParams.delayTime) || 0).toFixed(3)}
+        />
       </div>
 
       {/* Feedback */}

@@ -33,6 +33,7 @@ export class ReverbUpdater implements IEffectUpdater<Tone.Reverb> {
       }
     });
     
+    console.log('Reverb actualizado:', {
       decay: effect.decay || 'N/A',
       preDelay: effect.preDelay || 'N/A',
       wet: effect.wet?.value || 'N/A'

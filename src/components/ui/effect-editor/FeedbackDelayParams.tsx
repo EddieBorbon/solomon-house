@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface FeedbackDelayParamsProps {
   zone: EffectZone;
@@ -24,55 +25,33 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
       </h4>
 
       {/* Delay Time */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DELAY_TIME
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.delayTime ?? 0.3}
-            onChange={(e) => onEffectParamChange('delayTime', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(Number(zone?.effectParams.delayTime) || 0.3).toFixed(2)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.10S</span>
-          <span>1.00S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DELAY_TIME"
+          value={zone?.effectParams.delayTime ?? 0.3}
+          min={0.1}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('delayTime', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={(Number(zone?.effectParams.delayTime) || 0.3).toFixed(2)}
+        />
       </div>
 
       {/* Feedback */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FEEDBACK
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.feedback ?? 0.2}
-            onChange={(e) => onEffectParamChange('feedback', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="FEEDBACK"
+          value={zone?.effectParams.feedback ?? 0.2}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('feedback', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}
+        />
       </div>
     </div>
   );

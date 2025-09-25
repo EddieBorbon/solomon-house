@@ -32,6 +32,7 @@ export class ChorusUpdater implements IEffectUpdater<Tone.Chorus> {
       }
     });
     
+    console.log('Chorus actualizado:', {
       frequency: effect.frequency?.value || 'N/A',
       delayTime: effect.delayTime || 'N/A',
       depth: effect.depth || 'N/A',

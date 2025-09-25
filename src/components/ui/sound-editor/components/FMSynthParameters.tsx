@@ -53,9 +53,6 @@ export function FMSynthParameters({
           <span>0.1</span>
           <span>10.0</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_MODULATOR_FREQUENCY_RATIO
-        </p>
       </div>
 
       {/* Modulation Index */}
@@ -81,9 +78,6 @@ export function FMSynthParameters({
           <span>0</span>
           <span>50</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_MODULATION_DEPTH_INTENSITY
-        </p>
       </div>
     </div>
   );

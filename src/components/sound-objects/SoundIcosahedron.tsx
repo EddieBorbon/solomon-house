@@ -11,6 +11,7 @@ interface SoundIcosahedronProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
+  audioEnabled: boolean;
   audioParams: {
     frequency?: number;
     volume?: number;
@@ -21,7 +22,7 @@ interface SoundIcosahedronProps {
 }
 
 export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     
     // Referencias para la animación

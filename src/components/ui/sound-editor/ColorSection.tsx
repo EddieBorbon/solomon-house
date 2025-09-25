@@ -4,6 +4,7 @@ import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
 import { ColorPicker } from '../ColorPicker';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface ColorSectionProps {
   selectedObject: SoundObject;
@@ -42,59 +43,29 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         </h5>
         
         {/* Metalness */}
-        <div className="mb-4">
-          <label className="futuristic-label block mb-1 text-white text-xs">
-            METALNESS
-          </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
+        <div className="mb-6">
+          <FuturisticSlider
+            label="METALNESS"
             value={(selectedObject.audioParams as any).metalness || 0.3}
-            onChange={(e) => onParamChange('metalness', Number(e.target.value))}
-            className="futuristic-slider flex-1"
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={(value) => onParamChange('metalness', value)}
+            displayValue={((selectedObject.audioParams as any).metalness || 0.3).toFixed(2)}
           />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).metalness || 0.3).toFixed(2)}
-          </span>
         </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00</span>
-          <span>1.00</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_METALLIC_APPEARANCE
-        </p>
-      </div>
 
       {/* Roughness */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          ROUGHNESS
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={(selectedObject.audioParams as any).roughness || 0.2}
-            onChange={(e) => onParamChange('roughness', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).roughness || 0.2).toFixed(2)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00</span>
-          <span>1.00</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_SURFACE_ROUGHNESS
-        </p>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="ROUGHNESS"
+          value={(selectedObject.audioParams as any).roughness || 0.2}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onParamChange('roughness', value)}
+          displayValue={((selectedObject.audioParams as any).roughness || 0.2).toFixed(2)}
+        />
       </div>
 
       {/* Emissive Color */}
@@ -107,31 +78,16 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
       </div>
 
       {/* Emissive Intensity */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          EMISSIVE_INTENSITY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={(selectedObject.audioParams as any).emissiveIntensity || 0}
-            onChange={(e) => onParamChange('emissiveIntensity', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).emissiveIntensity || 0).toFixed(2)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00</span>
-          <span>1.00</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_EMISSIVE_LIGHT_INTENSITY
-        </p>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="EMISSIVE_INTENSITY"
+          value={(selectedObject.audioParams as any).emissiveIntensity || 0}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onParamChange('emissiveIntensity', value)}
+          displayValue={((selectedObject.audioParams as any).emissiveIntensity || 0).toFixed(2)}
+        />
       </div>
 
       </div>
@@ -143,31 +99,16 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         </h5>
         
         {/* Opacity */}
-        <div className="mb-4">
-          <label className="futuristic-label block mb-1 text-white text-xs">
-            OPACITY
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={(selectedObject.audioParams as any).opacity || 0.9}
-              onChange={(e) => onParamChange('opacity', Number(e.target.value))}
-              className="futuristic-slider flex-1"
-            />
-            <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-              {((selectedObject.audioParams as any).opacity || 0.9).toFixed(2)}
-            </span>
-          </div>
-          <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-            <span>0.00</span>
-            <span>1.00</span>
-          </div>
-          <p className="text-xs text-white mt-1 font-mono tracking-wider">
-            CONTROLS_OBJECT_TRANSPARENCY
-          </p>
+        <div className="mb-6">
+          <FuturisticSlider
+            label="OPACITY"
+            value={(selectedObject.audioParams as any).opacity || 0.9}
+            min={0}
+            max={1}
+            step={0.01}
+            onChange={(value) => onParamChange('opacity', value)}
+            displayValue={((selectedObject.audioParams as any).opacity || 0.9).toFixed(2)}
+          />
         </div>
 
         {/* Blending Mode */}
@@ -185,9 +126,6 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
             <option value="SubtractiveBlending">SUBTRACTIVE</option>
             <option value="MultiplyBlending">MULTIPLY</option>
           </select>
-          <p className="text-xs text-white mt-1 font-mono tracking-wider">
-            CONTROLS_MATERIAL_BLENDING
-          </p>
         </div>
       </div>
 
@@ -198,87 +136,42 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         </h5>
         
         {/* Pulse Speed */}
-        <div className="mb-4">
-          <label className="futuristic-label block mb-1 text-white text-xs">
-            PULSE_SPEED
-          </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="10"
-            step="0.1"
+        <div className="mb-6">
+          <FuturisticSlider
+            label="PULSE_SPEED"
             value={(selectedObject.audioParams as any).pulseSpeed || 2.0}
-            onChange={(e) => onParamChange('pulseSpeed', Number(e.target.value))}
-            className="futuristic-slider flex-1"
+            min={0}
+            max={10}
+            step={0.1}
+            onChange={(value) => onParamChange('pulseSpeed', value)}
+            displayValue={((selectedObject.audioParams as any).pulseSpeed || 2.0).toFixed(1)}
           />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).pulseSpeed || 2.0).toFixed(1)}
-          </span>
         </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.0</span>
-          <span>10.0</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_PULSE_SPEED_WHEN_PLAYING
-        </p>
-      </div>
 
       {/* Pulse Intensity */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          PULSE_INTENSITY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={(selectedObject.audioParams as any).pulseIntensity || 0.3}
-            onChange={(e) => onParamChange('pulseIntensity', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).pulseIntensity || 0.3).toFixed(2)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.00</span>
-          <span>1.00</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_PULSE_INTENSITY
-        </p>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="PULSE_INTENSITY"
+          value={(selectedObject.audioParams as any).pulseIntensity || 0.3}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onParamChange('pulseIntensity', value)}
+          displayValue={((selectedObject.audioParams as any).pulseIntensity || 0.3).toFixed(2)}
+        />
       </div>
 
       {/* Rotation Speed */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          ROTATION_SPEED
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="10"
-            step="0.1"
-            value={(selectedObject.audioParams as any).rotationSpeed || 1.0}
-            onChange={(e) => onParamChange('rotationSpeed', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).rotationSpeed || 1.0).toFixed(1)}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.0</span>
-          <span>10.0</span>
-        </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_AUTO_ROTATION_SPEED
-        </p>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="ROTATION_SPEED"
+          value={(selectedObject.audioParams as any).rotationSpeed || 1.0}
+          min={0}
+          max={10}
+          step={0.1}
+          onChange={(value) => onParamChange('rotationSpeed', value)}
+          displayValue={((selectedObject.audioParams as any).rotationSpeed || 1.0).toFixed(1)}
+        />
       </div>
 
       {/* Auto Rotate */}
@@ -297,9 +190,6 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
             {(selectedObject.audioParams as any).autoRotate ? 'ENABLED' : 'DISABLED'}
           </span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_AUTO_ROTATION_TOGGLE
-        </p>
       </div>
       </div>
 

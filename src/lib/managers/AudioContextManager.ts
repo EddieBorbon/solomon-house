@@ -41,6 +41,7 @@ export class AudioContextManager {
       
       // Nota: updateInterval no es una propiedad configurable en Tone.Transport
 
+      console.log('AudioContext inicializado:', {
         latencyHint: this.contextConfig.latencyHint,
         sampleRate: Tone.context.sampleRate,
         contextState: Tone.context.state

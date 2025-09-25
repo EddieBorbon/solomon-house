@@ -44,9 +44,6 @@ export function NoiseSynthParameters({
           <option value="pink">PINK_NOISE</option>
           <option value="brown">BROWN_NOISE</option>
         </select>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_NOISE_SPECTRUM_TYPE
-        </p>
       </div>
 
       {/* Attack */}
@@ -72,9 +69,6 @@ export function NoiseSynthParameters({
           <span>0.001s</span>
           <span>1.000s</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_ATTACK_TIME_ENVELOPE
-        </p>
       </div>
 
       {/* Decay */}
@@ -100,9 +94,6 @@ export function NoiseSynthParameters({
           <span>0.01s</span>
           <span>2.00s</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_DECAY_TIME_ENVELOPE
-        </p>
       </div>
 
       {/* Sustain */}
@@ -128,9 +119,6 @@ export function NoiseSynthParameters({
           <span>0</span>
           <span>1.0</span>
         </div>
-        <p className="text-xs text-white mt-1 font-mono tracking-wider">
-          CONTROLS_SUSTAIN_LEVEL_ENVELOPE
-        </p>
       </div>
     </div>
   );

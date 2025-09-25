@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { FuturisticSlider } from '../FuturisticSlider';
 
 interface ChorusParamsProps {
   zone: EffectZone;
@@ -24,133 +25,78 @@ export function ChorusParams({ zone, onEffectParamChange }: ChorusParamsProps) {
       </h4>
 
       {/* LFO Frequency */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          LFO_FREQUENCY
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="10"
-            step="0.1"
-            value={zone?.effectParams.chorusFrequency ?? 1}
-            onChange={(e) => onEffectParamChange('chorusFrequency', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.chorusFrequency ?? 1).toFixed(1)}HZ
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1HZ</span>
-          <span>10.0HZ</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="LFO_FREQUENCY"
+          value={zone?.effectParams.chorusFrequency ?? 1}
+          min={0.1}
+          max={10}
+          step={0.1}
+          onChange={(value) => onEffectParamChange('chorusFrequency', value)}
+          disabled={zone?.isLocked}
+          unit="HZ"
+          displayValue={(zone?.effectParams.chorusFrequency ?? 1).toFixed(1)}
+        />
       </div>
 
       {/* Delay Time */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DELAY_TIME
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.chorusDelayTime ?? 0.3}
-            onChange={(e) => onEffectParamChange('chorusDelayTime', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(zone?.effectParams.chorusDelayTime ?? 0.3).toFixed(2)}S
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.10S</span>
-          <span>1.00S</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DELAY_TIME"
+          value={zone?.effectParams.chorusDelayTime ?? 0.3}
+          min={0.1}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('chorusDelayTime', value)}
+          disabled={zone?.isLocked}
+          unit="S"
+          displayValue={(zone?.effectParams.chorusDelayTime ?? 0.3).toFixed(2)}
+        />
       </div>
 
       {/* Depth */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DEPTH
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.chorusDepth ?? 0.5}
-            onChange={(e) => onEffectParamChange('chorusDepth', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.chorusDepth ?? 0.5) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="DEPTH"
+          value={zone?.effectParams.chorusDepth ?? 0.5}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('chorusDepth', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.chorusDepth ?? 0.5) * 100)}
+        />
       </div>
 
       {/* Feedback */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FEEDBACK
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={zone?.effectParams.feedback ?? 0.2}
-            onChange={(e) => onEffectParamChange('feedback', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}%
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0%</span>
-          <span>100%</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="FEEDBACK"
+          value={zone?.effectParams.feedback ?? 0.2}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => onEffectParamChange('feedback', value)}
+          disabled={zone?.isLocked}
+          unit="%"
+          displayValue={Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}
+        />
       </div>
 
       {/* Spread */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          SPREAD
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="0"
-            max="180"
-            step="1"
-            value={zone?.effectParams.spread ?? 0}
-            onChange={(e) => onEffectParamChange('spread', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-            disabled={zone?.isLocked}
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {zone?.effectParams.spread ?? 0}°
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0°</span>
-          <span>180°</span>
-        </div>
+      <div className="mb-6">
+        <FuturisticSlider
+          label="SPREAD"
+          value={zone?.effectParams.spread ?? 0}
+          min={0}
+          max={180}
+          step={1}
+          onChange={(value) => onEffectParamChange('spread', value)}
+          disabled={zone?.isLocked}
+          unit="°"
+          displayValue={zone?.effectParams.spread ?? 0}
+        />
       </div>
 
       {/* LFO Type */}

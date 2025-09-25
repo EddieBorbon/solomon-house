@@ -11,6 +11,7 @@ interface SoundPlaneProps {
   rotation: [number, number, number];
   scale: [number, number, number];
   isSelected: boolean;
+  audioEnabled: boolean;
   audioParams: {
     frequency?: number;
     volume?: number;
@@ -21,7 +22,7 @@ interface SoundPlaneProps {
 }
 
 export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
     const { selectEntity, triggerObjectPercussion } = useWorldStore();

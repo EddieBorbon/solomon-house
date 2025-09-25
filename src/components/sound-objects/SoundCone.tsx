@@ -24,7 +24,7 @@ interface SoundConeProps {
 }
 
 export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
-  ({ id, position, rotation, scale, isSelected, audioParams }, ref) => {
+  ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo

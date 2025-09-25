@@ -23,6 +23,7 @@ export function useAudioListener() {
         upZ: 0, // Vector "arriba" en Y positivo
       });
 
+      console.log('Audio Context Info:', {
         contextState: Tone.context.state,
         sampleRate: Tone.context.sampleRate,
         latencyHint: Tone.context.latencyHint,

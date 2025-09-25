@@ -735,6 +735,7 @@ export class AudioManager {
     // Verificar efectos globales
     const globalEffects = this.effectManager.getAllGlobalEffects();
     globalEffects.forEach((effectData, effectId) => {
+      console.log(`Efecto global ${effectId}:`, {
         tipo: effectData.effectNode.constructor.name,
         posicion: effectData.position,
         radio: this.getEffectZoneRadius(effectId)
