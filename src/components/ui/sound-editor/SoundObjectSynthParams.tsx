@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
-import { type AudioParams } from '../../../lib/AudioManager';
 import { MonoSynthParameters } from './MonoSynthParameters';
 import { MetalSynthParameters } from './MetalSynthParameters';
 import { NoiseSynthParameters } from './NoiseSynthParameters';

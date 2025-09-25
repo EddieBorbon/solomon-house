@@ -64,7 +64,6 @@ export function BaseSynthParameters({
   };
 
   const frequencyRange = getFrequencyRange();
-  const frequencyLabels = getFrequencyLabels();
 
   return (
     <div className="relative border border-white p-4 mb-4">

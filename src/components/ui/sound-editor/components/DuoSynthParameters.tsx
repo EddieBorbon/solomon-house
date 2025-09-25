@@ -116,12 +116,12 @@ export function DuoSynthParameters({
             min="0.001"
             max="2"
             step="0.001"
-            value={(selectedObject.audioParams as any).attack || 0.01}
-            onChange={(e) => onParamChange('attack' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.attack || 0.01}
+            onChange={(e) => onParamChange('attack', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).attack || 0.01).toFixed(3)}s
+            {(selectedObject.audioParams.attack || 0.01).toFixed(3)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -141,12 +141,12 @@ export function DuoSynthParameters({
             min="0.01"
             max="4"
             step="0.01"
-            value={(selectedObject.audioParams as any).release || 1}
-            onChange={(e) => onParamChange('release' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.release || 1}
+            onChange={(e) => onParamChange('release', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).release || 1).toFixed(2)}s
+            {(selectedObject.audioParams.release || 1).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

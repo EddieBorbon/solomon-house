@@ -1,6 +1,8 @@
 import { AudioCommand, AudioOperationResult, AudioOperationType } from './types';
-import { AudioParams, SoundObjectType, SoundSource } from '../factories/SoundSourceFactory';
-import { EffectType } from '../managers/EffectManager';
+import { AudioParams, SoundObjectType, SoundSource, SoundSourceFactory } from '../factories/SoundSourceFactory';
+import { EffectType, EffectNode, EffectManager } from '../managers/EffectManager';
+import { SoundPlaybackManager } from '../managers/SoundPlaybackManager';
+import * as Tone from 'tone';
 
 // Comando base abstracto
 export abstract class BaseAudioCommand implements AudioCommand {
@@ -23,7 +25,7 @@ export abstract class BaseAudioCommand implements AudioCommand {
     return this.id;
   }
 
-  protected createResult(success: boolean, message: string, data?: any, error?: string): AudioOperationResult {
+  protected createResult(success: boolean, message: string, data?: unknown, error?: string): AudioOperationResult {
     return {
       success,
       operationId: this.id,
@@ -37,27 +39,25 @@ export abstract class BaseAudioCommand implements AudioCommand {
 
 // Comando para crear fuente de sonido
 export class CreateSoundSourceCommand extends BaseAudioCommand {
-  private soundSourceFactory: any; // Usaremos el factory existente
+  private soundSourceFactory: SoundSourceFactory;
   private soundSources: Map<string, SoundSource>;
-  private id: string;
   private type: SoundObjectType;
   private params: AudioParams;
   private position: [number, number, number];
-  private globalEffects: Map<string, any>;
+  private globalEffects: Map<string, { effectNode: EffectNode, panner: Tone.Panner3D, position: [number, number, number] }>;
 
   constructor(
     id: string,
     type: SoundObjectType,
     params: AudioParams,
     position: [number, number, number],
-    soundSourceFactory: any,
+    soundSourceFactory: SoundSourceFactory,
     soundSources: Map<string, SoundSource>,
-    globalEffects: Map<string, any>
+    globalEffects: Map<string, { effectNode: EffectNode, panner: Tone.Panner3D, position: [number, number, number] }>
   ) {
     super(id, 'createSoundSource');
     this.soundSourceFactory = soundSourceFactory;
     this.soundSources = soundSources;
-    this.id = id;
     this.type = type;
     this.params = params;
     this.position = position;
@@ -86,7 +86,7 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
       
       return true;
       
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -122,7 +122,7 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
       
       return true;
       
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -131,18 +131,16 @@ export class CreateSoundSourceCommand extends BaseAudioCommand {
 // Comando para eliminar fuente de sonido
 export class RemoveSoundSourceCommand extends BaseAudioCommand {
   private soundSources: Map<string, SoundSource>;
-  private soundPlaybackManager: any;
-  private id: string;
+  private soundPlaybackManager: SoundPlaybackManager;
 
   constructor(
     id: string,
     soundSources: Map<string, SoundSource>,
-    soundPlaybackManager: any
+    soundPlaybackManager: SoundPlaybackManager
   ) {
     super(id, 'removeSoundSource');
     this.soundSources = soundSources;
     this.soundPlaybackManager = soundPlaybackManager;
-    this.id = id;
   }
 
   async execute(): Promise<boolean> {
@@ -177,7 +175,7 @@ export class RemoveSoundSourceCommand extends BaseAudioCommand {
       
       return true;
       
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -191,7 +189,7 @@ export class RemoveSoundSourceCommand extends BaseAudioCommand {
 
 // Comando para crear efecto global
 export class CreateGlobalEffectCommand extends BaseAudioCommand {
-  private effectManager: any;
+  private effectManager: EffectManager;
   private soundSources: Map<string, SoundSource>;
   private effectId: string;
   private type: EffectType;
@@ -201,7 +199,7 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
     effectId: string,
     type: EffectType,
     position: [number, number, number],
-    effectManager: any,
+    effectManager: EffectManager,
     soundSources: Map<string, SoundSource>
   ) {
     super(effectId, 'createGlobalEffect');
@@ -228,7 +226,7 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
       
       return true;
       
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -244,7 +242,7 @@ export class CreateGlobalEffectCommand extends BaseAudioCommand {
       
       return true;
       
-    } catch (error) {
+    } catch {
       return false;
     }
   }

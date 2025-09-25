@@ -121,8 +121,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
               }
               
               lastMaterialUpdateRef.current = timeRef.current;
-            } catch (error) {
-            }
+    } catch {
+    }
           }
         } else {
           // Resetear a valores por defecto cuando no hay audio
@@ -136,8 +136,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
             if (materialRef.current.emissiveIntensity !== undefined) {
               materialRef.current.emissiveIntensity = 0;
             }
-          } catch (error) {
-          }
+    } catch {
+    }
         }
       }
 
@@ -178,8 +178,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           if (materialRef.current.emissiveIntensity !== undefined) {
             materialRef.current.emissiveIntensity = 0;
           }
-        } catch (error) {
-        }
+    } catch {
+    }
       }
     }, []);
 

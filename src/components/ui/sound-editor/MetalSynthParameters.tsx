@@ -54,13 +54,13 @@ export function MetalSynthParameters({
         <div className="mb-6">
         <FuturisticSlider
           label="MODULATION_ENVELOPE"
-          value={(selectedObject.audioParams as any).modulationEnvelope || 0.01}
+          value={selectedObject.audioParams.modulationEnvelope || 0.01}
           min={0.01}
           max={2}
           step={0.01}
-          onChange={(value) => onParamChange('modulationEnvelope' as keyof AudioParams, value)}
+          onChange={(value) => onParamChange('modulationEnvelope', value)}
           unit="s"
-          displayValue={((selectedObject.audioParams as any).modulationEnvelope || 0.01).toFixed(2)}
+          displayValue={(selectedObject.audioParams.modulationEnvelope || 0.01).toFixed(2)}
         />
         </div>
 

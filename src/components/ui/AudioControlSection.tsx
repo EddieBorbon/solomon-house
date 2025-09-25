@@ -5,10 +5,9 @@ import { type SoundObject, useWorldStore } from '../../state/useWorldStore';
 
 interface AudioControlSectionProps {
   selectedObject: SoundObject;
-  onRemove: (id: string) => void;
 }
 
-export function AudioControlSection({ selectedObject, onRemove }: AudioControlSectionProps) {
+export function AudioControlSection({ selectedObject }: AudioControlSectionProps) {
   return (
     <div className="mb-6 relative">
       {/* Contenedor con borde complejo */}

@@ -36,7 +36,7 @@ export function NoiseSynthParameters({
           NOISE_TYPE
         </label>
         <select
-          value={(selectedObject.audioParams as any).noiseType || 'white'}
+          value={selectedObject.audioParams.noiseType || 'white'}
           onChange={(e) => onParamChange('noiseType', e.target.value as 'white' | 'pink' | 'brown')}
           className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-full h-6 focus:outline-none focus:border-gray-400"
         >
@@ -57,12 +57,12 @@ export function NoiseSynthParameters({
             min="0.001"
             max="1"
             step="0.001"
-            value={(selectedObject.audioParams as any).attack || 0.001}
+            value={selectedObject.audioParams.attack || 0.001}
             onChange={(e) => onParamChange('attack', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).attack || 0.001).toFixed(3)}s
+            {(selectedObject.audioParams.attack || 0.001).toFixed(3)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -82,12 +82,12 @@ export function NoiseSynthParameters({
             min="0.01"
             max="2"
             step="0.01"
-            value={(selectedObject.audioParams as any).decay || 0.1}
+            value={selectedObject.audioParams.decay || 0.1}
             onChange={(e) => onParamChange('decay', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).decay || 0.1).toFixed(2)}s
+            {(selectedObject.audioParams.decay || 0.1).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -107,12 +107,12 @@ export function NoiseSynthParameters({
             min="0"
             max="1"
             step="0.01"
-            value={(selectedObject.audioParams as any).sustain || 0}
+            value={selectedObject.audioParams.sustain || 0}
             onChange={(e) => onParamChange('sustain', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).sustain || 0).toFixed(2)}
+            {(selectedObject.audioParams.sustain || 0).toFixed(2)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

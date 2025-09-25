@@ -5,6 +5,7 @@ import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
+import { useObjectStore } from '../../stores/useObjectStore';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
@@ -205,7 +206,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     const effectZones: EffectZoneType[] = [];
     
     // Obtener objetos del useObjectStore organizados por cuadrícula
-    const { useObjectStore } = require('../../stores/useObjectStore');
     const objectStore = useObjectStore.getState();
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
@@ -388,7 +388,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         if (!grid || !grid.id) return null;
         
         // Obtener objetos de esta cuadrícula desde el ObjectStore
-        const { useObjectStore } = require('../../stores/useObjectStore');
         const objectStore = useObjectStore.getState();
         const gridObjects = objectStore.getAllObjects(grid.id);
         
@@ -473,7 +472,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         
         // Para objetos sonoros, buscar en el ObjectStore para encontrar la cuadrícula
         if (allObjects.objects.some(obj => obj.id === selectedEntityId)) {
-          const { useObjectStore } = require('../../stores/useObjectStore');
           const objectStore = useObjectStore.getState();
           
           // Buscar en todas las cuadrículas para encontrar dónde está el objeto

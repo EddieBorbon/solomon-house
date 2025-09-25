@@ -19,14 +19,14 @@ class PhaserUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -60,14 +60,14 @@ class AutoFilterUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -89,14 +89,14 @@ class AutoWahUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -120,14 +120,14 @@ class BitCrusherUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -162,14 +162,14 @@ class ChorusUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -198,14 +198,14 @@ class DistortionUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }
@@ -223,19 +223,19 @@ class GenericUpdater implements EffectUpdater {
   getCurrentParams(effectNode: EffectNode): Record<string, unknown> {
     // Retornar parámetros básicos disponibles en todos los efectos
     return {
-      wet: (effectNode as any).wet?.value || 'N/A',
-      dry: (effectNode as any).dry?.value || 'N/A'
+      wet: (effectNode as unknown as { wet?: { value: unknown } }).wet?.value || 'N/A',
+      dry: (effectNode as unknown as { dry?: { value: unknown } }).dry?.value || 'N/A'
     };
   }
 
-  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
       } else if (node[paramName] !== undefined) {
         node[paramName] = value;
       }
-    } catch (error) {
+    } catch {
     }
   }
 }

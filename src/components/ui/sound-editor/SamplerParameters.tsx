@@ -98,14 +98,14 @@ export function SamplerParameters({
               try {
                 const urls = JSON.parse(e.target.value);
                 onParamChange('urls', urls);
-              } catch (error) {
+              } catch {
               }
             }}
             className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-cyan-500 focus:outline-none transition-colors h-20 resize-none"
-            placeholder='["A4.mp3", "C4.mp3", "Ds4.mp3", "Fs4.mp3"]'
+            placeholder='[&quot;A4.mp3&quot;, &quot;C4.mp3&quot;, &quot;Ds4.mp3&quot;, &quot;Fs4.mp3&quot;]'
           />
           <p className="text-xs text-gray-400 mt-1">
-            Formato JSON: ["archivo1.mp3", "archivo2.mp3", ...]
+            Formato JSON: [&quot;archivo1.mp3&quot;, &quot;archivo2.mp3&quot;, ...]
           </p>
         </div>
       </div>

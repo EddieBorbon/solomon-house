@@ -50,7 +50,7 @@ export class DelayUpdater implements IEffectUpdater<Tone.FeedbackDelay> {
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: Tone.FeedbackDelay): Record<string, any> {
+  getCurrentParams(effect: Tone.FeedbackDelay): Record<string, unknown> {
     return {
       delayTime: effect.delayTime || '8n',
       feedback: effect.feedback || 0.5,
@@ -64,7 +64,7 @@ export class DelayUpdater implements IEffectUpdater<Tone.FeedbackDelay> {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'delayTime':
         return typeof value === 'string' || (typeof value === 'number' && value >= 0 && value <= 10);
@@ -116,7 +116,7 @@ export class DelayUpdater implements IEffectUpdater<Tone.FeedbackDelay> {
       } else {
         return false;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }

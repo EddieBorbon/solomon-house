@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
-import { type AudioParams } from '../../../lib/AudioManager';
 import { SoundObjectContainer } from './SoundObjectContainer';
 import { SoundObjectHeader } from './SoundObjectHeader';
 import { SoundObjectControls } from './SoundObjectControls';

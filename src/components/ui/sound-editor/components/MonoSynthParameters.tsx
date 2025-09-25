@@ -41,12 +41,12 @@ export function MonoSynthParameters({
             min="50"
             max="2000"
             step="10"
-            value={(selectedObject.audioParams as any).filterBaseFreq || 200}
+            value={selectedObject.audioParams.filterBaseFreq || 200}
             onChange={(e) => onParamChange('filterBaseFreq', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).filterBaseFreq || 200}
+            {selectedObject.audioParams.filterBaseFreq || 200}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -66,12 +66,12 @@ export function MonoSynthParameters({
             min="1"
             max="8"
             step="0.5"
-            value={(selectedObject.audioParams as any).filterOctaves || 4}
+            value={selectedObject.audioParams.filterOctaves || 4}
             onChange={(e) => onParamChange('filterOctaves', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).filterOctaves || 4).toFixed(1)}
+            {(selectedObject.audioParams.filterOctaves || 4).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -91,12 +91,12 @@ export function MonoSynthParameters({
             min="0.1"
             max="10"
             step="0.1"
-            value={(selectedObject.audioParams as any).filterQ || 2}
+            value={selectedObject.audioParams.filterQ || 2}
             onChange={(e) => onParamChange('filterQ', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).filterQ || 2).toFixed(1)}
+            {(selectedObject.audioParams.filterQ || 2).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

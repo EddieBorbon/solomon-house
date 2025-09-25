@@ -48,13 +48,14 @@ export interface AudioParams {
   sustain?: number;
   attackNoise?: number;
   dampening?: number;
+  modulationEnvelope?: number;
   duration?: number;
   polyphony?: number;
   chord?: string[];
   release?: number;
   urls?: Record<string, string>;
-  baseUrl?: string;
   curve?: 'linear' | 'exponential';
+  baseUrl?: string;
   notes?: string | string[];
 }
 

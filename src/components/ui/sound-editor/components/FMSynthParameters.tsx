@@ -41,12 +41,12 @@ export function FMSynthParameters({
             min="0.1"
             max="10"
             step="0.1"
-            value={(selectedObject.audioParams as any).harmonicity || 2}
+            value={selectedObject.audioParams.harmonicity || 2}
             onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).harmonicity || 2).toFixed(1)}
+            {(selectedObject.audioParams.harmonicity || 2).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -66,12 +66,12 @@ export function FMSynthParameters({
             min="0"
             max="50"
             step="0.5"
-            value={(selectedObject.audioParams as any).modulationIndex || 10}
+            value={selectedObject.audioParams.modulationIndex || 10}
             onChange={(e) => onParamChange('modulationIndex', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).modulationIndex || 10).toFixed(1)}
+            {(selectedObject.audioParams.modulationIndex || 10).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

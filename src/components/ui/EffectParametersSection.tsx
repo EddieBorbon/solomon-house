@@ -6,30 +6,18 @@ import { type EffectZone } from '../../state/useWorldStore';
 interface EffectParametersSectionProps {
   zone: EffectZone;
   isUpdatingParams: boolean;
-  lastUpdatedParam: string | null;
   onEffectParamChange: (param: string, value: number | string) => void;
 }
 
 export function EffectParametersSection({ 
   zone, 
   isUpdatingParams, 
-  lastUpdatedParam, 
   onEffectParamChange 
 }: EffectParametersSectionProps) {
   // No renderizar para efectos que tienen sus propios componentes específicos
   const excludedTypes = ['phaser', 'autoFilter', 'autoWah', 'chebyshev', 'chorus', 'distortion', 'feedbackDelay', 'freeverb', 'frequencyShifter', 'jcReverb', 'pingPongDelay', 'pitchShift', 'reverb', 'stereoWidener', 'tremolo', 'vibrato'];
   if (excludedTypes.includes(zone?.type || '')) return null;
   
-  const getEffectTypeColor = (type: string) => {
-    switch (type) {
-      case 'phaser': return 'text-purple-400';
-      case 'autoFilter': return 'text-green-400';
-      case 'autoWah': return 'text-orange-400';
-      case 'bitCrusher': return 'text-red-400';
-      case 'chebyshev': return 'text-indigo-400';
-      default: return 'text-teal-400';
-    }
-  };
 
   const getEffectTypeName = (type: string) => {
     switch (type) {

@@ -41,12 +41,12 @@ export function MembraneSynthParameters({
             min="0.001"
             max="0.1"
             step="0.001"
-            value={(selectedObject.audioParams as any).pitchDecay || 0.05}
+            value={selectedObject.audioParams.pitchDecay || 0.05}
             onChange={(e) => onParamChange('pitchDecay', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).pitchDecay || 0.05).toFixed(3)}
+            {(selectedObject.audioParams.pitchDecay || 0.05).toFixed(3)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -66,12 +66,12 @@ export function MembraneSynthParameters({
             min="1"
             max="20"
             step="0.5"
-            value={(selectedObject.audioParams as any).octaves || 10}
+            value={selectedObject.audioParams.octaves || 10}
             onChange={(e) => onParamChange('octaves', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).octaves || 10).toFixed(1)}
+            {(selectedObject.audioParams.octaves || 10).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

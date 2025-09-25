@@ -42,7 +42,7 @@ export class DistortionFactory implements IEffectFactory {
    * Obtiene los parámetros por defecto para Distortion
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any> {
+  getDefaultParams(): Record<string, unknown> {
     return {
       distortion: 0.4,
       oversample: 'none',
@@ -56,7 +56,7 @@ export class DistortionFactory implements IEffectFactory {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'distortion':
         return typeof value === 'number' && value >= 0 && value <= 1;

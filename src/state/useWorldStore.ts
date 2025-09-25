@@ -5,6 +5,11 @@ import { useGridStore } from '../stores/useGridStore';
 import { useObjectStore } from '../stores/useObjectStore';
 import { useEffectStore } from '../stores/useEffectStore';
 import { useSelectionStore } from '../stores/useSelectionStore';
+import { DefaultParamsProvider } from './providers/DefaultParamsProvider';
+import { ObjectManager } from './managers/ObjectManager';
+import { MobileObjectManager } from './managers/MobileObjectManager';
+import { WorldManager } from './managers/WorldManager';
+import { WorldStoreFacade } from './facades/WorldStoreFacade';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
@@ -226,302 +231,13 @@ export interface WorldActions {
   updateMobileObjectPosition: (id: string, position: [number, number, number]) => void;
 }
 
-// Parámetros por defecto para cada tipo de objeto
+// Función helper para obtener parámetros por defecto usando el provider
 const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
-  switch (type) {
-    case 'cube':
-      return {
-        frequency: 220,
-        volume: 0.6, // Volumen aumentado para mejor audibilidad
-        waveform: 'sine', // Forma de onda de la portadora
-        color: '#000000', // Color negro por defecto
-        metalness: 0.3, // Material semi-metálico por defecto
-        roughness: 0.2, // Material liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 2.0, // Velocidad de pulsación moderada por defecto
-        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
-        rotationSpeed: 1.0, // Velocidad de rotación lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        harmonicity: 1.5,
-        modulationWaveform: 'square', // Forma de onda de la moduladora
-        duration: 2.0, // Duración de 2 segundos para sonidos continuos
-      };
-    case 'sphere':
-      return {
-        frequency: 300,
-        volume: 0.6, // Volumen aumentado para mejor audibilidad
-        waveform: 'sine',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.2, // Material menos metálico por defecto
-        roughness: 0.15, // Material muy liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.95, // Opacidad muy alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 1.5, // Velocidad de pulsación lenta por defecto
-        pulseIntensity: 0.4, // Intensidad de pulsación alta por defecto
-        rotationSpeed: 0.8, // Velocidad de rotación muy lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.3, // Resplandor moderado por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        modulationWaveform: 'sine',
-        harmonicity: 2, // Ratio de octava
-        modulationIndex: 10, // Valor alto para un timbre rico y metálico
-        duration: 1.5, // Duración de 1.5 segundos
-      };
-    case 'cylinder':
-      return {
-        frequency: 220,
-        volume: 0.6, // Volumen aumentado para mejor audibilidad
-        waveform: 'triangle',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.4, // Material más metálico por defecto
-        roughness: 0.25, // Material semi-rugoso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.95, // Opacidad muy alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 2.5, // Velocidad de pulsación rápida por defecto
-        pulseIntensity: 0.2, // Intensidad de pulsación baja por defecto
-        rotationSpeed: 1.2, // Velocidad de rotación moderada por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.1, // Resplandor suave por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        waveform2: 'sine', // La segunda voz puede ser diferente
-        harmonicity: 1.5,
-        vibratoAmount: 0.2,
-        vibratoRate: 5,
-        duration: 3.0, // Duración de 3 segundos para efectos de vibrato
-      };
-    case 'cone':
-      return {
-        frequency: 50, // Frecuencia baja para un bombo
-        volume: 0.6,   // Volumen aumentado para mejor audibilidad
-        waveform: 'sine',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.3, // Material semi-metálico por defecto
-        roughness: 0.35, // Material rugoso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.95, // Opacidad muy alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 3.0, // Velocidad de pulsación muy rápida por defecto
-        pulseIntensity: 0.5, // Intensidad de pulsación alta por defecto
-        rotationSpeed: 0.5, // Velocidad de rotación muy lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.4, // Resplandor intenso por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        pitchDecay: 0.05,
-        octaves: 10,
-        duration: 0.5, // Duración corta para sonidos percusivos
-      };
-    case 'pyramid':
-      return {
-        frequency: 110,
-        volume: 0.9,
-        waveform: 'sawtooth',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.4, // Material metálico por defecto
-        roughness: 0.3, // Material semi-rugoso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 4.0, // Velocidad de pulsación muy rápida por defecto
-        pulseIntensity: 0.6, // Intensidad de pulsación muy alta por defecto
-        rotationSpeed: 2.0, // Velocidad de rotación rápida por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.5, // Resplandor intenso por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        // Envolvente de Amplitud (corta y percusiva)
-        ampAttack: 0.01,
-        ampDecay: 0.2,
-        ampSustain: 0.1,
-        ampRelease: 0.5,
-        // Envolvente de Filtro (un "pluck" rápido)
-        filterAttack: 0.005,
-        filterDecay: 0.1,
-        filterSustain: 0.05,
-        filterRelease: 0.2,
-        filterBaseFreq: 200,
-        filterOctaves: 4,
-        filterQ: 2,
-      };
-    case 'icosahedron':
-      return {
-        frequency: 200,
-        volume: 0.8,
-        waveform: 'sine',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.9, // Material muy metálico por defecto
-        roughness: 0.05, // Material muy liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.95, // Opacidad muy alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 1.0, // Velocidad de pulsación muy lenta por defecto
-        pulseIntensity: 0.1, // Intensidad de pulsación muy baja por defecto
-        rotationSpeed: 0.3, // Velocidad de rotación muy lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.6, // Resplandor muy intenso por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        harmonicity: 5.1,
-        modulationIndex: 32,
-        resonance: 4000,
-        octaves: 1.5,
-        duration: 0.5, // Duración corta para sonidos percusivos metálicos
-      };
-    case 'plane':
-      return {
-        frequency: 0, // NoiseSynth no usa frecuencia
-        volume: 0.7,
-        waveform: 'sine', // No se usa en NoiseSynth pero es requerido por AudioParams
-        color: '#000000', // Color negro por defecto
-        metalness: 0.4, // Material semi-metálico por defecto
-        roughness: 0.25, // Material semi-liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 2.5, // Velocidad de pulsación rápida por defecto
-        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
-        rotationSpeed: 1.5, // Velocidad de rotación moderada por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        noiseType: 'white',
-        attack: 0.001,
-        decay: 0.1,
-        sustain: 0,
-        duration: 0.1, // Duración del golpe
-      };
-    case 'torus':
-      return {
-        frequency: 440,
-        volume: 0.9,
-        waveform: 'sine', // No se usa en PluckSynth pero es requerido por AudioParams
-        color: '#000000', // Color negro por defecto
-        metalness: 0.3, // Material semi-metálico por defecto
-        roughness: 0.4, // Material rugoso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 3.5, // Velocidad de pulsación muy rápida por defecto
-        pulseIntensity: 0.4, // Intensidad de pulsación alta por defecto
-        rotationSpeed: 1.8, // Velocidad de rotación rápida por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.3, // Resplandor moderado por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        attackNoise: 1,
-        dampening: 4000,
-        resonance: 0.9,
-      };
-    case 'dodecahedronRing':
-      return {
-        frequency: 220, // Frecuencia base A3 para transponer acordes
-        volume: 0.7,
-        waveform: 'sine',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.3, // Material semi-metálico por defecto
-        roughness: 0.1, // Material muy liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.95, // Opacidad muy alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 1.8, // Velocidad de pulsación moderada por defecto
-        pulseIntensity: 0.2, // Intensidad de pulsación baja por defecto
-        rotationSpeed: 0.7, // Velocidad de rotación lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-        // Efectos de iluminación
-        glowIntensity: 0.4, // Resplandor intenso por defecto
-        glowColor: '#ffffff', // Resplandor blanco por defecto
-        shadowCasting: true, // Proyectar sombras por defecto
-        shadowReceiving: true, // Recibir sombras por defecto
-        polyphony: 4,
-        chord: ["C4", "E4", "G4", "B4"], // Un acorde de Cmaj7
-        attack: 1.5, // Ataque lento
-        release: 2.0, // Liberación larga
-        // Parámetros para las voces de FMSynth
-        harmonicity: 1,
-        modulationIndex: 2,
-        modulationWaveform: 'triangle',
-      };
-    case 'spiral':
-      return {
-        volume: 0.9,
-        attack: 0.1,
-        release: 1.0,
-        curve: 'exponential',
-        color: '#000000', // Color negro por defecto
-        metalness: 0.2, // Material menos metálico por defecto
-        roughness: 0.3, // Material semi-rugoso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        notes: ["C4", "E4", "G4"], // Toca un acorde de C Mayor por defecto
-        duration: 1,
-        // Mapeo de samples
-        urls: {
-          C4: "C4.mp3",
-          "D#4": "Ds4.mp3",
-          "F#4": "Fs4.mp3",
-          A4: "A4.mp3",
-        },
-        baseUrl: "/samples/piano/", // La ruta a nuestra carpeta de samples
-        // Campos requeridos por AudioParams
-        frequency: 0, // No se usa en Sampler
-        waveform: 'sine', // No se usa en Sampler
-      };
-    default:
-      return {
-        frequency: 330,
-        waveform: 'sine',
-        volume: 0.6, // Volumen aumentado para mejor audibilidad
-        color: '#000000', // Color negro por defecto
-        metalness: 0.3, // Material semi-metálico por defecto
-        roughness: 0.2, // Material liso por defecto
-        emissiveColor: '#000000', // Sin emisión por defecto
-        emissiveIntensity: 0, // Sin intensidad de emisión por defecto
-        opacity: 0.9, // Opacidad alta por defecto
-        blendingMode: 'NormalBlending', // Modo normal por defecto
-        // Propiedades de animación
-        pulseSpeed: 2.0, // Velocidad de pulsación moderada por defecto
-        pulseIntensity: 0.3, // Intensidad de pulsación moderada por defecto
-        rotationSpeed: 1.0, // Velocidad de rotación lenta por defecto
-        autoRotate: false, // Sin rotación automática por defecto
-      };
-  }
+  return DefaultParamsProvider.getDefaultAudioParams(type);
 };
+
+// Instancia del facade que coordina todos los componentes
+const worldStoreFacade = new WorldStoreFacade();
 
 // Creación del store de Zustand
 export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
@@ -549,7 +265,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   worlds: [{ id: 'default', name: 'Default World' }],
   currentWorldId: 'default',
 
-  // Acción para añadir un nuevo objeto - Delegada al useObjectStore
+  // Acción para añadir un nuevo objeto - Delegada al WorldStoreFacade
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
     const state = get();
     const activeGridId = state.activeGridId;
@@ -558,8 +274,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       return;
     }
 
-    // Crear objeto usando el useObjectStore (ahora maneja la cuadrícula internamente)
-    const newObject = useObjectStore.getState().addObject(type, position, activeGridId);
+    // Crear objeto usando el facade
+    const newObject = worldStoreFacade.createObject(type, position, activeGridId);
     
     // Actualizar la cuadrícula para reflejar el nuevo objeto
     const activeGrid = state.grids.get(activeGridId);
@@ -572,12 +288,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       set((state) => ({
         grids: new Map(state.grids.set(activeGridId, updatedGrid)),
       }));
-
-    } else {
     }
   },
 
-  // Acción para eliminar un objeto - Delegada al useObjectStore
+  // Acción para eliminar un objeto - Delegada al WorldStoreFacade
   removeObject: (id: string) => {
     set((state) => {
       const newGrids = new Map(state.grids);
@@ -586,8 +300,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       for (const [gridId, grid] of newGrids) {
         const objectIndex = grid.objects.findIndex(obj => obj.id === id);
         if (objectIndex !== -1) {
-          // Eliminar objeto usando el useObjectStore
-          useObjectStore.getState().removeObject(id, gridId);
+          // Eliminar objeto usando el facade
+          worldStoreFacade.removeObject(id, gridId);
           
           const updatedObjects = grid.objects.filter(obj => obj.id !== id);
           
@@ -606,10 +320,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     });
   },
 
-  // Acción para seleccionar una entidad - Delegada al useSelectionStore
+  // Acción para seleccionar una entidad - Delegada al WorldStoreFacade
   selectEntity: (id: string | null) => {
-    // Delegar al useSelectionStore
-    useSelectionStore.getState().selectEntity(id);
+    // Delegar al facade
+    worldStoreFacade.selectEntity(id);
     
     set((state) => {
       const newGrids = new Map(state.grids);
@@ -647,7 +361,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     });
   },
 
-  // Acción para actualizar un objeto - Delegada al useObjectStore
+  // Acción para actualizar un objeto - Delegada al WorldStoreFacade
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => {
     set((state) => {
       const newGrids = new Map(state.grids);
@@ -656,8 +370,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       for (const [gridId, grid] of newGrids) {
         const objectIndex = grid.objects.findIndex(obj => obj.id === id);
         if (objectIndex !== -1) {
-          // Actualizar objeto usando el useObjectStore
-          useObjectStore.getState().updateObject(id, updates, gridId);
+          // Actualizar objeto usando el facade
+          worldStoreFacade.updateObject(id, updates, gridId);
           
           const updatedObjects = [...grid.objects];
           updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
@@ -675,34 +389,25 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     });
   },
 
-  // Acción para activar/desactivar el audio de un objeto - Delegada al useObjectStore
+  // Acción para activar/desactivar el audio de un objeto - Delegada al WorldStoreFacade
   toggleObjectAudio: (id: string, forceState?: boolean) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      // Delegar al useObjectStore
-      useObjectStore.getState().toggleObjectAudio(id, forceState, gridId);
+      // Delegar al facade
+      worldStoreFacade.toggleObjectAudio(id, forceState, gridId);
       
       // Actualizar el estado local
       set((state) => {
         const newGrids = new Map(state.grids);
-        const grid = newGrids.get(gridId!);
+        const grid = newGrids.get(gridId);
         if (grid) {
           const updatedObjects = grid.objects.map((obj) =>
             obj.id === id ? { ...obj, audioEnabled: forceState !== undefined ? forceState : !obj.audioEnabled } : obj
           );
           
-          newGrids.set(gridId!, {
+          newGrids.set(gridId, {
             ...grid,
             objects: updatedObjects
           });
@@ -713,105 +418,60 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
   },
 
-  // Acción para disparar una nota percusiva - Delegada al useObjectStore
+  // Acción para disparar una nota percusiva - Delegada al WorldStoreFacade
   triggerObjectNote: (id: string) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      useObjectStore.getState().triggerObjectNote(id, gridId);
+      worldStoreFacade.triggerObjectNote(id, gridId);
     }
   },
 
-  // Acción para disparar un objeto percusivo - Delegada al useObjectStore
+  // Acción para disparar un objeto percusivo - Delegada al WorldStoreFacade
   triggerObjectPercussion: (id: string) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      useObjectStore.getState().triggerObjectPercussion(id, gridId);
+      worldStoreFacade.triggerObjectPercussion(id, gridId);
     }
   },
 
-  // Acción para disparar una nota con duración específica - Delegada al useObjectStore
+  // Acción para disparar una nota con duración específica - Delegada al WorldStoreFacade
   triggerObjectAttackRelease: (id: string) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      useObjectStore.getState().triggerObjectAttackRelease(id, gridId);
+      worldStoreFacade.triggerObjectAttackRelease(id, gridId);
     }
   },
 
-  // Acción para iniciar el gate - Delegada al useObjectStore
+  // Acción para iniciar el gate - Delegada al WorldStoreFacade
   startObjectGate: (id: string) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      useObjectStore.getState().startObjectGate(id, gridId);
+      worldStoreFacade.startObjectGate(id, gridId);
     }
   },
 
-  // Acción para detener el gate - Delegada al useObjectStore
+  // Acción para detener el gate - Delegada al WorldStoreFacade
   stopObjectGate: (id: string) => {
     const state = get();
-    let gridId: string | null = null;
-    
-    // Buscar el objeto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
-      const obj = grid.objects.find(obj => obj.id === id);
-      if (obj) {
-        gridId = gId;
-        break;
-      }
-    }
+    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
-      useObjectStore.getState().stopObjectGate(id, gridId);
+      worldStoreFacade.stopObjectGate(id, gridId);
     }
   },
 
-  // Acción para limpiar todos los objetos - Delegada al useObjectStore
+  // Acción para limpiar todos los objetos - Delegada al WorldStoreFacade
   clearAllObjects: () => {
-    // Limpiar objetos usando el useObjectStore
-    useObjectStore.getState().clearAllObjects();
+    // Limpiar objetos usando el facade
+    worldStoreFacade.clearAllObjects();
     
     set((state) => {
       const newGrids = new Map(state.grids);
@@ -833,13 +493,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     });
   },
 
-  // Acción para establecer el modo de transformación - Delegada al useSelectionStore
+  // Acción para establecer el modo de transformación - Delegada al WorldStoreFacade
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => {
-    useSelectionStore.getState().setTransformMode(mode);
+    worldStoreFacade.setTransformMode(mode);
     set({ transformMode: mode });
   },
 
-  // Nuevas acciones para zonas de efectos - Delegadas al useEffectStore
+  // Nuevas acciones para zonas de efectos - Delegadas al WorldStoreFacade
   addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     const state = get();
     const activeGridId = state.activeGridId;
@@ -848,8 +508,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       return;
     }
 
-    // Crear zona de efecto usando el useEffectStore
-    const newEffectZone = useEffectStore.getState().addEffectZone(type, position, shape, activeGridId);
+    // Crear zona de efecto usando el facade
+    const newEffectZone = worldStoreFacade.createEffectZone(type, position, shape, activeGridId);
     
     // Agregar zona de efecto a la cuadrícula activa
     const activeGrid = state.grids.get(activeGridId);
@@ -862,7 +522,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       set((state) => ({
         grids: new Map(state.grids.set(activeGridId, updatedGrid)),
       }));
-
     }
   },
 
@@ -874,8 +533,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       for (const [gridId, grid] of newGrids) {
         const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
         if (zoneIndex !== -1) {
-          // Actualizar zona de efecto usando el useEffectStore
-          useEffectStore.getState().updateEffectZone(id, updates, gridId);
+          // Actualizar zona de efecto usando el facade
+          worldStoreFacade.updateEffectZone(id, updates, gridId);
           
           const updatedZones = [...grid.effectZones];
           updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], ...updates };
@@ -900,8 +559,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       for (const [gridId, grid] of newGrids) {
         const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
         if (zoneIndex !== -1) {
-          // Eliminar zona de efecto usando el useEffectStore
-          useEffectStore.getState().removeEffectZone(id, gridId);
+          // Eliminar zona de efecto usando el facade
+          worldStoreFacade.removeEffectZone(id, gridId);
           
           const updatedZones = grid.effectZones.filter(zone => zone.id !== id);
           
@@ -934,8 +593,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
     
     if (gridId) {
-      // Delegar al useEffectStore
-      useEffectStore.getState().toggleLockEffectZone(id, gridId);
+      // Delegar al facade
+      worldStoreFacade.toggleLockEffectZone(id, gridId);
       
       // Actualizar el estado local
       set((state) => {
@@ -960,7 +619,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
   },
 
-  // Nuevas acciones para controlar la edición de zonas de efectos - Delegadas al useEffectStore
+  // Nuevas acciones para controlar la edición de zonas de efectos - Delegadas al WorldStoreFacade
   setEditingEffectZone: (isEditing: boolean) => {
     useEffectStore.getState().setEditingEffectZone(isEditing);
     set({ isEditingEffectZone: isEditing });
@@ -974,40 +633,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     useEffectStore.getState().debugAudioChain(soundId);
   },
 
-  // Acciones para objetos móviles
+  // Acciones para objetos móviles - Delegadas al WorldStoreFacade
   addMobileObject: (position: [number, number, number]) => {
     const state = get();
     const activeGridId = state.activeGridId;
-    
     
     if (!activeGridId) {
       return;
     }
 
-    const newMobileObject: MobileObject = {
-      id: uuidv4(),
-      type: 'mobile',
-      position,
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1],
-      isSelected: false,
-      mobileParams: {
-        movementType: 'circular',
-        radius: 2,
-        speed: 1,
-        proximityThreshold: 1.5,
-        isActive: true,
-        centerPosition: position,
-        direction: [1, 0, 0],
-        axis: [0, 1, 0],
-        amplitude: 0.5,
-        frequency: 1,
-        randomSeed: Math.random() * 1000,
-        showRadiusIndicator: true,
-        showProximityIndicator: true,
-      },
-    };
-
+    // Crear objeto móvil usando el facade
+    const newMobileObject = worldStoreFacade.createMobileObject(position);
 
     // Agregar objeto móvil a la cuadrícula activa
     const activeGrid = state.grids.get(activeGridId);
@@ -1022,15 +658,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         newGrids.set(activeGridId, updatedGrid);
         return { grids: newGrids };
       });
-
-    } else {
     }
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
-    
     set((state) => {
       const newGrids = new Map(state.grids);
+      
+      // Actualizar objeto móvil usando el facade
+      worldStoreFacade.updateMobileObject(id, updates, newGrids);
       
       // Buscar el objeto móvil en todas las cuadrículas y actualizarlo
       for (const [gridId, grid] of newGrids) {
@@ -1054,6 +690,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   removeMobileObject: (id: string) => {
     set((state) => {
       const newGrids = new Map(state.grids);
+      
+      // Eliminar objeto móvil usando el facade
+      worldStoreFacade.removeMobileObject(id, newGrids);
       
       // Buscar y eliminar el objeto móvil de todas las cuadrículas
       for (const [gridId, grid] of newGrids) {
@@ -1079,6 +718,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   updateMobileObjectPosition: (id: string, position: [number, number, number]) => {
     set((state) => {
       const newGrids = new Map(state.grids);
+      
+      // Actualizar posición usando el facade
+      worldStoreFacade.updateMobileObjectPosition(id, position, newGrids);
       
       // Buscar el objeto móvil en todas las cuadrículas y actualizar su posición
       for (const [gridId, grid] of newGrids) {
@@ -1200,45 +842,32 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     useGridStore.getState().scaleGrid(gridId, scale);
   },
 
-  // World management functions
+  // World management functions - Delegadas al WorldStoreFacade
   createWorld: (name: string) => {
-    const state = get();
-    const newWorld = {
-      id: `world_${Date.now()}`,
-      name: name
-    };
+    const newWorld = worldStoreFacade.createWorld(name);
     
     set({
-      worlds: [...state.worlds, newWorld],
-      currentWorldId: newWorld.id
+      worlds: worldStoreFacade.getAllWorlds(),
+      currentWorldId: worldStoreFacade.getCurrentWorld()?.id || null
     });
-    
   },
 
   deleteWorld: (id: string) => {
-    const state = get();
+    const success = worldStoreFacade.deleteWorld(id);
     
-    if (id === 'default') {
-      return;
-    }
-    
-    const updatedWorlds = state.worlds.filter(w => w.id !== id);
-    const newCurrentWorldId = state.currentWorldId === id ? 'default' : state.currentWorldId;
-    
+    if (success) {
     set({
-      worlds: updatedWorlds,
-      currentWorldId: newCurrentWorldId
+        worlds: worldStoreFacade.getAllWorlds(),
+        currentWorldId: worldStoreFacade.getCurrentWorld()?.id || null
     });
-    
+    }
   },
 
   switchWorld: (id: string) => {
-    const state = get();
-    const world = state.worlds.find(w => w.id === id);
+    const success = worldStoreFacade.switchWorld(id);
     
-    if (world) {
-      set({ currentWorldId: id });
-    } else {
+    if (success) {
+      set({ currentWorldId: worldStoreFacade.getCurrentWorld()?.id || null });
     }
   },
 

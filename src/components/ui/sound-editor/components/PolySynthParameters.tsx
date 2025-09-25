@@ -53,12 +53,12 @@ export function PolySynthParameters({
             min="1"
             max="8"
             step="1"
-            value={(selectedObject.audioParams as any).polyphony || 4}
-            onChange={(e) => onParamChange('polyphony' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.polyphony || 4}
+            onChange={(e) => onParamChange('polyphony', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).polyphony || 4}
+            {selectedObject.audioParams.polyphony || 4}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -73,7 +73,7 @@ export function PolySynthParameters({
           CHORD_TYPE
         </label>
         <select
-          value={JSON.stringify((selectedObject.audioParams as any).chord || ["C4", "E4", "G4"])}
+          value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4"])}
           onChange={(e) => {
             const chord = chordMap[e.target.value] || ["C4", "E4", "G4"];
             onParamChange('chord' as keyof AudioParams, chord);
@@ -102,12 +102,12 @@ export function PolySynthParameters({
             min="0.01"
             max="4"
             step="0.01"
-            value={(selectedObject.audioParams as any).release || 1}
-            onChange={(e) => onParamChange('release' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.release || 1}
+            onChange={(e) => onParamChange('release', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).release || 1).toFixed(2)}s
+            {(selectedObject.audioParams.release || 1).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -122,8 +122,8 @@ export function PolySynthParameters({
           CURVE
         </label>
         <select
-          value={(selectedObject.audioParams as any).curve || 'linear'}
-          onChange={(e) => onParamChange('curve' as keyof AudioParams, e.target.value)}
+          value={selectedObject.audioParams.curve || 'linear'}
+          onChange={(e) => onParamChange('curve', e.target.value)}
           className="w-full p-2 bg-black text-white border border-white focus:border-white focus:outline-none transition-colors font-mono text-xs"
         >
           <option value="linear">LINEAR</option>
@@ -147,12 +147,12 @@ export function PolySynthParameters({
             min="0"
             max="10"
             step="0.1"
-            value={(selectedObject.audioParams as any).harmonicity || 1}
-            onChange={(e) => onParamChange('harmonicity' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.harmonicity || 1}
+            onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).harmonicity || 1).toFixed(1)}
+            {(selectedObject.audioParams.harmonicity || 1).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -172,12 +172,12 @@ export function PolySynthParameters({
             min="0"
             max="100"
             step="1"
-            value={(selectedObject.audioParams as any).modulationIndex || 10}
-            onChange={(e) => onParamChange('modulationIndex' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.modulationIndex || 10}
+            onChange={(e) => onParamChange('modulationIndex', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).modulationIndex || 10}
+            {selectedObject.audioParams.modulationIndex || 10}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -197,12 +197,12 @@ export function PolySynthParameters({
             min="0"
             max="1"
             step="0.01"
-            value={(selectedObject.audioParams as any).attack || 0.1}
-            onChange={(e) => onParamChange('attack' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.attack || 0.1}
+            onChange={(e) => onParamChange('attack', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).attack || 0.1).toFixed(2)}s
+            {(selectedObject.audioParams.attack || 0.1).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

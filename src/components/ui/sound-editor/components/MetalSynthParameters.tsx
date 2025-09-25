@@ -41,12 +41,12 @@ export function MetalSynthParameters({
             min="0.1"
             max="20"
             step="0.1"
-            value={(selectedObject.audioParams as any).harmonicity || 5.1}
+            value={selectedObject.audioParams.harmonicity || 5.1}
             onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).harmonicity || 5.1).toFixed(1)}
+            {(selectedObject.audioParams.harmonicity || 5.1).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -66,12 +66,12 @@ export function MetalSynthParameters({
             min="0"
             max="100"
             step="1"
-            value={(selectedObject.audioParams as any).modulationIndex || 32}
+            value={selectedObject.audioParams.modulationIndex || 32}
             onChange={(e) => onParamChange('modulationIndex', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).modulationIndex || 32}
+            {selectedObject.audioParams.modulationIndex || 32}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -91,12 +91,12 @@ export function MetalSynthParameters({
             min="1000"
             max="8000"
             step="100"
-            value={(selectedObject.audioParams as any).resonance || 4000}
+            value={selectedObject.audioParams.resonance || 4000}
             onChange={(e) => onParamChange('resonance', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).resonance || 4000}
+            {selectedObject.audioParams.resonance || 4000}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -116,12 +116,12 @@ export function MetalSynthParameters({
             min="0.5"
             max="5"
             step="0.1"
-            value={(selectedObject.audioParams as any).octaves || 1.5}
+            value={selectedObject.audioParams.octaves || 1.5}
             onChange={(e) => onParamChange('octaves', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).octaves || 1.5).toFixed(1)}
+            {(selectedObject.audioParams.octaves || 1.5).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

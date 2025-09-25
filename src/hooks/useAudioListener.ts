@@ -33,7 +33,7 @@ export function useAudioListener() {
         }
       });
 
-    } catch (error) {
+    } catch {
     }
   }, []);
 

@@ -46,12 +46,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         <div className="mb-6">
           <FuturisticSlider
             label="METALNESS"
-            value={(selectedObject.audioParams as any).metalness || 0.3}
+            value={selectedObject.audioParams.metalness || 0.3}
             min={0}
             max={1}
             step={0.01}
             onChange={(value) => onParamChange('metalness', value)}
-            displayValue={((selectedObject.audioParams as any).metalness || 0.3).toFixed(2)}
+            displayValue={(selectedObject.audioParams.metalness || 0.3).toFixed(2)}
           />
         </div>
 
@@ -59,19 +59,19 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
       <div className="mb-6">
         <FuturisticSlider
           label="ROUGHNESS"
-          value={(selectedObject.audioParams as any).roughness || 0.2}
+          value={selectedObject.audioParams.roughness || 0.2}
           min={0}
           max={1}
           step={0.01}
           onChange={(value) => onParamChange('roughness', value)}
-          displayValue={((selectedObject.audioParams as any).roughness || 0.2).toFixed(2)}
+          displayValue={(selectedObject.audioParams.roughness || 0.2).toFixed(2)}
         />
       </div>
 
       {/* Emissive Color */}
       <div className="mb-4">
         <ColorPicker
-          value={(selectedObject.audioParams as any).emissiveColor || '#000000'}
+          value={selectedObject.audioParams.emissiveColor || '#000000'}
           onChange={(color) => onParamChange('emissiveColor', color)}
           label="EMISSIVE_COLOR"
         />
@@ -81,12 +81,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
       <div className="mb-6">
         <FuturisticSlider
           label="EMISSIVE_INTENSITY"
-          value={(selectedObject.audioParams as any).emissiveIntensity || 0}
+          value={selectedObject.audioParams.emissiveIntensity || 0}
           min={0}
           max={1}
           step={0.01}
           onChange={(value) => onParamChange('emissiveIntensity', value)}
-          displayValue={((selectedObject.audioParams as any).emissiveIntensity || 0).toFixed(2)}
+          displayValue={(selectedObject.audioParams.emissiveIntensity || 0).toFixed(2)}
         />
       </div>
 
@@ -102,12 +102,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         <div className="mb-6">
           <FuturisticSlider
             label="OPACITY"
-            value={(selectedObject.audioParams as any).opacity || 0.9}
+            value={selectedObject.audioParams.opacity || 0.9}
             min={0}
             max={1}
             step={0.01}
             onChange={(value) => onParamChange('opacity', value)}
-            displayValue={((selectedObject.audioParams as any).opacity || 0.9).toFixed(2)}
+            displayValue={(selectedObject.audioParams.opacity || 0.9).toFixed(2)}
           />
         </div>
 
@@ -117,7 +117,7 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
             BLENDING_MODE
           </label>
           <select
-            value={(selectedObject.audioParams as any).blendingMode || 'NormalBlending'}
+            value={selectedObject.audioParams.blendingMode || 'NormalBlending'}
             onChange={(e) => onParamChange('blendingMode', e.target.value)}
             className="w-full bg-black/50 border border-white/30 rounded px-3 py-2 text-white text-xs font-mono tracking-wider focus:border-white focus:outline-none"
           >
@@ -139,12 +139,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         <div className="mb-6">
           <FuturisticSlider
             label="PULSE_SPEED"
-            value={(selectedObject.audioParams as any).pulseSpeed || 2.0}
+            value={selectedObject.audioParams.pulseSpeed || 2.0}
             min={0}
             max={10}
             step={0.1}
             onChange={(value) => onParamChange('pulseSpeed', value)}
-            displayValue={((selectedObject.audioParams as any).pulseSpeed || 2.0).toFixed(1)}
+            displayValue={(selectedObject.audioParams.pulseSpeed || 2.0).toFixed(1)}
           />
         </div>
 
@@ -152,12 +152,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
       <div className="mb-6">
         <FuturisticSlider
           label="PULSE_INTENSITY"
-          value={(selectedObject.audioParams as any).pulseIntensity || 0.3}
+          value={selectedObject.audioParams.pulseIntensity || 0.3}
           min={0}
           max={1}
           step={0.01}
           onChange={(value) => onParamChange('pulseIntensity', value)}
-          displayValue={((selectedObject.audioParams as any).pulseIntensity || 0.3).toFixed(2)}
+          displayValue={(selectedObject.audioParams.pulseIntensity || 0.3).toFixed(2)}
         />
       </div>
 
@@ -165,12 +165,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
       <div className="mb-6">
         <FuturisticSlider
           label="ROTATION_SPEED"
-          value={(selectedObject.audioParams as any).rotationSpeed || 1.0}
+          value={selectedObject.audioParams.rotationSpeed || 1.0}
           min={0}
           max={10}
           step={0.1}
           onChange={(value) => onParamChange('rotationSpeed', value)}
-          displayValue={((selectedObject.audioParams as any).rotationSpeed || 1.0).toFixed(1)}
+          displayValue={(selectedObject.audioParams.rotationSpeed || 1.0).toFixed(1)}
         />
       </div>
 
@@ -182,12 +182,12 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
         <div className="flex items-center gap-3">
           <input
             type="checkbox"
-            checked={(selectedObject.audioParams as any).autoRotate || false}
+            checked={selectedObject.audioParams.autoRotate || false}
             onChange={(e) => onParamChange('autoRotate', e.target.checked)}
             className="w-4 h-4 bg-black/50 border border-white/30 rounded focus:border-white focus:outline-none"
           />
           <span className="text-white font-mono text-xs tracking-wider">
-            {(selectedObject.audioParams as any).autoRotate ? 'ENABLED' : 'DISABLED'}
+            {selectedObject.audioParams.autoRotate ? 'ENABLED' : 'DISABLED'}
           </span>
         </div>
       </div>

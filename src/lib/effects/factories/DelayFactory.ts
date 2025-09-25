@@ -37,7 +37,7 @@ export class DelayFactory implements IEffectFactory {
    * Obtiene los parámetros por defecto para FeedbackDelay
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any> {
+  getDefaultParams(): Record<string, unknown> {
     return {
       delayTime: '8n',
       feedback: 0.5,
@@ -51,7 +51,7 @@ export class DelayFactory implements IEffectFactory {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'delayTime':
         return typeof value === 'string' || (typeof value === 'number' && value >= 0 && value <= 10);

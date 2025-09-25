@@ -41,7 +41,7 @@ export class ReverbFactory implements IEffectFactory {
    * Obtiene los parámetros por defecto para Reverb
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any> {
+  getDefaultParams(): Record<string, unknown> {
     return {
       decay: 1.5,
       preDelay: 0.01,
@@ -55,7 +55,7 @@ export class ReverbFactory implements IEffectFactory {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'decay':
         return typeof value === 'number' && value >= 0.1 && value <= 20;

@@ -9,7 +9,7 @@ import {
 } from './types';
 
 // Importar componentes de efectos
-import { AutoFilterParams } from '../../components/ui/effect-editor/AutoFilterParams';
+// import { AutoFilterParams } from '../../components/ui/effect-editor/AutoFilterParams';
 import { AutoWahParams } from '../../components/ui/effect-editor/AutoWahParams';
 import { BitCrusherParams } from '../../components/ui/effect-editor/BitCrusherParams';
 import { ChebyshevParams } from '../../components/ui/effect-editor/ChebyshevParams';
@@ -69,7 +69,8 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
     try {
       switch (effectType) {
         case 'autoFilter':
-          return <AutoFilterParams {...commonProps} />;
+          // return <AutoFilterParams {...commonProps} />;
+          return null;
 
         case 'autoWah':
           return <AutoWahParams {...commonProps} />;

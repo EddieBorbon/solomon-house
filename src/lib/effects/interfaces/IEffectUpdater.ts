@@ -30,7 +30,7 @@ export interface IEffectUpdater<T extends Tone.ToneAudioNode = Tone.ToneAudioNod
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: T): Record<string, any>;
+  getCurrentParams(effect: T): Record<string, unknown>;
   
   /**
    * Valida un parámetro específico
@@ -38,7 +38,7 @@ export interface IEffectUpdater<T extends Tone.ToneAudioNode = Tone.ToneAudioNod
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean;
+  validateParam(paramName: string, value: unknown): boolean;
 }
 
 /**
@@ -72,5 +72,5 @@ export interface IEffectUpdaterRegistry {
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: Tone.ToneAudioNode): Record<string, any>;
+  getCurrentParams(effect: Tone.ToneAudioNode): Record<string, unknown>;
 }

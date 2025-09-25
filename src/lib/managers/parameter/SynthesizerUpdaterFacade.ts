@@ -5,6 +5,7 @@ import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizer
 import { PolySynthUpdater } from './PolySynthUpdater';
 import { PluckSynthUpdater } from './PluckSynthUpdater';
 import { DuoSynthUpdater } from './DuoSynthUpdater';
+import { MembraneSynthUpdater } from './MembraneSynthUpdater';
 
 // Union type for all possible synthesizer types
 type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.MembraneSynth | Tone.PolySynth | Tone.Sampler;
@@ -30,6 +31,7 @@ export class SynthesizerUpdaterFacade {
     this.updaters.set('PolySynth', new PolySynthUpdater(this.configManager));
     this.updaters.set('PluckSynth', new PluckSynthUpdater(this.configManager));
     this.updaters.set('DuoSynth', new DuoSynthUpdater(this.configManager));
+    this.updaters.set('MembraneSynth', new MembraneSynthUpdater(this.configManager));
     // TODO: Agregar más updaters específicos cuando se creen
   }
 
@@ -77,7 +79,7 @@ export class SynthesizerUpdaterFacade {
     if (synth instanceof Tone.PolySynth) return 'PolySynth';
     if (synth instanceof Tone.PluckSynth) return 'PluckSynth';
     if ('voice0' in synth && 'voice1' in synth) return 'DuoSynth';
-    if ('pitchDecay' in synth) return 'MembraneSynth';
+    if ('pitchDecay' in synth && 'octaves' in synth) return 'MembraneSynth';
     if ('filterEnvelope' in synth) return 'MonoSynth';
     if ('resonance' in synth) return 'MetalSynth';
     if (synth instanceof Tone.NoiseSynth) return 'NoiseSynth';
@@ -142,7 +144,8 @@ export class SynthesizerUpdaterFacade {
   private isSpecificSynthesizer(synth: SynthesizerType): boolean {
     return synth instanceof Tone.PolySynth || 
            synth instanceof Tone.PluckSynth ||
-           ('voice0' in synth && 'voice1' in synth);
+           ('voice0' in synth && 'voice1' in synth) ||
+           ('pitchDecay' in synth && 'octaves' in synth);
   }
 
   // Métodos de actualización comunes (copiados de BaseSynthesizerUpdater)

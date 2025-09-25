@@ -42,7 +42,7 @@ export class PhaserFactory implements IEffectFactory {
    * Obtiene los parámetros por defecto para Phaser
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any> {
+  getDefaultParams(): Record<string, unknown> {
     return {
       frequency: 0.5,
       octaves: 2.2,
@@ -57,7 +57,7 @@ export class PhaserFactory implements IEffectFactory {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'frequency':
         return typeof value === 'number' && value >= 0 && value <= 20;

@@ -68,7 +68,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
-    const objects: any[] = [];
+    const objects: unknown[] = [];
     grids.forEach((grid) => {
       objects.push(...grid.objects);
     });

@@ -20,7 +20,7 @@ export class ChorusFactory implements IEffectFactory {
       effectNode.feedback.setValueAtTime(0, effectNode.context.currentTime);
       effectNode.spread = 180;
       effectNode.type = 'sine';
-    } catch (error) {
+    } catch {
     }
     
     effectNode.start();
@@ -50,7 +50,7 @@ export class ChorusFactory implements IEffectFactory {
    * Obtiene los parámetros por defecto para Chorus
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any> {
+  getDefaultParams(): Record<string, unknown> {
     return {
       frequency: 1.5,
       delayTime: 3.5,
@@ -68,7 +68,7 @@ export class ChorusFactory implements IEffectFactory {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'frequency':
       case 'chorusFrequency':

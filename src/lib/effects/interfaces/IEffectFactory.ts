@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { EffectType, EffectNode } from '../../managers/EffectManager';
 
 /**
@@ -28,7 +27,7 @@ export interface IEffectFactory {
    * Obtiene los parámetros por defecto para este tipo de efecto
    * @returns Objeto con los parámetros por defecto
    */
-  getDefaultParams(): Record<string, any>;
+  getDefaultParams(): Record<string, unknown>;
 }
 
 /**

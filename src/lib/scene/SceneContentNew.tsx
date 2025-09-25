@@ -20,6 +20,8 @@ import {
 import { GridRenderer } from '../../components/world/GridRenderer';
 import { CameraController } from '../../components/world/CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
+import { MobileObject } from '../../components/sound-objects/MobileObject';
+import { EffectZone } from '../../components/world/EffectZone';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<{ enabled: boolean } | null>;
@@ -164,8 +166,8 @@ class SelectionHandler implements ISelectionHandler {
  */
 class AudioHandler implements IAudioHandler {
   constructor(
-    private triggerObjectNote: (id: string) => void,
-    private toggleObjectAudio: (id: string) => void
+    private triggerObjectNoteFn: (id: string) => void,
+    private toggleObjectAudioFn: (id: string) => void
   ) {}
 
   handleObjectClick(object: SceneObject): void {
@@ -178,7 +180,7 @@ class AudioHandler implements IAudioHandler {
       case 'cone':
       case 'dodecahedronRing':
         // Para conos y anillos de dodecaedros, activar/desactivar el audio (sonido continuo)
-        this.toggleObjectAudio(object.id);
+        this.toggleObjectAudioFn(object.id);
         break;
       
       case 'icosahedron':
@@ -186,22 +188,22 @@ class AudioHandler implements IAudioHandler {
       case 'torus':
       case 'spiral':
         // Para estos objetos, solo disparar la nota (sonido percusivo)
-        this.triggerObjectNote(object.id);
+        this.triggerObjectNoteFn(object.id);
         break;
       
       default:
         // Para otros objetos, solo disparar la nota
-        this.triggerObjectNote(object.id);
+        this.triggerObjectNoteFn(object.id);
         break;
     }
   }
 
   triggerObjectNote(id: string): void {
-    this.triggerObjectNote(id);
+    this.triggerObjectNoteFn(id);
   }
 
   toggleObjectAudio(id: string): void {
-    this.toggleObjectAudio(id);
+    this.toggleObjectAudioFn(id);
   }
 }
 
@@ -239,13 +241,7 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
     
     const gridsArray = Array.from(grids.values());
     
-    
-    gridsArray.forEach((grid, index) => {
-        objects: grid.objects?.length || 0,
-        mobileObjects: grid.mobileObjects?.length || 0,
-        effectZones: grid.effectZones?.length || 0
-      });
-      
+    gridsArray.forEach((grid) => {
       if (Array.isArray(grid.objects)) {
         objects.push(...grid.objects.filter(obj => obj && obj.id));
       }
@@ -253,13 +249,11 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
         mobileObjects.push(...grid.mobileObjects.filter(obj => obj && obj.id));
       }
       if (Array.isArray(grid.effectZones)) {
-        effectZones.push(...grid.effectZones.filter(zone => zone && zone.id));
+        effectZones.push(...grid.effectZones.filter(zone => zone && zone.id).map(zone => ({
+          ...zone,
+          effectType: zone.type
+        })));
       }
-    });
-    
-      objects: objects.length,
-      mobileObjects: mobileObjects.length,
-      effectZones: effectZones.length
     });
     
     return { objects, mobileObjects, effectZones };

@@ -14,9 +14,9 @@ export function useKeyboardShortcuts() {
 
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
-    const objects: any[] = [];
-    const effectZones: any[] = [];
-    const mobileObjects: any[] = [];
+    const objects: unknown[] = [];
+    const effectZones: unknown[] = [];
+    const mobileObjects: unknown[] = [];
     
     grids.forEach((grid) => {
       objects.push(...grid.objects);

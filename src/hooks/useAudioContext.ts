@@ -49,11 +49,12 @@ export function useAudioContext() {
     setContextState(state.state);
     setIsAudioContextStarted(audioManager.isContextStarted());
     
+    return {
       state: state.state,
       isRunning: state.isRunning,
       sampleRate: state.sampleRate,
       latencyHint: state.latencyHint
-    });
+    };
   }, []);
 
   const suspendContext = useCallback(async () => {

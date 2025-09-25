@@ -56,7 +56,7 @@ export class ChorusUpdater implements IEffectUpdater<Tone.Chorus> {
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: Tone.Chorus): Record<string, any> {
+  getCurrentParams(effect: Tone.Chorus): Record<string, unknown> {
     return {
       frequency: effect.frequency?.value || 1.5,
       delayTime: effect.delayTime || 3.5,
@@ -74,7 +74,7 @@ export class ChorusUpdater implements IEffectUpdater<Tone.Chorus> {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'frequency':
       case 'chorusFrequency':
@@ -137,7 +137,7 @@ export class ChorusUpdater implements IEffectUpdater<Tone.Chorus> {
       } else {
         return false;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }

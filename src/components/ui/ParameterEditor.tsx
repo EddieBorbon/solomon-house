@@ -1,15 +1,12 @@
 'use client';
 
-import { useWorldStore, type EffectZone, type SoundObject } from '../../state/useWorldStore';
+import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import React from 'react';
-import { MobileObjectEditor } from './MobileObjectEditor';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
 import { EffectParametersSection } from './EffectParametersSection';
 import { EffectSpecificParameters } from './EffectSpecificParameters';
-import { AudioControlSection } from './AudioControlSection';
-import { EffectZoneEditor } from './effect-editor/EffectZoneEditor';
 import { EffectZoneHeader } from './effect-editor/EffectZoneHeader';
 import { AutoFilterParams } from './effect-editor/AutoFilterParams';
 import { AutoWahParams } from './effect-editor/AutoWahParams';
@@ -30,9 +27,6 @@ import { PhaserParams } from './effect-editor/PhaserParams';
 import { EffectInfoSection } from './effect-editor/EffectInfoSection';
 import { EffectTransformSection } from './effect-editor/EffectTransformSection';
 import { SoundObjectHeader } from './sound-editor/SoundObjectHeader';
-import { SynthSpecificParameters } from './sound-editor/SynthSpecificParameters';
-import { SoundTransformSection } from './sound-editor/SoundTransformSection';
-import { AdvancedSynthParameters } from './sound-editor/AdvancedSynthParameters';
 import { MonoSynthParameters } from './sound-editor/MonoSynthParameters';
 import { MetalSynthParameters } from './sound-editor/MetalSynthParameters';
 import { NoiseSynthParameters } from './sound-editor/NoiseSynthParameters';

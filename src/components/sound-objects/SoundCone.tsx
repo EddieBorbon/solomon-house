@@ -108,7 +108,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
           materialRef.current.color.setHex(audioParams.color || '#ff6b35'); // Usar color del audioParams
           materialRef.current.emissive.setHex(0x000000);
           materialRef.current.emissiveIntensity = 0;
-        } catch (error) {
+        } catch {
         }
       }
     }, []);

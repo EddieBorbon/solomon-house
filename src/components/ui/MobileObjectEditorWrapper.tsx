@@ -4,7 +4,7 @@ import React from 'react';
 import { MobileObjectEditor } from './MobileObjectEditor';
 
 interface MobileObjectEditorWrapperProps {
-  mobileObject: any;
+  mobileObject: unknown;
   onRemove: (id: string) => void;
 }
 

@@ -41,12 +41,12 @@ export function PluckSynthParameters({
             min="0.1"
             max="20"
             step="0.1"
-            value={(selectedObject.audioParams as any).attackNoise || 1}
-            onChange={(e) => onParamChange('attackNoise' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.attackNoise || 1}
+            onChange={(e) => onParamChange('attackNoise', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).attackNoise || 1).toFixed(1)}
+            {(selectedObject.audioParams.attackNoise || 1).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -66,12 +66,12 @@ export function PluckSynthParameters({
             min="500"
             max="7000"
             step="100"
-            value={(selectedObject.audioParams as any).dampening || 4000}
-            onChange={(e) => onParamChange('dampening' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.dampening || 4000}
+            onChange={(e) => onParamChange('dampening', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams as any).dampening || 4000}Hz
+            {selectedObject.audioParams.dampening || 4000}Hz
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -91,12 +91,12 @@ export function PluckSynthParameters({
             min="0.1"
             max="20"
             step="0.1"
-            value={(selectedObject.audioParams as any).resonance || 0.7}
-            onChange={(e) => onParamChange('resonance' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.resonance || 0.7}
+            onChange={(e) => onParamChange('resonance', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).resonance || 0.7).toFixed(1)}
+            {(selectedObject.audioParams.resonance || 0.7).toFixed(1)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -116,12 +116,12 @@ export function PluckSynthParameters({
             min="0.01"
             max="2"
             step="0.01"
-            value={(selectedObject.audioParams as any).release || 1}
-            onChange={(e) => onParamChange('release' as keyof AudioParams, Number(e.target.value))}
+            value={selectedObject.audioParams.release || 1}
+            onChange={(e) => onParamChange('release', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {((selectedObject.audioParams as any).release || 1).toFixed(2)}s
+            {(selectedObject.audioParams.release || 1).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">

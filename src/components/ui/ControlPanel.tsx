@@ -4,7 +4,6 @@ import { useState, useRef } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { LanguageSelector } from './LanguageSelector';
 import { 
   Cog6ToothIcon, 
   MusicalNoteIcon, 
@@ -117,30 +116,7 @@ export function ControlPanel() {
   const handleAddVibratoZone = () => createEffectZoneInActiveGrid('vibrato');
 
   // Funciones para controlar el scroll horizontal
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -150, behavior: 'smooth' });
-    }
-  };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 150, behavior: 'smooth' });
-    }
-  };
-
-  // Funciones de scroll para zonas de efectos
-  const scrollEffectsLeft = () => {
-    if (effectsScrollContainerRef.current) {
-      effectsScrollContainerRef.current.scrollBy({ left: -150, behavior: 'smooth' });
-    }
-  };
-
-  const scrollEffectsRight = () => {
-    if (effectsScrollContainerRef.current) {
-      effectsScrollContainerRef.current.scrollBy({ left: 150, behavior: 'smooth' });
-    }
-  };
 
   const handleAddMobileObject = () => createMobileObjectInActiveGrid();
 
