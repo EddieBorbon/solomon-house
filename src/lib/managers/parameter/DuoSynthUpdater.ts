@@ -1,41 +1,6 @@
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
 
-// Type definitions for DuoSynth properties
-interface SynthesizerWithVoice0 {
-  voice0: {
-    oscillator: {
-      type: string;
-    };
-  };
-}
-
-interface SynthesizerWithVoice1 {
-  voice1: {
-    oscillator: {
-      type: string;
-    };
-  };
-}
-
-interface SynthesizerWithHarmonicity {
-  harmonicity: {
-    rampTo: (value: number, time: number) => void;
-  } | number;
-}
-
-interface SynthesizerWithVibratoAmount {
-  vibratoAmount: {
-    rampTo: (value: number, time: number) => void;
-  };
-}
-
-interface SynthesizerWithVibratoRate {
-  vibratoRate: {
-    rampTo: (value: number, time: number) => void;
-  };
-}
-
 /**
  * Clase especializada en la actualización de DuoSynth
  * Responsabilidad única: Manejar parámetros específicos de DuoSynth
@@ -50,38 +15,64 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
     result: ParameterUpdateResult
   ): void {
     try {
+      // Verificación de seguridad inicial
+      if (!synth || typeof synth !== 'object') {
+        result.errors.push('DuoSynth: Invalid synthesizer object');
+        return;
+      }
+
+      const typedSynth = synth as Record<string, unknown>;
+      
       // Actualizar harmonicity
-      if (params.harmonicity !== undefined && 'harmonicity' in synth) {
-        const harmonicityParam = (synth as SynthesizerWithHarmonicity).harmonicity;
-        if (typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
-          harmonicityParam.rampTo(params.harmonicity, this.configManager.getRampTime());
-        } else {
-          (synth as { harmonicity: number }).harmonicity = params.harmonicity;
+      if (params.harmonicity !== undefined && 'harmonicity' in typedSynth) {
+        const harmonicityParam = typedSynth.harmonicity;
+        if (typeof harmonicityParam === 'object' && harmonicityParam !== null && 'rampTo' in harmonicityParam) {
+          (harmonicityParam as { rampTo: (value: number, time: number) => void }).rampTo(params.harmonicity, this.configManager.getRampTime());
+        } else if (typeof harmonicityParam === 'number') {
+          (typedSynth as { harmonicity: number }).harmonicity = params.harmonicity;
         }
         result.updatedParams.push('harmonicity');
       }
       
       // Actualizar vibratoAmount
-      if (params.vibratoAmount !== undefined && 'vibratoAmount' in synth) {
-        (synth as SynthesizerWithVibratoAmount).vibratoAmount.rampTo(params.vibratoAmount, this.configManager.getRampTime());
+      if (params.vibratoAmount !== undefined && 'vibratoAmount' in typedSynth) {
+        const vibratoAmountParam = typedSynth.vibratoAmount;
+        if (typeof vibratoAmountParam === 'object' && vibratoAmountParam !== null && 'rampTo' in vibratoAmountParam) {
+          (vibratoAmountParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoAmount, this.configManager.getRampTime());
+        }
         result.updatedParams.push('vibratoAmount');
       }
       
       // Actualizar vibratoRate
-      if (params.vibratoRate !== undefined && 'vibratoRate' in synth) {
-        (synth as SynthesizerWithVibratoRate).vibratoRate.rampTo(params.vibratoRate, this.configManager.getRampTime());
+      if (params.vibratoRate !== undefined && 'vibratoRate' in typedSynth) {
+        const vibratoRateParam = typedSynth.vibratoRate;
+        if (typeof vibratoRateParam === 'object' && vibratoRateParam !== null && 'rampTo' in vibratoRateParam) {
+          (vibratoRateParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoRate, this.configManager.getRampTime());
+        }
         result.updatedParams.push('vibratoRate');
       }
       
       // Actualizar waveform2 (segunda voz)
-      if (params.waveform2 !== undefined && 'voice1' in synth) {
-        (synth as SynthesizerWithVoice1).voice1.oscillator.type = params.waveform2;
+      if (params.waveform2 !== undefined && 'voice1' in typedSynth) {
+        const voice1 = typedSynth.voice1 as Record<string, unknown>;
+        if (voice1 && typeof voice1 === 'object' && 'oscillator' in voice1) {
+          const oscillator = voice1.oscillator as Record<string, unknown>;
+          if (oscillator && typeof oscillator === 'object') {
+            oscillator.type = params.waveform2;
+          }
+        }
         result.updatedParams.push('waveform2');
       }
 
       // Actualizar waveform (primera voz)
-      if (params.waveform !== undefined && 'voice0' in synth) {
-        (synth as SynthesizerWithVoice0).voice0.oscillator.type = params.waveform;
+      if (params.waveform !== undefined && 'voice0' in typedSynth) {
+        const voice0 = typedSynth.voice0 as Record<string, unknown>;
+        if (voice0 && typeof voice0 === 'object' && 'oscillator' in voice0) {
+          const oscillator = voice0.oscillator as Record<string, unknown>;
+          if (oscillator && typeof oscillator === 'object') {
+            oscillator.type = params.waveform;
+          }
+        }
         result.updatedParams.push('waveform');
       }
     } catch (error) {
@@ -93,7 +84,12 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
    * Verifica si el sintetizador es compatible con este updater
    */
   public static isCompatible(synth: unknown): boolean {
-    return 'voice0' in synth && 'voice1' in synth;
+    if (!synth || typeof synth !== 'object') {
+      return false;
+    }
+    
+    const typedSynth = synth as Record<string, unknown>;
+    return 'voice0' in typedSynth && 'voice1' in typedSynth;
   }
 
   /**

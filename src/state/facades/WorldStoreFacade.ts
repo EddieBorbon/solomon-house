@@ -259,7 +259,7 @@ export class WorldStoreFacade {
   /**
    * Actualiza una cuadrícula
    */
-  public updateGrid(gridId: string, updates: unknown): void {
+  public updateGrid(gridId: string, updates: Partial<Omit<Grid, 'id'>>): void {
     useGridStore.getState().updateGrid(gridId, updates);
   }
 
@@ -370,7 +370,11 @@ export class WorldStoreFacade {
     this.objectManager.clearAllObjects();
     useEffectStore.getState().clearAllEffectZones();
     this.worldManager.clearAllWorlds();
-    useGridStore.getState().clearAllGrids();
+    // Limpiar cuadrículas individualmente si no hay método clearAllGrids
+    const gridStore = useGridStore.getState();
+    gridStore.grids.forEach((_, gridId) => {
+      gridStore.deleteGrid(gridId);
+    });
     useSelectionStore.getState().clearSelection();
   }
 

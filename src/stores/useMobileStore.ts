@@ -86,7 +86,7 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
     get().removeMobileObject(id);
   },
 
-  select: (id: string | null) => {
+  selectEntity: (id: string | null) => {
     set((state) => ({
       mobileObjects: state.mobileObjects.map((obj) => ({
         ...obj,
