@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWorldStore, type EffectZone } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { ParameterComponentFactory } from './ParameterComponentFactory';
-import { ParameterManager } from '../managers/ParameterManager';
 import { 
   EffectZoneEntity, 
   SoundObjectEntity, 
