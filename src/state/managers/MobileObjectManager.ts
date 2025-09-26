@@ -161,6 +161,7 @@ export class MobileObjectManager {
     deltaTime: number
   ): [number, number, number] {
     const { mobileParams } = mobileObject;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { movementType, speed, radius, centerPosition, direction, axis, amplitude, frequency } = mobileParams;
 
     switch (movementType) {

@@ -130,7 +130,7 @@ export class AudioManager {
   /**
    * Fuerza la actualización de un efecto específico con estrategias optimizadas
    */
-  public forceEffectUpdate(effectId: string, paramName: string, newValue: number | string): void {
+  public forceEffectUpdate(effectId: string, paramName: string): void {
     this.effectManager.forceEffectUpdate(effectId, paramName);
   }
 

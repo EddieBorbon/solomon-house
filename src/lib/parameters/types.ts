@@ -67,9 +67,14 @@ export interface IParameterValidator {
   validateMobileObjectParameter(param: string, value: unknown): ValidationResult;
 }
 
+// Tipo base para sintetizadores
+type BaseSynthesizer = {
+  [key: string]: unknown;
+};
+
 export interface SynthParameterUpdater {
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult;
-  updateParameter(synth: any, param: string, value: unknown): boolean;
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult;
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean;
   getSupportedParams(): string[];
 }
 
@@ -161,7 +166,7 @@ export const DEFAULT_PARAMETER_CONFIG: ParameterConfig = {
 };
 
 // Tipo para sintetizadores
-export type SynthesizerType = any;
+export type SynthesizerType = BaseSynthesizer;
 
 // Información de parámetros
 export interface ParameterInfo {

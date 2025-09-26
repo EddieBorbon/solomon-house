@@ -7,9 +7,6 @@ import {
   SceneObject, 
   SceneMobileObject, 
   SceneEffectZone,
-  ISceneObjectRenderer,
-  ISceneMobileObjectRenderer,
-  ISceneEffectZoneRenderer,
   SceneOperationResult
 } from './types';
 

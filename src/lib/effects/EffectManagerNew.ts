@@ -183,7 +183,7 @@ export class EffectManagerNew {
    * Determina el tipo de efecto basado en el nodo
    */
   private getEffectTypeFromNode(effectNode: unknown): string {
-    const constructorName = effectNode.constructor.name;
+    const constructorName = (effectNode as { constructor?: { name?: string } }).constructor?.name;
     
     // Mapear nombres de constructores a tipos de efecto
     const typeMap: Record<string, string> = {
@@ -206,7 +206,7 @@ export class EffectManagerNew {
       'Vibrato': 'vibrato'
     };
 
-    return typeMap[constructorName] || 'generic';
+    return typeMap[constructorName || ''] || 'generic';
   }
 
   /**
@@ -225,7 +225,11 @@ export class EffectManagerNew {
     
     return {
       totalEffects: this.spatialEffectManager.getAllGlobalEffects().size,
-      testOscillators: testStats,
+      testOscillators: {
+        total: testStats.totalOscillators,
+        playing: testStats.playingOscillators,
+        stopped: testStats.stoppedOscillators
+      },
       supportedTypes: this.effectFactory.getSupportedTypes().length
     };
   }

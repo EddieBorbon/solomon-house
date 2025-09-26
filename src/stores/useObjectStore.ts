@@ -194,7 +194,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       scale: [1, 1, 1],
       audioParams: getDefaultAudioParams(type),
       isSelected: false,
-      audioEnabled: false,
+      audioEnabled: true, // Cambiar a true para que suene por defecto
     };
 
 
@@ -206,6 +206,9 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         newObject.audioParams,
         newObject.position
       );
+      
+      // Iniciar el sonido automáticamente ya que audioEnabled es true
+      audioManager.startContinuousSound(newObject.id, newObject.audioParams);
     } catch (error) {
       throw error;
     }

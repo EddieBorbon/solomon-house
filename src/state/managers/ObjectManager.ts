@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { AudioParams } from '../../lib/AudioManager';
 import { SoundObjectType, SoundObject } from '../useWorldStore';
 import { DefaultParamsProvider } from '../providers/DefaultParamsProvider';
@@ -21,21 +20,8 @@ export class ObjectManager {
     position: [number, number, number], 
     gridId: string
   ): SoundObject {
-    const audioParams = DefaultParamsProvider.getDefaultAudioParams(type);
-    
-    const newObject: SoundObject = {
-      id: uuidv4(),
-      type,
-      position,
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1],
-      audioParams,
-      isSelected: false,
-      audioEnabled: true,
-    };
-
-    // Delegar al useObjectStore para manejo interno
-    useObjectStore.getState().addObject(type, position, gridId);
+    // Delegar completamente al useObjectStore para manejo interno
+    const newObject = useObjectStore.getState().addObject(type, position, gridId);
     
     return newObject;
   }

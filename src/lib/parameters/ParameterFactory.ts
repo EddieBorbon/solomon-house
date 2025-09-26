@@ -6,6 +6,11 @@ import {
   AudioParams,
   ParameterUpdateResult
 } from './types';
+
+// Tipo base para sintetizadores
+type BaseSynthesizer = {
+  [key: string]: unknown;
+};
 import { 
   BaseParameterValidator, 
   PolySynthValidator, 
@@ -213,7 +218,7 @@ class BaseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -226,7 +231,7 @@ class BaseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       // Usar el método update del actualizador existente
       const result = this.updater.update(synth, { [param]: value });
@@ -249,7 +254,7 @@ class PolySynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -262,7 +267,7 @@ class PolySynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -283,7 +288,7 @@ class PluckSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -296,7 +301,7 @@ class PluckSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -317,7 +322,7 @@ class DuoSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -330,7 +335,7 @@ class DuoSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -351,7 +356,7 @@ class MembraneSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -364,7 +369,7 @@ class MembraneSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -385,7 +390,7 @@ class MetalSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -398,7 +403,7 @@ class MetalSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -419,7 +424,7 @@ class NoiseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -432,7 +437,7 @@ class NoiseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;
@@ -453,7 +458,7 @@ class SamplerParameterUpdaterAdapter implements SynthParameterUpdater {
     this.updater = updater;
   }
 
-  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+  update(synth: BaseSynthesizer, params: Partial<AudioParams>): ParameterUpdateResult {
     try {
       const result = this.updater.update(synth, params);
       return result;
@@ -466,7 +471,7 @@ class SamplerParameterUpdaterAdapter implements SynthParameterUpdater {
     }
   }
 
-  updateParameter(synth: any, param: string, value: unknown): boolean {
+  updateParameter(synth: BaseSynthesizer, param: string, value: unknown): boolean {
     try {
       const result = this.updater.update(synth, { [param]: value });
       return result.success;

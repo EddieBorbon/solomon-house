@@ -368,6 +368,7 @@ export class AudioManagerNew {
            !effectSend.disposed && !dryGain.disposed;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private updateSoundEffectMixing(_id: string, _position: [number, number, number]): void {
     // Implementación existente mantenida
   }

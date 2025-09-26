@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWorldStore, type EffectZone } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { ParameterComponentFactory } from './ParameterComponentFactory';
-import { ParameterManager } from './ParameterManager';
+import { ParameterManager } from '../managers/ParameterManager';
 import { 
   EffectZoneEntity, 
   SoundObjectEntity, 
@@ -102,12 +102,11 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     setEditingEffectZone
   } = useWorldStore();
 
-  const { isUpdatingParams, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
+  const { isUpdatingParams } = useParameterHandlers();
 
   // Hook para selección de entidades
   const {
     selectedEntity,
-    selectedEntityId,
     isSoundObject,
     isMobileObject,
     isEffectZone,
@@ -123,7 +122,6 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
 
   // Componentes refactorizados
   const parameterFactory = ParameterComponentFactory.getInstance();
-  const parameterManager = ParameterManager.getInstance();
 
   // Crear panel de parámetros
   const parameterPanel = useMemo(() => 
@@ -151,17 +149,8 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     };
   }, [selectedEntity?.type, setEditingEffectZone]);
 
-  // Suscribirse a cambios de estado de parámetros
-  useEffect(() => {
-    const unsubscribe = parameterManager.subscribeToChanges((entityId, state) => {
-      if (entityId === selectedEntityId) {
-        setIsUpdatingParams(state.isUpdating);
-        setLastUpdatedParam(state.lastUpdatedParam);
-      }
-    });
-
-    return unsubscribe;
-  }, [selectedEntityId, setIsUpdatingParams, setLastUpdatedParam, parameterManager]);
+  // Estado de parámetros se maneja localmente
+  // TODO: Implementar suscripción cuando esté disponible en ParameterManagerFacade
 
   // Función para actualizar parámetros de objeto sonoro
   const handleParamChange = useCallback((param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
@@ -169,9 +158,6 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
 
     const soundObject = getSoundObject();
     if (!soundObject) return;
-
-    // Usar el parameter manager para validar y actualizar
-    parameterManager.updateParameter(soundObject.id, param as string, value);
 
     const newAudioParams = {
       ...soundObject.audioParams,
@@ -181,7 +167,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     updateObject(soundObject.id, {
       audioParams: newAudioParams,
     });
-  }, [isSoundObject, getSoundObject, updateObject, parameterManager]);
+  }, [isSoundObject, getSoundObject, updateObject]);
 
   // Función para actualizar parámetros de zona de efecto
   const handleEffectParamChange = useCallback((param: string, value: number | string) => {
@@ -190,8 +176,8 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     const effectZone = getEffectZone();
     if (!effectZone) return;
 
-    // Usar el parameter manager para validar y actualizar
-    parameterManager.updateParameter(effectZone.id, param, value);
+    // TODO: Implementar validación específica para efectos cuando esté disponible
+    // const result = parameterManager.updateEffectParams(effectZone, { [param]: value });
 
     const newEffectParams = {
       ...effectZone.effectParams,
@@ -201,7 +187,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     updateEffectZone(effectZone.id, {
       effectParams: newEffectParams,
     });
-  }, [isEffectZone, getEffectZone, updateEffectZone, parameterManager]);
+  }, [isEffectZone, getEffectZone, updateEffectZone]);
 
   // Función para manejar actualización de zona de efecto
   const handleUpdateEffectZone = useCallback((id: string, updates: Partial<EffectZone>) => {

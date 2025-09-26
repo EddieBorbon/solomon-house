@@ -173,6 +173,7 @@ export class SpatialEffectManager {
    * Refresca todos los efectos globales
    */
   public refreshAllGlobalEffects(): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     this.globalEffects.forEach((effectData, _effectId) => {
       try {
         // Forzar actualización del panner

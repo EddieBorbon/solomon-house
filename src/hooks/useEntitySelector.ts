@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
-import { useObjectStore } from '../stores/useObjectStore';
 
 /**
  * Tipos de entidades que pueden ser seleccionadas
@@ -37,19 +36,13 @@ export function useEntitySelector() {
       return null;
     }
     
-    // Buscar en objetos sonoros usando el ObjectStore
-    const objectStore = useObjectStore.getState();
-    const soundObject = objectStore.getObjectById(selectedEntityId);
-    if (soundObject) {
-      return { type: 'soundObject', data: soundObject };
-    }
-    
-    // Buscar en objetos móviles y zonas de efectos en las cuadrículas
+    // Buscar en objetos sonoros en las cuadrículas del WorldStore
     for (const grid of grids.values()) {
-      console.log(`Grid ${grid.id}:`, {
-        mobileObjects: grid.mobileObjects.length,
-        effectZones: grid.effectZones.length
-      });
+      // Buscar en objetos sonoros
+      const soundObject = grid.objects.find(obj => obj.id === selectedEntityId);
+      if (soundObject) {
+        return { type: 'soundObject', data: soundObject };
+      }
       
       // Buscar en objetos móviles
       const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
