@@ -128,6 +128,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
             audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'plane' ? (
@@ -137,6 +138,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
             audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'torus' ? (
@@ -146,6 +148,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
             audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : object.type === 'dodecahedronRing' ? (
@@ -163,6 +166,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             rotation={[0, 0, 0]}
             scale={[1, 1, 1]}
             isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
             audioParams={object.audioParams as unknown as AudioParams}
           />
         ) : null}

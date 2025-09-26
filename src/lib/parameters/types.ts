@@ -56,14 +56,31 @@ export interface IParameterComponentFactory {
 
 export interface IParameterManager {
   updateParameter(entityId: string, param: string, value: unknown): void;
-  validateParameter(entityType: string, param: string, value: unknown): boolean;
+  validateParameter(entityType: string, param: string, value: unknown): ValidationResult;
   getParameterInfo(entityType: string, param: string): ParameterInfo | null;
 }
 
 export interface IParameterValidator {
-  validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult;
+  validate(params: Partial<AudioParams>): ValidationResult;
+  validateEffectParameter(effectType: import('../../types/world').EffectType, param: string, value: unknown): ValidationResult;
   validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult;
   validateMobileObjectParameter(param: string, value: unknown): ValidationResult;
+}
+
+export interface SynthParameterUpdater {
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult;
+  updateParameter(synth: any, param: string, value: unknown): boolean;
+  getSupportedParams(): string[];
+}
+
+export interface ParameterValidatorFactory {
+  createValidator(synthType: string): IParameterValidator;
+  getSupportedTypes(): string[];
+}
+
+export interface SynthUpdaterFactory {
+  createUpdater(synthType: string): SynthParameterUpdater;
+  getSupportedTypes(): string[];
 }
 
 // Interfaces para el sistema de UI
@@ -115,7 +132,36 @@ export interface ParameterConfig {
   enableTransformControls: boolean;
   panelWidth: number;
   animationDuration: number;
+  frequencyRange: {
+    min: number;
+    max: number;
+  };
+  volumeRange: {
+    min: number;
+    max: number;
+  };
 }
+
+// Configuración por defecto
+export const DEFAULT_PARAMETER_CONFIG: ParameterConfig = {
+  enableRealTimeUpdates: true,
+  updateDelay: 100,
+  enableValidation: true,
+  enableTransformControls: true,
+  panelWidth: 300,
+  animationDuration: 200,
+  frequencyRange: {
+    min: 20,
+    max: 20000
+  },
+  volumeRange: {
+    min: 0,
+    max: 1
+  }
+};
+
+// Tipo para sintetizadores
+export type SynthesizerType = any;
 
 // Información de parámetros
 export interface ParameterInfo {
@@ -129,12 +175,26 @@ export interface ParameterInfo {
   category: string;
 }
 
-// Resultado de validación
+// Resultado de validación de parámetros específico para AudioParams
+export interface ParameterValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  sanitizedParams: Partial<AudioParams>;
+}
+
+// Interfaz para validadores de parámetros de audio
+export interface ParameterValidator {
+  validate(params: Partial<AudioParams>): ParameterValidationResult;
+}
+
+// Resultado de validación general
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
   normalizedValue?: unknown;
+  sanitizedParams?: Partial<AudioParams>;
 }
 
 // Resultado de operaciones de parámetros
@@ -145,6 +205,13 @@ export interface ParameterOperationResult {
   operation: string;
   message: string;
   error?: string;
+}
+
+// Resultado de actualización de parámetros
+export interface ParameterUpdateResult {
+  success: boolean;
+  updatedParams: string[];
+  errors: string[];
 }
 
 // Estadísticas del sistema de parámetros

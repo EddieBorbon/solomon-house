@@ -71,7 +71,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Función para obtener traducciones
   const t = (key: string) => {
     const keys = key.split('.');
-    let value: unknown = messages[locale];
+    let value: any = messages[locale];
     
     for (const k of keys) {
       value = value?.[k];

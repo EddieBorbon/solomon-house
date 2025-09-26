@@ -1,4 +1,5 @@
-import { AudioParams, ParameterConfig } from '../ParameterManager';
+import { AudioParams } from '../../factories/SoundSourceFactory';
+import { ParameterConfig } from './ParameterConfigManager';
 
 export interface ValidationResult {
   valid: boolean;

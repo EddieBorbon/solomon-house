@@ -265,8 +265,8 @@ export class AudioManagerNew {
     this.effectManager.refreshAllGlobalEffects();
   }
 
-  public forceEffectUpdate(effectId: string, paramName: string, newValue: number | string): void {
-    this.effectManager.forceEffectUpdate(effectId, paramName, newValue);
+  public forceEffectUpdate(effectId: string, paramName: string): void {
+    this.effectManager.forceEffectUpdate(effectId, paramName);
   }
 
   public setEffectSendAmount(soundSourceId: string, effectId: string, amount: number): void {
@@ -368,7 +368,7 @@ export class AudioManagerNew {
            !effectSend.disposed && !dryGain.disposed;
   }
 
-  private updateSoundEffectMixing(/* _id: string, _position: [number, number, number] */): void {
+  private updateSoundEffectMixing(_id: string, _position: [number, number, number]): void {
     // Implementación existente mantenida
   }
 

@@ -49,7 +49,7 @@ export class ParameterManagerNew {
       }
 
       // Usar parámetros sanitizados para la actualización
-      const sanitizedParams = validationResult.sanitizedParams;
+      const sanitizedParams = validationResult.sanitizedParams || params;
 
       // Actualizar parámetros usando el actualizador específico
       const updateResult = updater.update(source.synth, sanitizedParams);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MobileObject } from '../../components/sound-objects/MobileObject';
 import { EffectZone } from '../../components/world/EffectZone';
+import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import { SceneObjectFactory } from './SceneObjectFactory';
 import { 
   SceneObject, 
@@ -16,29 +17,9 @@ import {
  * Renderer especializado para objetos de escena
  * Implementa Strategy Pattern para diferentes tipos de renderizado
  */
-export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRenderer, ISceneEffectZoneRenderer {
-  private objectFactory: SceneObjectFactory;
-  private renderStats: {
-    objectsRendered: number;
-    mobileObjectsRendered: number;
-    effectZonesRendered: number;
-    errors: number;
-  };
-
-  constructor() {
-    this.objectFactory = SceneObjectFactory.getInstance();
-    this.renderStats = {
-      objectsRendered: 0,
-      mobileObjectsRendered: 0,
-      effectZonesRendered: 0,
-      errors: 0
-    };
-  }
-
-  /**
-   * Renderiza un objeto de sonido
-   */
-  public render(object: SceneObject): React.ReactElement | null {
+export class SceneRenderer {
+  // Implementa ISceneObjectRenderer
+  public renderObject(object: SceneObject): React.ReactElement | null {
     try {
       const renderedObject = this.objectFactory.render(object);
       if (renderedObject) {
@@ -51,9 +32,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
     }
   }
 
-  /**
-   * Renderiza un objeto móvil
-   */
+  // Implementa ISceneMobileObjectRenderer
   public renderMobileObject(object: SceneMobileObject): React.ReactElement | null {
     try {
       this.renderStats.mobileObjectsRendered++;
@@ -83,16 +62,14 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
     }
   }
 
-  /**
-   * Renderiza una zona de efecto
-   */
+  // Implementa ISceneEffectZoneRenderer
   public renderEffectZone(zone: SceneEffectZone): React.ReactElement | null {
     try {
       this.renderStats.effectZonesRendered++;
       
       return (
         <EffectZone
-          zone={zone as unknown} // Cast necesario por compatibilidad con el componente existente
+          zone={zone as unknown as EffectZoneType} // Cast correcto pasando por unknown
           onSelect={() => {
             // Esta función será manejada por el componente padre
           }}
@@ -103,6 +80,24 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
       return null;
     }
   }
+  private objectFactory: SceneObjectFactory;
+  private renderStats: {
+    objectsRendered: number;
+    mobileObjectsRendered: number;
+    effectZonesRendered: number;
+    errors: number;
+  };
+
+  constructor() {
+    this.objectFactory = SceneObjectFactory.getInstance();
+    this.renderStats = {
+      objectsRendered: 0,
+      mobileObjectsRendered: 0,
+      effectZonesRendered: 0,
+      errors: 0
+    };
+  }
+
 
   /**
    * Renderiza múltiples objetos en lote
@@ -127,15 +122,15 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
     // Renderizar objetos de sonido
     entities.objects.forEach(object => {
       try {
-        const rendered = this.render(object);
+        const rendered = this.renderObject(object);
         if (rendered) {
           results.objects.push(rendered);
         }
-      } catch {
+      } catch (error) {
         results.errors.push({
           success: false,
           entityId: object.id,
-          operation: 'render',
+          operation: 'renderObject',
           message: `Error renderizando objeto ${object.id}`,
           error: error instanceof Error ? error.message : 'Unknown error'
         });
@@ -149,7 +144,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         if (rendered) {
           results.mobileObjects.push(rendered);
         }
-      } catch {
+      } catch (error) {
         results.errors.push({
           success: false,
           entityId: object.id,
@@ -167,7 +162,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         if (rendered) {
           results.effectZones.push(rendered);
         }
-      } catch {
+      } catch (error) {
         results.errors.push({
           success: false,
           entityId: zone.id,
@@ -256,11 +251,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
   /**
    * Obtiene información de debugging del renderer
    */
-  public getDebugInfo(): {
-    stats: typeof this.renderStats;
-    factoryStats: ReturnType<SceneObjectFactory['getFactoryStats']>;
-    supportedTypes: string[];
-  } {
+  public getDebugInfo() {
     return {
       stats: this.getRenderStats(),
       factoryStats: this.objectFactory.getFactoryStats(),

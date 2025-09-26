@@ -282,10 +282,10 @@ export class ParameterManagerFacade {
    */
   public getSystemSummary(): {
     config: ParameterConfig;
-    performance: ReturnType<typeof this.getPerformanceMetrics>;
-    errors: ReturnType<typeof this.getErrorStatistics>;
-    health: ReturnType<typeof this.getHealthStatus>;
-    updaters: ReturnType<typeof this.getUpdaterInfo>;
+    performance: ReturnType<ParameterManagerFacade['getPerformanceMetrics']>;
+    errors: ReturnType<ParameterManagerFacade['getErrorStatistics']>;
+    health: ReturnType<ParameterManagerFacade['getHealthStatus']>;
+    updaters: ReturnType<ParameterManagerFacade['getUpdaterInfo']>;
   } {
     return {
       config: this.getConfig(),

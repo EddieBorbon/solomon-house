@@ -80,6 +80,14 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     enableTransformControls: true,
     panelWidth: 384,
     animationDuration: 300,
+    frequencyRange: {
+      min: 20,
+      max: 20000
+    },
+    volumeRange: {
+      min: -60,
+      max: 0
+    },
     ...config
   };
 

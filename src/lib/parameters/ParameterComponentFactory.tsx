@@ -6,8 +6,7 @@ import {
   MobileObjectEntity,
   IParameterComponentFactory 
 } from './types';
-import { EffectZone, EffectType } from '../../types/world';
-import { MobileObject } from '../../state/useWorldStore';
+import { EffectZone, EffectType, SoundObject, MobileObject } from '../../types/world';
 
 // Importar componentes de efectos
 // import { AutoFilterParams } from '../../components/ui/effect-editor/AutoFilterParams';
@@ -64,7 +63,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
       position: entity.position,
       rotation: entity.rotation,
       scale: entity.scale,
-      isSelected: false
+      isSelected: entity.isSelected // Usar el valor real en lugar de false
     };
   }
 
@@ -79,7 +78,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
       position: entity.position,
       rotation: entity.rotation,
       scale: entity.scale,
-      isSelected: false
+      isSelected: entity.isSelected // Usar el valor real en lugar de false
     };
   }
 
@@ -157,7 +156,16 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
    */
   public createSoundObjectComponent(objectType: SoundObjectType, object: SoundObjectEntity): React.ReactElement | null {
     const commonProps = {
-      object: object as unknown, // Cast necesario por compatibilidad
+      object: {
+        id: object.id,
+        type: objectType, // Usar el tipo correcto de SoundObjectType
+        position: object.position,
+        rotation: object.rotation,
+        scale: object.scale,
+        audioParams: object.audioParams,
+        isSelected: object.isSelected,
+        audioEnabled: true // Agregar propiedad faltante
+      } as SoundObject,
       onParamChange: () => {
       }
     };

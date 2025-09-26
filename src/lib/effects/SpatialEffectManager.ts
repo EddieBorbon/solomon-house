@@ -121,7 +121,7 @@ export class SpatialEffectManager {
    * Actualiza la intensidad de todos los efectos basada en la posición del listener
    */
   public updateAllEffectIntensities(listenerPosition: [number, number, number]): void {
-    this.globalEffects.forEach((effectData, /* _effectId */) => {
+    this.globalEffects.forEach((effectData, effectId) => {
       const intensity = this.calculateEffectIntensity(effectId, listenerPosition);
       
       // Aplicar intensidad al efecto (ajustar wet/dry ratio)
@@ -173,7 +173,7 @@ export class SpatialEffectManager {
    * Refresca todos los efectos globales
    */
   public refreshAllGlobalEffects(): void {
-    this.globalEffects.forEach((effectData, /* _effectId */) => {
+    this.globalEffects.forEach((effectData, _effectId) => {
       try {
         // Forzar actualización del panner
         effectData.panner.positionX.value = effectData.panner.positionX.value;

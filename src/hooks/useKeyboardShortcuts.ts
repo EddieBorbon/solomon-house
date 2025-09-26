@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { useWorldStore } from '../state/useWorldStore';
+import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
 
 export function useKeyboardShortcuts() {
   const { 
@@ -14,9 +14,9 @@ export function useKeyboardShortcuts() {
 
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
-    const objects: unknown[] = [];
-    const effectZones: unknown[] = [];
-    const mobileObjects: unknown[] = [];
+    const objects: SoundObject[] = [];
+    const effectZones: EffectZone[] = [];
+    const mobileObjects: MobileObject[] = [];
     
     grids.forEach((grid) => {
       objects.push(...grid.objects);

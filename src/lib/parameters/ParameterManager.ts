@@ -1,5 +1,6 @@
+import { EffectType } from '../../types/world';
+import { AudioParams } from '../factories/SoundSourceFactory';
 import { 
-  EffectType, 
   SoundObjectType, 
   IParameterManager,
   IParameterValidator,
@@ -74,11 +75,34 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   }
 
   /**
+   * Valida parámetros usando la nueva interfaz
+   */
+  public validate(params: Partial<AudioParams>): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    
+    // Validación básica de parámetros de audio
+    Object.entries(params).forEach(([key, value]) => {
+      const validation = this.validateParameterGeneric(key, value);
+      if (!validation.isValid) {
+        errors.push(...validation.errors);
+      }
+      warnings.push(...validation.warnings);
+    });
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      sanitizedParams: params
+    };
+  }
+
+  /**
    * Valida un parámetro
    */
-  public validateParameter(entityType: string, param: string, value: unknown): boolean {
-    const validation = this.validateParameterGeneric(param, value);
-    return validation.isValid;
+  public validateParameter(entityType: string, param: string, value: unknown): ValidationResult {
+    return this.validateParameterGeneric(param, value);
   }
 
   /**

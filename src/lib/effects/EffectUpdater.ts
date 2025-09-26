@@ -19,7 +19,7 @@ class PhaserUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -60,7 +60,7 @@ class AutoFilterUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -89,7 +89,7 @@ class AutoWahUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -120,7 +120,7 @@ class BitCrusherUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -162,7 +162,7 @@ class ChorusUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -198,7 +198,7 @@ class DistortionUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;
@@ -228,7 +228,7 @@ class GenericUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: unknown, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: any, paramName: string, value: number | string): void {
     try {
       if (node[paramName] && typeof node[paramName].value !== 'undefined') {
         node[paramName].value = value;

@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 import { MobileObject, MovementType } from '../useWorldStore';
 
+interface GridData {
+  mobileObjects: MobileObject[];
+}
+
 /**
  * Manager para manejar objetos móviles
  * Responsabilidad única: Gestión completa de objetos móviles
@@ -36,7 +40,8 @@ export class MobileObjectManager {
   ): void {
     // Buscar el objeto en todas las cuadrículas
     for (const [, grid] of grids) {
-      const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
+      const gridData = grid as GridData;
+      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
         // Validar parámetros móviles si se están actualizando
         if (updates.mobileParams) {
@@ -53,10 +58,11 @@ export class MobileObjectManager {
   public removeMobileObject(id: string, grids: Map<string, unknown>): void {
     // Buscar y eliminar el objeto de todas las cuadrículas
     for (const [, grid] of grids) {
-      const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
+      const gridData = grid as GridData;
+      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
-        const updatedObjects = grid.mobileObjects.filter((obj: MobileObject) => obj.id !== id);
-        grid.mobileObjects = updatedObjects;
+        const updatedObjects = gridData.mobileObjects.filter((obj: MobileObject) => obj.id !== id);
+        gridData.mobileObjects = updatedObjects;
         break;
       }
     }
@@ -72,11 +78,12 @@ export class MobileObjectManager {
   ): void {
     // Buscar el objeto en todas las cuadrículas y actualizar su posición
     for (const [, grid] of grids) {
-      const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
+      const gridData = grid as GridData;
+      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
-        const updatedObjects = [...grid.mobileObjects];
+        const updatedObjects = [...gridData.mobileObjects];
         updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], position };
-        grid.mobileObjects = updatedObjects;
+        gridData.mobileObjects = updatedObjects;
         break;
       }
     }
@@ -87,7 +94,8 @@ export class MobileObjectManager {
    */
   public findMobileObjectById(id: string, grids: Map<string, unknown>): { object: MobileObject | null, gridId: string | null } {
     for (const [gridId, grid] of grids) {
-      const object = grid.mobileObjects.find((obj: MobileObject) => obj.id === id);
+      const gridData = grid as GridData;
+      const object = gridData.mobileObjects.find((obj: MobileObject) => obj.id === id);
       if (object) {
         return { object, gridId };
       }
@@ -160,7 +168,7 @@ export class MobileObjectManager {
         return this.calculateLinearMovement(mobileObject, deltaTime, speed, direction);
       
       case 'circular':
-        return this.calculateCircularMovement(mobileObject, deltaTime, speed, radius, centerPosition, axis);
+        return this.calculateCircularMovement(mobileObject, deltaTime, speed, radius, centerPosition);
       
       case 'polar':
         return this.calculatePolarMovement(mobileObject, deltaTime, speed, radius, centerPosition);
@@ -172,7 +180,7 @@ export class MobileObjectManager {
         return this.calculateFigure8Movement(mobileObject, deltaTime, speed, radius, centerPosition);
       
       case 'spiral':
-        return this.calculateSpiralMovement(mobileObject, deltaTime, speed, radius, centerPosition, axis);
+        return this.calculateSpiralMovement(mobileObject, deltaTime, speed, radius, centerPosition);
       
       default:
         return mobileObject.position;

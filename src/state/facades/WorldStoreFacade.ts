@@ -3,7 +3,7 @@ import { MobileObjectManager } from '../managers/MobileObjectManager';
 import { WorldManager } from '../managers/WorldManager';
 import { DefaultParamsProvider } from '../providers/DefaultParamsProvider';
 import { useGridStore, type Grid } from '../../stores/useGridStore';
-import { useEffectStore } from '../../stores/useEffectStore';
+import { useEffectStore, type EffectType } from '../../stores/useEffectStore';
 import { useSelectionStore } from '../../stores/useSelectionStore';
 import { SoundObjectType, SoundObject, MobileObject, EffectZone } from '../useWorldStore';
 import { AudioParams } from '../../lib/AudioManager';
@@ -149,12 +149,12 @@ export class WorldStoreFacade {
    * Crea una nueva zona de efecto
    */
   public createEffectZone(
-    type: string,
+    type: EffectType,
     position: [number, number, number],
     shape: 'sphere' | 'cube' = 'sphere',
     gridId?: string
   ): EffectZone {
-    return useEffectStore.getState().addEffectZone(type as unknown, position, shape, gridId);
+    return useEffectStore.getState().addEffectZone(type, position, shape, gridId);
   }
 
   /**

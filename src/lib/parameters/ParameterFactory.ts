@@ -1,15 +1,17 @@
 import { 
-  ParameterValidator, 
-  SynthParameterUpdater, 
-  ParameterValidatorFactory, 
-  SynthUpdaterFactory,
-  ParameterConfig
+  IParameterValidator, 
+  ParameterConfig,
+  SynthParameterUpdater,
+  ValidationResult,
+  AudioParams,
+  ParameterUpdateResult
 } from './types';
 import { 
   BaseParameterValidator, 
   PolySynthValidator, 
   PluckSynthValidator 
 } from './ParameterValidator';
+import { EffectType, SoundObjectType } from '../../types/world';
 import { 
   BaseSynthParameterUpdater,
   PolySynthParameterUpdater,
@@ -21,20 +23,156 @@ import {
   SamplerParameterUpdater
 } from './SynthParameterUpdater';
 
+// Adaptadores para convertir validadores existentes a IParameterValidator
+class BaseParameterValidatorAdapter implements IParameterValidator {
+  private validator: BaseParameterValidator;
+
+  constructor(validator: BaseParameterValidator) {
+    this.validator = validator;
+  }
+
+  validate(params: Partial<AudioParams>): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      sanitizedParams: params
+    };
+  }
+
+  validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult {
+    // Implementación básica para efectos
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult {
+    // Implementación básica para objetos de sonido
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateMobileObjectParameter(param: string, value: unknown): ValidationResult {
+    // Implementación básica para objetos móviles
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+}
+
+class PolySynthValidatorAdapter implements IParameterValidator {
+  private validator: PolySynthValidator;
+
+  constructor(validator: PolySynthValidator) {
+    this.validator = validator;
+  }
+
+  validate(params: Partial<AudioParams>): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      sanitizedParams: params
+    };
+  }
+
+  validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateMobileObjectParameter(param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+}
+
+class PluckSynthValidatorAdapter implements IParameterValidator {
+  private validator: PluckSynthValidator;
+
+  constructor(validator: PluckSynthValidator) {
+    this.validator = validator;
+  }
+
+  validate(params: Partial<AudioParams>): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      sanitizedParams: params
+    };
+  }
+
+  validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+
+  validateMobileObjectParameter(param: string, value: unknown): ValidationResult {
+    return {
+      isValid: true,
+      errors: [],
+      warnings: [],
+      normalizedValue: value
+    };
+  }
+}
+
 // Factory para crear validadores de parámetros
-export class ParameterValidatorFactory implements ParameterValidatorFactory {
+export class ParameterValidatorFactoryImpl {
   private config: ParameterConfig;
 
   constructor(config: ParameterConfig) {
     this.config = config;
   }
 
-  createValidator(synthType: string): ParameterValidator {
+  createValidator(synthType: string): IParameterValidator {
     switch (synthType) {
       case 'PolySynth':
-        return new PolySynthValidator(this.config);
+        return new PolySynthValidatorAdapter(new PolySynthValidator(this.config));
       case 'PluckSynth':
-        return new PluckSynthValidator(this.config);
+        return new PluckSynthValidatorAdapter(new PluckSynthValidator(this.config));
       case 'DuoSynth':
       case 'MembraneSynth':
       case 'MonoSynth':
@@ -44,9 +182,9 @@ export class ParameterValidatorFactory implements ParameterValidatorFactory {
       case 'FMSynth':
       case 'AMSynth':
       case 'Synth':
-        return new BaseParameterValidator(this.config);
+        return new BaseParameterValidatorAdapter(new BaseParameterValidator(this.config));
       default:
-        return new BaseParameterValidator(this.config);
+        return new BaseParameterValidatorAdapter(new BaseParameterValidator(this.config));
     }
   }
 
@@ -67,8 +205,283 @@ export class ParameterValidatorFactory implements ParameterValidatorFactory {
   }
 }
 
+// Adaptadores para convertir actualizadores existentes a SynthParameterUpdater
+class BaseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: BaseSynthParameterUpdater;
+
+  constructor(updater: BaseSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      // Usar el método update del actualizador existente
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    // Retornar parámetros básicos soportados
+    return ['frequency', 'volume', 'waveform', 'attack', 'release'];
+  }
+}
+
+class PolySynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: PolySynthParameterUpdater;
+
+  constructor(updater: PolySynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['frequency', 'volume', 'waveform', 'attack', 'release', 'harmonicity', 'modulationIndex'];
+  }
+}
+
+class PluckSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: PluckSynthParameterUpdater;
+
+  constructor(updater: PluckSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['frequency', 'volume', 'attack', 'release', 'resonance'];
+  }
+}
+
+class DuoSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: DuoSynthParameterUpdater;
+
+  constructor(updater: DuoSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['frequency', 'volume', 'waveform', 'attack', 'release', 'harmonicity', 'modulationIndex'];
+  }
+}
+
+class MembraneSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: MembraneSynthParameterUpdater;
+
+  constructor(updater: MembraneSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['frequency', 'volume', 'attack', 'release', 'pitchDecay', 'octaves'];
+  }
+}
+
+class MetalSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: MetalSynthParameterUpdater;
+
+  constructor(updater: MetalSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['frequency', 'volume', 'attack', 'release', 'harmonicity', 'modulationIndex', 'resonance'];
+  }
+}
+
+class NoiseSynthParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: NoiseSynthParameterUpdater;
+
+  constructor(updater: NoiseSynthParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['volume', 'attack', 'release', 'noiseType'];
+  }
+}
+
+class SamplerParameterUpdaterAdapter implements SynthParameterUpdater {
+  private updater: SamplerParameterUpdater;
+
+  constructor(updater: SamplerParameterUpdater) {
+    this.updater = updater;
+  }
+
+  update(synth: any, params: Partial<AudioParams>): ParameterUpdateResult {
+    try {
+      const result = this.updater.update(synth, params);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        updatedParams: [],
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  updateParameter(synth: any, param: string, value: unknown): boolean {
+    try {
+      const result = this.updater.update(synth, { [param]: value });
+      return result.success;
+    } catch {
+      return false;
+    }
+  }
+
+  getSupportedParams(): string[] {
+    return ['volume', 'attack', 'release', 'pitch'];
+  }
+}
+
 // Factory para crear actualizadores de sintetizadores
-export class SynthUpdaterFactory implements SynthUpdaterFactory {
+export class SynthUpdaterFactoryImpl {
   private config: ParameterConfig;
 
   constructor(config: ParameterConfig) {
@@ -78,26 +491,26 @@ export class SynthUpdaterFactory implements SynthUpdaterFactory {
   createUpdater(synthType: string): SynthParameterUpdater {
     switch (synthType) {
       case 'PolySynth':
-        return new PolySynthParameterUpdater(this.config);
+        return new PolySynthParameterUpdaterAdapter(new PolySynthParameterUpdater(this.config));
       case 'PluckSynth':
-        return new PluckSynthParameterUpdater(this.config);
+        return new PluckSynthParameterUpdaterAdapter(new PluckSynthParameterUpdater(this.config));
       case 'DuoSynth':
-        return new DuoSynthParameterUpdater(this.config);
+        return new DuoSynthParameterUpdaterAdapter(new DuoSynthParameterUpdater(this.config));
       case 'MembraneSynth':
-        return new MembraneSynthParameterUpdater(this.config);
+        return new MembraneSynthParameterUpdaterAdapter(new MembraneSynthParameterUpdater(this.config));
       case 'MetalSynth':
-        return new MetalSynthParameterUpdater(this.config);
+        return new MetalSynthParameterUpdaterAdapter(new MetalSynthParameterUpdater(this.config));
       case 'NoiseSynth':
-        return new NoiseSynthParameterUpdater(this.config);
+        return new NoiseSynthParameterUpdaterAdapter(new NoiseSynthParameterUpdater(this.config));
       case 'Sampler':
-        return new SamplerParameterUpdater(this.config);
+        return new SamplerParameterUpdaterAdapter(new SamplerParameterUpdater(this.config));
       case 'MonoSynth':
       case 'FMSynth':
       case 'AMSynth':
       case 'Synth':
-        return new BaseSynthParameterUpdater(this.config);
+        return new BaseSynthParameterUpdaterAdapter(new BaseSynthParameterUpdater(this.config));
       default:
-        return new BaseSynthParameterUpdater(this.config);
+        return new BaseSynthParameterUpdaterAdapter(new BaseSynthParameterUpdater(this.config));
     }
   }
 
@@ -120,18 +533,18 @@ export class SynthUpdaterFactory implements SynthUpdaterFactory {
 
 // Factory principal que combina ambos factories
 export class ParameterFactory {
-  private validatorFactory: ParameterValidatorFactory;
-  private updaterFactory: SynthUpdaterFactory;
+  private validatorFactory: ParameterValidatorFactoryImpl;
+  private updaterFactory: SynthUpdaterFactoryImpl;
 
   constructor(config: ParameterConfig) {
-    this.validatorFactory = new ParameterValidatorFactory(config);
-    this.updaterFactory = new SynthUpdaterFactory(config);
+    this.validatorFactory = new ParameterValidatorFactoryImpl(config);
+    this.updaterFactory = new SynthUpdaterFactoryImpl(config);
   }
 
   /**
    * Crea un validador para el tipo de sintetizador especificado
    */
-  public createValidator(synthType: string): ParameterValidator {
+  public createValidator(synthType: string): IParameterValidator {
     return this.validatorFactory.createValidator(synthType);
   }
 

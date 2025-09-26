@@ -7,6 +7,7 @@ import { SoundPlaybackManager } from '../managers/SoundPlaybackManager';
 import { ParameterManager } from '../managers/ParameterManager';
 import { SoundSource } from '../factories/SoundSourceFactory';
 import { GlobalEffect } from '../managers/EffectManager';
+import * as THREE from 'three';
 
 export class AudioOrchestrator implements IAudioOrchestrator {
   private soundSources: Map<string, SoundSource> = new Map();
@@ -167,8 +168,10 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       }
 
       // Configurar listener inicial
-      this.spatialAudioManager.updateListenerPosition([0, 0, 0]);
-      this.spatialAudioManager.updateListenerOrientation([0, 0, 0]);
+      this.spatialAudioManager.updateListener(
+        new THREE.Vector3(0, 0, 0), 
+        new THREE.Vector3(0, 0, -1)
+      );
 
       this.isInitialized = true;
       this.contextState = 'running';
@@ -277,12 +280,12 @@ export class AudioOrchestrator implements IAudioOrchestrator {
     
     // Actualizar posición del listener
     const listenerState = this.spatialAudioManager.getListenerState();
-    this.listenerPosition = listenerState.position;
-    this.listenerOrientation = listenerState.orientation;
+    this.listenerPosition = [listenerState.position.x, listenerState.position.y, listenerState.position.z];
+    this.listenerOrientation = [listenerState.forward.x, listenerState.forward.y, listenerState.forward.z];
     
     // Actualizar estado del contexto
     const contextState = this.audioContextManager.getContextState();
-    this.contextState = contextState.state;
+    this.contextState = contextState.state as 'suspended' | 'running' | 'closed';
   }
 
   /**

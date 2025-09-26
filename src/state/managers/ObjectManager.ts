@@ -4,6 +4,10 @@ import { SoundObjectType, SoundObject } from '../useWorldStore';
 import { DefaultParamsProvider } from '../providers/DefaultParamsProvider';
 import { useObjectStore } from '../../stores/useObjectStore';
 
+interface GridData {
+  objects: SoundObject[];
+}
+
 /**
  * Manager para manejar objetos de sonido
  * Responsabilidad única: Gestión completa de objetos de sonido
@@ -110,7 +114,8 @@ export class ObjectManager {
    */
   public findObjectById(id: string, grids: Map<string, unknown>): { object: SoundObject | null, gridId: string | null } {
     for (const [gridId, grid] of grids) {
-      const object = grid.objects.find((obj: SoundObject) => obj.id === id);
+      const gridData = grid as GridData;
+      const object = gridData.objects.find((obj: SoundObject) => obj.id === id);
       if (object) {
         return { object, gridId };
       }

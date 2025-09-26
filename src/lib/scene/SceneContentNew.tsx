@@ -44,7 +44,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
     }, [object, onSelect, onAudioInteraction]);
 
     const sceneRenderer = useMemo(() => new SceneRenderer(), []);
-    const renderedObject = sceneRenderer.render(object);
+    const renderedObject = sceneRenderer.renderObject(object);
 
     return (
       <group

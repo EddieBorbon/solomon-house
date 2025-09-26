@@ -139,9 +139,9 @@ export class TestOscillatorManager {
     }
 
     return {
-      frequency: testOsc.frequency.value,
+      frequency: typeof testOsc.frequency.value === 'number' ? testOsc.frequency.value : parseFloat(testOsc.frequency.value.toString()),
       volume: testOsc.volume.value,
-      type: testOsc.type,
+      type: testOsc.type as OscillatorType,
       isPlaying: testOsc.state === 'started'
     };
   }

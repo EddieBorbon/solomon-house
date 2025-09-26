@@ -1,20 +1,18 @@
 'use client';
 
 import React from 'react';
+import { type SoundObject } from '../../../state/useWorldStore';
 
 interface AdvancedSynthParametersProps {
-  object?: unknown;
-  onParamChange?: () => void;
+  object: SoundObject;
 }
 
 export function AdvancedSynthParameters({
-  // object,
-  // onParamChange
+  // object
 }: AdvancedSynthParametersProps) {
   return (
     <div className="futuristic-param-container">
-      
-
+      {/* Parámetros avanzados de sintetizadores */}
     </div>
   );
 }
