@@ -9,6 +9,9 @@ type ToneEffectNode = {
   dry?: { value: number };
 };
 
+// Tipo más flexible para nodos de efectos
+type FlexibleEffectNode = unknown;
+
 // Actualizadores específicos para cada tipo de efecto
 class PhaserUpdater implements EffectUpdater {
   update(effectNode: Tone.Phaser, params: EffectParams): void {
@@ -21,20 +24,23 @@ class PhaserUpdater implements EffectUpdater {
 
   getCurrentParams(effectNode: Tone.Phaser): Record<string, unknown> {
     return {
-      frequency: effectNode.frequency?.value || 'N/A',
+      frequency: (effectNode.frequency as { value?: number })?.value || 'N/A',
       octaves: effectNode.octaves || 'N/A',
       baseFrequency: effectNode.baseFrequency || 'N/A'
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -58,24 +64,27 @@ class AutoFilterUpdater implements EffectUpdater {
 
   getCurrentParams(effectNode: Tone.AutoFilter): Record<string, unknown> {
     return {
-      frequency: effectNode.frequency?.value || 'N/A',
+      frequency: (effectNode.frequency as { value?: number })?.value || 'N/A',
       baseFrequency: effectNode.baseFrequency || 'N/A',
       octaves: effectNode.octaves || 'N/A',
-      depth: effectNode.depth?.value || 'N/A',
-      filterType: effectNode.filter?.type || 'N/A',
-      filterQ: effectNode.filter?.Q?.value || 'N/A',
+      depth: (effectNode.depth as { value?: number })?.value || 'N/A',
+      filterType: (effectNode.filter as { type?: string })?.type || 'N/A',
+      filterQ: (effectNode.filter as { Q?: { value?: number } })?.Q?.value || 'N/A',
       lfoType: effectNode.type || 'N/A'
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -97,14 +106,17 @@ class AutoWahUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -113,10 +125,13 @@ class BitCrusherUpdater implements EffectUpdater {
   update(effectNode: Tone.BitCrusher, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
+        const value = params[paramName];
         
         if (paramName === 'bits') {
+          // Los bits en BitCrusher se manejan directamente
+          this.safeUpdateParam(effectNode, 'bits', value as number | string);
         } else {
-          this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
+          this.safeUpdateParam(effectNode, paramName, value as number | string);
         }
       }
     });
@@ -128,14 +143,17 @@ class BitCrusherUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -161,23 +179,26 @@ class ChorusUpdater implements EffectUpdater {
 
   getCurrentParams(effectNode: Tone.Chorus): Record<string, unknown> {
     return {
-      frequency: effectNode.frequency?.value || 'N/A',
+      frequency: (effectNode.frequency as { value?: number })?.value || 'N/A',
       delayTime: effectNode.delayTime || 'N/A',
       depth: effectNode.depth || 'N/A',
-      feedback: effectNode.feedback?.value || 'N/A',
+      feedback: (effectNode.feedback as { value?: number })?.value || 'N/A',
       spread: effectNode.spread || 'N/A',
       type: effectNode.type || 'N/A'
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -206,14 +227,17 @@ class DistortionUpdater implements EffectUpdater {
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
@@ -223,27 +247,31 @@ class GenericUpdater implements EffectUpdater {
   update(effectNode: EffectNode, params: EffectParams): void {
     Object.keys(params).forEach(paramName => {
       if (params[paramName] !== undefined) {
-        this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
+        this.safeUpdateParam(effectNode as FlexibleEffectNode, paramName, params[paramName] as number | string);
       }
     });
   }
 
   getCurrentParams(effectNode: EffectNode): Record<string, unknown> {
     // Retornar parámetros básicos disponibles en todos los efectos
+    const node = effectNode as unknown as ToneEffectNode;
     return {
-      wet: (effectNode as unknown as { wet?: { value: unknown } }).wet?.value || 'N/A',
-      dry: (effectNode as unknown as { dry?: { value: unknown } }).dry?.value || 'N/A'
+      wet: node.wet?.value || 'N/A',
+      dry: node.dry?.value || 'N/A'
     };
   }
 
-  private safeUpdateParam(node: ToneEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
     try {
-      if (node[paramName] && typeof node[paramName].value !== 'undefined') {
-        node[paramName].value = value;
-      } else if (node[paramName] !== undefined) {
-        node[paramName] = value;
+      const typedNode = node as Record<string, unknown>;
+      const param = typedNode[paramName];
+      if (param && typeof param === 'object' && 'value' in param) {
+        (param as { value: number | string }).value = value;
+      } else if (param !== undefined) {
+        (typedNode as Record<string, number | string>)[paramName] = value;
       }
     } catch {
+      // Silently handle errors
     }
   }
 }
