@@ -729,7 +729,7 @@ export class AudioManager {
     }
 
     
-    source.effectSends.forEach((send, effectId) => {
+    source.effectSends.forEach((_send, _effectId) => {
     });
 
     // Verificar efectos globales

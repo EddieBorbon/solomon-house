@@ -140,7 +140,7 @@ export class SceneObjectFactory implements ISceneObjectRenderer {
         default:
           return null;
       }
-    } catch (error) {
+    } catch {
       return null;
     }
   }

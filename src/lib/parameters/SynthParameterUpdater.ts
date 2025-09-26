@@ -25,7 +25,7 @@ export class BaseSynthParameterUpdater implements SynthParameterUpdater {
     this.config = config;
   }
 
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result: ParameterUpdateResult = {
       success: true,
       updatedParams: [],
@@ -184,7 +184,7 @@ export class BaseSynthParameterUpdater implements SynthParameterUpdater {
 
 // Actualizador específico para PolySynth
 export class PolySynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -234,7 +234,7 @@ export class PolySynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para PluckSynth
 export class PluckSynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -271,7 +271,7 @@ export class PluckSynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para DuoSynth
 export class DuoSynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -308,7 +308,7 @@ export class DuoSynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para MembraneSynth
 export class MembraneSynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -339,7 +339,7 @@ export class MembraneSynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para MetalSynth
 export class MetalSynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -364,7 +364,7 @@ export class MetalSynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para NoiseSynth
 export class NoiseSynthParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {
@@ -389,7 +389,7 @@ export class NoiseSynthParameterUpdater extends BaseSynthParameterUpdater {
 
 // Actualizador específico para Sampler
 export class SamplerParameterUpdater extends BaseSynthParameterUpdater {
-  update(synth: SynthesizerType, params: Partial<any>): ParameterUpdateResult {
+  update(synth: SynthesizerType, params: Partial<unknown>): ParameterUpdateResult {
     const result = super.update(synth, params);
 
     try {

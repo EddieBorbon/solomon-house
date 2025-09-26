@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
 
@@ -46,7 +45,7 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
    * Actualiza parámetros específicos del DuoSynth
    */
   public updateSynthesizer(
-    synth: any, // DuoSynth type
+    synth: unknown, // DuoSynth type
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -93,7 +92,7 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
   /**
    * Verifica si el sintetizador es compatible con este updater
    */
-  public static isCompatible(synth: any): boolean {
+  public static isCompatible(synth: unknown): boolean {
     return 'voice0' in synth && 'voice1' in synth;
   }
 

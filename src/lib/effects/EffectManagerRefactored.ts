@@ -35,7 +35,7 @@ export class EffectManagerRefactored implements IEffectManager {
   private updaterRegistry: EffectUpdaterRegistry;
   private testManager: EffectTestManager;
 
-  constructor(config?: Partial<IEffectManagerConfig>) {
+  constructor(_config?: Partial<IEffectManagerConfig>) {
     // Inicializar registries
     this.factoryRegistry = new EffectFactoryRegistry();
     this.updaterRegistry = new EffectUpdaterRegistry();
@@ -126,7 +126,7 @@ export class EffectManagerRefactored implements IEffectManager {
         // Crear un oscilador de prueba para escuchar los efectos
         this.testManager.createTestOscillator(effectId, effectNode);
       }
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -152,7 +152,7 @@ export class EffectManagerRefactored implements IEffectManager {
       
       // Log adicional para confirmar que los parámetros se aplicaron
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -218,7 +218,7 @@ export class EffectManagerRefactored implements IEffectManager {
     try {
       const { effectNode } = effectData;
       this.testManager.refreshEffect(effectId, effectNode);
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -254,7 +254,7 @@ export class EffectManagerRefactored implements IEffectManager {
       // Actualizar la posición almacenada en el efecto
       effectData.position = position;
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -298,7 +298,7 @@ export class EffectManagerRefactored implements IEffectManager {
       this.effectZoneRadii.clear();
       this.lastEffectIntensities.clear();
       
-    } catch (error) {
+    } catch {
     }
   }
 }

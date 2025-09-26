@@ -76,15 +76,15 @@ export interface IParameterComponentFactory {
 }
 
 export interface IParameterManager {
-  updateParameter(entityId: string, param: string, value: any): void;
-  validateParameter(entityType: string, param: string, value: any): boolean;
+  updateParameter(entityId: string, param: string, value: unknown): void;
+  validateParameter(entityType: string, param: string, value: unknown): boolean;
   getParameterInfo(entityType: string, param: string): ParameterInfo | null;
 }
 
 export interface IParameterValidator {
-  validateEffectParameter(effectType: EffectType, param: string, value: any): ValidationResult;
-  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: any): ValidationResult;
-  validateMobileObjectParameter(param: string, value: any): ValidationResult;
+  validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult;
+  validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult;
+  validateMobileObjectParameter(param: string, value: unknown): ValidationResult;
 }
 
 // Interfaces para el sistema de UI
@@ -145,7 +145,7 @@ export interface ParameterInfo {
   min?: number;
   max?: number;
   step?: number;
-  defaultValue: any;
+  defaultValue: unknown;
   description: string;
   category: string;
 }
@@ -155,7 +155,7 @@ export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
-  normalizedValue?: any;
+  normalizedValue?: unknown;
 }
 
 // Resultado de operaciones de parámetros

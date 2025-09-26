@@ -32,8 +32,6 @@ import { MonoSynthParameters } from '../../components/ui/sound-editor/MonoSynthP
 import { MetalSynthParameters } from '../../components/ui/sound-editor/MetalSynthParameters';
 import { NoiseSynthParameters } from '../../components/ui/sound-editor/NoiseSynthParameters';
 import { PluckSynthParameters } from '../../components/ui/sound-editor/PluckSynthParameters';
-import { PolySynthParameters } from '../../components/ui/sound-editor/PolySynthParameters';
-import { SamplerParameters } from '../../components/ui/sound-editor/SamplerParameters';
 
 // Importar componente de objetos móviles
 import { MobileObjectEditor } from '../../components/ui/MobileObjectEditor';
@@ -61,8 +59,8 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
    */
   public createEffectComponent(effectType: EffectType, zone: EffectZoneEntity): React.ReactElement | null {
     const commonProps = {
-      zone: zone as any, // Cast necesario por compatibilidad
-      onEffectParamChange: (param: string, value: any) => {
+      zone: zone as unknown, // Cast necesario por compatibilidad
+      onEffectParamChange: (_param: string, _value: unknown) => {
       }
     };
 
@@ -120,7 +118,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
         default:
           return null;
       }
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -130,8 +128,8 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
    */
   public createSoundObjectComponent(objectType: SoundObjectType, object: SoundObjectEntity): React.ReactElement | null {
     const commonProps = {
-      object: object as any, // Cast necesario por compatibilidad
-      onParamChange: (param: string, value: any) => {
+      object: object as unknown, // Cast necesario por compatibilidad
+      onParamChange: (_param: string, _value: unknown) => {
       }
     };
 
@@ -153,7 +151,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
         default:
           return null;
       }
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -165,12 +163,12 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
     try {
       return (
         <MobileObjectEditor
-          mobileObject={object as any} // Cast necesario por compatibilidad
-          onRemove={(id: string) => {
+          mobileObject={object as unknown} // Cast necesario por compatibilidad
+          onRemove={(_id: string) => {
           }}
         />
       );
-    } catch (error) {
+    } catch {
       return null;
     }
   }

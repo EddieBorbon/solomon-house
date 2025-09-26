@@ -38,7 +38,7 @@ export function useAudioContext() {
         setIsAudioContextStarted(true);
         setContextState('running');
       }
-    } catch (error) {
+    } catch {
     } finally {
       setIsInitializing(false);
     }
@@ -62,7 +62,7 @@ export function useAudioContext() {
       await audioManager.suspendContext();
       setIsAudioContextStarted(false);
       setContextState('suspended');
-    } catch (error) {
+    } catch {
     }
   }, []);
 
@@ -71,7 +71,7 @@ export function useAudioContext() {
       await audioManager.resumeContext();
       setIsAudioContextStarted(true);
       setContextState('running');
-    } catch (error) {
+    } catch {
     }
   }, []);
 
@@ -80,7 +80,7 @@ export function useAudioContext() {
       await audioManager.closeContext();
       setIsAudioContextStarted(false);
       setContextState('closed');
-    } catch (error) {
+    } catch {
     }
   }, []);
 

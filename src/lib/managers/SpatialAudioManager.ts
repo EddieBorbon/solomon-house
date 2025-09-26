@@ -54,7 +54,7 @@ export class SpatialAudioManager {
     try {
       // Configurar el listener con valores iniciales
       this.updateListener(this.listenerState.position, this.listenerState.forward);
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -87,7 +87,7 @@ export class SpatialAudioManager {
       if (this.lastListenerPosition !== currentPos) {
         this.lastListenerPosition = currentPos;
       }
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -126,7 +126,7 @@ export class SpatialAudioManager {
   public updatePannerPosition(panner: Tone.Panner3D, position: [number, number, number]): void {
     try {
       panner.setPosition(position[0], position[1], position[2]);
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -296,7 +296,7 @@ export class SpatialAudioManager {
     try {
       // Resetear el listener a posición neutral
       this.updateListener(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1));
-    } catch (error) {
+    } catch {
     }
   }
 }

@@ -549,7 +549,7 @@ export class SoundPlaybackManager {
     try {
       this.playingSounds.clear();
       this.playbackStates.clear();
-    } catch (error) {
+    } catch {
     }
   }
 }

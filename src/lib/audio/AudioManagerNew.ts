@@ -1,5 +1,4 @@
 import * as Tone from 'tone';
-import * as THREE from 'three';
 import { SoundSourceFactory, AudioParams, SoundObjectType, SoundSource } from '../factories/SoundSourceFactory';
 import { EffectManager, EffectType, GlobalEffect } from '../managers/EffectManager';
 import { SpatialAudioManager, SpatialAudioConfig, ListenerState } from '../managers/SpatialAudioManager';
@@ -16,7 +15,7 @@ import {
 } from './AudioCommand';
 import { AudioOrchestrator } from './AudioOrchestrator';
 import { AudioStateManager } from './AudioStateManager';
-import { AudioCommand, AudioOperationResult, AudioOperationType } from './types';
+import { AudioCommand, AudioOperationResult } from './types';
 
 // Re-exportar tipos para mantener compatibilidad
 export type { AudioParams, SoundObjectType, SoundSource, EffectType, GlobalEffect, SpatialAudioConfig, ListenerState, AudioContextState, AudioContextConfig, PlaybackState, PlaybackConfig, ParameterUpdateResult, ParameterConfig };
@@ -55,7 +54,7 @@ export class AudioManagerNew {
     this.stateManager = new AudioStateManager();
     
     // Configurar suscripción a cambios de estado
-    this.stateManager.subscribe((state) => {
+    this.stateManager.subscribe((_state) => {
     });
     
     // Registrar el AudioManager como listener de limpieza del contexto
@@ -212,7 +211,7 @@ export class AudioManagerNew {
   /**
    * Suscribe a cambios de estado del sistema
    */
-  public subscribeToStateChanges(callback: (state: any) => void) {
+  public subscribeToStateChanges(callback: (state: unknown) => void) {
     return this.stateManager.subscribe(callback);
   }
 
@@ -369,7 +368,7 @@ export class AudioManagerNew {
            !effectSend.disposed && !dryGain.disposed;
   }
 
-  private updateSoundEffectMixing(id: string, position: [number, number, number]): void {
+  private updateSoundEffectMixing(_id: string, _position: [number, number, number]): void {
     // Implementación existente mantenida
   }
 

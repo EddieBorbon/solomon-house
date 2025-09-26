@@ -53,7 +53,7 @@ export class AudioContextManager {
       // Configurar event listeners del navegador
       this.setupBrowserEventListeners();
 
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -78,7 +78,7 @@ export class AudioContextManager {
         }
       });
 
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -103,7 +103,7 @@ export class AudioContextManager {
         });
 
       }
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -113,7 +113,7 @@ export class AudioContextManager {
   private handleContextSuspension(): void {
     try {
       this.triggerCleanup();
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -128,7 +128,7 @@ export class AudioContextManager {
         } catch (error) {
         }
       });
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -293,7 +293,7 @@ export class AudioContextManager {
       // Nota: Las propiedades del contexto de Tone no se pueden modificar después de la inicialización
       // Solo actualizamos la configuración interna para futuras inicializaciones
 
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -349,7 +349,7 @@ export class AudioContextManager {
         window.removeEventListener('focus', () => {});
       }
 
-    } catch (error) {
+    } catch {
     }
   }
 }

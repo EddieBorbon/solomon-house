@@ -218,7 +218,7 @@ export class AudioStateManager implements IAudioStateManager {
     this.subscribers.forEach(callback => {
       try {
         callback(currentState);
-      } catch (error) {
+      } catch {
       }
     });
   }

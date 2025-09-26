@@ -1,14 +1,10 @@
 import { 
   EffectType, 
   SoundObjectType, 
-  EffectZoneEntity, 
-  SoundObjectEntity, 
-  MobileObjectEntity,
   IParameterManager,
   IParameterValidator,
   ParameterInfo,
   ValidationResult,
-  ParameterOperationResult,
   ParameterStats,
   EntityState
 } from './types';
@@ -44,7 +40,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Actualiza un parámetro de una entidad
    */
-  public updateParameter(entityId: string, param: string, value: any): void {
+  public updateParameter(entityId: string, param: string, value: unknown): void {
     try {
       
       // Validar el parámetro
@@ -72,7 +68,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
         });
       }, 1000);
 
-    } catch (error) {
+    } catch {
       this.stats.errorCount++;
     }
   }
@@ -80,7 +76,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida un parámetro
    */
-  public validateParameter(entityType: string, param: string, value: any): boolean {
+  public validateParameter(entityType: string, param: string, value: unknown): boolean {
     const validation = this.validateParameterGeneric(param, value);
     return validation.isValid;
   }
@@ -96,7 +92,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida parámetros de efectos
    */
-  public validateEffectParameter(effectType: EffectType, param: string, value: any): ValidationResult {
+  public validateEffectParameter(effectType: EffectType, param: string, value: unknown): ValidationResult {
     const key = `effect.${effectType}.${param}`;
     const info = this.parameterInfo.get(key);
     
@@ -114,7 +110,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida parámetros de objetos de sonido
    */
-  public validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: any): ValidationResult {
+  public validateSoundObjectParameter(objectType: SoundObjectType, param: string, value: unknown): ValidationResult {
     const key = `soundObject.${objectType}.${param}`;
     const info = this.parameterInfo.get(key);
     
@@ -132,7 +128,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida parámetros de objetos móviles
    */
-  public validateMobileObjectParameter(param: string, value: any): ValidationResult {
+  public validateMobileObjectParameter(param: string, value: unknown): ValidationResult {
     const key = `mobileObject.${param}`;
     const info = this.parameterInfo.get(key);
     
@@ -328,7 +324,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida un parámetro genérico
    */
-  private validateParameterGeneric(param: string, value: any): ValidationResult {
+  private validateParameterGeneric(param: string, value: unknown): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -355,7 +351,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
   /**
    * Valida un parámetro con información específica
    */
-  private validateParameterWithInfo(param: string, value: any, info: ParameterInfo): ValidationResult {
+  private validateParameterWithInfo(param: string, value: unknown, info: ParameterInfo): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -393,7 +389,7 @@ export class ParameterManager implements IParameterManager, IParameterValidator 
     this.subscribers.forEach(callback => {
       try {
         callback(entityId, state);
-      } catch (error) {
+      } catch {
       }
     });
   }

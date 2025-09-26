@@ -233,7 +233,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // Eliminar la fuente de sonido del AudioManager
     try {
       audioManager.removeSoundSource(id);
-    } catch (error) {
+    } catch {
     }
 
     // Eliminar objeto del estado local
@@ -400,7 +400,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       gridObjects.forEach(obj => {
         try {
           audioManager.removeSoundSource(obj.id);
-        } catch (error) {
+        } catch {
         }
       });
 
@@ -421,7 +421,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       objects.forEach(obj => {
         try {
           audioManager.removeSoundSource(obj.id);
-        } catch (error) {
+        } catch {
         }
       });
 

@@ -32,7 +32,7 @@ export class MobileObjectManager {
   public updateMobileObject(
     id: string,
     updates: Partial<Omit<MobileObject, 'id'>>,
-    grids: Map<string, any>
+    grids: Map<string, unknown>
   ): void {
     // Buscar el objeto en todas las cuadrículas
     for (const [gridId, grid] of grids) {
@@ -50,7 +50,7 @@ export class MobileObjectManager {
   /**
    * Elimina un objeto móvil
    */
-  public removeMobileObject(id: string, grids: Map<string, any>): void {
+  public removeMobileObject(id: string, grids: Map<string, unknown>): void {
     // Buscar y eliminar el objeto de todas las cuadrículas
     for (const [gridId, grid] of grids) {
       const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
@@ -68,7 +68,7 @@ export class MobileObjectManager {
   public updateMobileObjectPosition(
     id: string,
     position: [number, number, number],
-    grids: Map<string, any>
+    grids: Map<string, unknown>
   ): void {
     // Buscar el objeto en todas las cuadrículas y actualizar su posición
     for (const [gridId, grid] of grids) {
@@ -85,7 +85,7 @@ export class MobileObjectManager {
   /**
    * Busca un objeto móvil por ID en todas las cuadrículas
    */
-  public findMobileObjectById(id: string, grids: Map<string, any>): { object: MobileObject | null, gridId: string | null } {
+  public findMobileObjectById(id: string, grids: Map<string, unknown>): { object: MobileObject | null, gridId: string | null } {
     for (const [gridId, grid] of grids) {
       const object = grid.mobileObjects.find((obj: MobileObject) => obj.id === id);
       if (object) {

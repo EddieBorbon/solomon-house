@@ -110,7 +110,7 @@ export class ParameterDebugManager {
 
     // Log a consola en desarrollo
     if (process.env.NODE_ENV === 'development') {
-      const contextStr = context ? ` | Context: ${JSON.stringify(context)}` : '';
+      const _contextStr = context ? ` | Context: ${JSON.stringify(context)}` : '';
     }
   }
 

@@ -38,7 +38,7 @@ interface SynthesizerWithModulation {
   };
 }
 
-interface SynthesizerWithVoice1 {
+interface _SynthesizerWithVoice1 {
   voice1: {
     oscillator: {
       type: string;
@@ -46,7 +46,7 @@ interface SynthesizerWithVoice1 {
   };
 }
 
-interface SynthesizerWithEnvelope {
+interface _SynthesizerWithEnvelope {
   envelope: {
     attack: number;
     decay: number;
@@ -56,7 +56,7 @@ interface SynthesizerWithEnvelope {
   };
 }
 
-interface SynthesizerWithFilterEnvelope {
+interface _SynthesizerWithFilterEnvelope {
   filterEnvelope: {
     attack: number;
     decay: number;
@@ -67,7 +67,7 @@ interface SynthesizerWithFilterEnvelope {
   };
 }
 
-interface SynthesizerWithFilter {
+interface _SynthesizerWithFilter {
   filter: {
     Q: {
       value: number;
@@ -75,27 +75,27 @@ interface SynthesizerWithFilter {
   };
 }
 
-interface SynthesizerWithVibratoAmount {
+interface _SynthesizerWithVibratoAmount {
   vibratoAmount: {
     rampTo: (value: number, time: number) => void;
   };
 }
 
-interface SynthesizerWithVibratoRate {
+interface _SynthesizerWithVibratoRate {
   vibratoRate: {
     rampTo: (value: number, time: number) => void;
   };
 }
 
-interface SynthesizerWithPitchDecay {
+interface _SynthesizerWithPitchDecay {
   pitchDecay: number;
 }
 
-interface SynthesizerWithOctaves {
+interface _SynthesizerWithOctaves {
   octaves: number;
 }
 
-interface SynthesizerWithResonance {
+interface _SynthesizerWithResonance {
   resonance: number;
 }
 

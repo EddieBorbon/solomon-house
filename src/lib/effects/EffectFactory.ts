@@ -3,7 +3,6 @@ import {
   EffectType, 
   EffectNode, 
   EffectCreator, 
-  EffectConfig,
   TestOscillatorConfig 
 } from './types';
 
@@ -90,7 +89,7 @@ class ChorusCreator implements EffectCreator {
       effectNode.feedback.setValueAtTime(0, effectNode.context.currentTime);
       effectNode.spread = 180;
       effectNode.type = 'sine';
-    } catch (error) {
+    } catch {
     }
     effectNode.start();
     return effectNode;

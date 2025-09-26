@@ -18,7 +18,7 @@ export function PersistencePanel() {
   const [showLoadDialog, setShowLoadDialog] = useState(false);
 
   const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
-  const { isConnected, isSyncing, lastSyncTime, error } = useRealtimeSync(currentProjectId);
+  const { isConnected } = useRealtimeSync(currentProjectId);
   const { t } = useLanguage();
 
   // Cargar proyectos al montar el componente
@@ -31,7 +31,7 @@ export function PersistencePanel() {
       setIsLoading(true);
       const loadedProjects = await persistenceService.loadAllProjects();
       setProjects(loadedProjects);
-    } catch (error) {
+    } catch {
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +56,7 @@ export function PersistencePanel() {
       setProjectDescription('');
       await loadProjects(); // Recargar la lista de proyectos
       
-    } catch (error) {
+    } catch {
       alert('Error al guardar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -70,7 +70,7 @@ export function PersistencePanel() {
       setCurrentProjectId(projectId);
       setShowLoadDialog(false);
       
-    } catch (error) {
+    } catch {
       alert('Error al cargar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -90,7 +90,7 @@ export function PersistencePanel() {
       
       await loadProjects(); // Recargar la lista de proyectos
       
-    } catch (error) {
+    } catch {
       alert('Error al actualizar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);
@@ -111,7 +111,7 @@ export function PersistencePanel() {
         setCurrentProjectId(null);
       }
       
-    } catch (error) {
+    } catch {
       alert('Error al eliminar el proyecto. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);

@@ -51,7 +51,7 @@ export class EffectUpdaterRegistry implements IEffectUpdaterRegistry {
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: Tone.ToneAudioNode): Record<string, any> {
+  getCurrentParams(effect: Tone.ToneAudioNode): Record<string, unknown> {
     const updater = this.getUpdater(effect);
     if (!updater) {
       return {};
@@ -59,7 +59,7 @@ export class EffectUpdaterRegistry implements IEffectUpdaterRegistry {
 
     try {
       return updater.getCurrentParams(effect);
-    } catch (error) {
+    } catch {
       return {};
     }
   }

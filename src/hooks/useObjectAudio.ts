@@ -55,7 +55,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
         setIsPlaying(false);
       }, 2000); // 2 seconds default duration
 
-    } catch (error) {
+    } catch {
     }
   }, [objectId, params]);
 
@@ -63,7 +63,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
     try {
       audioManager.stopSound(objectId);
       setIsPlaying(false);
-    } catch (error) {
+    } catch {
     }
   }, [objectId]);
 
@@ -80,7 +80,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
 
       // Update the sound source parameters
       audioManager.updateSoundParams(objectId, audioParams);
-    } catch (error) {
+    } catch {
     }
   }, [objectId]);
 
@@ -115,7 +115,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
 
       audioManager.startContinuousSound(objectId, audioParams);
       setIsPlaying(true);
-    } catch (error) {
+    } catch {
     }
   }, [objectId, params]);
 
@@ -123,7 +123,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
     try {
       audioManager.stopSound(objectId);
       setIsPlaying(false);
-    } catch (error) {
+    } catch {
     }
   }, [objectId]);
 
@@ -132,7 +132,7 @@ export function useObjectAudio(objectId: string, params: UseObjectAudioParams) {
     return () => {
       try {
         audioManager.removeSoundSource(objectId);
-      } catch (error) {
+      } catch {
       }
     };
   }, [objectId]);

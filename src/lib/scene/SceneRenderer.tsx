@@ -46,7 +46,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         this.renderStats.objectsRendered++;
       }
       return renderedObject;
-    } catch (error) {
+    } catch {
       this.renderStats.errors++;
       return null;
     }
@@ -78,7 +78,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
           }}
         />
       );
-    } catch (error) {
+    } catch {
       this.renderStats.errors++;
       return null;
     }
@@ -93,13 +93,13 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
       
       return (
         <EffectZone
-          zone={zone as any} // Cast necesario por compatibilidad con el componente existente
+          zone={zone as unknown} // Cast necesario por compatibilidad con el componente existente
           onSelect={(id) => {
             // Esta función será manejada por el componente padre
           }}
         />
       );
-    } catch (error) {
+    } catch {
       this.renderStats.errors++;
       return null;
     }
@@ -132,7 +132,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         if (rendered) {
           results.objects.push(rendered);
         }
-      } catch (error) {
+      } catch {
         results.errors.push({
           success: false,
           entityId: object.id,
@@ -150,7 +150,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         if (rendered) {
           results.mobileObjects.push(rendered);
         }
-      } catch (error) {
+      } catch {
         results.errors.push({
           success: false,
           entityId: object.id,
@@ -168,7 +168,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
         if (rendered) {
           results.effectZones.push(rendered);
         }
-      } catch (error) {
+      } catch {
         results.errors.push({
           success: false,
           entityId: zone.id,

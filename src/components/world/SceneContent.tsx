@@ -186,7 +186,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     loadGrid,
     setActiveGrid,
     getGridKey,
-    currentGridCoordinates,
+    _currentGridCoordinates,
     activeGridId
   } = useWorldStore();
 
@@ -212,7 +212,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     const gridsArray = Array.from(grids.values());
     
     
-    gridsArray.forEach((grid, index) => {
+    gridsArray.forEach((grid, _index) => {
       // Obtener objetos de esta cuadrícula desde el ObjectStore
       const gridObjects = objectStore.getAllObjects(grid.id);
       

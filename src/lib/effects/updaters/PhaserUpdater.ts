@@ -45,7 +45,7 @@ export class PhaserUpdater implements IEffectUpdater<Tone.Phaser> {
    * @param effect Nodo de efecto
    * @returns Objeto con los parámetros actuales
    */
-  getCurrentParams(effect: Tone.Phaser): Record<string, any> {
+  getCurrentParams(effect: Tone.Phaser): Record<string, unknown> {
     return {
       frequency: effect.frequency?.value || 0.5,
       octaves: effect.octaves || 2.2,
@@ -60,7 +60,7 @@ export class PhaserUpdater implements IEffectUpdater<Tone.Phaser> {
    * @param value Valor a validar
    * @returns true si el valor es válido, false en caso contrario
    */
-  validateParam(paramName: string, value: any): boolean {
+  validateParam(paramName: string, value: unknown): boolean {
     switch (paramName) {
       case 'frequency':
         return typeof value === 'number' && value >= 0 && value <= 20;
@@ -114,7 +114,7 @@ export class PhaserUpdater implements IEffectUpdater<Tone.Phaser> {
       } else {
         return false;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }

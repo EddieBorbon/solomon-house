@@ -3,8 +3,7 @@ import {
   SynthParameterUpdater, 
   ParameterValidatorFactory, 
   SynthUpdaterFactory,
-  ParameterConfig,
-  SynthType
+  ParameterConfig
 } from './types';
 import { 
   BaseParameterValidator, 

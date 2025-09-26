@@ -130,9 +130,9 @@ export class SynthesizerUpdaterFacade {
    * Actualiza sintetizadores genéricos (no específicos)
    */
   private updateGenericSynthesizer(
-    synth: SynthesizerType, 
-    params: Partial<AudioParams>, 
-    result: ParameterUpdateResult
+    _synth: SynthesizerType,
+    _params: Partial<AudioParams>,
+    _result: ParameterUpdateResult
   ): void {
     // Implementar lógica genérica para sintetizadores no específicos
     // Por ahora, solo log
@@ -164,7 +164,7 @@ export class SynthesizerUpdaterFacade {
   private updateWaveform(synth: SynthesizerType, waveform: string, result: ParameterUpdateResult): void {
     try {
       if ('oscillator' in synth) {
-        (synth as any).oscillator.type = waveform;
+        (synth as unknown as { oscillator: { type: string } }).oscillator.type = waveform;
         result.updatedParams.push('waveform');
       }
     } catch (error) {
@@ -175,11 +175,11 @@ export class SynthesizerUpdaterFacade {
   private updateHarmonicity(synth: SynthesizerType, harmonicity: number, result: ParameterUpdateResult): void {
     try {
       if ('harmonicity' in synth) {
-        const harmonicityParam = (synth as any).harmonicity;
-        if (typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
-          harmonicityParam.rampTo(harmonicity, this.configManager.getRampTime());
+        const harmonicityParam = (synth as unknown as { harmonicity: unknown }).harmonicity;
+        if (harmonicityParam && typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
+          (harmonicityParam as { rampTo: (value: number, time: number) => void }).rampTo(harmonicity, this.configManager.getRampTime());
         } else {
-          (synth as any).harmonicity = harmonicity;
+          (synth as unknown as { harmonicity: number }).harmonicity = harmonicity;
         }
         result.updatedParams.push('harmonicity');
       }
@@ -191,11 +191,11 @@ export class SynthesizerUpdaterFacade {
   private updateModulationIndex(synth: SynthesizerType, modulationIndex: number, result: ParameterUpdateResult): void {
     try {
       if ('modulationIndex' in synth) {
-        const modulationIndexParam = (synth as any).modulationIndex;
-        if (typeof modulationIndexParam === 'object' && 'rampTo' in modulationIndexParam) {
-          modulationIndexParam.rampTo(modulationIndex, this.configManager.getRampTime());
+        const modulationIndexParam = (synth as unknown as { modulationIndex: unknown }).modulationIndex;
+        if (modulationIndexParam && typeof modulationIndexParam === 'object' && 'rampTo' in modulationIndexParam) {
+          (modulationIndexParam as { rampTo: (value: number, time: number) => void }).rampTo(modulationIndex, this.configManager.getRampTime());
         } else {
-          (synth as any).modulationIndex = modulationIndex;
+          (synth as unknown as { modulationIndex: number }).modulationIndex = modulationIndex;
         }
         result.updatedParams.push('modulationIndex');
       }
@@ -207,7 +207,7 @@ export class SynthesizerUpdaterFacade {
   private updateModulationWaveform(synth: SynthesizerType, modulationWaveform: string, result: ParameterUpdateResult): void {
     try {
       if ('modulation' in synth) {
-        (synth as any).modulation.type = modulationWaveform;
+        (synth as unknown as { modulation: { type: string } }).modulation.type = modulationWaveform;
         result.updatedParams.push('modulationWaveform');
       }
     } catch (error) {

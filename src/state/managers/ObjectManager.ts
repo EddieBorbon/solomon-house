@@ -108,7 +108,7 @@ export class ObjectManager {
   /**
    * Busca un objeto por ID en todas las cuadrículas
    */
-  public findObjectById(id: string, grids: Map<string, any>): { object: SoundObject | null, gridId: string | null } {
+  public findObjectById(id: string, grids: Map<string, unknown>): { object: SoundObject | null, gridId: string | null } {
     for (const [gridId, grid] of grids) {
       const object = grid.objects.find((obj: SoundObject) => obj.id === id);
       if (object) {

@@ -61,7 +61,7 @@ class ParameterPanel implements IParameterPanel {
     this.onExpandedChange?.(expanded);
   }
 
-  render(entity: any): React.ReactElement | null {
+  render(entity: unknown): React.ReactElement | null {
     // Esta implementación se maneja en el componente principal
     return null;
   }
@@ -203,7 +203,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
   }, [isEffectZone, getEffectZone, updateEffectZone, parameterManager]);
 
   // Función para manejar transformaciones
-  const handleTransformChange = useCallback((entityId: string, transform: any) => {
+  const handleTransformChange = useCallback((entityId: string, transform: unknown) => {
     updateTransform(entityId, transform);
   }, [updateTransform]);
 
@@ -305,7 +305,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                   />
 
                   {/* Parámetros específicos del efecto usando el factory */}
-                  {parameterFactory.createEffectComponent(zone.effectType as any, zone as EffectZoneEntity)}
+                  {parameterFactory.createEffectComponent(zone.effectType as unknown, zone as EffectZoneEntity)}
 
                   {/* Secciones adicionales */}
                   <EffectInfoSection zone={zone} />
@@ -365,7 +365,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                 {/* Controles de parámetros del objeto sonoro */}
                 <div className="space-y-4">
                   {/* Parámetros específicos del objeto usando el factory */}
-                  {parameterFactory.createSoundObjectComponent(soundObject.type as any, soundObject as SoundObjectEntity)}
+                  {parameterFactory.createSoundObjectComponent(soundObject.type as unknown, soundObject as SoundObjectEntity)}
 
                   {/* Secciones adicionales */}
                   <SynthSpecificParameters 

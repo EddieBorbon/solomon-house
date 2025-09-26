@@ -59,7 +59,8 @@ export type EffectType =
   | 'frequencyShifter' 
   | 'jcReverb' 
   | 'feedbackDelay' 
-  | 'freeverb';
+  | 'freeverb'
+  | 'phaser';
 
 // Interfaces para el sistema de renderizado
 export interface ISceneObjectRenderer {
@@ -90,7 +91,7 @@ export interface TransformData {
 // Interfaces para el sistema de selección
 export interface ISelectionHandler {
   handleEntitySelect(id: string): void;
-  handleBackgroundClick(event: any): void;
+  handleBackgroundClick(event: unknown): void;
 }
 
 // Interfaces para el sistema de audio

@@ -65,7 +65,7 @@ export class EffectTestManager implements IEffectTestManager {
       
       refreshStrategy(testOsc);
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -80,7 +80,7 @@ export class EffectTestManager implements IEffectTestManager {
         testOsc.stop();
         testOsc.dispose();
         this.testOscillators.delete(effectId);
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -89,11 +89,11 @@ export class EffectTestManager implements IEffectTestManager {
    * Limpia todos los osciladores de prueba
    */
   cleanup(): void {
-    this.testOscillators.forEach((testOsc, effectId) => {
+    this.testOscillators.forEach((testOsc, _effectId) => {
       try {
         testOsc.stop();
         testOsc.dispose();
-      } catch (error) {
+      } catch {
       }
     });
     this.testOscillators.clear();

@@ -48,7 +48,7 @@ export function BaseSynthParameters({
   };
 
   // Función helper para obtener etiquetas de frecuencia según el tipo
-  const getFrequencyLabels = () => {
+  const _getFrequencyLabels = () => {
     switch (selectedObject.type) {
       case 'cone':
         return { min: '20_HZ', max: '200_HZ' };

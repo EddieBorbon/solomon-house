@@ -48,7 +48,7 @@ export class PluckSynthUpdater extends BaseSynthesizerUpdater {
   /**
    * Verifica si el sintetizador es compatible con este updater
    */
-  public static isCompatible(synth: any): synth is Tone.PluckSynth {
+  public static isCompatible(synth: unknown): synth is Tone.PluckSynth {
     return synth instanceof Tone.PluckSynth;
   }
 

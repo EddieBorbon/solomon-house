@@ -287,7 +287,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
     // Eliminar el efecto global del AudioManager
     try {
       audioManager.removeGlobalEffect(id);
-    } catch (error) {
+    } catch {
     }
 
     // Eliminar zona de efecto del estado local
@@ -303,7 +303,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
     if (updates.position) {
       try {
         audioManager.updateEffectZonePosition(id, updates.position);
-      } catch (error) {
+      } catch {
       }
     }
 
@@ -317,7 +317,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
         
         // Actualizar otros parámetros del efecto
         audioManager.updateGlobalEffect(id, updates.effectParams);
-      } catch (error) {
+      } catch {
       }
     }
 
@@ -377,7 +377,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
     zones.forEach(zone => {
       try {
         audioManager.removeGlobalEffect(zone.id);
-      } catch (error) {
+      } catch {
       }
     });
 

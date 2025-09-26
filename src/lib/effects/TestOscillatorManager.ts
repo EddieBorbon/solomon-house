@@ -31,7 +31,7 @@ export class TestOscillatorManager {
       // Almacenar el oscilador para poder limpiarlo después
       this.testOscillators.set(effectId, testOsc);
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -45,7 +45,7 @@ export class TestOscillatorManager {
         testOsc.stop();
         testOsc.disconnect();
         this.testOscillators.delete(effectId);
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -68,10 +68,10 @@ export class TestOscillatorManager {
    * Detiene todos los osciladores de prueba
    */
   public stopAllTestOscillators(): void {
-    this.testOscillators.forEach((testOsc, effectId) => {
+    this.testOscillators.forEach((testOsc, _effectId) => {
       try {
         testOsc.stop();
-      } catch (error) {
+      } catch {
       }
     });
   }
@@ -80,7 +80,7 @@ export class TestOscillatorManager {
    * Limpia todos los osciladores de prueba
    */
   public clearAllTestOscillators(): void {
-    this.testOscillators.forEach((testOsc, effectId) => {
+    this.testOscillators.forEach((testOsc, _effectId) => {
       this.removeTestOscillator(effectId);
     });
   }
@@ -93,7 +93,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.frequency.value = frequency;
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -106,7 +106,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.volume.value = volume;
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -119,7 +119,7 @@ export class TestOscillatorManager {
     if (testOsc) {
       try {
         testOsc.type = type;
-      } catch (error) {
+      } catch {
       }
     }
   }

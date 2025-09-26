@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
 
@@ -36,7 +35,7 @@ export class MembraneSynthUpdater extends BaseSynthesizerUpdater {
    * Actualiza parámetros específicos del MembraneSynth
    */
   public updateSynthesizer(
-    synth: any, // MembraneSynth type
+    synth: unknown, // MembraneSynth type
     params: Partial<AudioParams>, 
     result: ParameterUpdateResult
   ): void {
@@ -94,7 +93,7 @@ export class MembraneSynthUpdater extends BaseSynthesizerUpdater {
   /**
    * Verifica si el sintetizador es compatible con este updater
    */
-  public static isCompatible(synth: any): boolean {
+  public static isCompatible(synth: unknown): boolean {
     return 'pitchDecay' in synth && 'octaves' in synth;
   }
 

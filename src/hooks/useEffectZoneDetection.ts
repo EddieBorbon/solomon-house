@@ -32,11 +32,11 @@ export function useEffectZoneDetection() {
 
         if (effectZone.shape === 'sphere') {
           // Para zonas esféricas: usar Sphere con radio basado en scale
-          const zoneRadius = effectZone.scale[0];
+          const _zoneRadius = effectZone.scale[0];
           const zoneCenter = new THREE.Vector3(...effectZone.position);
           const objectPoint = new THREE.Vector3(...soundObject.position);
           
-          const distance = zoneCenter.distanceTo(objectPoint);
+          const _distance = zoneCenter.distanceTo(objectPoint);
           isInside = distance <= zoneRadius;
           
           // CALCULAR AMOUNT VARIABLE para transiciones suaves
@@ -70,7 +70,7 @@ export function useEffectZoneDetection() {
           // Para cajas, calcular amount basado en la distancia al centro
           if (isInside) {
             const zoneCenter = new THREE.Vector3(...effectZone.position);
-            const distance = zoneCenter.distanceTo(objectPoint);
+            const _distance = zoneCenter.distanceTo(objectPoint);
             const maxDistance = zoneSize * 0.5; // Radio desde el centro al borde
             effectAmount = Math.max(0, Math.min(1, 1 - (distance / maxDistance)));
             isInsideAnyZone = true; // Marcar que está dentro de al menos una zona
@@ -78,11 +78,11 @@ export function useEffectZoneDetection() {
         }
 
         if (shouldDebug) {
-          const zoneType = effectZone.shape;
-          const zoneRadius = effectZone.scale[0];
+          const _zoneType = effectZone.shape;
+          const _zoneRadius = effectZone.scale[0];
           const objectPoint = new THREE.Vector3(...soundObject.position);
           const zoneCenter = new THREE.Vector3(...effectZone.position);
-          const distance = zoneCenter.distanceTo(objectPoint);
+          const _distance = zoneCenter.distanceTo(objectPoint);
           
         }
 

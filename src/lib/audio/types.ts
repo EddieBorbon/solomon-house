@@ -1,4 +1,3 @@
-import * as Tone from 'tone';
 import { AudioParams, SoundObjectType, SoundSource } from '../factories/SoundSourceFactory';
 import { EffectType, GlobalEffect } from '../managers/EffectManager';
 import { type EffectZone } from '../../state/useWorldStore';
@@ -58,7 +57,7 @@ export interface AudioOperationResult {
   operationId: string;
   operationType: AudioOperationType;
   message: string;
-  data?: any;
+  data?: unknown;
   error?: string;
 }
 

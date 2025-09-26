@@ -27,7 +27,7 @@ export function SpatializationDebug() {
           }
         };
         setDebugInfo(info);
-      } catch (error) {
+      } catch {
       }
     };
 

@@ -102,7 +102,7 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       }
     }
     
-    const successCount = results.filter(r => r.success).length;
+    const _successCount = results.filter(r => r.success).length;
     
     return results;
   }
@@ -174,7 +174,7 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       this.contextState = 'running';
       
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -205,7 +205,7 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       this.contextState = 'closed';
       
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -230,7 +230,7 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       } else {
       }
       return success;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

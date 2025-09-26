@@ -38,7 +38,7 @@ export class EffectManagerNew {
       this.testOscillatorManager.createTestOscillatorForEffect(effectId, effectNode, testConfig);
       
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -64,7 +64,7 @@ export class EffectManagerNew {
       this.refreshGlobalEffect(effectId);
       
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -101,7 +101,7 @@ export class EffectManagerNew {
       this.spatialEffectManager.removeSpatialEffect(effectId);
       
       
-    } catch (error) {
+    } catch {
     }
   }
 
@@ -117,7 +117,7 @@ export class EffectManagerNew {
         effectData.panner.positionY.value = effectData.panner.positionY.value;
         effectData.panner.positionZ.value = effectData.panner.positionZ.value;
         
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -182,7 +182,7 @@ export class EffectManagerNew {
   /**
    * Determina el tipo de efecto basado en el nodo
    */
-  private getEffectTypeFromNode(effectNode: any): string {
+  private getEffectTypeFromNode(effectNode: unknown): string {
     const constructorName = effectNode.constructor.name;
     
     // Mapear nombres de constructores a tipos de efecto

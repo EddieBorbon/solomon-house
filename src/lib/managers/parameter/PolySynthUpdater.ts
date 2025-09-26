@@ -24,13 +24,13 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
       
       // Actualizar frecuencia si cambia
       if (params.frequency !== undefined) {
-        (synth as any).frequency.value = params.frequency;
+        (synth as unknown as { frequency: { value: number } }).frequency.value = params.frequency;
         result.updatedParams.push('frequency');
       }
       
       // Actualizar waveform si cambia
       if (params.waveform !== undefined) {
-        (synth as any).oscillator.type = params.waveform;
+        (synth as unknown as { oscillator: { type: string } }).oscillator.type = params.waveform;
         result.updatedParams.push('waveform');
       }
       
@@ -42,7 +42,7 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
       
       // Actualizar curve si cambia
       if (params.curve !== undefined) {
-        (synth as any).envelope.curve = params.curve;
+        (synth as unknown as { envelope: { curve: string } }).envelope.curve = params.curve;
         result.updatedParams.push('curve');
       }
       
@@ -78,7 +78,7 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
   /**
    * Verifica si el sintetizador es compatible con este updater
    */
-  public static isCompatible(synth: any): synth is Tone.PolySynth {
+  public static isCompatible(synth: unknown): synth is Tone.PolySynth {
     return synth instanceof Tone.PolySynth;
   }
 

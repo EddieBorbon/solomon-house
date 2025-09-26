@@ -39,8 +39,6 @@ export function ControlPanel() {
   const [newGridSize, setNewGridSize] = useState<number>(20);
   const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
   const { t } = useLanguage();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const effectsScrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Obtener información de la cuadrícula activa
   const activeGrid = activeGridId ? grids.get(activeGridId) : null;

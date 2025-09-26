@@ -120,7 +120,7 @@ export class WorldStoreFacade {
   public updateMobileObject(
     id: string,
     updates: Partial<Omit<MobileObject, 'id'>>,
-    grids: Map<string, any>
+    grids: Map<string, unknown>
   ): void {
     this.mobileObjectManager.updateMobileObject(id, updates, grids);
   }
@@ -138,7 +138,7 @@ export class WorldStoreFacade {
   public updateMobileObjectPosition(
     id: string,
     position: [number, number, number],
-    grids: Map<string, any>
+    grids: Map<string, unknown>
   ): void {
     this.mobileObjectManager.updateMobileObjectPosition(id, position, grids);
   }
@@ -154,7 +154,7 @@ export class WorldStoreFacade {
     shape: 'sphere' | 'cube' = 'sphere',
     gridId?: string
   ): EffectZone {
-    return useEffectStore.getState().addEffectZone(type as any, position, shape, gridId);
+    return useEffectStore.getState().addEffectZone(type as unknown, position, shape, gridId);
   }
 
   /**
@@ -259,7 +259,7 @@ export class WorldStoreFacade {
   /**
    * Actualiza una cuadrícula
    */
-  public updateGrid(gridId: string, updates: any): void {
+  public updateGrid(gridId: string, updates: unknown): void {
     useGridStore.getState().updateGrid(gridId, updates);
   }
 
@@ -324,7 +324,7 @@ export class WorldStoreFacade {
    * Obtiene el estado actual de todos los componentes
    */
   public getCurrentState(): {
-    grids: Map<string, any>;
+    grids: Map<string, unknown>;
     currentGridCoordinates: [number, number, number];
     activeGridId: string | null;
     worlds: Array<{ id: string; name: string }>;

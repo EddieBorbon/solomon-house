@@ -159,7 +159,7 @@ export class WorldManager {
       }
       
       return this.createWorld(data.name);
-    } catch (error) {
+    } catch {
       return null;
     }
   }

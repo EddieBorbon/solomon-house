@@ -38,7 +38,7 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
       
       // Actualizar el listener de audio con la nueva posición y orientación
       audioManager.updateListener(position, forwardVector.current);
-    } catch (error) {
+    } catch {
     }
   });
 

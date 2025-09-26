@@ -43,7 +43,7 @@ export function EffectSpecificParameters({ zone, onEffectParamChange }: EffectSp
     </div>
   );
 
-  const renderParameterButtons = (
+  const _renderParameterButtons = (
     param: string,
     label: string,
     options: readonly string[],
@@ -74,7 +74,7 @@ export function EffectSpecificParameters({ zone, onEffectParamChange }: EffectSp
 
 
 
-  const renderBitCrusherParams = () => (
+  const _renderBitCrusherParams = () => (
     <>
       {renderParameterSlider('bits', 'Bits', 1, 16, 1, 8)}
       {renderParameterSlider('normFreq', 'Frecuencia Normalizada', 0, 1, 0.01, 0.5)}

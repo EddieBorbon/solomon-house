@@ -11,8 +11,8 @@ interface EntityTypeSelectorProps {
   isSoundObject: boolean;
   isEffectZone: boolean;
   getMobileObject: () => MobileObject | null;
-  getSoundObject: () => SoundObject | null;
-  getEffectZone: () => EffectZone | null;
+  _getSoundObject: () => SoundObject | null;
+  _getEffectZone: () => EffectZone | null;
   removeMobileObject: (id: string) => void;
   onRenderSoundObject: () => React.ReactNode;
   onRenderEffectZone: () => React.ReactNode;
@@ -29,8 +29,8 @@ export function EntityTypeSelector({
   isSoundObject,
   isEffectZone,
   getMobileObject,
-  getSoundObject,
-  getEffectZone,
+  _getSoundObject,
+  _getEffectZone,
   removeMobileObject,
   onRenderSoundObject,
   onRenderEffectZone
