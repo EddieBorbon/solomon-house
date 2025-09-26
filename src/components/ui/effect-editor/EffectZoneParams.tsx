@@ -9,14 +9,12 @@ import { EffectBasicParameters } from './EffectBasicParameters';
 interface EffectZoneParamsProps {
   zone: EffectZone;
   isUpdatingParams: boolean;
-  lastUpdatedParam: string | null;
   onEffectParamChange: (param: string, value: number | string) => void;
 }
 
 export function EffectZoneParams({
   zone,
   isUpdatingParams,
-  lastUpdatedParam,
   onEffectParamChange
 }: EffectZoneParamsProps) {
   return (
@@ -24,7 +22,6 @@ export function EffectZoneParams({
       <EffectParametersSection 
         zone={zone}
         isUpdatingParams={isUpdatingParams}
-        lastUpdatedParam={lastUpdatedParam}
         onEffectParamChange={onEffectParamChange}
       />
       

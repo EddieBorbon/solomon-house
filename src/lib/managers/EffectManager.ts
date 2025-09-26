@@ -112,7 +112,7 @@ export class EffectManager {
   /**
    * Fuerza la actualización de un efecto específico con estrategias optimizadas
    */
-  public forceEffectUpdate(effectId: string, paramName: string, _newValue: number | string): void {
+  public forceEffectUpdate(effectId: string, paramName: string): void {
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
       return;

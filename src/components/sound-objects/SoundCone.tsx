@@ -4,6 +4,7 @@ import { forwardRef, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundConeProps {
   id: string;
@@ -12,15 +13,7 @@ interface SoundConeProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: {
-    frequency: number;
-    volume: number;
-    waveform: OscillatorType;
-    color?: string;
-    pitchDecay?: number;
-    octaves?: number;
-    duration?: number;
-  };
+  audioParams: AudioParams;
 }
 
 export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
@@ -64,7 +57,8 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
       } else {
         // Resetear a valores por defecto
         meshRef.current.scale.set(scale[0], scale[1], scale[2]);
-        materialRef.current.color.setHex(audioParams.color || '#ff6b35'); // Usar color del audioParams
+        const colorHex = parseInt((audioParams.color || '#ff6b35').replace('#', ''), 16);
+        materialRef.current.color.setHex(colorHex); // Usar color del audioParams
         materialRef.current.emissiveIntensity = 0;
       }
 
@@ -105,13 +99,14 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     useEffect(() => {
       if (materialRef.current) {
         try {
-          materialRef.current.color.setHex(audioParams.color || '#ff6b35'); // Usar color del audioParams
+          const colorHex = parseInt((audioParams.color || '#ff6b35').replace('#', ''), 16);
+          materialRef.current.color.setHex(colorHex); // Usar color del audioParams
           materialRef.current.emissive.setHex(0x000000);
           materialRef.current.emissiveIntensity = 0;
         } catch {
         }
       }
-    }, []);
+    }, [audioParams.color]);
 
     return (
       <group ref={ref} position={position} rotation={rotation}>

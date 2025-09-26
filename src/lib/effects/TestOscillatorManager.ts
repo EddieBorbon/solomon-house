@@ -68,7 +68,7 @@ export class TestOscillatorManager {
    * Detiene todos los osciladores de prueba
    */
   public stopAllTestOscillators(): void {
-    this.testOscillators.forEach((testOsc, _effectId) => {
+    this.testOscillators.forEach((testOsc, /* _effectId */) => {
       try {
         testOsc.stop();
       } catch {
@@ -80,7 +80,7 @@ export class TestOscillatorManager {
    * Limpia todos los osciladores de prueba
    */
   public clearAllTestOscillators(): void {
-    this.testOscillators.forEach((testOsc, _effectId) => {
+    this.testOscillators.forEach((testOsc, effectId) => {
       this.removeTestOscillator(effectId);
     });
   }

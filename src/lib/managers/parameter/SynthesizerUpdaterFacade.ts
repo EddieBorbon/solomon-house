@@ -58,7 +58,7 @@ export class SynthesizerUpdaterFacade {
         updater.updateSynthesizer(source.synth, params, result);
       } else {
         // Usar lógica genérica para sintetizadores no específicos
-        this.updateGenericSynthesizer(source.synth, params, result);
+        this.updateGenericSynthesizer();
       }
 
       // Actualizar parámetros comunes (volumen, frecuencia, etc.)
@@ -130,9 +130,9 @@ export class SynthesizerUpdaterFacade {
    * Actualiza sintetizadores genéricos (no específicos)
    */
   private updateGenericSynthesizer(
-    _synth: SynthesizerType,
-    _params: Partial<AudioParams>,
-    _result: ParameterUpdateResult
+    // synth: SynthesizerType, 
+    // params: Partial<AudioParams>, 
+    // result: ParameterUpdateResult
   ): void {
     // Implementar lógica genérica para sintetizadores no específicos
     // Por ahora, solo log

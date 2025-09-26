@@ -4,6 +4,7 @@ import React, { forwardRef, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundCylinderProps {
   id: string;
@@ -12,16 +13,7 @@ interface SoundCylinderProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: {
-    frequency: number;
-    volume: number;
-    waveform: OscillatorType;
-    waveform2?: OscillatorType;
-    harmonicity?: number;
-    vibratoAmount?: number;
-    vibratoRate?: number;
-    duration?: number;
-  };
+  audioParams: AudioParams;
 }
 
 export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
@@ -130,7 +122,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           
           try {
             if (materialRef.current.color && materialRef.current.color.setHex) {
-              materialRef.current.color.setHex(audioParams.color || '#22c55e'); // Usar color del audioParams
+              const colorHex = parseInt((audioParams.color || '#22c55e').replace('#', ''), 16);
+              materialRef.current.color.setHex(colorHex); // Usar color del audioParams
             }
             
             if (materialRef.current.emissiveIntensity !== undefined) {
@@ -170,7 +163,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
         try {
           // Establecer valores iniciales seguros
           if (materialRef.current.color && materialRef.current.color.setHex) {
-            materialRef.current.color.setHex(audioParams.color || '#22c55e');
+            const colorHex = parseInt((audioParams.color || '#22c55e').replace('#', ''), 16);
+            materialRef.current.color.setHex(colorHex);
           }
           if (materialRef.current.emissive && materialRef.current.emissive.setHex) {
             materialRef.current.emissive.setHex(0x000000);
@@ -178,10 +172,10 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           if (materialRef.current.emissiveIntensity !== undefined) {
             materialRef.current.emissiveIntensity = 0;
           }
-    } catch {
-    }
+        } catch {
+        }
       }
-    }, []);
+    }, [audioParams.color]);
 
     return (
       <group ref={ref} position={position} rotation={rotation}>

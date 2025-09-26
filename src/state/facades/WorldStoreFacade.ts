@@ -2,7 +2,7 @@ import { ObjectManager } from '../managers/ObjectManager';
 import { MobileObjectManager } from '../managers/MobileObjectManager';
 import { WorldManager } from '../managers/WorldManager';
 import { DefaultParamsProvider } from '../providers/DefaultParamsProvider';
-import { useGridStore } from '../../stores/useGridStore';
+import { useGridStore, type Grid } from '../../stores/useGridStore';
 import { useEffectStore } from '../../stores/useEffectStore';
 import { useSelectionStore } from '../../stores/useSelectionStore';
 import { SoundObjectType, SoundObject, MobileObject, EffectZone } from '../useWorldStore';
@@ -128,7 +128,7 @@ export class WorldStoreFacade {
   /**
    * Elimina un objeto móvil
    */
-  public removeMobileObject(id: string, grids: Map<string, any>): void {
+  public removeMobileObject(id: string, grids: Map<string, Grid>): void {
     this.mobileObjectManager.removeMobileObject(id, grids);
   }
 
@@ -307,14 +307,14 @@ export class WorldStoreFacade {
   /**
    * Busca un objeto por ID
    */
-  public findObjectById(id: string, grids: Map<string, any>): { object: SoundObject | null, gridId: string | null } {
+  public findObjectById(id: string, grids: Map<string, Grid>): { object: SoundObject | null, gridId: string | null } {
     return this.objectManager.findObjectById(id, grids);
   }
 
   /**
    * Busca un objeto móvil por ID
    */
-  public findMobileObjectById(id: string, grids: Map<string, any>): { object: MobileObject | null, gridId: string | null } {
+  public findMobileObjectById(id: string, grids: Map<string, Grid>): { object: MobileObject | null, gridId: string | null } {
     return this.mobileObjectManager.findMobileObjectById(id, grids);
   }
 
@@ -355,9 +355,9 @@ export class WorldStoreFacade {
   public syncAllComponents(): void {
     // Esta función puede ser utilizada para sincronizar el estado
     // entre todos los componentes cuando sea necesario
-    const gridStore = useGridStore.getState();
-    const effectStore = useEffectStore.getState();
-    const selectionStore = useSelectionStore.getState();
+    useGridStore.getState();
+    useEffectStore.getState();
+    useSelectionStore.getState();
 
     // Aquí se pueden agregar operaciones de sincronización específicas
     // si es necesario en el futuro

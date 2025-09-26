@@ -1,4 +1,3 @@
-import { Group } from 'three';
 import { SoundObject, MobileObject, EffectZone } from '../../state/useWorldStore';
 import { AudioParams } from '../factories/SoundSourceFactory';
 

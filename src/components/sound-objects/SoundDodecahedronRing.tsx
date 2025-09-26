@@ -177,7 +177,7 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
           </mesh>
         );
       });
-    }, [polyphony, dodecahedronGeometry, audioEnabled, handleClick]);
+    }, [polyphony, dodecahedronGeometry, audioEnabled, handleClick, audioParams.blendingMode, audioParams.color, audioParams.emissiveColor, audioParams.emissiveIntensity, audioParams.metalness, audioParams.opacity, audioParams.roughness]);
 
     return (
       <group ref={ref} position={position}>

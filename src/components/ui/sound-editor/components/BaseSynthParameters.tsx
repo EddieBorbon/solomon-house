@@ -48,20 +48,20 @@ export function BaseSynthParameters({
   };
 
   // Función helper para obtener etiquetas de frecuencia según el tipo
-  const _getFrequencyLabels = () => {
-    switch (selectedObject.type) {
-      case 'cone':
-        return { min: '20_HZ', max: '200_HZ' };
-      case 'icosahedron':
-        return { min: '50_HZ', max: '1200_HZ' };
-      case 'dodecahedronRing':
-        return { min: '55_HZ_A1', max: '880_HZ_A5' };
-      case 'torus':
-        return { min: '20_HZ', max: '440_HZ' };
-      default:
-        return { min: '20_HZ', max: '2000_HZ' };
-    }
-  };
+  // const _getFrequencyLabels = () => {
+  //   switch (selectedObject.type) {
+  //     case 'cone':
+  //       return { min: '20_HZ', max: '200_HZ' };
+  //     case 'icosahedron':
+  //       return { min: '50_HZ', max: '1200_HZ' };
+  //     case 'dodecahedronRing':
+  //       return { min: '55_HZ_A1', max: '880_HZ_A5' };
+  //     case 'torus':
+  //       return { min: '20_HZ', max: '440_HZ' };
+  //     default:
+  //       return { min: '20_HZ', max: '2000_HZ' };
+  //   }
+  // };
 
   const frequencyRange = getFrequencyRange();
 

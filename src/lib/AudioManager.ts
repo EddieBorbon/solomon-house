@@ -729,8 +729,8 @@ export class AudioManager {
     }
 
     
-    source.effectSends.forEach((_send, _effectId) => {
-    });
+    // source.effectSends.forEach((_send, _effectId) => {
+    // });
 
     // Verificar efectos globales
     const globalEffects = this.effectManager.getAllGlobalEffects();

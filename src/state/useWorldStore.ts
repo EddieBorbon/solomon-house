@@ -1,15 +1,8 @@
 import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
-import { audioManager, type AudioParams } from '../lib/AudioManager';
 import { useGridStore } from '../stores/useGridStore';
-import { useObjectStore } from '../stores/useObjectStore';
 import { useEffectStore } from '../stores/useEffectStore';
-import { useSelectionStore } from '../stores/useSelectionStore';
-import { DefaultParamsProvider } from './providers/DefaultParamsProvider';
-import { ObjectManager } from './managers/ObjectManager';
-import { MobileObjectManager } from './managers/MobileObjectManager';
-import { WorldManager } from './managers/WorldManager';
 import { WorldStoreFacade } from './facades/WorldStoreFacade';
+import { type AudioParams } from '../lib/AudioManager';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
@@ -232,9 +225,9 @@ export interface WorldActions {
 }
 
 // Función helper para obtener parámetros por defecto usando el provider
-const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
-  return DefaultParamsProvider.getDefaultAudioParams(type);
-};
+// const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
+//   return DefaultParamsProvider.getDefaultAudioParams(type);
+// };
 
 // Instancia del facade que coordina todos los componentes
 const worldStoreFacade = new WorldStoreFacade();
@@ -392,7 +385,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para activar/desactivar el audio de un objeto - Delegada al WorldStoreFacade
   toggleObjectAudio: (id: string, forceState?: boolean) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       // Delegar al facade
@@ -421,7 +414,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para disparar una nota percusiva - Delegada al WorldStoreFacade
   triggerObjectNote: (id: string) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectNote(id, gridId);
@@ -431,7 +424,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para disparar un objeto percusivo - Delegada al WorldStoreFacade
   triggerObjectPercussion: (id: string) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectPercussion(id, gridId);
@@ -441,7 +434,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para disparar una nota con duración específica - Delegada al WorldStoreFacade
   triggerObjectAttackRelease: (id: string) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectAttackRelease(id, gridId);
@@ -451,7 +444,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para iniciar el gate - Delegada al WorldStoreFacade
   startObjectGate: (id: string) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       worldStoreFacade.startObjectGate(id, gridId);
@@ -461,7 +454,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // Acción para detener el gate - Delegada al WorldStoreFacade
   stopObjectGate: (id: string) => {
     const state = get();
-    const { object, gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
       worldStoreFacade.stopObjectGate(id, gridId);
@@ -751,7 +744,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     // Sincronizar el estado local
     const gridStoreState = useGridStore.getState();
-    set((state) => ({
+    set(() => ({
       grids: new Map(gridStoreState.grids)
     }));
   },
@@ -765,7 +758,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     // Sincronizar el estado local
     const gridStoreState = useGridStore.getState();
-    set((state) => ({
+    set(() => ({
       grids: new Map(gridStoreState.grids),
       currentGridCoordinates: gridStoreState.currentGridCoordinates,
       activeGridId: gridStoreState.activeGridId
@@ -786,7 +779,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     // Sincronizar el estado local con el useGridStore
     const gridStoreState = useGridStore.getState();
-    set((state) => ({
+    set(() => ({
       grids: new Map(gridStoreState.grids),
       currentGridCoordinates: gridStoreState.currentGridCoordinates,
       activeGridId: gridStoreState.activeGridId,
@@ -800,7 +793,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     // Sincronizar el estado local
     const gridStoreState = useGridStore.getState();
-    set((state) => ({
+    set(() => ({
       grids: new Map(gridStoreState.grids),
       activeGridId: gridStoreState.activeGridId
     }));
@@ -844,7 +837,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // World management functions - Delegadas al WorldStoreFacade
   createWorld: (name: string) => {
-    const newWorld = worldStoreFacade.createWorld(name);
+    worldStoreFacade.createWorld(name);
     
     set({
       worlds: worldStoreFacade.getAllWorlds(),

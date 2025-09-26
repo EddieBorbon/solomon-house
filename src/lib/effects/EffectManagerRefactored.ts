@@ -1,6 +1,6 @@
 import * as Tone from 'tone';
 import { EffectType, EffectParams, GlobalEffect } from '../managers/EffectManager';
-import { IEffectManager, IEffectManagerConfig } from './interfaces/IEffectManager';
+import { IEffectManager } from './interfaces/IEffectManager';
 import { EffectFactoryRegistry } from './factories/EffectFactoryRegistry';
 import { EffectUpdaterRegistry } from './updaters/EffectUpdaterRegistry';
 import { EffectTestManager } from './test-managers/EffectTestManager';
@@ -35,7 +35,7 @@ export class EffectManagerRefactored implements IEffectManager {
   private updaterRegistry: EffectUpdaterRegistry;
   private testManager: EffectTestManager;
 
-  constructor(_config?: Partial<IEffectManagerConfig>) {
+  constructor(/* _config?: Partial<IEffectManagerConfig> */) {
     // Inicializar registries
     this.factoryRegistry = new EffectFactoryRegistry();
     this.updaterRegistry = new EffectUpdaterRegistry();
@@ -183,7 +183,7 @@ export class EffectManagerRefactored implements IEffectManager {
         this.effectZoneRadii.delete(effectId);
         this.lastEffectIntensities.delete(effectId);
         
-      } catch (error) {
+      } catch {
       }
     }
   }
@@ -230,7 +230,7 @@ export class EffectManagerRefactored implements IEffectManager {
     this.globalEffects.forEach((effectData, effectId) => {
       try {
         this.refreshGlobalEffect(effectId);
-      } catch (error) {
+      } catch {
       }
     });
   }

@@ -3,15 +3,13 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
-import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType, type Grid } from '../../state/useWorldStore';
 import { SceneRenderer } from './SceneRenderer';
-import { SceneObjectFactory } from './SceneObjectFactory';
 import { 
   SceneObject, 
   SceneMobileObject, 
   SceneEffectZone,
   SceneConfig,
-  SceneState,
   TransformData,
   ITransformHandler,
   ISelectionHandler,
@@ -43,7 +41,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
       event.stopPropagation();
       onSelect(object.id);
       onAudioInteraction(object);
-    }, [object.id, onSelect, onAudioInteraction]);
+    }, [object, onSelect, onAudioInteraction]);
 
     const sceneRenderer = useMemo(() => new SceneRenderer(), []);
     const renderedObject = sceneRenderer.render(object);
@@ -69,11 +67,11 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
  */
 class TransformHandler implements ITransformHandler {
   constructor(
-    private updateObject: (id: string, updates: any) => void,
-    private updateMobileObject: (id: string, updates: any) => void,
-    private updateEffectZone: (id: string, updates: any) => void,
+    private updateObject: (id: string, updates: Partial<SoundObject>) => void,
+    private updateMobileObject: (id: string, updates: Partial<MobileObjectType>) => void,
+    private updateEffectZone: (id: string, updates: Partial<EffectZoneType>) => void,
     private allObjects: { objects: SceneObject[]; mobileObjects: SceneMobileObject[]; effectZones: SceneEffectZone[] },
-    private grids: Map<string, any>,
+    private grids: Map<string, Grid>,
     private orbitControlsRef: React.RefObject<{ enabled: boolean } | null>
   ) {}
 
@@ -88,9 +86,9 @@ class TransformHandler implements ITransformHandler {
       
       // Encontrar la cuadrícula que contiene este objeto
       for (const grid of this.grids.values()) {
-        if (grid.objects.some((obj: any) => obj.id === entityId) ||
-            grid.mobileObjects.some((obj: any) => obj.id === entityId) ||
-            grid.effectZones.some((zone: any) => zone.id === entityId)) {
+        if (grid.objects.some((obj: SoundObject) => obj.id === entityId) ||
+            grid.mobileObjects.some((obj: MobileObjectType) => obj.id === entityId) ||
+            grid.effectZones.some((zone: EffectZoneType) => zone.id === entityId)) {
           // Convertir a posición local: posición mundial - posición de la cuadrícula
           localPosition = [
             transform.position.x - grid.position[0],
@@ -308,7 +306,7 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
   }, [selectionHandler]);
 
   // Función para manejar clic en el espacio vacío
-  const handleBackgroundClick = useCallback((event: any) => {
+  const handleBackgroundClick = useCallback((event: { object?: { type?: string; geometry?: { type?: string } } }) => {
     selectionHandler.handleBackgroundClick(event);
   }, [selectionHandler]);
 
@@ -436,9 +434,9 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
         // Encontrar la cuadrícula que contiene este objeto para calcular la posición mundial
         let worldPosition = selectedEntity.position;
         for (const grid of grids.values()) {
-          if (grid.objects.some((obj: any) => obj.id === selectedEntityId) ||
-              grid.mobileObjects.some((obj: any) => obj.id === selectedEntityId) ||
-              grid.effectZones.some((zone: any) => zone.id === selectedEntityId)) {
+          if (grid.objects.some((obj: SoundObject) => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some((obj: MobileObjectType) => obj.id === selectedEntityId) ||
+              grid.effectZones.some((zone: EffectZoneType) => zone.id === selectedEntityId)) {
             worldPosition = [
               grid.position[0] + selectedEntity.position[0],
               grid.position[1] + selectedEntity.position[1],

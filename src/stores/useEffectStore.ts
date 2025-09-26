@@ -246,7 +246,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
   isEditingEffectZone: false,
 
   // Acciones básicas de efectos
-  addEffectZone: (type: EffectType, position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere', gridId?: string) => {
+  addEffectZone: (type: EffectType, position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
 
     // Obtener parámetros por defecto
     const defaultParams = getDefaultEffectParams(type);
@@ -282,7 +282,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
     return newEffectZone;
   },
 
-  removeEffectZone: (id: string, gridId?: string) => {
+  removeEffectZone: (id: string) => {
 
     // Eliminar el efecto global del AudioManager
     try {
@@ -297,7 +297,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
 
   },
 
-  updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>, gridId?: string) => {
+  updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
 
     // Si se actualiza la posición, actualizar también en el AudioManager
     if (updates.position) {
@@ -331,7 +331,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
   },
 
   // Acciones de gestión de efectos
-  toggleLockEffectZone: (id: string, gridId?: string) => {
+  toggleLockEffectZone: (id: string) => {
 
     set((state) => ({
       effectZones: state.effectZones.map(zone =>
@@ -348,29 +348,29 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
   refreshAllEffects: () => {
     try {
       audioManager.refreshAllGlobalEffects();
-    } catch (error) {
+    } catch {
     }
   },
 
   debugAudioChain: (soundId: string) => {
     try {
       audioManager.debugAudioChain(soundId);
-    } catch (error) {
+    } catch {
     }
   },
 
   // Acciones de consulta
-  getEffectZoneById: (id: string, gridId?: string) => {
+  getEffectZoneById: (id: string) => {
     const zone = get().effectZones.find(zone => zone.id === id);
     return zone || null;
   },
 
-  getAllEffectZones: (gridId?: string) => {
+  getAllEffectZones: () => {
     const zones = get().effectZones;
     return zones;
   },
 
-  clearAllEffectZones: (gridId?: string) => {
+  clearAllEffectZones: () => {
     
     // Eliminar todas las zonas de efectos del AudioManager
     const zones = get().effectZones;

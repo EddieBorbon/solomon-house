@@ -18,7 +18,7 @@ export interface SoundObjectEntity extends ParameterEntity {
 
 export interface EffectZoneEntity extends ParameterEntity {
   type: 'effectZone';
-  effectType: EffectType;
+  effectType: import('../../types/world').EffectType;
   effectParams: EffectZone['effectParams'];
   position: [number, number, number];
   rotation: [number, number, number];
@@ -33,27 +33,6 @@ export interface MobileObjectEntity extends ParameterEntity {
   rotation: [number, number, number];
   scale: [number, number, number];
 }
-
-// Tipos de efectos soportados
-export type EffectType = 
-  | 'reverb' 
-  | 'delay' 
-  | 'chorus' 
-  | 'distortion' 
-  | 'filter' 
-  | 'tremolo' 
-  | 'vibrato' 
-  | 'pitchShift' 
-  | 'stereoWidener' 
-  | 'pingPongDelay' 
-  | 'autoFilter' 
-  | 'autoWah' 
-  | 'bitCrusher' 
-  | 'chebyshev' 
-  | 'frequencyShifter' 
-  | 'jcReverb' 
-  | 'feedbackDelay' 
-  | 'freeverb';
 
 // Tipos de objetos de sonido soportados
 export type SoundObjectType = 
@@ -70,7 +49,7 @@ export type SoundObjectType =
 
 // Interfaces para el sistema de parámetros
 export interface IParameterComponentFactory {
-  createEffectComponent(effectType: EffectType, zone: EffectZoneEntity): React.ReactElement | null;
+  createEffectComponent(effectType: import('../../types/world').EffectType, zone: EffectZoneEntity): React.ReactElement | null;
   createSoundObjectComponent(objectType: SoundObjectType, object: SoundObjectEntity): React.ReactElement | null;
   createMobileObjectComponent(object: MobileObjectEntity): React.ReactElement | null;
 }

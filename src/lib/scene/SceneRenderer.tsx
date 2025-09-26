@@ -1,5 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
-import { Group } from 'three';
+import React from 'react';
 import { MobileObject } from '../../components/sound-objects/MobileObject';
 import { EffectZone } from '../../components/world/EffectZone';
 import { SceneObjectFactory } from './SceneObjectFactory';
@@ -70,10 +69,10 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
             ...object.mobileParams,
             centerPosition: [0, 0, 0] // Centro relativo a la cuadrícula
           }}
-          onUpdatePosition={(id, position) => {
+          onUpdatePosition={() => {
             // Esta función será manejada por el componente padre
           }}
-          onSelect={(id) => {
+          onSelect={() => {
             // Esta función será manejada por el componente padre
           }}
         />
@@ -94,7 +93,7 @@ export class SceneRenderer implements ISceneObjectRenderer, ISceneMobileObjectRe
       return (
         <EffectZone
           zone={zone as unknown} // Cast necesario por compatibilidad con el componente existente
-          onSelect={(id) => {
+          onSelect={() => {
             // Esta función será manejada por el componente padre
           }}
         />

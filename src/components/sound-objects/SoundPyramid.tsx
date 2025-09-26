@@ -4,6 +4,7 @@ import { forwardRef, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundPyramidProps {
   id: string;
@@ -12,7 +13,7 @@ interface SoundPyramidProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams?: { color?: string };
+  audioParams?: AudioParams;
   duration?: number;
 }
 
@@ -53,7 +54,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
       }
 
       // Solo ejecutar animaciones cuando el audio está activo o hay sonido reproduciéndose
-      if (audioEnabled || isSoundPlaying) {
+      if ((audioEnabled || isSoundPlaying) && audioParams) {
         // Rotación automática
         if (audioParams.autoRotate) {
           const rotationSpeed = audioParams.rotationSpeed || 1.0;
@@ -149,18 +150,18 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
         <mesh ref={meshRef}>
           <coneGeometry args={[0.8, 1.5, 4]} />
           <meshStandardMaterial
-            color={audioParams.color || "#000000"}
-            metalness={audioParams.metalness || 0.4}
-            roughness={audioParams.roughness || 0.3}
+            color={audioParams?.color || "#000000"}
+            metalness={audioParams?.metalness || 0.4}
+            roughness={audioParams?.roughness || 0.3}
             transparent
-            opacity={audioParams.opacity || 0.9}
-            emissive={audioParams.emissiveColor || "#000000"}
-            emissiveIntensity={audioParams.emissiveIntensity || (isSelected ? 0.3 : 0)}
-            blending={audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
-                     audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
-                     audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+            opacity={audioParams?.opacity || 0.9}
+            emissive={audioParams?.emissiveColor || "#000000"}
+            emissiveIntensity={audioParams?.emissiveIntensity || (isSelected ? 0.3 : 0)}
+            blending={audioParams?.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+                     audioParams?.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+                     audioParams?.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
                      THREE.NormalBlending}
-            premultipliedAlpha={audioParams.blendingMode === 'SubtractiveBlending' || audioParams.blendingMode === 'MultiplyBlending'}
+            premultipliedAlpha={audioParams?.blendingMode === 'SubtractiveBlending' || audioParams?.blendingMode === 'MultiplyBlending'}
             envMapIntensity={1.2}
           />
         </mesh>

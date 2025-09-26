@@ -4,6 +4,7 @@ import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundPlaneProps {
   id: string;
@@ -12,13 +13,7 @@ interface SoundPlaneProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: {
-    frequency?: number;
-    volume?: number;
-    waveform?: OscillatorType;
-    color?: string;
-    duration?: number;
-  };
+  audioParams: AudioParams;
 }
 
 export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(

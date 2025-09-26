@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useWorldStore, type EffectZone, type SoundObject, type MobileObject } from '../../state/useWorldStore';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useWorldStore, type EffectZone } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { ParameterComponentFactory } from './ParameterComponentFactory';
 import { ParameterManager } from './ParameterManager';
 import { 
   EffectZoneEntity, 
   SoundObjectEntity, 
-  MobileObjectEntity,
   ParameterConfig,
-  EntityState,
-  IParameterPanel
+  IParameterPanel,
+  SoundObjectType
 } from './types';
+import { EffectType } from '../../types/world';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
@@ -20,7 +20,6 @@ import { useParameterHandlers } from '../../hooks/useParameterHandlers';
 // Importar componentes de UI
 import { EffectZoneHeader } from '../../components/ui/effect-editor/EffectZoneHeader';
 import { EffectParametersSection } from '../../components/ui/EffectParametersSection';
-import { EffectSpecificParameters } from '../../components/ui/EffectSpecificParameters';
 import { EffectInfoSection } from '../../components/ui/effect-editor/EffectInfoSection';
 import { EffectShapeSelector } from '../../components/ui/effect-editor/EffectShapeSelector';
 import { EffectTransformSection } from '../../components/ui/effect-editor/EffectTransformSection';
@@ -61,7 +60,7 @@ class ParameterPanel implements IParameterPanel {
     this.onExpandedChange?.(expanded);
   }
 
-  render(entity: unknown): React.ReactElement | null {
+  render(): React.ReactElement | null {
     // Esta implementación se maneja en el componente principal
     return null;
   }
@@ -72,7 +71,6 @@ class ParameterPanel implements IParameterPanel {
  */
 export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
   const [isPanelExpanded, setIsPanelExpanded] = useState(false);
-  const [isRefreshingEffects, setIsRefreshingEffects] = useState(false);
   
   // Configuración por defecto
   const defaultConfig: ParameterConfig = {
@@ -93,11 +91,10 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     removeMobileObject,
     removeEffectZone,
     toggleLockEffectZone,
-    setEditingEffectZone,
-    refreshAllEffects
+    setEditingEffectZone
   } = useWorldStore();
 
-  const { isUpdatingParams, lastUpdatedParam, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
+  const { isUpdatingParams, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
 
   // Hook para selección de entidades
   const {
@@ -108,16 +105,12 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     isEffectZone,
     getSoundObject,
     getMobileObject,
-    getEffectZone,
-    hasSelection
+    getEffectZone
   } = useEntitySelector();
 
   // Hook para transformaciones
   const {
-    updateTransform,
-    resetTransform,
-    roundToDecimals,
-    canTransform
+    roundToDecimals
   } = useTransformHandler();
 
   // Componentes refactorizados
@@ -202,20 +195,54 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     });
   }, [isEffectZone, getEffectZone, updateEffectZone, parameterManager]);
 
-  // Función para manejar transformaciones
-  const handleTransformChange = useCallback((entityId: string, transform: unknown) => {
-    updateTransform(entityId, transform);
-  }, [updateTransform]);
+  // Función para manejar actualización de zona de efecto
+  const handleUpdateEffectZone = useCallback((id: string, updates: Partial<EffectZone>) => {
+    updateEffectZone(id, updates);
+  }, [updateEffectZone]);
+
+  // Función para manejar cambio de forma de zona de efecto
+  const handleShapeChange = useCallback((shape: 'sphere' | 'cube') => {
+    if (!isEffectZone) return;
+    const zone = getEffectZone();
+    if (!zone) return;
+    handleUpdateEffectZone(zone.id, { shape });
+  }, [isEffectZone, getEffectZone, handleUpdateEffectZone]);
+
+  // Función para manejar transformaciones de objeto sonoro
+  const handleSoundTransformChange = useCallback((transform: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {
+    if (!isSoundObject) return;
+    const soundObject = getSoundObject();
+    if (!soundObject) return;
+    
+    const newTransform = { ...soundObject };
+    if (transform === 'position') {
+      newTransform.position[axis] = value;
+    } else if (transform === 'rotation') {
+      newTransform.rotation[axis] = value;
+    } else if (transform === 'scale') {
+      newTransform.scale[axis] = value;
+    }
+    
+    updateObject(soundObject.id, newTransform);
+  }, [isSoundObject, getSoundObject, updateObject]);
+
+  // Función para resetear transformaciones de objeto sonoro
+  const handleResetSoundTransform = useCallback(() => {
+    if (!isSoundObject) return;
+    const soundObject = getSoundObject();
+    if (!soundObject) return;
+    
+    updateObject(soundObject.id, {
+      position: [0, 0, 0],
+      rotation: [0, 0, 0],
+      scale: [1, 1, 1]
+    });
+  }, [isSoundObject, getSoundObject, updateObject]);
 
   // Función para manejar refresco de efectos
-  const handleRefreshEffects = useCallback(() => {
-    setIsRefreshingEffects(true);
-    refreshAllEffects();
-
-    setTimeout(() => {
-      setIsRefreshingEffects(false);
-    }, defaultConfig.updateDelay);
-  }, [refreshAllEffects, defaultConfig.updateDelay]);
+  // const handleRefreshEffects = useCallback(() => {
+  //   refreshAllEffects();
+  // }, [refreshAllEffects]);
 
   // Si no hay entidad seleccionada, mostrar solo el botón de toggle
   if (!selectedEntity) {
@@ -289,10 +316,8 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                 {/* Header con información de la zona de efecto */}
                 <EffectZoneHeader
                   zone={zone}
-                  isRefreshingEffects={isRefreshingEffects}
                   onRemove={removeEffectZone}
                   onToggleLock={toggleLockEffectZone}
-                  onRefresh={handleRefreshEffects}
                 />
 
                 {/* Controles de parámetros del efecto */}
@@ -300,19 +325,32 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                   <EffectParametersSection
                     zone={zone}
                     isUpdatingParams={isUpdatingParams}
-                    lastUpdatedParam={lastUpdatedParam}
                     onEffectParamChange={handleEffectParamChange}
                   />
 
                   {/* Parámetros específicos del efecto usando el factory */}
-                  {parameterFactory.createEffectComponent(zone.effectType as unknown, zone as EffectZoneEntity)}
+                  {parameterFactory.createEffectComponent(zone.type as EffectType, {
+                    id: zone.id,
+                    type: 'effectZone',
+                    effectType: zone.type as EffectType,
+                    effectParams: zone.effectParams || {},
+                    position: zone.position,
+                    rotation: zone.rotation,
+                    scale: zone.scale,
+                    isLocked: zone.isLocked,
+                    isSelected: true
+                  } as EffectZoneEntity)}
 
                   {/* Secciones adicionales */}
-                  <EffectInfoSection zone={zone} />
-                  <EffectShapeSelector zone={zone} />
+                  <EffectInfoSection effectType={zone.type} />
+                  <EffectShapeSelector 
+                    zone={zone}
+                    onShapeChange={handleShapeChange}
+                  />
                   <EffectTransformSection 
                     zone={zone} 
-                    onTransformChange={handleTransformChange}
+                    onUpdateEffectZone={handleUpdateEffectZone}
+                    roundToDecimals={roundToDecimals}
                   />
                 </div>
               </>
@@ -358,32 +396,46 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
               <>
                 {/* Header con información del objeto sonoro */}
                 <SoundObjectHeader
-                  object={soundObject}
+                  selectedObject={soundObject}
                   onRemove={removeObject}
                 />
 
                 {/* Controles de parámetros del objeto sonoro */}
                 <div className="space-y-4">
                   {/* Parámetros específicos del objeto usando el factory */}
-                  {parameterFactory.createSoundObjectComponent(soundObject.type as unknown, soundObject as SoundObjectEntity)}
+                  {parameterFactory.createSoundObjectComponent(soundObject.type as SoundObjectType, {
+                    id: soundObject.id,
+                    type: 'soundObject',
+                    audioParams: soundObject.audioParams,
+                    position: soundObject.position,
+                    rotation: soundObject.rotation,
+                    scale: soundObject.scale,
+                    isSelected: true
+                  } as SoundObjectEntity)}
 
                   {/* Secciones adicionales */}
                   <SynthSpecificParameters 
-                    object={soundObject}
+                    selectedObject={soundObject}
                     onParamChange={handleParamChange}
                   />
                   <SoundTransformSection 
-                    object={soundObject} 
-                    onTransformChange={handleTransformChange}
+                    selectedObject={soundObject}
+                    onTransformChange={handleSoundTransformChange}
+                    onResetTransform={handleResetSoundTransform}
+                    roundToDecimals={roundToDecimals}
                   />
                   <SoundObjectControls 
-                    object={soundObject}
+                    selectedObject={soundObject}
                     onParamChange={handleParamChange}
+                    onTransformChange={handleSoundTransformChange}
+                    onResetTransform={handleResetSoundTransform}
+                    roundToDecimals={roundToDecimals}
+                    onRemove={removeObject}
                   />
                 </div>
 
                 {/* Footer */}
-                <SoundObjectFooter object={soundObject} />
+                <SoundObjectFooter />
               </>
             )}
           </div>

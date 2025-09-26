@@ -183,7 +183,7 @@ export function ColorSection({ selectedObject, onParamChange }: ColorSectionProp
           <input
             type="checkbox"
             checked={selectedObject.audioParams.autoRotate || false}
-            onChange={(e) => onParamChange('autoRotate', e.target.checked)}
+            onChange={(e) => onParamChange('autoRotate', e.target.checked ? 1 : 0)}
             className="w-4 h-4 bg-black/50 border border-white/30 rounded focus:border-white focus:outline-none"
           />
           <span className="text-white font-mono text-xs tracking-wider">

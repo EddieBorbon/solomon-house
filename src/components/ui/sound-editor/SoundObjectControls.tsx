@@ -23,14 +23,13 @@ export function SoundObjectControls({
   onTransformChange,
   onResetTransform,
   roundToDecimals,
-  onRemove
+  // onRemove
 }: SoundObjectControlsProps) {
   return (
     <div className="space-y-4">
       {/* Control de activación de audio */}
       <AudioControlSection 
         selectedObject={selectedObject} 
-        onRemove={onRemove} 
       />
 
       {/* Controles de parámetros */}
@@ -40,9 +39,8 @@ export function SoundObjectControls({
       />
 
       {/* Parámetros avanzados de sintetizadores */}
-      <AdvancedSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
+      <AdvancedSynthParameters
+        object={selectedObject}
       />
 
       {/* Sección de color */}

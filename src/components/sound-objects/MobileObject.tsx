@@ -3,7 +3,7 @@
 import React, { forwardRef, useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
 
 // Tipos de movimiento disponibles
 export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
@@ -68,7 +68,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
-    const objects: unknown[] = [];
+    const objects: SoundObject[] = [];
     grids.forEach((grid) => {
       objects.push(...grid.objects);
     });

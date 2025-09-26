@@ -27,15 +27,7 @@ import { PhaserParams } from './effect-editor/PhaserParams';
 import { EffectInfoSection } from './effect-editor/EffectInfoSection';
 import { EffectTransformSection } from './effect-editor/EffectTransformSection';
 import { SoundObjectHeader } from './sound-editor/SoundObjectHeader';
-import { MonoSynthParameters } from './sound-editor/MonoSynthParameters';
-import { MetalSynthParameters } from './sound-editor/MetalSynthParameters';
-import { NoiseSynthParameters } from './sound-editor/NoiseSynthParameters';
-import { PluckSynthParameters } from './sound-editor/PluckSynthParameters';
-import { PolySynthParameters } from './sound-editor/PolySynthParameters';
 import { SoundObjectControls } from './sound-editor/SoundObjectControls';
-import { SamplerParameters } from './sound-editor/SamplerParameters';
-import { SoundObjectEditor } from './sound-editor/SoundObjectEditor';
-import { SoundObjectFooter } from './sound-editor/SoundObjectFooter';
 import { NoSelectionMessage } from './NoSelectionMessage';
 import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
@@ -49,23 +41,20 @@ export function ParameterEditor() {
     removeMobileObject,
     removeEffectZone,
     toggleLockEffectZone,
-    setEditingEffectZone,
-    refreshAllEffects
+    setEditingEffectZone
   } = useWorldStore();
 
-  const { isUpdatingParams, lastUpdatedParam, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
+  const { isUpdatingParams, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
 
   // Usar el hook personalizado para la selección de entidades
   const {
     selectedEntity,
-    selectedEntityId,
     isSoundObject,
     isMobileObject,
     isEffectZone,
     getSoundObject,
     getMobileObject,
-    getEffectZone,
-    hasSelection
+    getEffectZone
   } = useEntitySelector();
 
   // Expandir automáticamente el panel cuando se selecciona una entidad
@@ -79,8 +68,7 @@ export function ParameterEditor() {
   const {
     updateTransform,
     resetTransform,
-    roundToDecimals,
-    canTransform
+    roundToDecimals
   } = useTransformHandler();
 
 
@@ -288,7 +276,6 @@ export function ParameterEditor() {
             <EffectParametersSection
               zone={zone}
               isUpdatingParams={isUpdatingParams}
-              lastUpdatedParam={lastUpdatedParam}
               onEffectParamChange={handleEffectParamChange}
             />
 

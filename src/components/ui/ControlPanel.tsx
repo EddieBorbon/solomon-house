@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';

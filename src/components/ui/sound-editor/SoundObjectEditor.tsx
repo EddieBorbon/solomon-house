@@ -55,8 +55,7 @@ export function SoundObjectEditor({
 
       {/* Parámetros avanzados de sintetizadores */}
       <AdvancedSynthParameters 
-        selectedObject={selectedObject}
-        onParamChange={onParamChange}
+        object={selectedObject}
       />
 
       {/* Parámetros específicos de sintetizadores */}

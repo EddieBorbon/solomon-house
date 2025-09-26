@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
@@ -193,9 +194,11 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                 {/* UNAM Logo */}
                 <div className="text-center">
                   <div className="w-24 h-24 mx-auto mb-2 flex items-center justify-center">
-                    <img 
+                    <Image 
                       src="/Picture1-removebg-preview.png" 
                       alt="UNAM Logo" 
+                      width={96}
+                      height={96}
                       className="w-full h-full object-contain filter brightness-0 invert opacity-90"
                     />
                   </div>
@@ -204,9 +207,11 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                 {/* FaM Logo */}
                 <div className="text-center">
                   <div className="w-24 h-24 mx-auto mb-2 flex items-center justify-center">
-                    <img 
+                    <Image 
                       src="/Picture2-removebg-preview.png" 
                       alt="FaM Logo" 
+                      width={96}
+                      height={96}
                       className="w-full h-full object-contain filter brightness-0 invert opacity-90"
                     />
                   </div>

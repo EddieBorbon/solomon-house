@@ -10,12 +10,9 @@ import { EffectInfoSection } from './EffectInfoSection';
 
 interface EffectZoneContentProps {
   zone: EffectZone;
-  isRefreshingEffects: boolean;
   isUpdatingParams: boolean;
-  lastUpdatedParam: string | null;
   onRemove: (id: string) => void;
   onToggleLock: (id: string) => void;
-  onRefresh: () => void;
   onEffectParamChange: (param: string, value: number | string) => void;
   onUpdateEffectZone: (id: string, updates: Partial<EffectZone>) => void;
   roundToDecimals: (value: number) => number;
@@ -23,12 +20,9 @@ interface EffectZoneContentProps {
 
 export function EffectZoneContent({
   zone,
-  isRefreshingEffects,
   isUpdatingParams,
-  lastUpdatedParam,
   onRemove,
   onToggleLock,
-  onRefresh,
   onEffectParamChange,
   onUpdateEffectZone,
   roundToDecimals
@@ -38,17 +32,14 @@ export function EffectZoneContent({
       {/* Header con información de la zona de efecto */}
       <EffectZoneHeader 
         zone={zone}
-        isRefreshingEffects={isRefreshingEffects}
         onRemove={onRemove}
         onToggleLock={onToggleLock}
-        onRefresh={onRefresh}
       />
 
       {/* Controles de parámetros del efecto */}
       <EffectZoneParams
         zone={zone}
         isUpdatingParams={isUpdatingParams}
-        lastUpdatedParam={lastUpdatedParam}
         onEffectParamChange={onEffectParamChange}
       />
 

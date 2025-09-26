@@ -28,7 +28,7 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
       <div className="mb-6">
         <FuturisticSlider
           label="DELAY_TIME"
-          value={zone?.effectParams.delayTime ?? 0.3}
+          value={Number(zone?.effectParams.delayTime) ?? 0.3}
           min={0.1}
           max={1}
           step={0.01}

@@ -68,7 +68,7 @@ export class AudioContextManager {
         this.stateChangeListeners.forEach(listener => {
           try {
             listener(newState);
-          } catch (error) {
+          } catch {
           }
         });
 
@@ -125,7 +125,7 @@ export class AudioContextManager {
       this.cleanupListeners.forEach(listener => {
         try {
           listener();
-        } catch (error) {
+        } catch {
         }
       });
     } catch {
@@ -146,7 +146,7 @@ export class AudioContextManager {
       } else {
         return true;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -165,7 +165,7 @@ export class AudioContextManager {
       } else {
         return true;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -185,7 +185,7 @@ export class AudioContextManager {
       } else {
         return true;
       }
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -200,7 +200,7 @@ export class AudioContextManager {
       this.isContextStarted = false;
       
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

@@ -89,7 +89,7 @@ export class EffectTestManager implements IEffectTestManager {
    * Limpia todos los osciladores de prueba
    */
   cleanup(): void {
-    this.testOscillators.forEach((testOsc, _effectId) => {
+    this.testOscillators.forEach((testOsc, /* _effectId */) => {
       try {
         testOsc.stop();
         testOsc.dispose();

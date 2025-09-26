@@ -1,12 +1,13 @@
 import React from 'react';
 import { 
-  EffectType, 
   SoundObjectType, 
   EffectZoneEntity, 
   SoundObjectEntity, 
   MobileObjectEntity,
   IParameterComponentFactory 
 } from './types';
+import { EffectZone, EffectType } from '../../types/world';
+import { MobileObject } from '../../state/useWorldStore';
 
 // Importar componentes de efectos
 // import { AutoFilterParams } from '../../components/ui/effect-editor/AutoFilterParams';
@@ -28,10 +29,6 @@ import { PitchShiftParams } from '../../components/ui/effect-editor/PitchShiftPa
 
 // Importar componentes de objetos de sonido
 import { AdvancedSynthParameters } from '../../components/ui/sound-editor/AdvancedSynthParameters';
-import { MonoSynthParameters } from '../../components/ui/sound-editor/MonoSynthParameters';
-import { MetalSynthParameters } from '../../components/ui/sound-editor/MetalSynthParameters';
-import { NoiseSynthParameters } from '../../components/ui/sound-editor/NoiseSynthParameters';
-import { PluckSynthParameters } from '../../components/ui/sound-editor/PluckSynthParameters';
 
 // Importar componente de objetos móviles
 import { MobileObjectEditor } from '../../components/ui/MobileObjectEditor';
@@ -55,12 +52,44 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
   }
 
   /**
+   * Convierte EffectZoneEntity a EffectZone
+   */
+  private convertToEffectZone(entity: EffectZoneEntity): EffectZone {
+    return {
+      id: entity.id,
+      type: entity.effectType as EffectType, // Cast explícito
+      shape: 'sphere', // Valor por defecto
+      isLocked: entity.isLocked,
+      effectParams: entity.effectParams,
+      position: entity.position,
+      rotation: entity.rotation,
+      scale: entity.scale,
+      isSelected: false
+    };
+  }
+
+  /**
+   * Convierte MobileObjectEntity a MobileObject
+   */
+  private convertToMobileObject(entity: MobileObjectEntity): MobileObject {
+    return {
+      id: entity.id,
+      type: 'mobile',
+      mobileParams: entity.mobileParams,
+      position: entity.position,
+      rotation: entity.rotation,
+      scale: entity.scale,
+      isSelected: false
+    };
+  }
+
+  /**
    * Crea un componente de parámetros para un efecto específico
    */
   public createEffectComponent(effectType: EffectType, zone: EffectZoneEntity): React.ReactElement | null {
     const commonProps = {
-      zone: zone as unknown, // Cast necesario por compatibilidad
-      onEffectParamChange: (_param: string, _value: unknown) => {
+      zone: this.convertToEffectZone(zone), // Conversión correcta
+      onEffectParamChange: () => {
       }
     };
 
@@ -129,7 +158,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
   public createSoundObjectComponent(objectType: SoundObjectType, object: SoundObjectEntity): React.ReactElement | null {
     const commonProps = {
       object: object as unknown, // Cast necesario por compatibilidad
-      onParamChange: (_param: string, _value: unknown) => {
+      onParamChange: () => {
       }
     };
 
@@ -163,8 +192,8 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
     try {
       return (
         <MobileObjectEditor
-          mobileObject={object as unknown} // Cast necesario por compatibilidad
-          onRemove={(_id: string) => {
+          mobileObject={this.convertToMobileObject(object)} // Conversión correcta
+          onRemove={() => {
           }}
         />
       );
@@ -337,7 +366,7 @@ export class ParameterComponentFactory implements IParameterComponentFactory {
       }
     };
 
-    return effectInfo[effectType] || {
+    return effectInfo[effectType as keyof typeof effectInfo] || {
       name: 'Unknown',
       description: 'Unknown effect type',
       category: 'distortion',

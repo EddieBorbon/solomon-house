@@ -4,6 +4,7 @@ import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundIcosahedronProps {
   id: string;
@@ -12,13 +13,7 @@ interface SoundIcosahedronProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: {
-    frequency?: number;
-    volume?: number;
-    waveform?: OscillatorType;
-    color?: string;
-    duration?: number;
-  };
+  audioParams: AudioParams;
 }
 
 export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(

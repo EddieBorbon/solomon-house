@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
+import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
 
 // Tipos para cuadrículas
 export interface Grid {
@@ -8,9 +9,9 @@ export interface Grid {
   position: [number, number, number]; // Posición 3D en el mundo
   rotation: [number, number, number]; // Rotación 3D
   scale: [number, number, number]; // Escala 3D
-  objects: unknown[]; // Será tipado cuando refactoricemos los objetos
-  mobileObjects: unknown[]; // Será tipado cuando refactoricemos los objetos móviles
-  effectZones: unknown[]; // Será tipado cuando refactoricemos los efectos
+  objects: SoundObject[];
+  mobileObjects: MobileObject[];
+  effectZones: EffectZone[];
   gridSize: number;
   gridColor: string;
   isLoaded: boolean; // Si la cuadrícula está cargada en memoria

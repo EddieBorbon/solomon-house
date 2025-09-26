@@ -38,66 +38,66 @@ interface SynthesizerWithModulation {
   };
 }
 
-interface _SynthesizerWithVoice1 {
-  voice1: {
-    oscillator: {
-      type: string;
-    };
-  };
-}
+// interface _SynthesizerWithVoice1 {
+//   voice1: {
+//     oscillator: {
+//       type: string;
+//     };
+//   };
+// }
 
-interface _SynthesizerWithEnvelope {
-  envelope: {
-    attack: number;
-    decay: number;
-    sustain: number;
-    release: number;
-    curve?: string;
-  };
-}
+// interface _SynthesizerWithEnvelope {
+//   envelope: {
+//     attack: number;
+//     decay: number;
+//     sustain: number;
+//     release: number;
+//     curve?: string;
+//   };
+// }
 
-interface _SynthesizerWithFilterEnvelope {
-  filterEnvelope: {
-    attack: number;
-    decay: number;
-    sustain: number;
-    release: number;
-    baseFrequency: number;
-    octaves: number;
-  };
-}
+// interface _SynthesizerWithFilterEnvelope {
+//   filterEnvelope: {
+//     attack: number;
+//     decay: number;
+//     sustain: number;
+//     release: number;
+//     baseFrequency: number;
+//     octaves: number;
+//   };
+// }
 
-interface _SynthesizerWithFilter {
-  filter: {
-    Q: {
-      value: number;
-    };
-  };
-}
+// interface _SynthesizerWithFilter {
+//   filter: {
+//     Q: {
+//       value: number;
+//     };
+//   };
+// }
 
-interface _SynthesizerWithVibratoAmount {
-  vibratoAmount: {
-    rampTo: (value: number, time: number) => void;
-  };
-}
+// interface _SynthesizerWithVibratoAmount {
+//   vibratoAmount: {
+//     rampTo: (value: number, time: number) => void;
+//   };
+// }
 
-interface _SynthesizerWithVibratoRate {
-  vibratoRate: {
-    rampTo: (value: number, time: number) => void;
-  };
-}
+// interface _SynthesizerWithVibratoRate {
+//   vibratoRate: {
+//     rampTo: (value: number, time: number) => void;
+//   };
+// }
 
-interface _SynthesizerWithPitchDecay {
-  pitchDecay: number;
-}
+// interface _SynthesizerWithPitchDecay {
+//   pitchDecay: number;
+// }
 
-interface _SynthesizerWithOctaves {
-  octaves: number;
-}
+// interface _SynthesizerWithOctaves {
+//   octaves: number;
+// }
 
-interface _SynthesizerWithResonance {
-  resonance: number;
-}
+// interface _SynthesizerWithResonance {
+//   resonance: number;
+// }
 
 export interface ParameterUpdateResult {
   success: boolean;

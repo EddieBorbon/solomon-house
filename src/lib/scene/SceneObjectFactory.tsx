@@ -1,5 +1,4 @@
 import React from 'react';
-import { Group } from 'three';
 import { SoundCube } from '../../components/sound-objects/SoundCube';
 import { SoundSphere } from '../../components/sound-objects/SoundSphere';
 import { SoundCylinder } from '../../components/sound-objects/SoundCylinder';

@@ -20,12 +20,12 @@ interface EffectZoneEditorProps {
 
 export function EffectZoneEditor({
   zone,
-  isRefreshingEffects,
+  // isRefreshingEffects,
   isUpdatingParams,
-  lastUpdatedParam,
+  // lastUpdatedParam,
   onRemove,
   onToggleLock,
-  onRefresh,
+  // onRefresh,
   onEffectParamChange,
   onUpdateEffectZone,
   roundToDecimals
@@ -39,12 +39,9 @@ export function EffectZoneEditor({
     <EffectZoneContainer>
       <EffectZoneContent
         zone={zone}
-        isRefreshingEffects={isRefreshingEffects}
         isUpdatingParams={isUpdatingParams}
-        lastUpdatedParam={lastUpdatedParam}
         onRemove={onRemove}
         onToggleLock={onToggleLock}
-        onRefresh={onRefresh}
         onEffectParamChange={onEffectParamChange}
         onUpdateEffectZone={onUpdateEffectZone}
         roundToDecimals={roundToDecimals}

@@ -48,7 +48,12 @@ export function MobileObjectEditorWrapper({
         </div>
 
         {/* Contenido del editor de objeto móvil */}
-        <MobileObjectEditor mobileObject={mobileObject} />
+        <MobileObjectEditor 
+          mobileObject={mobileObject} 
+          onRemove={() => {
+            // Función placeholder para eliminar objeto móvil
+          }}
+        />
       </div>
     </div>
   );

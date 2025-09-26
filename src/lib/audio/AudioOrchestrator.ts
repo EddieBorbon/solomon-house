@@ -102,7 +102,7 @@ export class AudioOrchestrator implements IAudioOrchestrator {
       }
     }
     
-    const _successCount = results.filter(r => r.success).length;
+    // const _successCount = results.filter(r => r.success).length;
     
     return results;
   }

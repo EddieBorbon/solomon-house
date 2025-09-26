@@ -289,7 +289,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   },
 
   // Acciones de audio
-  toggleObjectAudio: (id: string, forceState?: boolean, gridId?: string) => {
+  toggleObjectAudio: (id: string, forceState?: boolean) => {
 
     const currentObject = get().objects.find(obj => obj.id === id);
     if (!currentObject) {
@@ -319,7 +319,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  triggerObjectNote: (id: string, gridId?: string) => {
+  triggerObjectNote: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -333,7 +333,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     audioManager.triggerNoteAttack(id, object.audioParams);
   },
 
-  triggerObjectPercussion: (id: string, gridId?: string) => {
+  triggerObjectPercussion: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -351,7 +351,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  triggerObjectAttackRelease: (id: string, gridId?: string) => {
+  triggerObjectAttackRelease: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -365,7 +365,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     audioManager.triggerAttackRelease(id, object.audioParams);
   },
 
-  startObjectGate: (id: string, gridId?: string) => {
+  startObjectGate: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -378,7 +378,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  stopObjectGate: (id: string, gridId?: string) => {
+  stopObjectGate: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -433,7 +433,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  getObjectById: (id: string, gridId?: string) => {
+  getObjectById: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     return object || null;
   },

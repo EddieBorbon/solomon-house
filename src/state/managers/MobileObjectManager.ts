@@ -35,7 +35,7 @@ export class MobileObjectManager {
     grids: Map<string, unknown>
   ): void {
     // Buscar el objeto en todas las cuadrículas
-    for (const [gridId, grid] of grids) {
+    for (const [, grid] of grids) {
       const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
         // Validar parámetros móviles si se están actualizando
@@ -52,7 +52,7 @@ export class MobileObjectManager {
    */
   public removeMobileObject(id: string, grids: Map<string, unknown>): void {
     // Buscar y eliminar el objeto de todas las cuadrículas
-    for (const [gridId, grid] of grids) {
+    for (const [, grid] of grids) {
       const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
         const updatedObjects = grid.mobileObjects.filter((obj: MobileObject) => obj.id !== id);
@@ -71,7 +71,7 @@ export class MobileObjectManager {
     grids: Map<string, unknown>
   ): void {
     // Buscar el objeto en todas las cuadrículas y actualizar su posición
-    for (const [gridId, grid] of grids) {
+    for (const [, grid] of grids) {
       const objectIndex = grid.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
       if (objectIndex !== -1) {
         const updatedObjects = [...grid.mobileObjects];
@@ -206,12 +206,10 @@ export class MobileObjectManager {
     deltaTime: number,
     speed: number,
     radius: number,
-    centerPosition: [number, number, number],
-    axis: [number, number, number]
+    centerPosition: [number, number, number]
   ): [number, number, number] {
     const time = Date.now() * 0.001 * speed;
     const [cx, cy, cz] = centerPosition;
-    const [ax, ay, az] = axis;
     
     // Simplificado: movimiento circular en el plano XY
     return [
@@ -289,8 +287,7 @@ export class MobileObjectManager {
     deltaTime: number,
     speed: number,
     radius: number,
-    centerPosition: [number, number, number],
-    axis: [number, number, number]
+    centerPosition: [number, number, number]
   ): [number, number, number] {
     const time = Date.now() * 0.001 * speed;
     const [cx, cy, cz] = centerPosition;

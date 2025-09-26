@@ -54,8 +54,8 @@ export class AudioManagerNew {
     this.stateManager = new AudioStateManager();
     
     // Configurar suscripción a cambios de estado
-    this.stateManager.subscribe((_state) => {
-    });
+    // this.stateManager.subscribe((_state) => {
+    // });
     
     // Registrar el AudioManager como listener de limpieza del contexto
     this.audioContextManager.onCleanup(() => {
@@ -368,7 +368,7 @@ export class AudioManagerNew {
            !effectSend.disposed && !dryGain.disposed;
   }
 
-  private updateSoundEffectMixing(_id: string, _position: [number, number, number]): void {
+  private updateSoundEffectMixing(/* _id: string, _position: [number, number, number] */): void {
     // Implementación existente mantenida
   }
 

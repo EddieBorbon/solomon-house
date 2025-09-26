@@ -4,6 +4,7 @@ import React, { forwardRef, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, AdditiveBlending, SubtractiveBlending, MultiplyBlending, NormalBlending } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
+import { type AudioParams } from '../../lib/AudioManager';
 
 interface SoundCubeProps {
   id: string;
@@ -12,14 +13,7 @@ interface SoundCubeProps {
   scale: [number, number, number];
   isSelected: boolean;
   audioEnabled: boolean;
-  audioParams: {
-    frequency: number;
-    volume: number;
-    waveform: OscillatorType;
-    harmonicity?: number;
-    modulationWaveform?: OscillatorType;
-    duration?: number;
-  };
+  audioParams: AudioParams;
 }
 
 export const SoundCube = forwardRef<Group, SoundCubeProps>(({
@@ -136,8 +130,8 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
       {/* Cubo principal */}
       <mesh
         ref={meshRef}
-        castShadow={audioParams.shadowCasting !== false}
-        receiveShadow={audioParams.shadowReceiving !== false}
+        castShadow={true}
+        receiveShadow={true}
         onClick={handleClick}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
