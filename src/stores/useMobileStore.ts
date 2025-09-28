@@ -6,6 +6,19 @@ interface MobileState {
   mobileObjects: MobileObject[];
 }
 
+// Función para migrar objetos móviles existentes
+const migrateMobileObjects = (objects: MobileObject[]): MobileObject[] => {
+  return objects.map(obj => ({
+    ...obj,
+    mobileParams: {
+      ...obj.mobileParams,
+      // Asegurar que los nuevos parámetros existan
+      height: obj.mobileParams?.height ?? 1,
+      heightSpeed: obj.mobileParams?.heightSpeed ?? 0.5,
+    }
+  }));
+};
+
 export const useMobileStore = create<MobileState & MobileObjectActions>((set, get) => ({
   // Estado inicial
   mobileObjects: [],
@@ -31,6 +44,8 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
         amplitude: 0.5,
         frequency: 1,
         randomSeed: Math.random() * 1000,
+        height: 1, // Altura del movimiento vertical
+        heightSpeed: 0.5, // Velocidad del movimiento vertical
         showRadiusIndicator: true,
         showProximityIndicator: true,
       },
@@ -44,11 +59,26 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
-    
     set((state) => ({
-      mobileObjects: state.mobileObjects.map(obj =>
-        obj.id === id ? { ...obj, ...updates } : obj
-      )
+      mobileObjects: state.mobileObjects.map(obj => {
+        if (obj.id === id) {
+          // Migrar parámetros móviles si faltan los nuevos campos
+          const updatedMobileParams = {
+            ...obj.mobileParams,
+            ...updates.mobileParams,
+            // Asegurar que los nuevos parámetros existan
+            height: updates.mobileParams?.height ?? obj.mobileParams?.height ?? 1,
+            heightSpeed: updates.mobileParams?.heightSpeed ?? obj.mobileParams?.heightSpeed ?? 0.5,
+          };
+          
+          return { 
+            ...obj, 
+            ...updates, 
+            mobileParams: updatedMobileParams 
+          };
+        }
+        return obj;
+      })
     }));
   },
 
@@ -102,6 +132,6 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
 
   getAll: () => {
     const state = get();
-    return state.mobileObjects;
-  },
+    return migrateMobileObjects(state.mobileObjects);
+  }
 }));

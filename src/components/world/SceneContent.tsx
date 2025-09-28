@@ -53,8 +53,8 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         // Para icosaedros, planos y toroides, solo disparar la nota (sonido percusivo)
         triggerObjectNote(object.id);
       } else if (object.type === 'dodecahedronRing') {
-        // Para anillos de dodecaedros, activar/desactivar el audio (sonido continuo)
-        toggleObjectAudio(object.id);
+        // Para anillos de dodecaedros, disparar acorde (sonido percusivo)
+        triggerObjectNote(object.id);
       } else if (object.type === 'spiral') {
         // Para espirales, disparar la nota (sonido percusivo)
         triggerObjectNote(object.id);
@@ -216,18 +216,17 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     
     
     gridsArray.forEach((grid) => {
-      // Obtener objetos de esta cuadrícula desde el ObjectStore
-      const gridObjects = objectStore.getAllObjects(grid.id);
+      // Usar objetos directamente de la cuadrícula (useWorldStore) en lugar del ObjectStore
+      const gridObjects = grid.objects || [];
       
       console.log(`Grid ${grid.id}:`, {
-        objectsFromStore: gridObjects.length,
-        objectsFromGrid: grid.objects?.length || 0,
+        objectsFromGrid: gridObjects.length,
         mobileObjects: grid.mobileObjects?.length || 0,
         effectZones: grid.effectZones?.length || 0,
         isActive: grid.id === activeGridId
       });
       
-      // Usar objetos del ObjectStore en lugar de la cuadrícula
+      // Usar objetos de la cuadrícula directamente
       objects.push(...gridObjects.filter(obj => obj && obj.id));
       
       // Mantener objetos móviles y zonas de efectos de la cuadrícula
@@ -390,15 +389,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       {Array.from(grids.values()).map((grid) => {
         if (!grid || !grid.id) return null;
         
-        // Obtener objetos de esta cuadrícula desde el ObjectStore
-        const objectStore = useObjectStore.getState();
-        const gridObjects = objectStore.getAllObjects(grid.id);
-        
-        // Log de depuración para cada cuadrícula
+        // Usar objetos directamente de la cuadrícula
+        const gridObjects = grid.objects || [];
         
         return (
           <group key={grid.id} position={grid.position}>
-          {/* Renderizado de objetos sonoros de esta cuadrícula desde ObjectStore */}
+          {/* Renderizado de objetos sonoros de esta cuadrícula */}
           {gridObjects.map((obj) => {
             if (!obj || !obj.id) return null;
             const objectRef = entityRefs.get(obj.id);
@@ -473,26 +469,13 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         let worldPosition = selectedEntity.position;
         let foundGrid = null;
         
-        // Para objetos sonoros, buscar en el ObjectStore para encontrar la cuadrícula
-        if (allObjects.objects.some(obj => obj.id === selectedEntityId)) {
-          const objectStore = useObjectStore.getState();
-          
-          // Buscar en todas las cuadrículas para encontrar dónde está el objeto
-          for (const grid of grids.values()) {
-            const gridObjects = objectStore.getAllObjects(grid.id);
-            if (gridObjects.some(obj => obj.id === selectedEntityId)) {
-              foundGrid = grid;
-              break;
-            }
-          }
-        } else {
-          // Para objetos móviles y zonas de efectos, buscar en las cuadrículas
-          for (const grid of grids.values()) {
-            if (grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
-                grid.effectZones.some(zone => zone.id === selectedEntityId)) {
-              foundGrid = grid;
-              break;
-            }
+        // Buscar en todas las cuadrículas para encontrar dónde está el objeto
+        for (const grid of grids.values()) {
+          if (grid.objects.some(obj => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
+              grid.effectZones.some(zone => zone.id === selectedEntityId)) {
+            foundGrid = grid;
+            break;
           }
         }
         

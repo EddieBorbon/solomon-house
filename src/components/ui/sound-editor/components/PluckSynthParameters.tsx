@@ -63,7 +63,7 @@ export function PluckSynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="500"
+            min="0"
             max="7000"
             step="100"
             value={selectedObject.audioParams.dampening || 4000}
@@ -75,7 +75,7 @@ export function PluckSynthParameters({
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>500 Hz</span>
+          <span>0 Hz</span>
           <span>7000 Hz</span>
         </div>
       </div>
@@ -88,20 +88,20 @@ export function PluckSynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0.1"
-            max="20"
-            step="0.1"
+            min="0"
+            max="1"
+            step="0.01"
             value={selectedObject.audioParams.resonance || 0.7}
             onChange={(e) => onParamChange('resonance', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams.resonance || 0.7).toFixed(1)}
+            {(selectedObject.audioParams.resonance || 0.7).toFixed(2)}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.1</span>
-          <span>20</span>
+          <span>0</span>
+          <span>1.0</span>
         </div>
       </div>
 

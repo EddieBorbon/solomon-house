@@ -152,7 +152,7 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
         )}
         
         {/* Botón de activación/desactivación de audio - No disponible para sintetizadores percusivos */}
-        {selectedObject.type !== 'cone' && selectedObject.type !== 'icosahedron' && selectedObject.type !== 'torus' && (
+        {selectedObject.type !== 'cone' && selectedObject.type !== 'icosahedron' && selectedObject.type !== 'torus' && selectedObject.type !== 'plane' && (
           <div className="mt-4">
             <button
               onClick={() => {

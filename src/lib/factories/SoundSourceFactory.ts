@@ -360,7 +360,7 @@ export class SoundSourceFactory {
         release: params.release || 2.0,
       },
     });
-    polySynth.maxPolyphony = params.polyphony || 4;
+    polySynth.maxPolyphony = params.polyphony || 8;
     return polySynth;
   }
 

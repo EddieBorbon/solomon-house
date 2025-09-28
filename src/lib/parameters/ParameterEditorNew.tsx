@@ -153,6 +153,8 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
 
   // Función para actualizar parámetros de objeto sonoro
   const handleParamChange = useCallback((param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
+    console.log('🎛️ ParameterEditorNew: handleParamChange llamado', { param, value });
+    
     if (!isSoundObject) return;
 
     const soundObject = getSoundObject();
@@ -162,6 +164,8 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
       ...soundObject.audioParams,
       [param]: value,
     };
+
+    console.log('🎛️ ParameterEditorNew: Actualizando objeto', { id: soundObject.id, newAudioParams });
 
     updateObject(soundObject.id, {
       audioParams: newAudioParams,

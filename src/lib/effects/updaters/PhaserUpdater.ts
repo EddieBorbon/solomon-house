@@ -47,8 +47,8 @@ export class PhaserUpdater implements IEffectUpdater<Tone.Phaser> {
    */
   getCurrentParams(effect: Tone.Phaser): Record<string, unknown> {
     return {
-      frequency: effect.frequency?.value || 0.5,
-      octaves: effect.octaves || 2.2,
+      frequency: effect.frequency?.value || 15,
+      octaves: effect.octaves || 5,
       baseFrequency: effect.baseFrequency || 1000,
       wet: effect.wet?.value || 0.5
     };

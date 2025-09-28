@@ -6,6 +6,7 @@ import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { SceneContent } from './SceneContent';
 import { useCameraControls } from '../../hooks/useCameraControls';
+import { CameraControlsManager } from './CameraControlsManager';
 import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
@@ -87,6 +88,9 @@ export function Experience() {
       >
         {/* Controlador de cámara WASD */}
         <CameraControllerInternal orbitControlsRef={orbitControlsRef} />
+        
+        {/* Manager de controles de cámara */}
+        <CameraControlsManager />
         
         {/* Controles de cámara */}
         <OrbitControls 

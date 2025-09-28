@@ -39,7 +39,7 @@ export function MetalSynthParameters({
           <input
             type="range"
             min="0.1"
-            max="20"
+            max="10"
             step="0.1"
             value={selectedObject.audioParams.harmonicity || 5.1}
             onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
@@ -51,7 +51,7 @@ export function MetalSynthParameters({
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>0.1</span>
-          <span>20.0</span>
+          <span>10.0</span>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export function MetalSynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0"
+            min="1"
             max="100"
             step="1"
             value={selectedObject.audioParams.modulationIndex || 32}
@@ -75,7 +75,7 @@ export function MetalSynthParameters({
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0</span>
+          <span>1</span>
           <span>100</span>
         </div>
       </div>
@@ -88,20 +88,20 @@ export function MetalSynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="1000"
-            max="8000"
+            min="0"
+            max="7000"
             step="100"
             value={selectedObject.audioParams.resonance || 4000}
             onChange={(e) => onParamChange('resonance', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {selectedObject.audioParams.resonance || 4000}
+            {selectedObject.audioParams.resonance || 4000} Hz
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>1000 Hz</span>
-          <span>8000 Hz</span>
+          <span>0 Hz</span>
+          <span>7000 Hz</span>
         </div>
       </div>
 
@@ -113,8 +113,8 @@ export function MetalSynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0.5"
-            max="5"
+            min="0"
+            max="8"
             step="0.1"
             value={selectedObject.audioParams.octaves || 1.5}
             onChange={(e) => onParamChange('octaves', Number(e.target.value))}
@@ -125,8 +125,8 @@ export function MetalSynthParameters({
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0.5</span>
-          <span>5.0</span>
+          <span>0.0</span>
+          <span>8.0</span>
         </div>
       </div>
     </div>

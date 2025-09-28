@@ -177,12 +177,12 @@ class AudioHandler implements IAudioHandler {
       
       case 'cone':
       case 'dodecahedronRing':
-        // Para conos y anillos de dodecaedros, activar/desactivar el audio (sonido continuo)
+      case 'plane':
+        // Para conos, anillos de dodecaedros y planos (NoiseSynth), activar/desactivar el audio (sonido continuo)
         this.toggleObjectAudioFn(object.id);
         break;
       
       case 'icosahedron':
-      case 'plane':
       case 'torus':
       case 'spiral':
         // Para estos objetos, solo disparar la nota (sonido percusivo)

@@ -48,19 +48,56 @@ export class SoundPlaybackManager {
       // Aplicar TODOS los parámetros antes de iniciar
       updateParamsCallback(soundId, params);
       
+      // Para NoiseSynth, usar triggerAttack sin frecuencia (sonido continuo)
+      if (source.synth instanceof Tone.NoiseSynth) {
+        source.synth.triggerAttack(this.getUniqueStartTime());
+        this.playingSounds.add(soundId);
+        this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
+        return;
+      }
+      
       // Para PolySynth, usar triggerAttack con acordes (sonido continuo)
       if (source.synth instanceof Tone.PolySynth) {
+        // Aplicar parámetros antes de disparar
+        updateParamsCallback(soundId, params);
+        
         // Generar acorde basado en la frecuencia base si está disponible
-        let chord = params.chord || ["C4", "E4", "G4"];
+        let chord: number[];
         
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
-          // Convertir frecuencia a nota más cercana
+          // Convertir frecuencia base a nota
           const baseNote = this.frequencyToNote(params.frequency);
-          chord = this.generateChordFromBase(baseNote, params.chord || ["C4", "E4", "G4"]);
+          // Generar acorde a partir de la nota base
+          const chordNotes = this.generateChordFromNote(baseNote, params.chord || ["C4", "E4", "G4", "B4"]);
+          // Convertir notas a frecuencias
+          chord = chordNotes.map(note => this.noteToFrequency(note));
+        } else {
+          // Convertir acorde de notas a frecuencias
+          chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
+        }
+        
+        console.log('🎵 PolySynth startContinuousSound:');
+        console.log('  - Acorde:', chord);
+        console.log('  - Notas en acorde:', chord.length);
+        console.log('  - Polyphony:', source.synth.maxPolyphony);
+        console.log('  - Voces activas antes:', source.synth.activeVoices);
+        
+        // Validar que el polyphony sea suficiente para el acorde
+        if (chord.length > source.synth.maxPolyphony) {
+          console.warn(`PolySynth: Acorde tiene ${chord.length} notas pero polyphony es ${source.synth.maxPolyphony}. Ajustando polyphony.`);
+          source.synth.maxPolyphony = chord.length;
         }
         
         source.synth.triggerAttack(chord, this.getUniqueStartTime());
+        
+        // Log después del trigger
+        setTimeout(() => {
+          console.log('🎵 PolySynth después del trigger:');
+          console.log('  - Voces activas después:', (source.synth as Tone.PolySynth).activeVoices);
+          console.log('  - Polyphony después:', (source.synth as Tone.PolySynth).maxPolyphony);
+        }, 100);
+        
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
@@ -110,13 +147,19 @@ export class SoundPlaybackManager {
       // Para PolySynth, usar triggerAttack con acordes
       if (source.synth instanceof Tone.PolySynth) {
         // Generar acorde basado en la frecuencia base si está disponible
-        let chord = params.chord || ["C4", "E4", "G4"];
+        let chord: number[];
         
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
-          // Convertir frecuencia a nota más cercana
+          // Convertir frecuencia base a nota
           const baseNote = this.frequencyToNote(params.frequency);
-          chord = this.generateChordFromBase(baseNote, params.chord || ["C4", "E4", "G4"]);
+          // Generar acorde a partir de la nota base
+          const chordNotes = this.generateChordFromNote(baseNote, params.chord || ["C4", "E4", "G4", "B4"]);
+          // Convertir notas a frecuencias
+          chord = chordNotes.map(note => this.noteToFrequency(note));
+        } else {
+          // Convertir acorde de notas a frecuencias
+          chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
         
         source.synth.triggerAttack(chord, Tone.now());
@@ -293,12 +336,25 @@ export class SoundPlaybackManager {
       
       // Para PolySynth, usar triggerAttackRelease con acordes
       if (source.synth instanceof Tone.PolySynth) {
-        let chord = params.chord || ["C4", "E4", "G4"];
+        let chord: number[];
         
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
-          const baseNote = this.frequencyToNote(params.frequency);
-          chord = this.generateChordFromBase(baseNote, params.chord || ["C4", "E4", "G4"]);
+          chord = this.generateChordFrequencies(params.frequency, params.chord || ["C4", "E4", "G4", "B4"]);
+        } else {
+          chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
+        }
+        
+        console.log('🎵 PolySynth triggerNoteAttack:');
+        console.log('  - Acorde:', chord);
+        console.log('  - Notas en acorde:', chord.length);
+        console.log('  - Polyphony:', source.synth.maxPolyphony);
+        console.log('  - Voces activas antes:', source.synth.activeVoices);
+        
+        // Validar que el polyphony sea suficiente para el acorde
+        if (chord.length > source.synth.maxPolyphony) {
+          console.warn(`PolySynth: Acorde tiene ${chord.length} notas pero polyphony es ${source.synth.maxPolyphony}. Ajustando polyphony.`);
+          source.synth.maxPolyphony = chord.length;
         }
         
         const duration = params.duration || '8n';
@@ -540,6 +596,62 @@ export class SoundPlaybackManager {
       playingSoundsIds: Array.from(this.playingSounds),
       config: this.getConfig(),
     };
+  }
+
+  /**
+   * Helper para convertir nota a frecuencia (ejemplo: "A4" -> 440Hz)
+   */
+  private noteToFrequency(note: string): number {
+    return Tone.Frequency(note).toFrequency();
+  }
+
+  /**
+   * Helper para generar acordes basados en una frecuencia base (devuelve frecuencias)
+   */
+  private generateChordFrequencies(baseFrequency: number, chord: string[]): number[] {
+    const baseNote = this.frequencyToNote(baseFrequency);
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
+    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
+    
+    const chordFrequencies = chord.map(note => {
+      const noteName = note.replace(/[0-9]/g, '');
+      const noteIndex = notes.indexOf(noteName);
+      const semitoneDiff = noteIndex - baseNoteIndex;
+      const newNoteName = notes[(semitoneDiff + 12) % 12];
+      const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
+      const newNote = newNoteName + newOctave;
+      return this.noteToFrequency(newNote);
+    });
+    
+    return chordFrequencies;
+  }
+
+  /**
+   * Helper para convertir acorde de notas a frecuencias
+   */
+  private convertChordToFrequencies(chord: string[]): number[] {
+    return chord.map(note => this.noteToFrequency(note));
+  }
+
+  /**
+   * Helper para generar acordes basados en una nota base (devuelve notas)
+   */
+  private generateChordFromNote(baseNote: string, chord: string[]): string[] {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
+    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
+    
+    const chordNotes = chord.map(note => {
+      const noteName = note.replace(/[0-9]/g, '');
+      const noteIndex = notes.indexOf(noteName);
+      const semitoneDiff = noteIndex - baseNoteIndex;
+      const newNoteName = notes[(semitoneDiff + 12) % 12];
+      const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
+      return newNoteName + newOctave;
+    });
+    
+    return chordNotes;
   }
 
   /**

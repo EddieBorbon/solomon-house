@@ -6,6 +6,10 @@ import { PolySynthUpdater } from './PolySynthUpdater';
 import { PluckSynthUpdater } from './PluckSynthUpdater';
 import { DuoSynthUpdater } from './DuoSynthUpdater';
 import { MembraneSynthUpdater } from './MembraneSynthUpdater';
+import { MetalSynthUpdater } from './MetalSynthUpdater';
+import { MonoSynthUpdater } from './MonoSynthUpdater';
+import { FMSynthUpdater } from './FMSynthUpdater';
+import { NoiseSynthUpdater } from './NoiseSynthUpdater';
 
 // Union type for all possible synthesizer types
 type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.MembraneSynth | Tone.PolySynth | Tone.Sampler;
@@ -32,6 +36,10 @@ export class SynthesizerUpdaterFacade {
     this.updaters.set('PluckSynth', new PluckSynthUpdater(this.configManager));
     this.updaters.set('DuoSynth', new DuoSynthUpdater(this.configManager));
     this.updaters.set('MembraneSynth', new MembraneSynthUpdater(this.configManager));
+    this.updaters.set('MetalSynth', new MetalSynthUpdater(this.configManager));
+    this.updaters.set('MonoSynth', new MonoSynthUpdater(this.configManager));
+    this.updaters.set('FMSynth', new FMSynthUpdater(this.configManager));
+    this.updaters.set('NoiseSynth', new NoiseSynthUpdater(this.configManager));
     // TODO: Agregar más updaters específicos cuando se creen
   }
 
@@ -42,6 +50,16 @@ export class SynthesizerUpdaterFacade {
     source: SoundSource, 
     params: Partial<AudioParams>
   ): ParameterUpdateResult {
+    // Solo loggear si hay parámetros significativos
+    const significantParams = Object.keys(params).filter(key => 
+      params[key as keyof AudioParams] !== undefined && 
+      params[key as keyof AudioParams] !== null
+    );
+    
+    if (significantParams.length > 0) {
+      console.log('🔧 SynthesizerUpdaterFacade: Actualizando parámetros:', significantParams);
+    }
+    
     const result: ParameterUpdateResult = {
       success: true,
       updatedParams: [],
@@ -51,18 +69,30 @@ export class SynthesizerUpdaterFacade {
     try {
       // Determinar el tipo de sintetizador y usar el updater apropiado
       const synthType = this.getSynthesizerType(source.synth);
+      console.log(`SynthesizerUpdaterFacade: Tipo de sintetizador detectado: ${synthType}`);
+      console.log(`SynthesizerUpdaterFacade: Sintetizador:`, source.synth);
+      console.log(`SynthesizerUpdaterFacade: Parámetros recibidos:`, params);
+      
       const updater = this.updaters.get(synthType);
+      console.log(`SynthesizerUpdaterFacade: Updater encontrado:`, updater ? 'Sí' : 'No');
 
       if (updater) {
         // Usar updater específico
+        console.log(`SynthesizerUpdaterFacade: Usando updater específico para ${synthType}`);
         updater.updateSynthesizer(source.synth, params, result);
       } else {
         // Usar lógica genérica para sintetizadores no específicos
-        this.updateGenericSynthesizer();
+        console.log(`SynthesizerUpdaterFacade: No se encontró updater específico para ${synthType}, usando genérico`);
+        // this.updateGenericSynthesizer(source.synth, params, result);
       }
 
       // Actualizar parámetros comunes (volumen, frecuencia, etc.)
       this.updateCommonParams(source.synth, params, result);
+
+      // Manejo especial para PolySynth: si se actualiza la frecuencia, regenerar el acorde
+      if (source.synth instanceof Tone.PolySynth && params.frequency !== undefined) {
+        this.handlePolySynthFrequencyUpdate(source.synth, params, result);
+      }
 
     } catch (error) {
       result.success = false;
@@ -76,14 +106,48 @@ export class SynthesizerUpdaterFacade {
    * Determina el tipo de sintetizador
    */
   private getSynthesizerType(synth: SynthesizerType): string {
-    if (synth instanceof Tone.PolySynth) return 'PolySynth';
-    if (synth instanceof Tone.PluckSynth) return 'PluckSynth';
-    if ('voice0' in synth && 'voice1' in synth) return 'DuoSynth';
-    if ('pitchDecay' in synth && 'octaves' in synth) return 'MembraneSynth';
-    if ('filterEnvelope' in synth) return 'MonoSynth';
-    if ('resonance' in synth) return 'MetalSynth';
-    if (synth instanceof Tone.NoiseSynth) return 'NoiseSynth';
-    if (synth instanceof Tone.Sampler) return 'Sampler';
+    console.log('🔍 getSynthesizerType: Analizando sintetizador:', synth);
+    console.log('🔍 getSynthesizerType: Constructor name:', synth.constructor.name);
+    console.log('🔍 getSynthesizerType: Propiedades:', Object.keys(synth));
+    
+    if (synth instanceof Tone.PolySynth) {
+      console.log('🔍 getSynthesizerType: Detectado PolySynth');
+      return 'PolySynth';
+    }
+    if (synth instanceof Tone.PluckSynth) {
+      console.log('🔍 getSynthesizerType: Detectado PluckSynth');
+      return 'PluckSynth';
+    }
+    if ('voice0' in synth && 'voice1' in synth) {
+      console.log('🔍 getSynthesizerType: Detectado DuoSynth');
+      return 'DuoSynth';
+    }
+    if ('pitchDecay' in synth && 'octaves' in synth) {
+      console.log('🔍 getSynthesizerType: Detectado MembraneSynth');
+      return 'MembraneSynth';
+    }
+    if ('filterEnvelope' in synth) {
+      console.log('🔍 getSynthesizerType: Detectado MonoSynth');
+      return 'MonoSynth';
+    }
+    if ('resonance' in synth) {
+      console.log('🔍 getSynthesizerType: Detectado MetalSynth');
+      return 'MetalSynth';
+    }
+    if (synth instanceof Tone.FMSynth) {
+      console.log('🔍 getSynthesizerType: Detectado FMSynth');
+      return 'FMSynth';
+    }
+    if (synth instanceof Tone.NoiseSynth) {
+      console.log('🔍 getSynthesizerType: Detectado NoiseSynth');
+      return 'NoiseSynth';
+    }
+    if (synth instanceof Tone.Sampler) {
+      console.log('🔍 getSynthesizerType: Detectado Sampler');
+      return 'Sampler';
+    }
+    
+    console.log('🔍 getSynthesizerType: No se pudo detectar el tipo, usando genérico');
     return 'Generic';
   }
 
@@ -255,5 +319,118 @@ export class SynthesizerUpdaterFacade {
         'FMSynth'
       ]
     };
+  }
+
+  /**
+   * Maneja la actualización de frecuencia en PolySynth regenerando el acorde
+   */
+  private handlePolySynthFrequencyUpdate(
+    synth: Tone.PolySynth, 
+    params: Partial<AudioParams>, 
+    result: ParameterUpdateResult
+  ): void {
+    try {
+      console.log('🎵 handlePolySynthFrequencyUpdate: Regenerando acorde para PolySynth');
+      console.log('🎵 handlePolySynthFrequencyUpdate: Frecuencia recibida:', params.frequency);
+      console.log('🎵 handlePolySynthFrequencyUpdate: Acorde recibido:', params.chord);
+      
+      // Detener el acorde actual si está sonando
+      if (synth.activeVoices > 0) {
+        console.log('🎵 handlePolySynthFrequencyUpdate: Deteniendo acorde actual');
+        synth.releaseAll();
+      }
+
+      // Generar nuevo acorde basado en la frecuencia base
+      if (params.frequency && params.frequency > 0) {
+        // Convertir frecuencia base a nota
+        const baseNote = this.frequencyToNote(params.frequency);
+        console.log('🎵 handlePolySynthFrequencyUpdate: Frecuencia base:', params.frequency, '-> Nota base:', baseNote);
+        
+        // Generar acorde a partir de la nota base
+        const chordNotes = this.generateChordFromNote(baseNote, params.chord || ["C4", "E4", "G4", "B4"]);
+        console.log('🎵 handlePolySynthFrequencyUpdate: Acorde generado (notas):', chordNotes);
+        
+        // Convertir notas a frecuencias
+        const chordFrequencies = chordNotes.map(note => this.noteToFrequency(note));
+        
+        console.log('🎵 handlePolySynthFrequencyUpdate: Nuevo acorde generado (frecuencias):', chordFrequencies);
+        console.log('🎵 handlePolySynthFrequencyUpdate: Tipo de datos:', typeof chordFrequencies[0]);
+        
+        // Asegurar que el polyphony sea suficiente para el acorde ANTES de iniciarlo
+        if (chordFrequencies.length > synth.maxPolyphony) {
+          console.warn(`PolySynth: Acorde tiene ${chordFrequencies.length} notas pero polyphony es ${synth.maxPolyphony}. Ajustando polyphony.`);
+          synth.maxPolyphony = chordFrequencies.length;
+        }
+        
+        // Iniciar el nuevo acorde inmediatamente (sin setTimeout)
+        console.log('🎵 handlePolySynthFrequencyUpdate: Iniciando acorde inmediatamente');
+        synth.triggerAttack(chordFrequencies, Tone.now());
+        result.updatedParams.push('chordRegenerated');
+        
+        console.log('🎵 handlePolySynthFrequencyUpdate: Nuevo acorde iniciado con frecuencias');
+        console.log('🎵 handlePolySynthFrequencyUpdate: Voces activas después:', synth.activeVoices);
+      }
+    } catch (error) {
+      result.errors.push(`PolySynth frequency update: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Helper para convertir frecuencia a nota (ejemplo: 440Hz -> "A4")
+   */
+  private frequencyToNote(frequency: number): string {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const octave = Math.floor(Math.log2(frequency / 440) / 12) + 4; // 440Hz es A4
+    const noteIndex = Math.round(12 * Math.log2(frequency / 440)) % 12;
+    return notes[noteIndex] + octave;
+  }
+
+  /**
+   * Helper para convertir nota a frecuencia (ejemplo: "A4" -> 440Hz)
+   */
+  private noteToFrequency(note: string): number {
+    return Tone.Frequency(note).toFrequency();
+  }
+
+  /**
+   * Helper para generar acordes basados en una frecuencia base
+   */
+  private generateChordFromBase(baseFrequency: number, chord: string[]): number[] {
+    const baseNote = this.frequencyToNote(baseFrequency);
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
+    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
+    
+    const chordFrequencies = chord.map(note => {
+      const noteName = note.replace(/[0-9]/g, '');
+      const noteIndex = notes.indexOf(noteName);
+      const semitoneDiff = noteIndex - baseNoteIndex;
+      const newNoteName = notes[(semitoneDiff + 12) % 12];
+      const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
+      const newNote = newNoteName + newOctave;
+      return this.noteToFrequency(newNote);
+    });
+    
+    return chordFrequencies;
+  }
+
+  /**
+   * Helper para generar acordes basados en una nota base (devuelve notas)
+   */
+  private generateChordFromNote(baseNote: string, chord: string[]): string[] {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
+    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
+    
+    const chordNotes = chord.map(note => {
+      const noteName = note.replace(/[0-9]/g, '');
+      const noteIndex = notes.indexOf(noteName);
+      const semitoneDiff = noteIndex - baseNoteIndex;
+      const newNoteName = notes[(semitoneDiff + 12) % 12];
+      const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
+      return newNoteName + newOctave;
+    });
+    
+    return chordNotes;
   }
 }

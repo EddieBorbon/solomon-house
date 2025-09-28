@@ -118,8 +118,8 @@ export function BaseSynthParameters({
       {selectedObject.type !== 'spiral' && (
         <div className="mb-4">
           <div className="flex gap-3">
-            {/* WAVEFORM */}
-            {showWaveform && (
+            {/* WAVEFORM - No mostrar para MetalSynth (icosaedro) ya que es fijo */}
+            {showWaveform && selectedObject.type !== 'icosahedron' && (
               <div className="flex-1">
                 <label className="futuristic-label block mb-1 text-white text-xs">
                   WAVEFORM

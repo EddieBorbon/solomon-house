@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -15,7 +15,10 @@ import {
   CursorArrowRaysIcon,
   TrashIcon,
   CommandLineIcon,
-  XMarkIcon
+  XMarkIcon,
+  PlayIcon,
+  PauseIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { 
   Box, 
@@ -37,6 +40,7 @@ export function ControlPanel() {
   const [isGridsExpanded, setIsGridsExpanded] = useState(false);
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
+  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
   const { t } = useLanguage();
   
@@ -54,6 +58,53 @@ export function ControlPanel() {
     const z = (Math.random() - 0.5) * 10;
     addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', [x, 0.5, z]);
   };
+
+  // Funciones para controlar la cámara
+  const toggleCamera = () => {
+    const newState = !isCameraEnabled;
+    const event = new CustomEvent('camera-toggle', { 
+      detail: { enabled: newState } 
+    });
+    window.dispatchEvent(event);
+    setIsCameraEnabled(newState);
+    console.log(`🎥 Camera controls ${newState ? 'enabled' : 'disabled'}`);
+  };
+
+  const enableCamera = () => {
+    const event = new CustomEvent('camera-toggle', { 
+      detail: { enabled: true } 
+    });
+    window.dispatchEvent(event);
+    setIsCameraEnabled(true);
+    console.log('🎥 Camera controls enabled');
+  };
+
+  const disableCamera = () => {
+    const event = new CustomEvent('camera-toggle', { 
+      detail: { enabled: false } 
+    });
+    window.dispatchEvent(event);
+    setIsCameraEnabled(false);
+    console.log('🎥 Camera controls disabled');
+  };
+
+  const debugCamera = () => {
+    const event = new CustomEvent('camera-debug-request');
+    window.dispatchEvent(event);
+  };
+
+  // Escuchar eventos de cambio de estado de la cámara
+  useEffect(() => {
+    const handleCameraStateChange = (event: CustomEvent) => {
+      setIsCameraEnabled(event.detail.enabled);
+    };
+
+    window.addEventListener('camera-state-change', handleCameraStateChange as EventListener);
+
+    return () => {
+      window.removeEventListener('camera-state-change', handleCameraStateChange as EventListener);
+    };
+  }, []);
 
   // Función helper para crear zonas de efecto en la cuadrícula activa
   const createEffectZoneInActiveGrid = (type: string) => {
@@ -258,10 +309,70 @@ export function ControlPanel() {
                   <p className="flex items-center gap-2"><XMarkIcon className="w-3 h-3" /><span className="text-white">{t('controls.esc')}</span> {t('controls.exitEditMode')}</p>
                 </div>
               </div>
+
+              {/* Controles de cámara */}
+              <div className="p-2 border border-gray-600 text-xs text-gray-300 font-mono">
+                <div className="space-y-2">
+                  {/* Estado de la cámara */}
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${isCameraEnabled ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className="text-white">
+                      {isCameraEnabled ? 'Cámara Activa' : 'Cámara Bloqueada'}
+                    </span>
+                  </div>
+
+                  {/* Botones de control */}
+                  <div className="grid grid-cols-2 gap-1">
+                    <button
+                      onClick={toggleCamera}
+                      className={`px-1 py-1 text-xs font-mono border transition-all duration-300 ${
+                        isCameraEnabled
+                          ? 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white'
+                          : 'border-green-500 text-green-500 hover:bg-green-500 hover:text-white'
+                      }`}
+                    >
+                      {isCameraEnabled ? 'Bloquear' : 'Activar'}
+                    </button>
+
+                    <button
+                      onClick={enableCamera}
+                      className="px-1 py-1 text-xs font-mono border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300"
+                    >
+                      Forzar ON
+                    </button>
+
+                    <button
+                      onClick={disableCamera}
+                      className="px-1 py-1 text-xs font-mono border border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white transition-all duration-300"
+                    >
+                      Forzar OFF
+                    </button>
+
+                    <button
+                      onClick={debugCamera}
+                      className="px-1 py-1 text-xs font-mono border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white transition-all duration-300"
+                    >
+                      Debug
+                    </button>
+                  </div>
+
+                  {/* Información de estado */}
+                  {isCameraEnabled ? (
+                    <p className="text-green-400">
+                      ✅ Puedes rotar la cámara con el mouse
+                    </p>
+                  ) : (
+                    <p className="text-red-400">
+                      ⚠️ La cámara está bloqueada
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
+
 
       {/* Sección de Añadir Objeto */}
       <div className="mb-4 relative">

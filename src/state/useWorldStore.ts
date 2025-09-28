@@ -267,8 +267,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       return;
     }
 
+    console.log('useWorldStore.addObject: Creando objeto', { type, position, activeGridId });
+
     // Crear objeto usando el facade
     const newObject = worldStoreFacade.createObject(type, position, activeGridId);
+    
+    console.log('useWorldStore.addObject: Objeto creado', newObject);
     
     // Actualizar la cuadrícula para reflejar el nuevo objeto
     const activeGrid = state.grids.get(activeGridId);

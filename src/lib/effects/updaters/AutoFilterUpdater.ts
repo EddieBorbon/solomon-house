@@ -57,10 +57,10 @@ export class AutoFilterUpdater implements IEffectUpdater<Tone.AutoFilter> {
    */
   getCurrentParams(effect: Tone.AutoFilter): Record<string, unknown> {
     return {
-      frequency: effect.frequency?.value || 0.5,
+      frequency: effect.frequency?.value || "4n",
       baseFrequency: effect.baseFrequency || 200,
       octaves: effect.octaves || 2.6,
-      depth: effect.depth?.value || 0.5,
+      depth: effect.depth?.value || 0.8,
       filterType: effect.filter?.type || 'lowpass',
       filterQ: effect.filter?.Q?.value || 1,
       lfoType: effect.type || 'sine',

@@ -45,37 +45,40 @@ export function PolySynthParameters({
       {/* Polifonía */}
       <div className="mb-4">
         <label className="futuristic-label block mb-1 text-white text-xs">
-          POLYPHONY
+          POLYPHONY (MAX_VOICES)
         </label>
         <div className="flex items-center gap-3">
           <input
             type="range"
             min="1"
-            max="8"
+            max="32"
             step="1"
-            value={selectedObject.audioParams.polyphony || 4}
+            value={selectedObject.audioParams.polyphony || 8}
             onChange={(e) => onParamChange('polyphony', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {selectedObject.audioParams.polyphony || 4}
+            {selectedObject.audioParams.polyphony || 8}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
           <span>1</span>
-          <span>8</span>
+          <span>32</span>
         </div>
+        <p className="text-xs text-gray-400 mt-1 font-mono">
+          MAX_SIMULTANEOUS_NOTES
+        </p>
       </div>
 
       {/* Tipo de Acorde */}
       <div className="mb-4">
         <label className="futuristic-label block mb-1 text-white text-xs">
-          CHORD_TYPE
+          CHORD_TYPE (NOTES_TO_PLAY)
         </label>
         <select
-          value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4"])}
+          value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4", "B4"])}
           onChange={(e) => {
-            const chord = chordMap[e.target.value] || ["C4", "E4", "G4"];
+            const chord = chordMap[e.target.value] || ["C4", "E4", "G4", "B4"];
             onParamChange('chord' as keyof AudioParams, chord);
           }}
           className="w-full p-2 bg-black text-white border border-white focus:border-white focus:outline-none transition-colors font-mono text-xs"
@@ -89,6 +92,9 @@ export function PolySynthParameters({
           <option value='["C4","E4","G#4","B4"]'>C_MAJOR_7_SHARP5 (C-E-G#-B)</option>
           <option value='["C4","Eb4","G4","Bb4","Db5"]'>C_MINOR_9_FLAT5 (C-Eb-G-Bb-Db)</option>
         </select>
+        <p className="text-xs text-gray-400 mt-1 font-mono">
+          ALL_NOTES_PLAY_SIMULTANEOUSLY
+        </p>
       </div>
 
       {/* Release */}
@@ -144,8 +150,8 @@ export function PolySynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0"
-            max="10"
+            min="0.1"
+            max="20"
             step="0.1"
             value={selectedObject.audioParams.harmonicity || 1}
             onChange={(e) => onParamChange('harmonicity', Number(e.target.value))}
@@ -156,8 +162,8 @@ export function PolySynthParameters({
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0</span>
-          <span>10</span>
+          <span>0.1</span>
+          <span>20</span>
         </div>
       </div>
 
@@ -172,12 +178,12 @@ export function PolySynthParameters({
             min="0"
             max="100"
             step="1"
-            value={selectedObject.audioParams.modulationIndex || 10}
+            value={selectedObject.audioParams.modulationIndex || 2}
             onChange={(e) => onParamChange('modulationIndex', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {selectedObject.audioParams.modulationIndex || 10}
+            {selectedObject.audioParams.modulationIndex || 2}
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
@@ -194,20 +200,20 @@ export function PolySynthParameters({
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min="0"
-            max="1"
+            min="0.01"
+            max="3"
             step="0.01"
-            value={selectedObject.audioParams.attack || 0.1}
+            value={selectedObject.audioParams.attack || 1.5}
             onChange={(e) => onParamChange('attack', Number(e.target.value))}
             className="futuristic-slider flex-1"
           />
           <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {(selectedObject.audioParams.attack || 0.1).toFixed(2)}s
+            {(selectedObject.audioParams.attack || 1.5).toFixed(2)}s
           </span>
         </div>
         <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>0s</span>
-          <span>1s</span>
+          <span>0.01s</span>
+          <span>3s</span>
         </div>
       </div>
     </div>

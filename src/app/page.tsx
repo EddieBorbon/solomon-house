@@ -33,7 +33,6 @@ export default function Home() {
         {/* Panel de control */}
         <ControlPanel />
         
-        
         {/* Escena 3D */}
         <Experience />
       </div>

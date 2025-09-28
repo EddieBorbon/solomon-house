@@ -96,27 +96,68 @@ class AutoWahUpdater implements EffectUpdater {
         this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
       }
     });
+    
+    console.log('🎛️ AutoWahUpdater: Parámetros actualizados:', {
+      baseFrequency: effectNode.baseFrequency,
+      octaves: effectNode.octaves,
+      sensitivity: effectNode.sensitivity,
+      qValue: effectNode.Q?.value,
+      wet: effectNode.wet?.value
+    });
   }
 
   getCurrentParams(effectNode: Tone.AutoWah): Record<string, unknown> {
     return {
-      baseFrequency: effectNode.baseFrequency || 'N/A',
-      octaves: effectNode.octaves || 'N/A',
-      sensitivity: effectNode.sensitivity || 'N/A'
+      baseFrequency: effectNode.baseFrequency || 50,
+      octaves: effectNode.octaves || 6,
+      sensitivity: effectNode.sensitivity || -30,
+      qValue: effectNode.Q?.value || 6,
+      wet: effectNode.wet?.value || 0.5
     };
   }
 
-  private safeUpdateParam(node: FlexibleEffectNode, paramName: string, value: number | string): void {
+  private safeUpdateParam(node: Tone.AutoWah, paramName: string, value: number | string): void {
     try {
-      const typedNode = node as Record<string, unknown>;
-      const param = typedNode[paramName];
-      if (param && typeof param === 'object' && 'value' in param) {
-        (param as { value: number | string }).value = value;
-      } else if (param !== undefined) {
-        (typedNode as Record<string, number | string>)[paramName] = value;
+      // Manejar parámetros específicos del AutoWah
+      switch (paramName) {
+        case 'baseFrequency':
+          if (node.baseFrequency !== undefined) {
+            node.baseFrequency = value as number;
+          }
+          break;
+        case 'octaves':
+          if (node.octaves !== undefined) {
+            node.octaves = value as number;
+          }
+          break;
+        case 'sensitivity':
+          if (node.sensitivity !== undefined) {
+            node.sensitivity = value as number;
+          }
+          break;
+        case 'qValue':
+          if (node.Q && 'value' in node.Q) {
+            (node.Q as { value: number }).value = value as number;
+          }
+          break;
+        case 'wet':
+          if (node.wet && 'value' in node.wet) {
+            (node.wet as { value: number }).value = value as number;
+          }
+          break;
+        default:
+          // Intentar acceso genérico
+          const typedNode = node as Record<string, unknown>;
+          const param = typedNode[paramName];
+          if (param && typeof param === 'object' && 'value' in param) {
+            (param as { value: number | string }).value = value;
+          } else if (param !== undefined) {
+            (typedNode as Record<string, number | string>)[paramName] = value;
+          }
+          break;
       }
-    } catch {
-      // Silently handle errors
+    } catch (error) {
+      console.warn(`⚠️ AutoWahUpdater: Error actualizando parámetro ${paramName}:`, error);
     }
   }
 }

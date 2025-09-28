@@ -1,0 +1,72 @@
+import * as Tone from 'tone';
+import { IEffectFactory } from '../interfaces/IEffectFactory';
+import { EffectType, EffectNode } from '../../managers/EffectManager';
+
+/**
+ * Factory para crear efectos PingPongDelay
+ * Implementa el Factory Pattern específico para PingPongDelay
+ */
+export class PingPongDelayFactory implements IEffectFactory {
+  readonly effectType: EffectType = 'pingPongDelay';
+
+  /**
+   * Crea un nuevo nodo PingPongDelay con parámetros por defecto
+   * @returns El nodo PingPongDelay creado
+   */
+  createEffect(): EffectNode {
+    const effectNode = new Tone.PingPongDelay({
+      delayTime: '8n',    // Tiempo de delay en notas musicales
+      feedback: 0.3,      // Feedback moderado
+      wet: 0.5           // Mezcla entre señal seca y procesada
+    });
+
+    console.log(`🎛️ PingPongDelayFactory: PingPongDelay creado con parámetros iniciales:`, {
+      delayTime: effectNode.delayTime.value,
+      feedback: effectNode.feedback.value,
+      wet: effectNode.wet?.value || 0.5,
+      readyForSpatialConnection: true
+    });
+
+    return effectNode;
+  }
+
+  /**
+   * Valida si este factory puede crear el tipo de efecto especificado
+   * @param type Tipo de efecto a validar
+   * @returns true si puede crear el efecto, false en caso contrario
+   */
+  canCreate(type: EffectType): boolean {
+    return type === 'pingPongDelay';
+  }
+
+  /**
+   * Obtiene los parámetros por defecto para PingPongDelay
+   * @returns Objeto con los parámetros por defecto
+   */
+  getDefaultParams(): Record<string, unknown> {
+    return {
+      delayTime: '8n',    // Tiempo de delay (notas musicales o segundos)
+      feedback: 0.3,      // Feedback (0-1)
+      wet: 0.5           // Mezcla entre señal seca y procesada
+    };
+  }
+
+  /**
+   * Valida un parámetro específico para PingPongDelay
+   * @param paramName Nombre del parámetro
+   * @param value Valor a validar
+   * @returns true si el valor es válido, false en caso contrario
+   */
+  validateParam(paramName: string, value: unknown): boolean {
+    switch (paramName) {
+      case 'delayTime':
+        return typeof value === 'string' || (typeof value === 'number' && value >= 0);
+      case 'feedback':
+        return typeof value === 'number' && value >= 0 && value <= 1;
+      case 'wet':
+        return typeof value === 'number' && value >= 0 && value <= 1;
+      default:
+        return false;
+    }
+  }
+}

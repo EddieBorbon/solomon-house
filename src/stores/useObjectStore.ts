@@ -186,6 +186,12 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   // Acciones básicas de objetos
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => {
 
+    // Determinar si el objeto debe tener audio habilitado por defecto
+    // Los objetos percusivos (icosahedron, torus, spiral, pyramid) no deberían tener audio continuo
+    // El plane (NoiseSynth) puede tener sonido continuo
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(type);
+    const defaultAudioEnabled = !isPercussiveObject;
+
     const newObject: SoundObject = {
       id: uuidv4(),
       type,
@@ -194,7 +200,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       scale: [1, 1, 1],
       audioParams: getDefaultAudioParams(type),
       isSelected: false,
-      audioEnabled: true, // Cambiar a true para que suene por defecto
+      audioEnabled: defaultAudioEnabled,
     };
 
 
@@ -207,8 +213,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         newObject.position
       );
       
-      // Iniciar el sonido automáticamente ya que audioEnabled es true
-      audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+      // Solo iniciar el sonido continuo si no es un objeto percusivo
+      if (defaultAudioEnabled) {
+        audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+      }
     } catch (error) {
       throw error;
     }
@@ -299,13 +307,18 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
+    console.log('toggleObjectAudio:', { id, type: currentObject.type, currentAudioEnabled: currentObject.audioEnabled, forceState });
+
     // Ignorar los tipos percusivos ya que no necesitan toggle de audio
-    if (currentObject.type === 'cone' || currentObject.type === 'icosahedron' || currentObject.type === 'torus') {
+    if (currentObject.type === 'icosahedron' || currentObject.type === 'torus') {
+      console.log('toggleObjectAudio: Ignorando objeto percusivo:', currentObject.type);
       return;
     }
 
     // Determinar el nuevo estado
     const newAudioEnabled = forceState !== undefined ? forceState : !currentObject.audioEnabled;
+    
+    console.log('toggleObjectAudio: Cambiando audio de', currentObject.audioEnabled, 'a', newAudioEnabled);
 
     // Actualizar el objeto
     set((state) => ({
@@ -316,8 +329,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Controlar el audio en el AudioManager
     if (newAudioEnabled) {
+      console.log('toggleObjectAudio: Iniciando sonido continuo para', id);
       audioManager.startContinuousSound(id, currentObject.audioParams);
     } else {
+      console.log('toggleObjectAudio: Deteniendo sonido para', id);
       audioManager.stopSound(id);
     }
   },
@@ -328,12 +343,17 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
-    if (object.audioEnabled) {
-      return;
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar la nota
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
+    
+    if (isPercussiveObject) {
+      audioManager.triggerNoteAttack(id, object.audioParams);
+    } else {
+      // Para objetos continuos, solo disparar si no tienen audio continuo activo
+      if (!object.audioEnabled) {
+        audioManager.triggerNoteAttack(id, object.audioParams);
+      }
     }
-
-    audioManager.triggerNoteAttack(id, object.audioParams);
   },
 
   triggerObjectPercussion: (id: string) => {
@@ -342,15 +362,24 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
-    if (object.audioEnabled) {
-      return;
-    }
-
-    if (object.type === 'plane') {
-      audioManager.triggerNoiseAttack(id, object.audioParams);
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
+    
+    if (isPercussiveObject) {
+      if (object.type === 'plane') {
+        audioManager.triggerNoiseAttack(id, object.audioParams);
+      } else {
+        audioManager.triggerNoteAttack(id, object.audioParams);
+      }
     } else {
-      audioManager.triggerNoteAttack(id, object.audioParams);
+      // Para objetos continuos, solo disparar si no tienen audio continuo activo
+      if (!object.audioEnabled) {
+        if (object.type === 'plane') {
+          audioManager.triggerNoiseAttack(id, object.audioParams);
+        } else {
+          audioManager.triggerNoteAttack(id, object.audioParams);
+        }
+      }
     }
   },
 
@@ -360,12 +389,17 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Si el objeto tiene sonido continuo activo, no disparar notas adicionales
-    if (object.audioEnabled) {
-      return;
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid), siempre disparar
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(object.type);
+    
+    if (isPercussiveObject) {
+      audioManager.triggerAttackRelease(id, object.audioParams);
+    } else {
+      // Para objetos continuos, solo disparar si no tienen audio continuo activo
+      if (!object.audioEnabled) {
+        audioManager.triggerAttackRelease(id, object.audioParams);
+      }
     }
-
-    audioManager.triggerAttackRelease(id, object.audioParams);
   },
 
   startObjectGate: (id: string) => {

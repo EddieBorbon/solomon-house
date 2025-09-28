@@ -11,16 +11,40 @@ import { PhaserFactory } from './factories/PhaserFactory';
 import { ReverbFactory } from './factories/ReverbFactory';
 import { ChorusFactory } from './factories/ChorusFactory';
 import { AutoFilterFactory } from './factories/AutoFilterFactory';
+import { AutoWahFactory } from './factories/AutoWahFactory';
 import { DistortionFactory } from './factories/DistortionFactory';
 import { DelayFactory } from './factories/DelayFactory';
+import { BitCrusherFactory } from './factories/BitCrusherFactory';
+import { ChebyshevFactory } from './factories/ChebyshevFactory';
+import { FeedbackDelayFactory } from './factories/FeedbackDelayFactory';
+import { FreeverbFactory } from './factories/FreeverbFactory';
+import { FrequencyShifterFactory } from './factories/FrequencyShifterFactory';
+import { JCReverbFactory } from './factories/JCReverbFactory';
+import { PingPongDelayFactory } from './factories/PingPongDelayFactory';
+import { PitchShiftFactory } from './factories/PitchShiftFactory';
+import { StereoWidenerFactory } from './factories/StereoWidenerFactory';
+import { TremoloFactory } from './factories/TremoloFactory';
+import { VibratoFactory } from './factories/VibratoFactory';
 
 // Importar updaters específicos
 import { PhaserUpdater } from './updaters/PhaserUpdater';
 import { ReverbUpdater } from './updaters/ReverbUpdater';
 import { ChorusUpdater } from './updaters/ChorusUpdater';
 import { AutoFilterUpdater } from './updaters/AutoFilterUpdater';
+import { AutoWahUpdater } from './updaters/AutoWahUpdater';
 import { DistortionUpdater } from './updaters/DistortionUpdater';
 import { DelayUpdater } from './updaters/DelayUpdater';
+import { BitCrusherUpdater } from './updaters/BitCrusherUpdater';
+import { ChebyshevUpdater } from './updaters/ChebyshevUpdater';
+import { FeedbackDelayUpdater } from './updaters/FeedbackDelayUpdater';
+import { FreeverbUpdater } from './updaters/FreeverbUpdater';
+import { FrequencyShifterUpdater } from './updaters/FrequencyShifterUpdater';
+import { JCReverbUpdater } from './updaters/JCReverbUpdater';
+import { PingPongDelayUpdater } from './updaters/PingPongDelayUpdater';
+import { PitchShiftUpdater } from './updaters/PitchShiftUpdater';
+import { StereoWidenerUpdater } from './updaters/StereoWidenerUpdater';
+import { TremoloUpdater } from './updaters/TremoloUpdater';
+import { VibratoUpdater } from './updaters/VibratoUpdater';
 
 /**
  * EffectManager refactorizado usando Factory y Strategy Patterns
@@ -60,13 +84,20 @@ export class EffectManagerRefactored implements IEffectManager {
     this.factoryRegistry.register(new ReverbFactory());
     this.factoryRegistry.register(new ChorusFactory());
     this.factoryRegistry.register(new AutoFilterFactory());
+    this.factoryRegistry.register(new AutoWahFactory());
     this.factoryRegistry.register(new DistortionFactory());
     this.factoryRegistry.register(new DelayFactory());
-    
-    // TODO: Registrar los demás factories cuando estén creados
-    // this.factoryRegistry.register(new AutoWahFactory());
-    // this.factoryRegistry.register(new BitCrusherFactory());
-    // ... etc
+    this.factoryRegistry.register(new BitCrusherFactory());
+    this.factoryRegistry.register(new ChebyshevFactory());
+    this.factoryRegistry.register(new FeedbackDelayFactory());
+    this.factoryRegistry.register(new FreeverbFactory());
+    this.factoryRegistry.register(new FrequencyShifterFactory());
+    this.factoryRegistry.register(new JCReverbFactory());
+    this.factoryRegistry.register(new PingPongDelayFactory());
+    this.factoryRegistry.register(new PitchShiftFactory());
+    this.factoryRegistry.register(new StereoWidenerFactory());
+    this.factoryRegistry.register(new TremoloFactory());
+    this.factoryRegistry.register(new VibratoFactory());
   }
 
   /**
@@ -77,13 +108,20 @@ export class EffectManagerRefactored implements IEffectManager {
     this.updaterRegistry.register(new ReverbUpdater());
     this.updaterRegistry.register(new ChorusUpdater());
     this.updaterRegistry.register(new AutoFilterUpdater());
+    this.updaterRegistry.register(new AutoWahUpdater());
     this.updaterRegistry.register(new DistortionUpdater());
     this.updaterRegistry.register(new DelayUpdater());
-    
-    // TODO: Registrar los demás updaters cuando estén creados
-    // this.updaterRegistry.register(new AutoWahUpdater());
-    // this.updaterRegistry.register(new BitCrusherUpdater());
-    // ... etc
+    this.updaterRegistry.register(new BitCrusherUpdater());
+    this.updaterRegistry.register(new ChebyshevUpdater());
+    this.updaterRegistry.register(new FeedbackDelayUpdater());
+    this.updaterRegistry.register(new FreeverbUpdater());
+    this.updaterRegistry.register(new FrequencyShifterUpdater());
+    this.updaterRegistry.register(new JCReverbUpdater());
+    this.updaterRegistry.register(new PingPongDelayUpdater());
+    this.updaterRegistry.register(new PitchShiftUpdater());
+    this.updaterRegistry.register(new StereoWidenerUpdater());
+    this.updaterRegistry.register(new TremoloUpdater());
+    this.updaterRegistry.register(new VibratoUpdater());
   }
 
   /**
@@ -123,8 +161,9 @@ export class EffectManagerRefactored implements IEffectManager {
         // Configurar radio inicial para la zona de efectos
         this.setEffectZoneRadius(effectId, 2.0);
         
-        // Crear un oscilador de prueba para escuchar los efectos
-        this.testManager.createTestOscillator(effectId, effectNode);
+        // NOTA: Los osciladores de prueba están deshabilitados para evitar interferencia
+        // con el procesamiento normal de efectos de objetos sonoros
+        // this.testManager.createTestOscillator(effectId, effectNode);
       }
     } catch {
     }

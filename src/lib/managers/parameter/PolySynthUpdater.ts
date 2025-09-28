@@ -1,12 +1,17 @@
 import * as Tone from 'tone';
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
+import { ParameterConfigManager } from './ParameterConfigManager';
 
 /**
  * Clase especializada en la actualización de PolySynth
  * Responsabilidad única: Manejar parámetros específicos de PolySynth
  */
 export class PolySynthUpdater extends BaseSynthesizerUpdater {
+  constructor(configManager?: ParameterConfigManager) {
+    super(configManager);
+  }
+
   /**
    * Actualiza parámetros específicos del PolySynth
    */
@@ -16,60 +21,98 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
     result: ParameterUpdateResult
   ): void {
     try {
+      // Solo loggear parámetros significativos
+      const significantParams = Object.keys(params).filter(key => 
+        params[key as keyof AudioParams] !== undefined && 
+        params[key as keyof AudioParams] !== null
+      );
+      
+      if (significantParams.length > 0) {
+        console.log('PolySynthUpdater: Actualizando parámetros:', significantParams);
+      }
+
       // Actualizar polyphony si cambia
       if (params.polyphony !== undefined) {
         synth.maxPolyphony = params.polyphony;
         result.updatedParams.push('polyphony');
       }
-      
-      // Actualizar frecuencia si cambia
-      if (params.frequency !== undefined) {
-        (synth as unknown as { frequency: { value: number } }).frequency.value = params.frequency;
-        result.updatedParams.push('frequency');
-      }
-      
-      // Actualizar waveform si cambia
+
+      // Actualizar parámetros de las voces usando el método set()
+      const voiceOptions: Record<string, unknown> = {};
+      let hasVoiceOptions = false;
+
+      // Parámetros del oscilador
       if (params.waveform !== undefined) {
-        (synth as unknown as { oscillator: { type: string } }).oscillator.type = params.waveform;
-        result.updatedParams.push('waveform');
+        voiceOptions.oscillator = { type: params.waveform };
+        hasVoiceOptions = true;
       }
-      
-      // Actualizar chord si cambia
-      if (params.chord !== undefined) {
-        // El PolySynth maneja acordes automáticamente
-        result.updatedParams.push('chord');
+
+      // Parámetros de modulación
+      if (params.modulationWaveform !== undefined) {
+        voiceOptions.modulation = { type: params.modulationWaveform };
+        hasVoiceOptions = true;
       }
-      
-      // Actualizar curve si cambia
-      if (params.curve !== undefined) {
-        (synth as unknown as { envelope: { curve: string } }).envelope.curve = params.curve;
-        result.updatedParams.push('curve');
+
+      // Parámetros de FMSynth
+      if (params.harmonicity !== undefined) {
+        voiceOptions.harmonicity = params.harmonicity;
+        hasVoiceOptions = true;
       }
-      
-      // Actualizar parámetros de las voces FMSynth
-      if (params.harmonicity !== undefined || params.modulationIndex !== undefined || 
-          params.attack !== undefined || params.release !== undefined) {
-        const voiceOptions: Record<string, unknown> = {};
-        
-        if (params.harmonicity !== undefined) {
-          voiceOptions.harmonicity = params.harmonicity;
+
+      if (params.modulationIndex !== undefined) {
+        voiceOptions.modulationIndex = params.modulationIndex;
+        hasVoiceOptions = true;
+      }
+
+      // Parámetros del envelope
+      if (params.attack !== undefined || params.decay !== undefined || 
+          params.sustain !== undefined || params.release !== undefined) {
+        voiceOptions.envelope = {};
+        if (params.attack !== undefined) {
+          (voiceOptions.envelope as { attack: number }).attack = params.attack;
         }
-        if (params.modulationIndex !== undefined) {
-          voiceOptions.modulationIndex = params.modulationIndex;
+        if (params.decay !== undefined) {
+          (voiceOptions.envelope as { decay: number }).decay = params.decay;
         }
-        if (params.attack !== undefined || params.release !== undefined) {
-          voiceOptions.envelope = {};
-          if (params.attack !== undefined) {
-            (voiceOptions.envelope as { attack: number }).attack = params.attack;
-          }
-          if (params.release !== undefined) {
-            (voiceOptions.envelope as { release: number }).release = params.release;
-          }
+        if (params.sustain !== undefined) {
+          (voiceOptions.envelope as { sustain: number }).sustain = params.sustain;
         }
-        
+        if (params.release !== undefined) {
+          (voiceOptions.envelope as { release: number }).release = params.release;
+        }
+        hasVoiceOptions = true;
+      }
+
+      // Aplicar cambios a todas las voces
+      if (hasVoiceOptions) {
         synth.set(voiceOptions);
         result.updatedParams.push('voiceOptions');
       }
+
+      // Actualizar chord si cambia (se maneja en el trigger, no en el synth)
+      if (params.chord !== undefined) {
+        result.updatedParams.push('chord');
+      }
+
+      // Actualizar curve si cambia
+      if (params.curve !== undefined) {
+        const curveOptions = { envelope: { curve: params.curve } };
+        synth.set(curveOptions);
+        result.updatedParams.push('curve');
+      }
+
+      // Parámetros comunes
+      if (params.volume !== undefined) {
+        this.updateVolume(synth, params.volume, result);
+      }
+
+      // Manejo especial para frecuencia en PolySynth
+      if (params.frequency !== undefined) {
+        result.updatedParams.push('frequency');
+        // La frecuencia se maneja en el nivel superior para regenerar el acorde
+        console.log('PolySynthUpdater: Frecuencia actualizada, se requiere regeneración de acorde');
+      }
+
     } catch (error) {
       result.errors.push(`PolySynth params: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -83,19 +126,22 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
   }
 
   /**
-   * Obtiene los parámetros soportados por PolySynth
+   * Retorna los parámetros soportados por este updater
    */
-  public static getSupportedParams(): string[] {
+  public getSupportedParams(): string[] {
     return [
+      'volume',
       'polyphony',
-      'frequency',
       'waveform',
-      'chord',
-      'curve',
+      'modulationWaveform',
       'harmonicity',
       'modulationIndex',
       'attack',
-      'release'
+      'decay',
+      'sustain',
+      'release',
+      'chord',
+      'curve'
     ];
   }
 }

@@ -15,10 +15,10 @@ export class AutoFilterFactory implements IEffectFactory {
    */
   createEffect(): EffectNode {
     const effectNode = new Tone.AutoFilter({
-      frequency: 0.5,
+      frequency: "4n",  // Frecuencia del LFO en notación musical (más audible)
       baseFrequency: 200,
       octaves: 2.6,
-      depth: 0.5,
+      depth: 0.8,  // Mayor profundidad para efecto más notable
       filter: {
         type: 'lowpass',
         rolloff: -12,
@@ -27,13 +27,18 @@ export class AutoFilterFactory implements IEffectFactory {
       type: 'sine',
     });
 
-    console.log(`🎛️ AutoFilterFactory: AutoFilter creado con parámetros iniciales:`, {
+    // CRÍTICO: Iniciar el AutoFilter para que el LFO comience a modular el filtro
+    // Según la documentación de Tone.js, el AutoFilter debe ser iniciado con .start()
+    effectNode.start();
+
+    console.log(`🎛️ AutoFilterFactory: AutoFilter creado e iniciado con parámetros iniciales:`, {
       frequency: effectNode.frequency.value,
       baseFrequency: effectNode.baseFrequency,
       octaves: effectNode.octaves,
       depth: effectNode.depth.value,
       filterType: effectNode.filter.type,
-      filterQ: effectNode.filter.Q.value
+      filterQ: effectNode.filter.Q.value,
+      lfoStarted: true
     });
 
     return effectNode;
@@ -54,14 +59,14 @@ export class AutoFilterFactory implements IEffectFactory {
    */
   getDefaultParams(): Record<string, unknown> {
     return {
-      frequency: 0.5,
-      baseFrequency: 200,
-      octaves: 2.6,
-      depth: 0.5,
-      filterType: 'lowpass',
-      filterQ: 1,
-      lfoType: 'sine',
-      wet: 0.5
+      frequency: "4n",     // Frecuencia del LFO en notación musical
+      baseFrequency: 200,  // Frecuencia base del filtro (Hz)
+      octaves: 2.6,        // Número de octavas del filtro
+      depth: 0.8,          // Profundidad de modulación (0-1)
+      filterType: 'lowpass', // Tipo de filtro
+      filterQ: 1,          // Factor Q del filtro
+      lfoType: 'sine',     // Tipo de onda del LFO
+      wet: 0.5             // Mezcla entre señal seca y procesada
     };
   }
 

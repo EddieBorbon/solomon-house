@@ -15,15 +15,20 @@ export class PhaserFactory implements IEffectFactory {
    */
   createEffect(): EffectNode {
     const effectNode = new Tone.Phaser({
-      frequency: 0.5,
-      octaves: 2.2,
-      baseFrequency: 1000,
+      frequency: 15,  // Velocidad del phasing (como en la documentación)
+      octaves: 5,     // Número de octavas (como en la documentación)
+      baseFrequency: 1000,  // Frecuencia base de los filtros
     });
+
+    // NOTA: No conectamos directamente al destino aquí porque el EffectManager
+    // se encarga de la conexión espacial con el panner 3D
+    // El EffectManager hará: effectNode.chain(effectPanner, Tone.Destination)
 
     console.log(`🎛️ PhaserFactory: Phaser creado con parámetros iniciales:`, {
       frequency: effectNode.frequency.value,
       octaves: effectNode.octaves,
-      baseFrequency: effectNode.baseFrequency
+      baseFrequency: effectNode.baseFrequency,
+      readyForSpatialConnection: true
     });
 
     return effectNode;
@@ -44,10 +49,10 @@ export class PhaserFactory implements IEffectFactory {
    */
   getDefaultParams(): Record<string, unknown> {
     return {
-      frequency: 0.5,
-      octaves: 2.2,
-      baseFrequency: 1000,
-      wet: 0.5
+      frequency: 15,     // Velocidad del phasing (Hz)
+      octaves: 5,        // Número de octavas del efecto
+      baseFrequency: 1000, // Frecuencia base de los filtros (Hz)
+      wet: 0.5           // Mezcla entre señal seca y procesada
     };
   }
 

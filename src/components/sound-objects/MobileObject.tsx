@@ -27,6 +27,8 @@ export interface MobileObjectParams {
   amplitude: number; // Para movimiento polar
   frequency: number; // Para movimiento polar
   randomSeed: number; // Para movimiento aleatorio
+  height: number; // Para movimiento vertical en movimientos circulares/polares
+  heightSpeed: number; // Velocidad del movimiento vertical
   showRadiusIndicator?: boolean; // Para mostrar indicador de radio
   showProximityIndicator?: boolean; // Para mostrar indicador de proximidad
 }
@@ -113,7 +115,17 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
   // Función para calcular la nueva posición según el tipo de movimiento
   const calculateNewPosition = (time: number): [number, number, number] => {
-    const { movementType, radius, speed, direction, amplitude, frequency, randomSeed } = mobileParams;
+    const { 
+      movementType, 
+      radius = 2, 
+      speed = 1, 
+      direction = [1, 0, 0], 
+      amplitude = 0.5, 
+      frequency = 1, 
+      randomSeed = 0, 
+      height = 1, 
+      heightSpeed = 0.5 
+    } = mobileParams;
     
     // El objeto se mueve desde el origen (0,0,0) del grupo
     const origin = [0, 0, 0] as [number, number, number];
@@ -133,9 +145,10 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         const angle = time * speed;
         const cos = Math.cos(angle);
         const sin = Math.sin(angle);
+        const yOffset = height * Math.sin(time * heightSpeed); // Movimiento vertical oscilatorio
         return [
           origin[0] + radius * cos,
-          origin[1],
+          origin[1] + yOffset,
           origin[2] + radius * sin
         ];
       }
@@ -143,9 +156,10 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       case 'polar': {
         const angle = time * speed;
         const r = radius + amplitude * Math.sin(frequency * angle);
+        const yOffset = height * Math.sin(time * heightSpeed); // Movimiento vertical oscilatorio
         return [
           origin[0] + r * Math.cos(angle),
-          origin[1],
+          origin[1] + yOffset,
           origin[2] + r * Math.sin(angle)
         ];
       }
@@ -155,22 +169,25 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         const seed = randomSeed + time * 0.1;
         const x = origin[0] + (Math.sin(seed) * radius);
         const z = origin[2] + (Math.cos(seed * 1.3) * radius);
-        return [x, origin[1], z];
+        const y = origin[1] + (Math.sin(seed * 0.7) * height); // Movimiento vertical aleatorio
+        return [x, y, z];
       }
       
       case 'figure8': {
         const angle = time * speed;
         const x = origin[0] + radius * Math.sin(angle);
         const z = origin[2] + radius * Math.sin(2 * angle) * 0.5;
-        return [x, origin[1], z];
+        const yOffset = height * Math.sin(time * heightSpeed); // Movimiento vertical oscilatorio
+        return [x, origin[1] + yOffset, z];
       }
       
       case 'spiral': {
         const angle = time * speed;
         const r = radius * (1 + time * 0.1); // Radio creciente
+        const yOffset = height * Math.sin(time * heightSpeed); // Movimiento vertical oscilatorio
         return [
           origin[0] + r * Math.cos(angle),
-          origin[1] + time * 0.5, // Movimiento vertical
+          origin[1] + yOffset,
           origin[2] + r * Math.sin(angle)
         ];
       }

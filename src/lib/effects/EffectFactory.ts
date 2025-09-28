@@ -47,10 +47,21 @@ class AutoFilterCreator implements EffectCreator {
 class AutoWahCreator implements EffectCreator {
   create(): Tone.AutoWah {
     const effectNode = new Tone.AutoWah({
-      baseFrequency: 200,
-      octaves: 2.6,
-      sensitivity: 0.5,
+      baseFrequency: 50,    // Frecuencia base del filtro (Hz) - como en la documentación
+      octaves: 6,          // Número de octavas del barrido - como en la documentación
+      sensitivity: -30,    // Sensibilidad en dB (rango -40 a 0) - como en la documentación
     });
+
+    // Configurar Q para mayor efecto (como en el ejemplo de la documentación)
+    effectNode.Q.value = 6;
+
+    console.log(`🎛️ AutoWahCreator: AutoWah creado con parámetros optimizados:`, {
+      baseFrequency: effectNode.baseFrequency,
+      octaves: effectNode.octaves,
+      sensitivity: effectNode.sensitivity,
+      qValue: effectNode.Q.value
+    });
+
     return effectNode;
   }
 

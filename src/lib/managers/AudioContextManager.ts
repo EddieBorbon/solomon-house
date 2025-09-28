@@ -47,6 +47,9 @@ export class AudioContextManager {
         contextState: Tone.context.state
       });
 
+      // Configurar el contexto para evitar suspensión automática
+      this.configureContextForPersistence();
+
       // Configurar event listeners para cambios de estado
       this.setupStateChangeListeners();
       
@@ -54,6 +57,33 @@ export class AudioContextManager {
       this.setupBrowserEventListeners();
 
     } catch {
+    }
+  }
+
+  /**
+   * Configura el contexto de audio para mantenerlo activo
+   */
+  private configureContextForPersistence(): void {
+    try {
+      // Configurar el contexto para que no se suspenda automáticamente
+      if (Tone.context.state === 'suspended') {
+        console.log('🎵 AudioContextManager: Contexto suspendido, intentando reanudar...');
+        Tone.start();
+      }
+
+      // Configurar el Transport para mantener el tiempo activo
+      if (Tone.Transport.state !== 'started') {
+        Tone.Transport.start();
+      }
+
+      console.log('🎵 AudioContextManager: Contexto configurado para persistencia:', {
+        contextState: Tone.context.state,
+        transportState: Tone.Transport.state,
+        sampleRate: Tone.context.sampleRate
+      });
+
+    } catch (error) {
+      console.warn('🎵 AudioContextManager: Error configurando persistencia del contexto:', error);
     }
   }
 
@@ -88,18 +118,38 @@ export class AudioContextManager {
   private setupBrowserEventListeners(): void {
     try {
       if (typeof window !== 'undefined') {
-        // Limpieza cuando se cierre la ventana
+        // Limpieza SOLO cuando se cierre la ventana/pestaña
         window.addEventListener('beforeunload', () => {
           this.triggerCleanup();
         });
 
-        // Limpieza cuando la página pierda el foco (opcional)
-        window.addEventListener('blur', () => {
-          this.triggerCleanup();
+        // REMOVIDO: No limpiar cuando la página pierda el foco
+        // Esto permite que el audio siga sonando cuando el usuario hace clic fuera
+        // window.addEventListener('blur', () => {
+        //   this.triggerCleanup();
+        // });
+
+        // Event listener para cuando la página vuelva a tener foco (sin limpieza)
+        window.addEventListener('focus', () => {
+          // Opcional: podríamos reanudar el contexto si está suspendido
+          if (Tone.context.state === 'suspended') {
+            console.log('🎵 AudioContextManager: Página recuperó el foco, reanudando contexto de audio');
+            this.resumeContext();
+          }
         });
 
-        // Limpieza cuando la página vuelva a tener foco
-        window.addEventListener('focus', () => {
+        // Manejar cambio de visibilidad de la página (cambio de pestaña)
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) {
+            // Página oculta (cambio de pestaña) - mantener audio funcionando
+            console.log('🎵 AudioContextManager: Página oculta, manteniendo audio activo');
+          } else {
+            // Página visible de nuevo
+            console.log('🎵 AudioContextManager: Página visible de nuevo');
+            if (Tone.context.state === 'suspended') {
+              this.resumeContext();
+            }
+          }
         });
 
       }
@@ -345,8 +395,9 @@ export class AudioContextManager {
       // Remover event listeners del navegador
       if (typeof window !== 'undefined') {
         window.removeEventListener('beforeunload', this.triggerCleanup);
-        window.removeEventListener('blur', this.triggerCleanup);
+        // Removido: no hay listener de blur para remover
         window.removeEventListener('focus', () => {});
+        document.removeEventListener('visibilitychange', () => {});
       }
 
     } catch {

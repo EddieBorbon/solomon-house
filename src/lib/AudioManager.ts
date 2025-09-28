@@ -181,10 +181,17 @@ export class AudioManager {
   public setEffectSendAmount(soundSourceId: string, effectId: string, amount: number): void {
     try {
       const source = this.soundSources.get(soundSourceId);
-      if (!source) return;
+      if (!source) {
+        console.warn(`⚠️ AudioManager: Fuente de sonido ${soundSourceId} no encontrada`);
+        return;
+      }
 
       const effectSend = source.effectSends.get(effectId);
-      if (!effectSend) return;
+      if (!effectSend) {
+        console.warn(`⚠️ AudioManager: EffectSend para ${effectId} no encontrado en fuente ${soundSourceId}`);
+        console.log(`🔍 AudioManager: EffectSends disponibles:`, Array.from(source.effectSends.keys()));
+        return;
+      }
 
       if (!this.isAudioContextValid(effectSend, source.dryGain)) return;
       
@@ -195,13 +202,19 @@ export class AudioManager {
       effectSend.gain.setValueAtTime(effectAmount, Tone.now());
       source.dryGain.gain.setValueAtTime(dryAmount, Tone.now());
       
+      // Debug: Log cuando el amount es significativo
+      if (amount > 0.1) {
+        console.log(`🎛️ AudioManager: Aplicando efecto ${effectId} a ${soundSourceId} con amount: ${amount.toFixed(2)}`);
+      }
+      
       // Registrar cambios significativos
       const currentSendAmount = Math.round(amount * 10) / 10;
       const key = `${soundSourceId}-${effectId}`;
       if (this.lastSendAmounts.get(key) !== currentSendAmount) {
         this.lastSendAmounts.set(key, currentSendAmount);
       }
-    } catch {
+    } catch (error) {
+      console.error(`❌ AudioManager: Error en setEffectSendAmount:`, error);
     }
   }
 
