@@ -286,21 +286,31 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       };
     });
 
-    // Obtener el objeto actualizado para comunicar cambios al AudioManager
-    const updatedObject = get().objects.find(obj => obj.id === id);
-    if (updatedObject) {
-      console.log('🎛️ useObjectStore.updateObject: Objeto actualizado encontrado', updatedObject);
-      // Comunicar cambios al AudioManager
-      if (updates.position) {
-        console.log('🎛️ useObjectStore.updateObject: Actualizando posición en AudioManager');
-        audioManager.updateSoundPosition(id, updatedObject.position);
-      }
-      if (updates.audioParams) {
-        console.log('🎛️ useObjectStore.updateObject: Actualizando parámetros de audio en AudioManager', updatedObject.audioParams);
-        audioManager.updateSoundParams(id, updatedObject.audioParams);
-      }
-    } else {
-      console.log('🎛️ useObjectStore.updateObject: No se encontró el objeto actualizado');
+    // También actualizar en useGridStore para mantener sincronización
+    const { useGridStore } = require('./useGridStore');
+    const grids = useGridStore.getState().grids;
+    const grid = grids.get(gridId);
+    if (grid) {
+      const updatedObjects = grid.objects.map(obj => 
+        obj.id === id ? { ...obj, ...updates } : obj
+      );
+      useGridStore.getState().updateGrid(gridId, {
+        ...grid,
+        objects: updatedObjects
+      });
+    }
+
+    // Comunicar cambios al AudioManager directamente usando los datos actualizados
+    // No necesitamos buscar el objeto en el store porque ya tenemos los datos actualizados
+    console.log('🎛️ useObjectStore.updateObject: Comunicando cambios al AudioManager directamente');
+    
+    if (updates.position) {
+      console.log('🎛️ useObjectStore.updateObject: Actualizando posición en AudioManager');
+      audioManager.updateSoundPosition(id, updates.position);
+    }
+    if (updates.audioParams) {
+      console.log('🎛️ useObjectStore.updateObject: Actualizando parámetros de audio en AudioManager', updates.audioParams);
+      audioManager.updateSoundParams(id, updates.audioParams);
     }
 
   },

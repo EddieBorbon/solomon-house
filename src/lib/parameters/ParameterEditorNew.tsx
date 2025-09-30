@@ -98,10 +98,16 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     removeMobileObject,
     removeEffectZone,
     toggleLockEffectZone,
-    setEditingEffectZone
+    setEditingEffectZone,
+    setSyncLock,
+    updateGlobalSoundObject,
+    activeGridId
   } = useWorldStore();
 
   const { isUpdatingParams } = useParameterHandlers();
+
+  // Detectar si estamos en modo global
+  const isGlobalMode = activeGridId === 'global-world';
 
   // Hook para selección de entidades
   const {
@@ -169,6 +175,10 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
 
     updateObject(soundObject.id, {
       audioParams: newAudioParams,
+      // Preservar datos de transformación
+      position: soundObject.position,
+      rotation: soundObject.rotation,
+      scale: soundObject.scale
     });
   }, [isSoundObject, getSoundObject, updateObject]);
 
@@ -206,10 +216,20 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
   }, [isEffectZone, getEffectZone, handleUpdateEffectZone]);
 
   // Función para manejar transformaciones de objeto sonoro
-  const handleSoundTransformChange = useCallback((transform: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {
-    if (!isSoundObject) return;
+  const handleSoundTransformChange = useCallback(async (transform: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {
+    console.log('🎛️ handleSoundTransformChange: INICIANDO', { transform, axis, value, isGlobalMode, activeGridId });
+    
+    if (!isSoundObject) {
+      console.log('🎛️ handleSoundTransformChange: No es un objeto sonoro');
+      return;
+    }
     const soundObject = getSoundObject();
-    if (!soundObject) return;
+    if (!soundObject) {
+      console.log('🎛️ handleSoundTransformChange: No se pudo obtener el objeto sonoro');
+      return;
+    }
+    
+    console.log('🎛️ handleSoundTransformChange: Objeto sonoro encontrado', { id: soundObject.id, currentTransform: { position: soundObject.position, rotation: soundObject.rotation, scale: soundObject.scale } });
     
     const newTransform = { ...soundObject };
     if (transform === 'position') {
@@ -220,21 +240,63 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
       newTransform.scale[axis] = value;
     }
     
-    updateObject(soundObject.id, newTransform);
-  }, [isSoundObject, getSoundObject, updateObject]);
+    console.log('🎛️ handleSoundTransformChange: Nueva transformación calculada', { transform, newValue: newTransform[transform] });
+    
+    // Usar función global o local según el modo (igual que los parámetros de audio)
+    if (isGlobalMode) {
+      console.log('🎛️ handleSoundTransformChange: Usando modo global - updateGlobalSoundObject');
+      await updateGlobalSoundObject(soundObject.id, {
+        [transform]: newTransform[transform],
+        // Preservar datos de audio y otras transformaciones
+        audioParams: soundObject.audioParams,
+        position: newTransform.position,
+        rotation: newTransform.rotation,
+        scale: newTransform.scale
+      });
+      console.log('🎛️ handleSoundTransformChange: updateGlobalSoundObject completado');
+    } else {
+      console.log('🎛️ handleSoundTransformChange: Usando modo local - updateObject');
+      updateObject(soundObject.id, {
+        [transform]: newTransform[transform],
+        // Preservar datos de audio y otras transformaciones
+        audioParams: soundObject.audioParams,
+        position: newTransform.position,
+        rotation: newTransform.rotation,
+        scale: newTransform.scale
+      });
+      console.log('🎛️ handleSoundTransformChange: updateObject completado');
+    }
+    
+    console.log('🎛️ handleSoundTransformChange: FINALIZADO');
+  }, [isSoundObject, getSoundObject, updateObject, updateGlobalSoundObject, isGlobalMode]);
 
   // Función para resetear transformaciones de objeto sonoro
-  const handleResetSoundTransform = useCallback(() => {
+  const handleResetSoundTransform = useCallback(async () => {
     if (!isSoundObject) return;
     const soundObject = getSoundObject();
     if (!soundObject) return;
     
-    updateObject(soundObject.id, {
+    const resetValues = {
       position: [0, 0, 0],
       rotation: [0, 0, 0],
       scale: [1, 1, 1]
-    });
-  }, [isSoundObject, getSoundObject, updateObject]);
+    };
+    
+    // Usar función global o local según el modo (igual que los parámetros de audio)
+    if (isGlobalMode) {
+      await updateGlobalSoundObject(soundObject.id, {
+        ...resetValues,
+        // Preservar datos de audio
+        audioParams: soundObject.audioParams
+      });
+    } else {
+      updateObject(soundObject.id, {
+        ...resetValues,
+        // Preservar datos de audio
+        audioParams: soundObject.audioParams
+      });
+    }
+  }, [isSoundObject, getSoundObject, updateObject, updateGlobalSoundObject, isGlobalMode]);
 
   // Función para manejar refresco de efectos
   // const handleRefreshEffects = useCallback(() => {

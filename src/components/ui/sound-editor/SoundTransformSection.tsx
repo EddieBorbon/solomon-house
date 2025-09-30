@@ -34,23 +34,32 @@ export function SoundTransformSection({
         {/* Position */}
         <div>
           <label className="futuristic-label block mb-2 text-white text-center">POSITION</label>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {[
               { axis: 'X', value: selectedObject.position[0] },
               { axis: 'Y', value: selectedObject.position[1] },
               { axis: 'Z', value: selectedObject.position[2] }
             ].map(({ axis, value }, index) => (
-              <div key={axis} className="flex items-center gap-1">
-                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+              <div key={axis} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white font-mono tracking-wider">{axis}</span>
+                  <span className="text-xs text-cyan-400 font-mono">{roundToDecimals(value)}</span>
+                </div>
                 <input
-                  type="number"
+                  type="range"
+                  min="-10"
+                  max="10"
                   step="0.1"
-                  value={roundToDecimals(value)}
+                  value={value}
                   onChange={(e) => {
-                    const newValue = parseFloat(e.target.value) || 0;
+                    const newValue = parseFloat(e.target.value);
+                    console.log('🎛️ SoundTransformSection: Slider POSITION cambiado', { axis, newValue, oldValue: value });
                     onTransformChange('position', index as 0 | 1 | 2, newValue);
                   }}
-                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  className="w-full h-2 bg-black border border-cyan-400 rounded-lg appearance-none cursor-pointer slider-neon"
+                  style={{
+                    background: `linear-gradient(to right, #00ffff 0%, #00ffff ${((value + 10) / 20) * 100}%, #000000 ${((value + 10) / 20) * 100}%, #000000 100%)`
+                  }}
                 />
               </div>
             ))}
@@ -60,23 +69,32 @@ export function SoundTransformSection({
         {/* Rotation */}
         <div>
           <label className="futuristic-label block mb-2 text-white text-center">ROTATION</label>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {[
               { axis: 'X', value: selectedObject.rotation[0] },
               { axis: 'Y', value: selectedObject.rotation[1] },
               { axis: 'Z', value: selectedObject.rotation[2] }
             ].map(({ axis, value }, index) => (
-              <div key={axis} className="flex items-center gap-1">
-                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+              <div key={axis} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white font-mono tracking-wider">{axis}</span>
+                  <span className="text-xs text-purple-400 font-mono">{roundToDecimals(value)}°</span>
+                </div>
                 <input
-                  type="number"
+                  type="range"
+                  min="-180"
+                  max="180"
                   step="1"
-                  value={roundToDecimals(value)}
+                  value={value}
                   onChange={(e) => {
-                    const newValue = parseFloat(e.target.value) || 0;
+                    const newValue = parseFloat(e.target.value);
+                    console.log('🎛️ SoundTransformSection: Slider ROTATION cambiado', { axis, newValue, oldValue: value });
                     onTransformChange('rotation', index as 0 | 1 | 2, newValue);
                   }}
-                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  className="w-full h-2 bg-black border border-purple-400 rounded-lg appearance-none cursor-pointer slider-neon"
+                  style={{
+                    background: `linear-gradient(to right, #a855f7 0%, #a855f7 ${((value + 180) / 360) * 100}%, #000000 ${((value + 180) / 360) * 100}%, #000000 100%)`
+                  }}
                 />
               </div>
             ))}
@@ -86,24 +104,32 @@ export function SoundTransformSection({
         {/* Scale */}
         <div>
           <label className="futuristic-label block mb-2 text-white text-center">SCALE</label>
-          <div className="space-y-1">
+          <div className="space-y-2">
             {[
               { axis: 'X', value: selectedObject.scale[0] },
               { axis: 'Y', value: selectedObject.scale[1] },
               { axis: 'Z', value: selectedObject.scale[2] }
             ].map(({ axis, value }, index) => (
-              <div key={axis} className="flex items-center gap-1">
-                <span className="text-xs text-white font-mono tracking-wider w-3">{axis}</span>
+              <div key={axis} className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-white font-mono tracking-wider">{axis}</span>
+                  <span className="text-xs text-green-400 font-mono">{roundToDecimals(value)}</span>
+                </div>
                 <input
-                  type="number"
-                  step="0.1"
+                  type="range"
                   min="0.1"
-                  value={roundToDecimals(value)}
+                  max="5"
+                  step="0.1"
+                  value={value}
                   onChange={(e) => {
-                    const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+                    const newValue = Math.max(0.1, parseFloat(e.target.value));
+                    console.log('🎛️ SoundTransformSection: Slider SCALE cambiado', { axis, newValue, oldValue: value });
                     onTransformChange('scale', index as 0 | 1 | 2, newValue);
                   }}
-                  className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-12 h-6 focus:outline-none focus:border-gray-400"
+                  className="w-full h-2 bg-black border border-green-400 rounded-lg appearance-none cursor-pointer slider-neon"
+                  style={{
+                    background: `linear-gradient(to right, #10b981 0%, #10b981 ${((value - 0.1) / 4.9) * 100}%, #000000 ${((value - 0.1) / 4.9) * 100}%, #000000 100%)`
+                  }}
                 />
               </div>
             ))}

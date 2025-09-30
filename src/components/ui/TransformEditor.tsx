@@ -3,6 +3,40 @@
 import React, { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 
+// Estilos CSS para los sliders
+const sliderStyles = `
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: 2px solid #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .slider::-webkit-slider-thumb:hover {
+    background: #f3f4f6;
+    border-color: #6b7280;
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    border: 2px solid #374151;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .slider::-moz-range-thumb:hover {
+    background: #f3f4f6;
+    border-color: #6b7280;
+  }
+`;
+
 interface TransformValues {
   position: [number, number, number];
   rotation: [number, number, number];
@@ -63,6 +97,7 @@ export function TransformEditor() {
   if (!selectedEntity) {
     return (
       <div className="fixed top-4 right-4 z-50 w-80">
+        <style dangerouslySetInnerHTML={{ __html: sliderStyles }} />
         <div className="bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b border-gray-700">
@@ -168,6 +203,7 @@ export function TransformEditor() {
 
   return (
     <div className="fixed top-4 right-4 z-50 w-80">
+      <style dangerouslySetInnerHTML={{ __html: sliderStyles }} />
       <div className="bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-700 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between p-3 border-b border-gray-700">
@@ -205,16 +241,22 @@ export function TransformEditor() {
                     <div className="flex items-center gap-1 mb-1">
                       <div className={`w-2 h-2 ${color} rounded-sm`}></div>
                       <span className="text-xs text-gray-400">{axis}</span>
+                      <span className="text-xs text-white ml-auto">{roundToDecimals(value)}</span>
                     </div>
                     <input
-                      type="number"
+                      type="range"
+                      min="-10"
+                      max="10"
                       step="0.1"
-                      value={roundToDecimals(value)}
+                      value={value}
                       onChange={(e) => {
-                        const newValue = parseFloat(e.target.value) || 0;
+                        const newValue = parseFloat(e.target.value);
                         handleTransformChange('position', index as 0 | 1 | 2, newValue);
                       }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${color.replace('bg-', '#')} 0%, ${color.replace('bg-', '#')} ${((value + 10) / 20) * 100}%, #374151 ${((value + 10) / 20) * 100}%, #374151 100%)`
+                      }}
                     />
                   </div>
                 ))}
@@ -237,16 +279,22 @@ export function TransformEditor() {
                     <div className="flex items-center gap-1 mb-1">
                       <div className={`w-2 h-2 ${color} rounded-sm`}></div>
                       <span className="text-xs text-gray-400">{axis}</span>
+                      <span className="text-xs text-white ml-auto">{roundToDecimals(value)}°</span>
                     </div>
                     <input
-                      type="number"
+                      type="range"
+                      min="-180"
+                      max="180"
                       step="1"
-                      value={roundToDecimals(value)}
+                      value={value}
                       onChange={(e) => {
-                        const newValue = parseFloat(e.target.value) || 0;
+                        const newValue = parseFloat(e.target.value);
                         handleTransformChange('rotation', index as 0 | 1 | 2, newValue);
                       }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${color.replace('bg-', '#')} 0%, ${color.replace('bg-', '#')} ${((value + 180) / 360) * 100}%, #374151 ${((value + 180) / 360) * 100}%, #374151 100%)`
+                      }}
                     />
                   </div>
                 ))}
@@ -269,17 +317,22 @@ export function TransformEditor() {
                     <div className="flex items-center gap-1 mb-1">
                       <div className={`w-2 h-2 ${color} rounded-sm`}></div>
                       <span className="text-xs text-gray-400">{axis}</span>
+                      <span className="text-xs text-white ml-auto">{roundToDecimals(value)}</span>
                     </div>
                     <input
-                      type="number"
-                      step="0.1"
+                      type="range"
                       min="0.1"
-                      value={roundToDecimals(value)}
+                      max="5"
+                      step="0.1"
+                      value={value}
                       onChange={(e) => {
-                        const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+                        const newValue = parseFloat(e.target.value);
                         handleTransformChange('scale', index as 0 | 1 | 2, newValue);
                       }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, ${color.replace('bg-', '#')} 0%, ${color.replace('bg-', '#')} ${((value - 0.1) / 4.9) * 100}%, #374151 ${((value - 0.1) / 4.9) * 100}%, #374151 100%)`
+                      }}
                     />
                   </div>
                 ))}

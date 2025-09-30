@@ -241,7 +241,7 @@ export class PersistenceService {
   // Sincronizar automáticamente los cambios con Firebase
   startAutoSync(projectId: string): () => void {
     
-    const unsubscribe = firebaseService.subscribeToProject(projectId, (project) => {
+    const unsubscribeProject = firebaseService.subscribeToProject(projectId, (project) => {
       if (project) {
         
         // Convertir las cuadrículas de Firebase al formato del store
@@ -294,7 +294,48 @@ export class PersistenceService {
       }
     });
 
-    return unsubscribe;
+    // También sincronizar el mundo global
+    const unsubscribeGlobalWorld = firebaseService.subscribeToGlobalWorld((globalWorld) => {
+      if (globalWorld) {
+        console.log('🌍 PersistenceService: Sincronizando mundo global desde Firebase', globalWorld);
+        
+        // Crear la cuadrícula global con los datos del mundo global
+        const globalGrid: Grid = {
+          id: 'global-world',
+          coordinates: globalWorld.currentGridCoordinates,
+          position: [0, 0, 0],
+          objects: globalWorld.objects || [],
+          mobileObjects: globalWorld.mobileObjects || [],
+          effectZones: globalWorld.effectZones || []
+        };
+
+        // Actualizar el store con los datos del mundo global
+        useWorldStore.setState((currentState) => {
+          const currentGrids = new Map(currentState.grids);
+          const currentGlobalGrid = currentGrids.get('global-world');
+          
+          // Solo actualizar si hay cambios
+          if (!currentGlobalGrid || JSON.stringify(currentGlobalGrid) !== JSON.stringify(globalGrid)) {
+            currentGrids.set('global-world', globalGrid);
+            
+            return {
+              ...currentState,
+              grids: currentGrids,
+              activeGridId: globalWorld.activeGridId || currentState.activeGridId,
+              currentGridCoordinates: globalWorld.currentGridCoordinates || currentState.currentGridCoordinates
+            };
+          }
+          
+          return currentState;
+        });
+      }
+    });
+
+    // Retornar función para desuscribirse de ambos
+    return () => {
+      unsubscribeProject();
+      unsubscribeGlobalWorld();
+    };
   }
 
   // Detener la sincronización automática

@@ -357,17 +357,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       const objectIndex = grid.objects.findIndex(obj => obj.id === id);
       if (objectIndex !== -1) {
         console.log('🎛️ useWorldStore.updateObject: Objeto encontrado en grid', gridId);
-        // Actualizar objeto usando el facade
+        // Actualizar objeto usando el facade (esto ya maneja toda la lógica)
         worldStoreFacade.updateObject(id, updates, gridId);
-        
-        const updatedObjects = [...grid.objects];
-        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
-        
-        // Actualizar la cuadrícula
-        useGridStore.getState().updateGrid(gridId, {
-          ...grid,
-          objects: updatedObjects
-        });
         break;
       }
     }
@@ -766,12 +757,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Establecer el estado global desde Firestore
   setGlobalStateFromFirestore: (state: GlobalWorldDoc) => {
-    // Verificar si la sincronización está bloqueada
-    const currentState = get();
-    if (currentState.isSyncLocked) {
-      console.log('🔒 Ignorando actualización de Firestore - sincronización bloqueada');
-      return;
-    }
+    // Permitir actualizaciones de Firebase incluso si hay bloqueo de sincronización local
+    // Esto asegura que otros usuarios puedan ver los cambios en tiempo real
+    console.log('🌐 Procesando actualización de Firestore para el mundo global');
     
     // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Recibiendo estado de Firebase', state);
     set((currentState) => {
@@ -817,8 +805,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
               // VERIFICAR SI HAY UNA ACTUALIZACIÓN OPTIMISTA PENDIENTE
               const currentLocalObject = get().objects.find(localObj => localObj.id === obj.id);
               if (currentLocalObject && currentLocalObject._pendingUpdate) {
-                console.log('🎵 Ignorando actualización de Firestore para objeto con cambio pendiente:', obj.id);
-                return; // No sobrescribir cambios locales pendientes
+                console.log('🎵 Procesando actualización de Firestore para objeto con cambio pendiente:', obj.id);
+                // Procesar la actualización de Firebase incluso si hay cambios pendientes
+                // Esto permite que otros usuarios vean los cambios en tiempo real
               }
               
               // Manejar estado de audio (habilitado/deshabilitado)
@@ -982,7 +971,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       }
 
       // Sincronizar con Firestore (sin esperar respuesta)
-      console.log('🎛️ Sincronizando con Firestore (optimistic)');
+      console.log('🎛️ Sincronizando con Firestore (optimistic) - Transformaciones:', updates);
       firebaseService.updateGlobalSoundObject(objectId, updates)
         .then(() => {
           console.log('🎛️ Firestore confirmó el cambio para:', objectId);

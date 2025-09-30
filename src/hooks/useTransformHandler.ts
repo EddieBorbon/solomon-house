@@ -49,6 +49,7 @@ export function useTransformHandler() {
 
   // Detectar si estamos en modo global
   const isGlobalMode = activeGridId === 'global-world';
+  console.log('🎛️ useTransformHandler: Detección de modo global', { activeGridId, isGlobalMode });
 
   /**
    * Actualiza una propiedad de transformación específica
@@ -61,29 +62,40 @@ export function useTransformHandler() {
     axis: 0 | 1 | 2,
     value: number
   ) => {
+    console.log('🎛️ useTransformHandler.updateTransform: INICIANDO', { property, axis, value, hasSelection });
+    
     if (!hasSelection) {
+      console.log('🎛️ useTransformHandler.updateTransform: No hay selección');
       return;
     }
 
     if (isSoundObject) {
+      console.log('🎛️ useTransformHandler.updateTransform: Es un objeto sonoro');
       const soundObject = getSoundObject();
       if (!soundObject) {
+        console.log('🎛️ useTransformHandler.updateTransform: No se pudo obtener el objeto sonoro');
         return;
       }
+
+      console.log('🎛️ useTransformHandler.updateTransform: Objeto sonoro encontrado', { id: soundObject.id, currentTransform: { position: soundObject.position, rotation: soundObject.rotation, scale: soundObject.scale } });
 
       const newValues = [...soundObject[property]] as [number, number, number];
       newValues[axis] = value;
 
-      // Usar función global o local según el modo
-      if (isGlobalMode) {
-        await updateGlobalSoundObject(soundObject.id, {
-          [property]: newValues
-        });
-      } else {
-        updateObject(soundObject.id, {
-          [property]: newValues
-        });
-      }
+      console.log('🎛️ useTransformHandler.updateTransform: Nueva transformación calculada', { property, newValues, isGlobalMode });
+
+      // TEMPORAL: Forzar uso de updateGlobalSoundObject para transformaciones
+      // ya que activeGridId está undefined pero el objeto está en global-world
+      console.log('🎛️ useTransformHandler.updateTransform: Forzando modo global - updateGlobalSoundObject');
+      await updateGlobalSoundObject(soundObject.id, {
+        [property]: newValues,
+        // Preservar datos de audio y otras transformaciones
+        audioParams: soundObject.audioParams,
+        position: property === 'position' ? newValues : soundObject.position,
+        rotation: property === 'rotation' ? newValues : soundObject.rotation,
+        scale: property === 'scale' ? newValues : soundObject.scale
+      });
+      console.log('🎛️ useTransformHandler.updateTransform: updateGlobalSoundObject completado');
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (!effectZone) {
@@ -116,16 +128,18 @@ export function useTransformHandler() {
       return;
     }
 
-    if (isSoundObject) {
-      const soundObject = getSoundObject();
-      if (soundObject) {
-        // Usar función global o local según el modo
-        if (isGlobalMode) {
-          await updateGlobalSoundObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
-        } else {
-          updateObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
+      if (isSoundObject) {
+        const soundObject = getSoundObject();
+        if (soundObject) {
+          // TEMPORAL: Forzar uso de updateGlobalSoundObject para transformaciones
+          console.log('🎛️ useTransformHandler.resetTransform: Forzando modo global - updateGlobalSoundObject');
+          await updateGlobalSoundObject(soundObject.id, {
+            ...DEFAULT_TRANSFORM_VALUES,
+            // Preservar datos de audio
+            audioParams: soundObject.audioParams
+          });
+          console.log('🎛️ useTransformHandler.resetTransform: updateGlobalSoundObject completado');
         }
-      }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (effectZone) {
@@ -152,20 +166,21 @@ export function useTransformHandler() {
       return;
     }
 
-    if (isSoundObject) {
-      const soundObject = getSoundObject();
-      if (soundObject) {
-        // Usar función global o local según el modo
-        if (isGlobalMode) {
+      if (isSoundObject) {
+        const soundObject = getSoundObject();
+        if (soundObject) {
+          // TEMPORAL: Forzar uso de updateGlobalSoundObject para transformaciones
+          console.log('🎛️ useTransformHandler.setTransform: Forzando modo global - updateGlobalSoundObject');
           await updateGlobalSoundObject(soundObject.id, {
-            [property]: values
+            [property]: values,
+            // Preservar datos de audio y otras transformaciones
+            audioParams: soundObject.audioParams,
+            position: property === 'position' ? values : soundObject.position,
+            rotation: property === 'rotation' ? values : soundObject.rotation,
+            scale: property === 'scale' ? values : soundObject.scale
           });
-        } else {
-          updateObject(soundObject.id, {
-            [property]: values
-          });
+          console.log('🎛️ useTransformHandler.setTransform: updateGlobalSoundObject completado');
         }
-      }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (effectZone) {

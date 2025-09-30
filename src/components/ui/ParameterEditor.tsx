@@ -135,11 +135,19 @@ export function ParameterEditor() {
         console.log('🎛️ ParameterEditor: Usando modo global - updateGlobalSoundObject');
         await updateGlobalSoundObject(soundObject.id, {
           audioParams: newAudioParams,
+          // Preservar datos de transformación
+          position: soundObject.position,
+          rotation: soundObject.rotation,
+          scale: soundObject.scale
         });
       } else {
         console.log('🎛️ ParameterEditor: Usando modo local - updateObject');
         updateObject(soundObject.id, {
           audioParams: newAudioParams,
+          // Preservar datos de transformación
+          position: soundObject.position,
+          rotation: soundObject.rotation,
+          scale: soundObject.scale
         });
       }
     } finally {

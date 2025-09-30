@@ -274,22 +274,29 @@ export class FirebaseService {
   // Actualizar un objeto existente en el mundo global
   async updateGlobalSoundObject(objectId: string, updates: Partial<SoundObject>): Promise<void> {
     try {
+      console.log('🔥 FirebaseService.updateGlobalSoundObject:', { objectId, updates });
       // Primero obtener el documento actual
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const docSnap = await getDoc(globalWorldRef);
       
       if (docSnap.exists()) {
         const data = docSnap.data() as GlobalWorldDoc;
+        console.log('🔥 FirebaseService: Documento global encontrado, objetos:', data.objects.length);
         const updatedObjects = data.objects.map(obj => 
           obj.id === objectId ? { ...obj, ...updates } : obj
         );
         
+        console.log('🔥 FirebaseService: Actualizando documento global con objetos:', updatedObjects.length);
         await updateDoc(globalWorldRef, {
           objects: updatedObjects,
           updatedAt: Timestamp.now()
         });
+        console.log('🔥 FirebaseService: Documento global actualizado exitosamente');
+      } else {
+        console.log('🔥 FirebaseService: Documento global no existe');
       }
     } catch (error) {
+      console.error('🔥 FirebaseService: Error al actualizar objeto global:', error);
       throw error;
     }
   }
@@ -447,11 +454,15 @@ export class FirebaseService {
   subscribeToGlobalWorld(callback: (state: GlobalWorldDoc | null) => void): () => void {
     const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
     
+    console.log('🔥 FirebaseService: Iniciando suscripción al mundo global');
+    
     return onSnapshot(globalWorldRef, (doc) => {
       if (doc.exists()) {
         const state = { id: doc.id, ...doc.data() } as GlobalWorldDoc;
+        console.log('🔥 FirebaseService: Recibida actualización del mundo global:', state);
         callback(state);
       } else {
+        console.log('🔥 FirebaseService: Documento del mundo global no existe');
         callback(null);
       }
     });
