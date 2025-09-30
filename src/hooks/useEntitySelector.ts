@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
+import { useGridStore } from '../stores/useGridStore';
 
 /**
  * Tipos de entidades que pueden ser seleccionadas
@@ -27,12 +28,13 @@ export interface SelectedEntity {
  * - Open/Closed: Fácil extender para nuevos tipos de entidades
  */
 export function useEntitySelector() {
-  const { grids, selectedEntityId } = useWorldStore();
+  const { selectedEntityId } = useWorldStore();
+  const { grids } = useGridStore();
 
   // Encontrar la entidad seleccionada (objeto sonoro, objeto móvil o zona de efecto)
   const selectedEntity = useMemo((): SelectedEntity | null => {
     
-    if (!selectedEntityId) {
+    if (!selectedEntityId || !grids) {
       return null;
     }
     

@@ -89,78 +89,6 @@ class AutoFilterUpdater implements EffectUpdater {
   }
 }
 
-class AutoWahUpdater implements EffectUpdater {
-  update(effectNode: Tone.AutoWah, params: EffectParams): void {
-    Object.keys(params).forEach(paramName => {
-      if (params[paramName] !== undefined) {
-        this.safeUpdateParam(effectNode, paramName, params[paramName] as number | string);
-      }
-    });
-    
-    console.log('🎛️ AutoWahUpdater: Parámetros actualizados:', {
-      baseFrequency: effectNode.baseFrequency,
-      octaves: effectNode.octaves,
-      sensitivity: effectNode.sensitivity,
-      qValue: effectNode.Q?.value,
-      wet: effectNode.wet?.value
-    });
-  }
-
-  getCurrentParams(effectNode: Tone.AutoWah): Record<string, unknown> {
-    return {
-      baseFrequency: effectNode.baseFrequency || 50,
-      octaves: effectNode.octaves || 6,
-      sensitivity: effectNode.sensitivity || -30,
-      qValue: effectNode.Q?.value || 6,
-      wet: effectNode.wet?.value || 0.5
-    };
-  }
-
-  private safeUpdateParam(node: Tone.AutoWah, paramName: string, value: number | string): void {
-    try {
-      // Manejar parámetros específicos del AutoWah
-      switch (paramName) {
-        case 'baseFrequency':
-          if (node.baseFrequency !== undefined) {
-            node.baseFrequency = value as number;
-          }
-          break;
-        case 'octaves':
-          if (node.octaves !== undefined) {
-            node.octaves = value as number;
-          }
-          break;
-        case 'sensitivity':
-          if (node.sensitivity !== undefined) {
-            node.sensitivity = value as number;
-          }
-          break;
-        case 'qValue':
-          if (node.Q && 'value' in node.Q) {
-            (node.Q as { value: number }).value = value as number;
-          }
-          break;
-        case 'wet':
-          if (node.wet && 'value' in node.wet) {
-            (node.wet as { value: number }).value = value as number;
-          }
-          break;
-        default:
-          // Intentar acceso genérico
-          const typedNode = node as Record<string, unknown>;
-          const param = typedNode[paramName];
-          if (param && typeof param === 'object' && 'value' in param) {
-            (param as { value: number | string }).value = value;
-          } else if (param !== undefined) {
-            (typedNode as Record<string, number | string>)[paramName] = value;
-          }
-          break;
-      }
-    } catch (error) {
-      console.warn(`⚠️ AutoWahUpdater: Error actualizando parámetro ${paramName}:`, error);
-    }
-  }
-}
 
 class BitCrusherUpdater implements EffectUpdater {
   update(effectNode: Tone.BitCrusher, params: EffectParams): void {
@@ -328,7 +256,7 @@ export class EffectUpdaterFactory {
   private initializeUpdaters(): void {
     this.updaters.set('phaser', new PhaserUpdater());
     this.updaters.set('autoFilter', new AutoFilterUpdater());
-    this.updaters.set('autoWah', new AutoWahUpdater());
+    // this.updaters.set('autoWah', new AutoWahUpdater()); // Usar el updater específico en su lugar
     this.updaters.set('bitCrusher', new BitCrusherUpdater());
     this.updaters.set('chorus', new ChorusUpdater());
     this.updaters.set('distortion', new DistortionUpdater());

@@ -66,94 +66,94 @@ export class TestOscillatorFactory implements ITestOscillatorFactory {
       case 'Phaser':
         return (osc) => {
           osc.frequency.rampTo(880, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
         };
       case 'AutoFilter':
         return (osc) => {
           osc.frequency.rampTo(660, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
         };
       case 'AutoWah':
         return (osc) => {
           osc.frequency.rampTo(110, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
         };
       case 'BitCrusher':
         return (osc) => {
           osc.frequency.rampTo(880, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 100);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 100);
         };
       case 'Chebyshev':
         return (osc) => {
           osc.frequency.rampTo(660, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 150);
         };
       case 'Chorus':
         return (osc) => {
           osc.frequency.rampTo(880, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 100);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 100);
         };
       case 'Distortion':
         return (osc) => {
           osc.frequency.rampTo(880, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'FeedbackDelay':
         return (osc) => {
           osc.frequency.rampTo(330, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'Freeverb':
         return (osc) => {
           osc.frequency.rampTo(550, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'FrequencyShifter':
         return (osc) => {
           osc.frequency.rampTo(330, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'JCReverb':
         return (osc) => {
           osc.frequency.rampTo(520, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'PingPongDelay':
         return (osc) => {
           osc.frequency.rampTo(330, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'PitchShift':
         return (osc) => {
           osc.frequency.rampTo(880, 0.05);
-          setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.05), 120);
         };
       case 'Reverb':
         return (osc) => {
           osc.frequency.rampTo(660, 0.1);
-          setTimeout(() => osc.frequency.rampTo(330, 0.1), 200);
+          // setTimeout(() => osc.frequency.rampTo(330, 0.1), 200);
         };
       case 'StereoWidener':
         return (osc) => {
           osc.frequency.rampTo(1100, 0.05);
-          setTimeout(() => osc.frequency.rampTo(550, 0.05), 100);
+          // setTimeout(() => osc.frequency.rampTo(550, 0.05), 100);
         };
       case 'Tremolo':
         return (osc) => {
           osc.frequency.rampTo(880, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
         };
       case 'Vibrato':
         return (osc) => {
           osc.frequency.rampTo(880, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
         };
       default:
         return (osc) => {
           const currentFreq = osc.frequency.value;
           const newFreq = currentFreq === 440 ? 880 : 440;
           osc.frequency.rampTo(newFreq, 0.1);
-          setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
+          // setTimeout(() => osc.frequency.rampTo(440, 0.1), 200);
         };
     }
   }

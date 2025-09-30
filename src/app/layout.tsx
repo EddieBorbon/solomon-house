@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto, Roboto_Mono } from "next/font/google";
 import "./tailwind.css";
 import "./neon-sliders.css";
 import "./glassmorphism.css";
@@ -7,14 +7,18 @@ import "./futuristic-sliders.css";
 import { StoreProvider } from "../components/StoreProvider";
 import { LanguageProvider } from "../contexts/LanguageContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ['300', '400', '500', '700'],
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
+  weight: ['300', '400', '500', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -30,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full m-0 p-0 bg-black overflow-hidden`}
+        className={`${roboto.variable} ${robotoMono.variable} antialiased h-full m-0 p-0 bg-black overflow-hidden`}
       >
         <LanguageProvider>
           <StoreProvider>

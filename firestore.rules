@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para el mundo global colaborativo
+    match /globalWorldState/{docId} {
+      // Todos pueden leer el estado del mundo global
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden modificar el mundo global
+      // Para desarrollo/testing, puedes cambiar esto a 'if true' temporalmente
+      allow write: if request.auth != null;
+      
+      // Alternativa para desarrollo sin autenticación:
+      // allow write: if true;
+    }
+    
+    // Reglas para proyectos individuales (mantener compatibilidad)
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Reglas para cuadrículas individuales (mantener compatibilidad)
+    match /grids/{gridId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Reglas por defecto - denegar todo lo demás
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -92,11 +92,11 @@ export class SoundPlaybackManager {
         source.synth.triggerAttack(chord, this.getUniqueStartTime());
         
         // Log después del trigger
-        setTimeout(() => {
-          console.log('🎵 PolySynth después del trigger:');
-          console.log('  - Voces activas después:', (source.synth as Tone.PolySynth).activeVoices);
-          console.log('  - Polyphony después:', (source.synth as Tone.PolySynth).maxPolyphony);
-        }, 100);
+        // setTimeout(() => {
+        //   console.log('🎵 PolySynth después del trigger:');
+        //   console.log('  - Voces activas después:', (source.synth as Tone.PolySynth).activeVoices);
+        //   console.log('  - Polyphony después:', (source.synth as Tone.PolySynth).maxPolyphony);
+        // }, 100);
         
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
@@ -263,17 +263,20 @@ export class SoundPlaybackManager {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || this.config.defaultDuration;
         
-        // Reproducir cada nota del acorde
+        // Reproducir cada nota del acorde usando Tone.Transport (más eficiente)
         notes.forEach((note: string, index: number) => {
           const frequency = this.getNoteFrequency(note);
           const delay = index * this.config.chordDelay;
-          setTimeout(() => {
+          const startTime = Tone.now() + delay;
+          
+          // Usar Tone.Transport en lugar de setTimeout para mejor rendimiento
+          Tone.Transport.schedule((time) => {
             try {
-              (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
+              (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, time);
             } catch {
               // Manejo silencioso de errores
             }
-          }, delay * 1000);
+          }, startTime);
         });
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
         return;
@@ -377,16 +380,20 @@ export class SoundPlaybackManager {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || '8n';
         
+        // Reproducir cada nota del acorde usando Tone.Transport (más eficiente)
         notes.forEach((note: string, index: number) => {
           const frequency = this.getNoteFrequency(note);
           const delay = index * this.config.chordDelay;
-          setTimeout(() => {
+          const startTime = Tone.now() + delay;
+          
+          // Usar Tone.Transport en lugar de setTimeout para mejor rendimiento
+          Tone.Transport.schedule((time) => {
             try {
-              (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
+              (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, time);
             } catch {
               // Manejo silencioso de errores
             }
-          }, delay * 1000);
+          }, startTime);
         });
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
@@ -400,18 +407,20 @@ export class SoundPlaybackManager {
         (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
       } else {
-        // Fallback: usar triggerAttack con duración manual
+        // Usar Tone.Transport para mejor rendimiento
         const frequency = params.frequency;
         const duration = params.duration || this.config.defaultDuration;
         
         (source.synth as SynthesizerType).triggerAttack(frequency, Tone.now());
-        setTimeout(() => {
+        
+        // Programar el release usando Tone.Transport
+        Tone.Transport.schedule((time) => {
           try {
-            (source.synth as SynthesizerType).triggerRelease(Tone.now());
+            (source.synth as SynthesizerType).triggerRelease(time);
           } catch {
             // Manejo silencioso de errores
           }
-        }, duration * 1000);
+        }, Tone.now() + duration);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
       }
     } catch {

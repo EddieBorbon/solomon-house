@@ -187,9 +187,9 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => {
 
     // Determinar si el objeto debe tener audio habilitado por defecto
-    // Los objetos percusivos (icosahedron, torus, spiral, pyramid) no deberían tener audio continuo
+    // Los objetos percusivos (icosahedron, torus, spiral, pyramid, cone) no deberían tener audio continuo
     // El plane (NoiseSynth) puede tener sonido continuo
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(type);
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(type);
     const defaultAudioEnabled = !isPercussiveObject;
 
     const newObject: SoundObject = {
@@ -265,6 +265,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   },
 
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>, gridId: string) => {
+    console.log('🎛️ useObjectStore.updateObject llamado', { id, updates, gridId });
 
     // Actualizar objeto en el estado local
     set((state) => {
@@ -288,13 +289,18 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // Obtener el objeto actualizado para comunicar cambios al AudioManager
     const updatedObject = get().objects.find(obj => obj.id === id);
     if (updatedObject) {
+      console.log('🎛️ useObjectStore.updateObject: Objeto actualizado encontrado', updatedObject);
       // Comunicar cambios al AudioManager
       if (updates.position) {
+        console.log('🎛️ useObjectStore.updateObject: Actualizando posición en AudioManager');
         audioManager.updateSoundPosition(id, updatedObject.position);
       }
       if (updates.audioParams) {
+        console.log('🎛️ useObjectStore.updateObject: Actualizando parámetros de audio en AudioManager', updatedObject.audioParams);
         audioManager.updateSoundParams(id, updatedObject.audioParams);
       }
+    } else {
+      console.log('🎛️ useObjectStore.updateObject: No se encontró el objeto actualizado');
     }
 
   },
@@ -310,7 +316,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     console.log('toggleObjectAudio:', { id, type: currentObject.type, currentAudioEnabled: currentObject.audioEnabled, forceState });
 
     // Ignorar los tipos percusivos ya que no necesitan toggle de audio
-    if (currentObject.type === 'icosahedron' || currentObject.type === 'torus') {
+    if (currentObject.type === 'icosahedron' || currentObject.type === 'torus' || currentObject.type === 'cone') {
       console.log('toggleObjectAudio: Ignorando objeto percusivo:', currentObject.type);
       return;
     }
@@ -343,8 +349,8 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar la nota
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing, cone), siempre disparar la nota
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing', 'cone'].includes(object.type);
     
     if (isPercussiveObject) {
       audioManager.triggerNoteAttack(id, object.audioParams);
@@ -362,8 +368,8 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing, cone), siempre disparar
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing', 'cone'].includes(object.type);
     
     if (isPercussiveObject) {
       if (object.type === 'plane') {
@@ -389,8 +395,8 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Para objetos percusivos (icosahedron, torus, spiral, pyramid), siempre disparar
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(object.type);
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, cone), siempre disparar
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(object.type);
     
     if (isPercussiveObject) {
       audioManager.triggerAttackRelease(id, object.audioParams);

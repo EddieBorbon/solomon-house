@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { useGridStore, type Grid } from '../../stores/useGridStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
-import { useObjectStore } from '../../stores/useObjectStore';
+// import { useObjectStore } from '../../stores/useObjectStore'; // No utilizado
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
@@ -34,7 +35,7 @@ interface SoundObjectContainerProps {
 
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
-    const { triggerObjectNote, toggleObjectAudio } = useWorldStore();
+    const { triggerObjectNote, toggleObjectAudio, triggerObjectAttackRelease } = useWorldStore();
     
     const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
@@ -46,9 +47,9 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         return;
       }
       
-      // Para conos, activar/desactivar el audio
+      // Para conos, disparar la nota (sonido percusivo)
       if (object.type === 'cone') {
-        toggleObjectAudio(object.id);
+        triggerObjectAttackRelease(object.id);
       } else if (object.type === 'icosahedron' || object.type === 'plane' || object.type === 'torus') {
         // Para icosaedros, planos y toroides, solo disparar la nota (sonido percusivo)
         triggerObjectNote(object.id);
@@ -62,7 +63,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         // Para otros objetos, solo disparar la nota
         triggerObjectNote(object.id);
       }
-    }, [object.id, onSelect, triggerObjectNote, toggleObjectAudio, object.type]);
+    }, [object.id, onSelect, triggerObjectNote, toggleObjectAudio, triggerObjectAttackRelease, object.type]);
 
     return (
       <group
@@ -180,27 +181,36 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
 // Componente principal de la escena
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const { 
-    grids, 
     selectedEntityId, 
     transformMode, 
     updateObject, 
     updateMobileObject,
     updateEffectZone, 
     selectEntity,
+    // Acciones globales
+    updateGlobalSoundObject,
+    updateGlobalMobileObject,
+    updateGlobalEffectZone,
+    // Acciones de bloqueo de sincronización
+    setSyncLock
+  } = useWorldStore();
+
+  const { 
+    grids, 
     loadGrid,
     setActiveGrid,
     getGridKey,
     activeGridId
-  } = useWorldStore();
+  } = useGridStore();
 
   // Inicializar la cuadrícula por defecto si no hay ninguna
   useEffect(() => {
-    if (grids.size === 0) {
+    if (!grids || grids.size === 0) {
       loadGrid([0, 0, 0]);
       const defaultGridKey = getGridKey([0, 0, 0]);
       setActiveGrid(defaultGridKey);
     }
-  }, [grids.size, loadGrid, setActiveGrid, getGridKey]);
+  }, [grids, loadGrid, setActiveGrid, getGridKey]);
   
   // Obtener objetos directamente del useObjectStore organizados por cuadrícula
   const allObjects = useMemo(() => {
@@ -209,40 +219,41 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     const effectZones: EffectZoneType[] = [];
     
     // Obtener objetos del useObjectStore organizados por cuadrícula
-    const objectStore = useObjectStore.getState();
+    // const objectStore = useObjectStore.getState(); // No utilizado
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
+    if (!grids) return { objects, mobileObjects, effectZones };
     const gridsArray = Array.from(grids.values());
     
     
-    gridsArray.forEach((grid) => {
+    gridsArray.forEach((grid: Grid) => {
       // Usar objetos directamente de la cuadrícula (useWorldStore) en lugar del ObjectStore
       const gridObjects = grid.objects || [];
       
-      console.log(`Grid ${grid.id}:`, {
-        objectsFromGrid: gridObjects.length,
-        mobileObjects: grid.mobileObjects?.length || 0,
-        effectZones: grid.effectZones?.length || 0,
-        isActive: grid.id === activeGridId
-      });
+      // console.log(`Grid ${grid.id}:`, {
+      //   objectsFromGrid: gridObjects.length,
+      //   mobileObjects: grid.mobileObjects?.length || 0,
+      //   effectZones: grid.effectZones?.length || 0,
+      //   isActive: grid.id === activeGridId
+      // });
       
       // Usar objetos de la cuadrícula directamente
-      objects.push(...gridObjects.filter(obj => obj && obj.id));
+      objects.push(...gridObjects.filter((obj: any) => obj && obj.id));
       
       // Mantener objetos móviles y zonas de efectos de la cuadrícula
       if (Array.isArray(grid.mobileObjects)) {
-        mobileObjects.push(...grid.mobileObjects.filter(obj => obj && obj.id));
+        mobileObjects.push(...grid.mobileObjects.filter((obj: any) => obj && obj.id));
       }
       if (Array.isArray(grid.effectZones)) {
-        effectZones.push(...grid.effectZones.filter(zone => zone && zone.id));
+        effectZones.push(...grid.effectZones.filter((zone: any) => zone && zone.id));
       }
     });
     
-    console.log('Total objects:', {
-      objects: objects.length,
-      mobileObjects: mobileObjects.length,
-      effectZones: effectZones.length
-    });
+    // console.log('Total objects:', {
+    //   objects: objects.length,
+    //   mobileObjects: mobileObjects.length,
+    //   effectZones: effectZones.length
+    // });
     
     return { objects, mobileObjects, effectZones };
   }, [grids, activeGridId]);
@@ -272,25 +283,45 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     return refs;
   }, [allObjects]);
 
-  // Función para manejar cambios en las transformaciones
+  // Referencias para el debounce de transformaciones
+  const transformTimeouts = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const pendingTransforms = useRef<Map<string, { position?: { x: number, y: number, z: number }, rotation?: { x: number, y: number, z: number }, scale?: { x: number, y: number, z: number } }>>(new Map());
+
+  // Función para manejar cambios en las transformaciones con debounce
   const handleTransformChange = useCallback((entityId: string, newTransform: { position?: { x: number, y: number, z: number }, rotation?: { x: number, y: number, z: number }, scale?: { x: number, y: number, z: number } }) => {
-    if (newTransform) {
+    if (!newTransform) return;
+
+    // Guardar la transformación pendiente
+    pendingTransforms.current.set(entityId, newTransform);
+
+    // Limpiar timeout anterior si existe
+    const existingTimeout = transformTimeouts.current.get(entityId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+    }
+
+    // Crear nuevo timeout para aplicar la transformación después del debounce
+    const timeout = setTimeout(async () => {
+      const pendingTransform = pendingTransforms.current.get(entityId);
+      if (!pendingTransform) return;
+
       const updates: Record<string, unknown> = {};
       
-      if (newTransform.position) {
+      if (pendingTransform.position) {
         // Convertir posición mundial a posición local
-        let localPosition = [newTransform.position.x, newTransform.position.y, newTransform.position.z];
+        let localPosition = [pendingTransform.position.x, pendingTransform.position.y, pendingTransform.position.z];
         
         // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
+        if (!grids) return;
         for (const grid of grids.values()) {
-          if (grid.objects.some(obj => obj.id === entityId) ||
-              grid.mobileObjects.some(obj => obj.id === entityId) ||
-              grid.effectZones.some(zone => zone.id === entityId)) {
+          if (grid.objects.some((obj: any) => obj.id === entityId) ||
+              grid.mobileObjects.some((obj: any) => obj.id === entityId) ||
+              grid.effectZones.some((zone: any) => zone.id === entityId)) {
             // Convertir a posición local: posición mundial - posición de la cuadrícula
             localPosition = [
-              newTransform.position.x - grid.position[0],
-              newTransform.position.y - grid.position[1],
-              newTransform.position.z - grid.position[2]
+              pendingTransform.position.x - grid.position[0],
+              pendingTransform.position.y - grid.position[1],
+              pendingTransform.position.z - grid.position[2]
             ];
             break;
           }
@@ -299,12 +330,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         updates.position = localPosition;
       }
       
-      if (newTransform.rotation) {
-        updates.rotation = [newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z];
+      if (pendingTransform.rotation) {
+        updates.rotation = [pendingTransform.rotation.x, pendingTransform.rotation.y, pendingTransform.rotation.z];
       }
       
-      if (newTransform.scale) {
-        updates.scale = [newTransform.scale.x, newTransform.scale.y, newTransform.scale.z];
+      if (pendingTransform.scale) {
+        updates.scale = [pendingTransform.scale.x, pendingTransform.scale.y, pendingTransform.scale.z];
       }
       
       if (Object.keys(updates).length > 0) {
@@ -313,16 +344,41 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         const isMobileObject = allObjects.mobileObjects.some(obj => obj.id === entityId);
         const isEffectZone = allObjects.effectZones.some(zone => zone.id === entityId);
         
-        if (isSoundObject) {
-          updateObject(entityId, updates);
-        } else if (isMobileObject) {
-          updateMobileObject(entityId, updates);
-        } else if (isEffectZone) {
-          updateEffectZone(entityId, updates);
+        // Verificar si estamos en el mundo global
+        const isGlobalWorld = activeGridId === 'global-world';
+        
+        try {
+          if (isSoundObject) {
+            if (isGlobalWorld) {
+              await updateGlobalSoundObject(entityId, updates);
+            } else {
+              updateObject(entityId, updates);
+            }
+          } else if (isMobileObject) {
+            if (isGlobalWorld) {
+              await updateGlobalMobileObject(entityId, updates);
+            } else {
+              updateMobileObject(entityId, updates);
+            }
+          } else if (isEffectZone) {
+            if (isGlobalWorld) {
+              await updateGlobalEffectZone(entityId, updates);
+            } else {
+              updateEffectZone(entityId, updates);
+            }
+          }
+        } catch (error) {
+          console.error('Error al actualizar entidad:', error);
         }
       }
-    }
-  }, [updateObject, updateMobileObject, updateEffectZone, allObjects, grids]);
+
+      // Limpiar transformación pendiente
+      pendingTransforms.current.delete(entityId);
+      transformTimeouts.current.delete(entityId);
+    }, 100); // Debounce de 100ms para transformaciones del gizmo
+
+    transformTimeouts.current.set(entityId, timeout);
+  }, [updateObject, updateMobileObject, updateEffectZone, updateGlobalSoundObject, updateGlobalMobileObject, updateGlobalEffectZone, allObjects, grids, activeGridId]);
 
   // Función para manejar la selección de entidades
   const handleEntitySelect = useCallback((id: string) => {
@@ -339,33 +395,130 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
-    // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
-    if (orbitControlsRef.current && selectedEntityId && !selectedEntityId.includes(',')) {
-      orbitControlsRef.current.enabled = false;
-    }
-  }, [orbitControlsRef, selectedEntityId]);
+    console.log('🎮 Iniciando transformación - bloqueando sincronización');
+    setIsTransforming(true);
+    setSyncLock(true); // Bloquear sincronización globalmente
+  }, [setSyncLock]);
 
   // Función para manejar el fin de la manipulación
-  const handleTransformEnd = useCallback(() => {
-    if (orbitControlsRef.current) {
-      orbitControlsRef.current.enabled = true;
-    }
-  }, [orbitControlsRef]);
+  const handleTransformEnd = useCallback(async () => {
+    console.log('🎮 Finalizando transformación - desbloqueando sincronización');
+    setIsTransforming(false);
+    setSyncLock(false); // Desbloquear sincronización globalmente
 
-  // Efecto para controlar OrbitControls basado en el estado de edición de zona de efectos
-  // Solo deshabilitar OrbitControls cuando se estén usando TransformControls, no solo por editar
+    // Aplicar cualquier transformación pendiente inmediatamente
+    if (selectedEntityId) {
+      const pendingTransform = pendingTransforms.current.get(selectedEntityId);
+      if (pendingTransform) {
+        // Limpiar timeout existente
+        const existingTimeout = transformTimeouts.current.get(selectedEntityId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+        }
+
+        // Aplicar la transformación inmediatamente
+        const updates: Record<string, unknown> = {};
+        
+        if (pendingTransform.position) {
+          // Convertir posición mundial a posición local
+          let localPosition = [pendingTransform.position.x, pendingTransform.position.y, pendingTransform.position.z];
+          
+          // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
+          if (!grids) return;
+          for (const grid of grids.values()) {
+            if (grid.objects.some((obj: any) => obj.id === selectedEntityId) ||
+                grid.mobileObjects.some((obj: any) => obj.id === selectedEntityId) ||
+                grid.effectZones.some((zone: any) => zone.id === selectedEntityId)) {
+              // Convertir a posición local: posición mundial - posición de la cuadrícula
+              localPosition = [
+                pendingTransform.position.x - grid.position[0],
+                pendingTransform.position.y - grid.position[1],
+                pendingTransform.position.z - grid.position[2]
+              ];
+              break;
+            }
+          }
+          
+          updates.position = localPosition;
+        }
+        
+        if (pendingTransform.rotation) {
+          updates.rotation = [pendingTransform.rotation.x, pendingTransform.rotation.y, pendingTransform.rotation.z];
+        }
+        
+        if (pendingTransform.scale) {
+          updates.scale = [pendingTransform.scale.x, pendingTransform.scale.y, pendingTransform.scale.z];
+        }
+        
+        if (Object.keys(updates).length > 0) {
+          // Determinar si es un objeto sonoro, móvil o una zona de efecto
+          const isSoundObject = allObjects.objects.some(obj => obj.id === selectedEntityId);
+          const isMobileObject = allObjects.mobileObjects.some(obj => obj.id === selectedEntityId);
+          const isEffectZone = allObjects.effectZones.some(zone => zone.id === selectedEntityId);
+          
+          // Verificar si estamos en el mundo global
+          const isGlobalWorld = activeGridId === 'global-world';
+          
+          try {
+            if (isSoundObject) {
+              if (isGlobalWorld) {
+                await updateGlobalSoundObject(selectedEntityId, updates);
+              } else {
+                updateObject(selectedEntityId, updates);
+              }
+            } else if (isMobileObject) {
+              if (isGlobalWorld) {
+                await updateGlobalMobileObject(selectedEntityId, updates);
+              } else {
+                updateMobileObject(selectedEntityId, updates);
+              }
+            } else if (isEffectZone) {
+              if (isGlobalWorld) {
+                await updateGlobalEffectZone(selectedEntityId, updates);
+              } else {
+                updateEffectZone(selectedEntityId, updates);
+              }
+            }
+          } catch (error) {
+            console.error('Error al actualizar entidad al finalizar transformación:', error);
+          }
+        }
+
+        // Limpiar transformación pendiente
+        pendingTransforms.current.delete(selectedEntityId);
+        transformTimeouts.current.delete(selectedEntityId);
+      }
+    }
+  }, [selectedEntityId, allObjects, grids, activeGridId, updateObject, updateMobileObject, updateEffectZone, updateGlobalSoundObject, updateGlobalMobileObject, updateGlobalEffectZone, setSyncLock]);
+
+  // Estado para rastrear si se está manipulando un objeto
+  const [isTransforming, setIsTransforming] = React.useState(false);
+
+  // Efecto para controlar OrbitControls basado en el estado de transformación
   React.useEffect(() => {
     if (orbitControlsRef.current) {
-      // Solo deshabilitar OrbitControls cuando se estén usando TransformControls
-      // El estado isEditingEffectZone no debería bloquear la cámara
-      // Mantener OrbitControls habilitado para permitir movimiento de cámara
-      orbitControlsRef.current.enabled = true;
+      // Solo deshabilitar OrbitControls cuando se esté transformando activamente
+      orbitControlsRef.current.enabled = !isTransforming;
+      console.log('🎮 OrbitControls enabled:', !isTransforming);
     }
-  }, [orbitControlsRef]);
+  }, [isTransforming]);
+
+  // Limpiar timeouts cuando el componente se desmonte
+  useEffect(() => {
+    const timeoutsRef = transformTimeouts;
+    const pendingRef = pendingTransforms;
+    
+    return () => {
+      // Limpiar todos los timeouts pendientes
+      timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      timeoutsRef.current.clear();
+      pendingRef.current.clear();
+    };
+  }, []);
 
   // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {
-  }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
+  }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids?.size]);
 
   return (
     <>
@@ -386,7 +539,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       </mesh>
 
       {/* Renderizado de cuadrículas con sus objetos */}
-      {Array.from(grids.values()).map((grid) => {
+      {grids && Array.from(grids.values()).map((grid: Grid) => {
         if (!grid || !grid.id) return null;
         
         // Usar objetos directamente de la cuadrícula
@@ -395,7 +548,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         return (
           <group key={grid.id} position={grid.position}>
           {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {gridObjects.map((obj) => {
+          {gridObjects.map((obj: any) => {
             if (!obj || !obj.id) return null;
             const objectRef = entityRefs.get(obj.id);
             if (!objectRef) return null;
@@ -411,7 +564,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de objetos móviles de esta cuadrícula */}
-          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj) => {
+          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj: any) => {
             if (!mobileObj || !mobileObj.id) return null;
             const objectRef = entityRefs.get(mobileObj.id);
             if (!objectRef) return null;
@@ -436,7 +589,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de zonas de efectos de esta cuadrícula */}
-          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone) => {
+          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone: any) => {
             if (!zone || !zone.id) return null;
             const zoneRef = entityRefs.get(zone.id);
             if (!zoneRef) return null;
@@ -470,10 +623,11 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         let foundGrid = null;
         
         // Buscar en todas las cuadrículas para encontrar dónde está el objeto
+        if (!grids) return null;
         for (const grid of grids.values()) {
-          if (grid.objects.some(obj => obj.id === selectedEntityId) ||
-              grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
-              grid.effectZones.some(zone => zone.id === selectedEntityId)) {
+          if (grid.objects.some((obj: any) => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some((obj: any) => obj.id === selectedEntityId) ||
+              grid.effectZones.some((zone: any) => zone.id === selectedEntityId)) {
             foundGrid = grid;
             break;
           }

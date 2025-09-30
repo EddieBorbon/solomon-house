@@ -31,7 +31,14 @@ export const DEFAULT_TRANSFORM_VALUES = {
  * - Dependency Inversion: Depende de abstracciones (hooks)
  */
 export function useTransformHandler() {
-  const { updateObject, updateEffectZone } = useWorldStore();
+  const { 
+    updateObject, 
+    updateEffectZone,
+    // Funciones globales
+    updateGlobalSoundObject,
+    updateGlobalEffectZone,
+    activeGridId
+  } = useWorldStore();
   const {
     hasSelection,
     isSoundObject,
@@ -40,13 +47,16 @@ export function useTransformHandler() {
     getEffectZone
   } = useEntitySelector();
 
+  // Detectar si estamos en modo global
+  const isGlobalMode = activeGridId === 'global-world';
+
   /**
    * Actualiza una propiedad de transformación específica
    * @param property - Propiedad a actualizar (position, rotation, scale)
    * @param axis - Eje específico (0=X, 1=Y, 2=Z)
    * @param value - Nuevo valor
    */
-  const updateTransform = useCallback((
+  const updateTransform = useCallback(async (
     property: TransformProperty,
     axis: 0 | 1 | 2,
     value: number
@@ -64,10 +74,16 @@ export function useTransformHandler() {
       const newValues = [...soundObject[property]] as [number, number, number];
       newValues[axis] = value;
 
-      
-      updateObject(soundObject.id, {
-        [property]: newValues
-      });
+      // Usar función global o local según el modo
+      if (isGlobalMode) {
+        await updateGlobalSoundObject(soundObject.id, {
+          [property]: newValues
+        });
+      } else {
+        updateObject(soundObject.id, {
+          [property]: newValues
+        });
+      }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (!effectZone) {
@@ -77,42 +93,58 @@ export function useTransformHandler() {
       const newValues = [...effectZone[property]] as [number, number, number];
       newValues[axis] = value;
 
-      
-      updateEffectZone(effectZone.id, {
-        [property]: newValues
-      });
+      // Usar función global o local según el modo
+      if (isGlobalMode) {
+        await updateGlobalEffectZone(effectZone.id, {
+          [property]: newValues
+        });
+      } else {
+        updateEffectZone(effectZone.id, {
+          [property]: newValues
+        });
+      }
     } else {
+      // No hay entidad seleccionada válida
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Resetea todas las transformaciones a valores por defecto
    */
-  const resetTransform = useCallback(() => {
+  const resetTransform = useCallback(async () => {
     if (!hasSelection) {
       return;
     }
 
-
     if (isSoundObject) {
       const soundObject = getSoundObject();
       if (soundObject) {
-        updateObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
+        // Usar función global o local según el modo
+        if (isGlobalMode) {
+          await updateGlobalSoundObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
+        } else {
+          updateObject(soundObject.id, DEFAULT_TRANSFORM_VALUES);
+        }
       }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (effectZone) {
-        updateEffectZone(effectZone.id, DEFAULT_TRANSFORM_VALUES);
+        // Usar función global o local según el modo
+        if (isGlobalMode) {
+          await updateGlobalEffectZone(effectZone.id, DEFAULT_TRANSFORM_VALUES);
+        } else {
+          updateEffectZone(effectZone.id, DEFAULT_TRANSFORM_VALUES);
+        }
       }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Actualiza una transformación completa (todos los ejes)
    * @param property - Propiedad a actualizar
    * @param values - Valores para los 3 ejes [X, Y, Z]
    */
-  const setTransform = useCallback((
+  const setTransform = useCallback(async (
     property: TransformProperty,
     values: [number, number, number]
   ) => {
@@ -120,23 +152,36 @@ export function useTransformHandler() {
       return;
     }
 
-
     if (isSoundObject) {
       const soundObject = getSoundObject();
       if (soundObject) {
-        updateObject(soundObject.id, {
-          [property]: values
-        });
+        // Usar función global o local según el modo
+        if (isGlobalMode) {
+          await updateGlobalSoundObject(soundObject.id, {
+            [property]: values
+          });
+        } else {
+          updateObject(soundObject.id, {
+            [property]: values
+          });
+        }
       }
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       if (effectZone) {
-        updateEffectZone(effectZone.id, {
-          [property]: values
-        });
+        // Usar función global o local según el modo
+        if (isGlobalMode) {
+          await updateGlobalEffectZone(effectZone.id, {
+            [property]: values
+          });
+        } else {
+          updateEffectZone(effectZone.id, {
+            [property]: values
+          });
+        }
       }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Obtiene los valores actuales de una propiedad de transformación

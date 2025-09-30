@@ -1,11 +1,14 @@
 import { useFrame } from '@react-three/fiber';
-import { useWorldStore } from '../state/useWorldStore';
+import { useGridStore } from '../stores/useGridStore';
 import { audioManager } from '../lib/AudioManager';
 import * as THREE from 'three';
 
 export function useEffectZoneDetection() {
-  const { grids } = useWorldStore();
+  const { grids } = useGridStore();
   let lastDebugTime = 0;
+  
+  // Verificar que grids esté disponible
+  if (!grids) return;
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = Array.from(grids.values()).flatMap(grid => grid.objects);

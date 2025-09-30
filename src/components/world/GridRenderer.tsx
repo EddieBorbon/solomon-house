@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { ManipulatableGrid } from './ManipulatableGrid';
 
 interface GridRendererProps {
@@ -9,7 +9,7 @@ interface GridRendererProps {
 }
 
 export function GridRenderer({ position = [0, 0, 0] }: GridRendererProps) {
-  const { grids, selectGrid } = useWorldStore();
+  const { grids, selectGrid } = useGridStore();
 
   const handleGridSelect = (gridId: string) => {
     selectGrid(gridId);
@@ -18,7 +18,7 @@ export function GridRenderer({ position = [0, 0, 0] }: GridRendererProps) {
   return (
     <group position={position}>
       {/* Renderizar todas las cuadrículas como objetos manipulables */}
-      {Array.from(grids.values()).map((grid) => {
+      {grids && Array.from(grids.values()).map((grid) => {
         if (!grid || !grid.id) return null;
         return (
           <ManipulatableGrid

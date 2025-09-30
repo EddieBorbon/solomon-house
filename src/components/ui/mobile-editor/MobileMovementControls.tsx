@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { type MobileObject, type MobileObjectParams } from '../../../state/useWorldStore';
+import { type MobileObject } from '../../../state/useWorldStore';
+import { type MobileObjectParams } from '../../sound-objects/MobileObject';
 
 interface MobileMovementControlsProps {
   mobileObject: MobileObject;
-  onParamChange: (param: keyof MobileObjectParams, value: any) => void;
+  onParamChange: (param: keyof MobileObjectParams, value: string | number | boolean | [number, number, number]) => void;
 }
 
 export function MobileMovementControls({

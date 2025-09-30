@@ -1,6 +1,7 @@
 'use client';
 
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import React from 'react';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
@@ -41,8 +42,15 @@ export function ParameterEditor() {
     removeMobileObject,
     removeEffectZone,
     toggleLockEffectZone,
-    setEditingEffectZone
+    setEditingEffectZone,
+    // Funciones globales
+    updateGlobalSoundObject,
+    updateGlobalEffectZone,
+    // Acciones de bloqueo de sincronización
+    setSyncLock
   } = useWorldStore();
+
+  const { activeGridId } = useGridStore();
 
   const { isUpdatingParams, setIsUpdatingParams, setLastUpdatedParam } = useParameterHandlers();
 
@@ -56,6 +64,9 @@ export function ParameterEditor() {
     getMobileObject,
     getEffectZone
   } = useEntitySelector();
+
+  // Detectar si estamos en modo global
+  const isGlobalMode = activeGridId === 'global-world';
 
   // Expandir automáticamente el panel cuando se selecciona una entidad
   React.useEffect(() => {
@@ -88,11 +99,24 @@ export function ParameterEditor() {
   }, [selectedEntity?.type, setEditingEffectZone]);
 
   // Función para actualizar un parámetro específico de objeto sonoro
-  const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
-    if (!isSoundObject) return;
+  const handleParamChange = async (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
+    console.log('🎛️ ParameterEditor: handleParamChange llamado', { param, value, isGlobalMode, activeGridId });
+    
+    if (!isSoundObject) {
+      console.log('🎛️ ParameterEditor: No es un objeto sonoro');
+      return;
+    }
 
     const soundObject = getSoundObject();
-    if (!soundObject) return;
+    if (!soundObject) {
+      console.log('🎛️ ParameterEditor: No se pudo obtener el objeto sonoro');
+      return;
+    }
+
+    console.log('🎛️ ParameterEditor: Objeto sonoro encontrado', { id: soundObject.id, currentParams: soundObject.audioParams });
+
+    // Bloquear sincronización durante la actualización
+    setSyncLock(true);
 
     // Mostrar estado de actualización
     setIsUpdatingParams(true);
@@ -103,9 +127,27 @@ export function ParameterEditor() {
       [param]: value,
     };
 
-    updateObject(soundObject.id, {
-      audioParams: newAudioParams,
-    });
+    console.log('🎛️ ParameterEditor: Nuevos parámetros de audio', newAudioParams);
+
+    try {
+      // Usar función global o local según el modo
+      if (isGlobalMode) {
+        console.log('🎛️ ParameterEditor: Usando modo global - updateGlobalSoundObject');
+        await updateGlobalSoundObject(soundObject.id, {
+          audioParams: newAudioParams,
+        });
+      } else {
+        console.log('🎛️ ParameterEditor: Usando modo local - updateObject');
+        updateObject(soundObject.id, {
+          audioParams: newAudioParams,
+        });
+      }
+    } finally {
+      // Desbloquear sincronización después de un breve delay
+      setTimeout(() => {
+        setSyncLock(false);
+      }, 100);
+    }
 
     // Ocultar estado de actualización después de un breve delay
     setTimeout(() => {
@@ -115,7 +157,7 @@ export function ParameterEditor() {
   };
 
   // Función para actualizar parámetros de zona de efecto
-  const handleEffectParamChange = (param: string, value: number | string) => {
+  const handleEffectParamChange = async (param: string, value: number | string) => {
     if (!isEffectZone) return;
 
     const effectZone = getEffectZone();
@@ -130,9 +172,16 @@ export function ParameterEditor() {
       [param]: value,
     };
 
-    updateEffectZone(effectZone.id, {
-      effectParams: newEffectParams,
-    });
+    // Usar función global o local según el modo
+    if (isGlobalMode) {
+      await updateGlobalEffectZone(effectZone.id, {
+        effectParams: newEffectParams,
+      });
+    } else {
+      updateEffectZone(effectZone.id, {
+        effectParams: newEffectParams,
+      });
+    }
 
     // Ocultar estado de actualización después de un breve delay
     setTimeout(() => {

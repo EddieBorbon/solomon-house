@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
+import { useGridStore } from '../stores/useGridStore';
 
 export function useKeyboardShortcuts() {
   const { 
@@ -8,9 +9,10 @@ export function useKeyboardShortcuts() {
     removeObject, 
     removeEffectZone, 
     removeMobileObject,
-    selectedEntityId,
-    grids
+    selectedEntityId
   } = useWorldStore();
+
+  const { grids } = useGridStore();
 
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {
@@ -18,11 +20,13 @@ export function useKeyboardShortcuts() {
     const effectZones: EffectZone[] = [];
     const mobileObjects: MobileObject[] = [];
     
-    grids.forEach((grid) => {
-      objects.push(...grid.objects);
-      effectZones.push(...grid.effectZones);
-      mobileObjects.push(...grid.mobileObjects);
-    });
+    if (grids) {
+      Array.from(grids.values()).forEach((grid) => {
+        objects.push(...grid.objects);
+        effectZones.push(...grid.effectZones);
+        mobileObjects.push(...grid.mobileObjects);
+      });
+    }
     
     return { objects, effectZones, mobileObjects };
   }, [grids]);
@@ -65,21 +69,27 @@ export function useKeyboardShortcuts() {
             // Buscar si es un objeto sonoro
             const soundObject = allObjects.objects.find(obj => obj.id === selectedEntityId);
             if (soundObject) {
-              removeObject(selectedEntityId);
+              removeObject(selectedEntityId).catch(error => {
+                console.error('Error al eliminar objeto:', error);
+              });
               return;
             }
             
             // Buscar si es una zona de efecto
             const effectZone = allObjects.effectZones.find(zone => zone.id === selectedEntityId);
             if (effectZone) {
-              removeEffectZone(selectedEntityId);
+              removeEffectZone(selectedEntityId).catch(error => {
+                console.error('Error al eliminar zona de efecto:', error);
+              });
               return;
             }
             
             // Buscar si es un objeto móvil
             const mobileObject = allObjects.mobileObjects.find(obj => obj.id === selectedEntityId);
             if (mobileObject) {
-              removeMobileObject(selectedEntityId);
+              removeMobileObject(selectedEntityId).catch(error => {
+                console.error('Error al eliminar objeto móvil:', error);
+              });
               return;
             }
             

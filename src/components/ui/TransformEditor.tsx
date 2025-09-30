@@ -15,7 +15,11 @@ export function TransformEditor() {
     objects, 
     effectZones, 
     updateObject, 
-    updateEffectZone 
+    updateEffectZone,
+    // Funciones globales
+    updateGlobalSoundObject,
+    updateGlobalEffectZone,
+    activeGridId
   } = useWorldStore();
 
   const [transformValues, setTransformValues] = useState<TransformValues>({
@@ -25,6 +29,9 @@ export function TransformEditor() {
   });
 
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Detectar si estamos en modo global
+  const isGlobalMode = activeGridId === 'global-world';
 
   // Encontrar la entidad seleccionada
   const selectedEntity = React.useMemo(() => {
@@ -91,7 +98,7 @@ export function TransformEditor() {
     );
   }
 
-  const handleTransformChange = (
+  const handleTransformChange = async (
     property: keyof TransformValues,
     axis: 0 | 1 | 2,
     value: number
@@ -106,19 +113,31 @@ export function TransformEditor() {
     newValues[property][axis] = value;
     setTransformValues(newValues);
 
-    // Aplicar cambios a la entidad
+    // Aplicar cambios a la entidad usando función global o local según el modo
     if (selectedEntity.type === 'soundObject') {
-      updateObject(selectedEntity.data.id, {
-        [property]: newValues[property]
-      });
+      if (isGlobalMode) {
+        await updateGlobalSoundObject(selectedEntity.data.id, {
+          [property]: newValues[property]
+        });
+      } else {
+        updateObject(selectedEntity.data.id, {
+          [property]: newValues[property]
+        });
+      }
     } else if (selectedEntity.type === 'effectZone') {
-      updateEffectZone(selectedEntity.data.id, {
-        [property]: newValues[property]
-      });
+      if (isGlobalMode) {
+        await updateGlobalEffectZone(selectedEntity.data.id, {
+          [property]: newValues[property]
+        });
+      } else {
+        updateEffectZone(selectedEntity.data.id, {
+          [property]: newValues[property]
+        });
+      }
     }
   };
 
-  const resetTransform = () => {
+  const resetTransform = async () => {
     const resetValues: TransformValues = {
       position: [0, 0, 0],
       rotation: [0, 0, 0],
@@ -127,11 +146,19 @@ export function TransformEditor() {
     
     setTransformValues(resetValues);
 
-    // Aplicar reset a la entidad
+    // Aplicar reset a la entidad usando función global o local según el modo
     if (selectedEntity.type === 'soundObject') {
-      updateObject(selectedEntity.data.id, resetValues);
+      if (isGlobalMode) {
+        await updateGlobalSoundObject(selectedEntity.data.id, resetValues);
+      } else {
+        updateObject(selectedEntity.data.id, resetValues);
+      }
     } else if (selectedEntity.type === 'effectZone') {
-      updateEffectZone(selectedEntity.data.id, resetValues);
+      if (isGlobalMode) {
+        await updateGlobalEffectZone(selectedEntity.data.id, resetValues);
+      } else {
+        updateEffectZone(selectedEntity.data.id, resetValues);
+      }
     }
   };
 

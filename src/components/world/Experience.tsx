@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -11,12 +11,15 @@ import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
 import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
+import { GlobalWorldSyncStatus } from '../ui/GlobalWorldSyncStatus';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
   const { } = useThree();
   const { updateCameraPosition } = useCameraControls();
+  const { selectedEntityId } = useWorldStore();
   
   // Inicializar la espacialización de audio
   useAudioListener();
@@ -25,7 +28,8 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
   const forwardVector = useRef(new THREE.Vector3());
 
   useFrame(({ camera }) => {
-    if (orbitControlsRef.current) {
+    // Solo permitir controles WASD si no hay una entidad seleccionada
+    if (orbitControlsRef.current && !selectedEntityId) {
       updateCameraPosition(camera, orbitControlsRef.current);
     }
 
@@ -50,11 +54,21 @@ export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { currentProjectId } = useWorldStore();
   
+  // Hook de sincronización global
+  const globalSync = useGlobalWorldSync();
+
+  // Cargar el estado inicial del mundo global al montar el componente
+  useEffect(() => {
+    globalSync.loadInitialGlobalState();
+  }, []); // Solo ejecutar una vez al montar
 
   return (
     <div className="w-full h-screen">
       {/* Estado de sincronización en tiempo real */}
       <RealtimeSyncStatus projectId={currentProjectId} />
+      
+      {/* Estado de sincronización del mundo global */}
+      <GlobalWorldSyncStatus />
       
       <Canvas
         camera={{

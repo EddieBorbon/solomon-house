@@ -110,9 +110,9 @@ export interface ParameterUpdateResult {
  * Responsabilidad única: Manejar operaciones comunes de todos los sintetizadores
  */
 export abstract class BaseSynthesizerUpdater {
-  protected configManager: ParameterConfigManager;
+  protected configManager?: ParameterConfigManager;
 
-  constructor(configManager: ParameterConfigManager) {
+  constructor(configManager?: ParameterConfigManager) {
     this.configManager = configManager;
   }
 
@@ -126,11 +126,11 @@ export abstract class BaseSynthesizerUpdater {
   ): void {
     try {
       // Asegurar que la frecuencia esté en el rango válido
-      const safeFrequency = this.configManager.clampFrequency(frequency);
+      const safeFrequency = this.configManager?.clampFrequency(frequency) ?? frequency;
       
       // Verificar si el sintetizador tiene la propiedad frequency
       if ('frequency' in synth && synth.frequency) {
-        synth.frequency.rampTo(safeFrequency, this.configManager.getRampTime());
+        synth.frequency.rampTo(safeFrequency, this.configManager?.getRampTime() ?? 0);
         result.updatedParams.push('frequency');
       } else if (synth instanceof Tone.PluckSynth) {
         // Para PluckSynth, usar toFrequency
@@ -178,7 +178,7 @@ export abstract class BaseSynthesizerUpdater {
       if ('harmonicity' in synth) {
         const harmonicityParam = (synth as SynthesizerWithHarmonicity).harmonicity;
         if (typeof harmonicityParam === 'object' && 'rampTo' in harmonicityParam) {
-          harmonicityParam.rampTo(harmonicity, this.configManager.getRampTime());
+          harmonicityParam.rampTo(harmonicity, this.configManager?.getRampTime() ?? 0);
         } else {
           (synth as SynthesizerWithHarmonicity).harmonicity = harmonicity;
         }
@@ -201,7 +201,7 @@ export abstract class BaseSynthesizerUpdater {
       if ('modulationIndex' in synth) {
         const modulationIndexParam = (synth as SynthesizerWithModulationIndex).modulationIndex;
         if (typeof modulationIndexParam === 'object' && 'rampTo' in modulationIndexParam) {
-          modulationIndexParam.rampTo(modulationIndex, this.configManager.getRampTime());
+          modulationIndexParam.rampTo(modulationIndex, this.configManager?.getRampTime() ?? 0);
         } else {
           (synth as SynthesizerWithModulationIndex).modulationIndex = modulationIndex;
         }
@@ -240,19 +240,19 @@ export abstract class BaseSynthesizerUpdater {
   ): void {
     try {
       // Clampear el volumen al rango configurado
-      const clampedVolume = this.configManager.clampVolume(volume);
+      const clampedVolume = this.configManager?.clampVolume(volume) ?? volume;
 
       // Para síntesis AM, el volumen debe controlar tanto la amplitud como el volumen general
       if ('modulation' in synth) {
         // Es un AMSynth - aplicar volumen a la amplitud de la portadora
         const amplitudeValue = clampedVolume;
-        synth.oscillator.volume.rampTo(Tone.gainToDb(amplitudeValue), this.configManager.getRampTime());
+        synth.oscillator.volume.rampTo(Tone.gainToDb(amplitudeValue), this.configManager?.getRampTime() ?? 0);
       }
       
       // Aplicar volumen general al sintetizador (control de salida)
       // Mapeo directo: 0 = -Infinity, 1.0 = 0dB (volumen completo)
       const dbValue = clampedVolume > 0 ? Tone.gainToDb(clampedVolume) : -Infinity;
-      synth.volume.rampTo(dbValue, this.configManager.getRampTime());
+      synth.volume.rampTo(dbValue, this.configManager?.getRampTime() ?? 0);
       
       result.updatedParams.push('volume');
     } catch (error) {

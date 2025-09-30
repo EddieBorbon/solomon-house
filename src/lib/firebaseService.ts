@@ -5,11 +5,14 @@ import {
   getDocs, 
   addDoc, 
   updateDoc, 
+  setDoc,
   deleteDoc, 
   query, 
   orderBy,
   onSnapshot,
-  Timestamp 
+  Timestamp,
+  arrayUnion,
+  arrayRemove
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
@@ -36,10 +39,24 @@ export interface FirebaseProject {
   updatedAt: Timestamp;
 }
 
+// Interfaz para el documento del mundo global
+export interface GlobalWorldDoc {
+  id: string;
+  objects: SoundObject[];
+  mobileObjects: MobileObject[];
+  effectZones: EffectZone[];
+  activeGridId: string | null;
+  currentGridCoordinates: [number, number, number];
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  lastModifiedBy?: string; // Para futuras funcionalidades de autenticación
+}
+
 export class FirebaseService {
   private static instance: FirebaseService;
   private projectsCollection = 'projects';
   private gridsCollection = 'grids';
+  private globalWorldCollection = 'globalWorldState';
 
   static getInstance(): FirebaseService {
     if (!FirebaseService.instance) {
@@ -209,6 +226,234 @@ export class FirebaseService {
         grids.push({ id: doc.id, ...doc.data() } as FirebaseGrid);
       });
       callback(grids);
+    });
+  }
+
+  // ===== MÉTODOS PARA EL MUNDO GLOBAL =====
+
+  // Guardar todo el estado del mundo global
+  async saveGlobalWorldState(state: GlobalWorldDoc): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      await setDoc(globalWorldRef, {
+        ...state,
+        createdAt: state.createdAt || Timestamp.now(),
+        updatedAt: Timestamp.now()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Actualizar solo partes del documento del mundo global
+  async updateGlobalWorldState(updates: Partial<GlobalWorldDoc>): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      await updateDoc(globalWorldRef, {
+        ...updates,
+        updatedAt: Timestamp.now()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Agregar un objeto al mundo global usando arrayUnion
+  async addGlobalSoundObject(object: SoundObject): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      await updateDoc(globalWorldRef, {
+        objects: arrayUnion(object),
+        updatedAt: Timestamp.now()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Actualizar un objeto existente en el mundo global
+  async updateGlobalSoundObject(objectId: string, updates: Partial<SoundObject>): Promise<void> {
+    try {
+      // Primero obtener el documento actual
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const updatedObjects = data.objects.map(obj => 
+          obj.id === objectId ? { ...obj, ...updates } : obj
+        );
+        
+        await updateDoc(globalWorldRef, {
+          objects: updatedObjects,
+          updatedAt: Timestamp.now()
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Eliminar un objeto del mundo global usando arrayRemove
+  async removeGlobalSoundObject(objectId: string): Promise<void> {
+    try {
+      // Primero obtener el documento actual para encontrar el objeto
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const objectToRemove = data.objects.find(obj => obj.id === objectId);
+        
+        if (objectToRemove) {
+          await updateDoc(globalWorldRef, {
+            objects: arrayRemove(objectToRemove),
+            updatedAt: Timestamp.now()
+          });
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Métodos similares para objetos móviles
+  async addGlobalMobileObject(mobileObject: MobileObject): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      await updateDoc(globalWorldRef, {
+        mobileObjects: arrayUnion(mobileObject),
+        updatedAt: Timestamp.now()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateGlobalMobileObject(objectId: string, updates: Partial<MobileObject>): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const updatedObjects = data.mobileObjects.map(obj => 
+          obj.id === objectId ? { ...obj, ...updates } : obj
+        );
+        
+        await updateDoc(globalWorldRef, {
+          mobileObjects: updatedObjects,
+          updatedAt: Timestamp.now()
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async removeGlobalMobileObject(objectId: string): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const objectToRemove = data.mobileObjects.find(obj => obj.id === objectId);
+        
+        if (objectToRemove) {
+          await updateDoc(globalWorldRef, {
+            mobileObjects: arrayRemove(objectToRemove),
+            updatedAt: Timestamp.now()
+          });
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Métodos similares para zonas de efectos
+  async addGlobalEffectZone(effectZone: EffectZone): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      await updateDoc(globalWorldRef, {
+        effectZones: arrayUnion(effectZone),
+        updatedAt: Timestamp.now()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateGlobalEffectZone(zoneId: string, updates: Partial<EffectZone>): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const updatedZones = data.effectZones.map(zone => 
+          zone.id === zoneId ? { ...zone, ...updates } : zone
+        );
+        
+        await updateDoc(globalWorldRef, {
+          effectZones: updatedZones,
+          updatedAt: Timestamp.now()
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async removeGlobalEffectZone(zoneId: string): Promise<void> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GlobalWorldDoc;
+        const zoneToRemove = data.effectZones.find(zone => zone.id === zoneId);
+        
+        if (zoneToRemove) {
+          await updateDoc(globalWorldRef, {
+            effectZones: arrayRemove(zoneToRemove),
+            updatedAt: Timestamp.now()
+          });
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Cargar el estado del mundo global
+  async loadGlobalWorldState(): Promise<GlobalWorldDoc | null> {
+    try {
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as GlobalWorldDoc;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Escuchar cambios en tiempo real del mundo global
+  subscribeToGlobalWorld(callback: (state: GlobalWorldDoc | null) => void): () => void {
+    const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+    
+    return onSnapshot(globalWorldRef, (doc) => {
+      if (doc.exists()) {
+        const state = { id: doc.id, ...doc.data() } as GlobalWorldDoc;
+        callback(state);
+      } else {
+        callback(null);
+      }
     });
   }
 }

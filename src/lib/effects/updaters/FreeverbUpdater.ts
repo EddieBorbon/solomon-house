@@ -26,7 +26,7 @@ export class FreeverbUpdater implements IEffectUpdater<Tone.Freeverb> {
     
     console.log('Freeverb actualizado:', {
       roomSize: effect.roomSize.value,
-      dampening: effect.dampening.value,
+      dampening: effect.dampening,
       wet: effect.wet?.value || 'N/A'
     });
   }
@@ -48,7 +48,7 @@ export class FreeverbUpdater implements IEffectUpdater<Tone.Freeverb> {
   getCurrentParams(effect: Tone.Freeverb): Record<string, unknown> {
     return {
       roomSize: effect.roomSize.value,
-      dampening: effect.dampening.value,
+      dampening: effect.dampening,
       wet: effect.wet?.value || 0.5
     };
   }
@@ -85,7 +85,7 @@ export class FreeverbUpdater implements IEffectUpdater<Tone.Freeverb> {
           effect.roomSize.value = value as number;
           break;
         case 'dampening':
-          effect.dampening.value = value as number;
+          effect.dampening = value as number;
           break;
         case 'wet':
           if (effect.wet) {

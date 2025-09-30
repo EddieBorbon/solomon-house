@@ -136,10 +136,10 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
 
       // Solo ejecutar animaciones cuando el audio está activo
       if (audioEnabled) {
-        // Rotación automática
+        // Rotación automática - cilindros rotan sobre el eje Z (horizontal)
         if (audioParams.autoRotate) {
           const rotationSpeed = audioParams.rotationSpeed || 1.0;
-          meshRef.current.rotation.y += (rotationSpeed * 0.01);
+          meshRef.current.rotation.z += (rotationSpeed * 0.01);
         }
         
         // Efecto de pulsación basado en pulseSpeed y pulseIntensity

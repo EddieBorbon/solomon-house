@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
 
@@ -28,13 +29,13 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar frecuencia usando el método base
       if (params.frequency !== undefined) {
         console.log('DuoSynthUpdater: Actualizando frecuencia a', params.frequency);
-        this.updateFrequency(synth as any, params.frequency, result);
+        this.updateFrequency(synth as Tone.DuoSynth, params.frequency, result);
       }
       
       // Actualizar volumen usando el método base
       if (params.volume !== undefined) {
         console.log('DuoSynthUpdater: Actualizando volumen a', params.volume);
-        this.updateVolume(synth as any, params.volume, result);
+        this.updateVolume(synth as Tone.DuoSynth, params.volume, result);
       }
       
       // Actualizar harmonicity
@@ -42,7 +43,7 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
         console.log('DuoSynthUpdater: Actualizando harmonicity a', params.harmonicity);
         const harmonicityParam = typedSynth.harmonicity;
         if (typeof harmonicityParam === 'object' && harmonicityParam !== null && 'rampTo' in harmonicityParam) {
-          (harmonicityParam as { rampTo: (value: number, time: number) => void }).rampTo(params.harmonicity, this.configManager.getRampTime());
+          (harmonicityParam as { rampTo: (value: number, time: number) => void }).rampTo(params.harmonicity, this.configManager?.getRampTime() ?? 0);
         } else if (typeof harmonicityParam === 'number') {
           (typedSynth as { harmonicity: number }).harmonicity = params.harmonicity;
         }
@@ -54,7 +55,7 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
         console.log('DuoSynthUpdater: Actualizando vibratoAmount a', params.vibratoAmount);
         const vibratoAmountParam = typedSynth.vibratoAmount;
         if (typeof vibratoAmountParam === 'object' && vibratoAmountParam !== null && 'rampTo' in vibratoAmountParam) {
-          (vibratoAmountParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoAmount, this.configManager.getRampTime());
+          (vibratoAmountParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoAmount, this.configManager?.getRampTime() ?? 0);
         }
         result.updatedParams.push('vibratoAmount');
       }
@@ -64,7 +65,7 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
         console.log('DuoSynthUpdater: Actualizando vibratoRate a', params.vibratoRate);
         const vibratoRateParam = typedSynth.vibratoRate;
         if (typeof vibratoRateParam === 'object' && vibratoRateParam !== null && 'rampTo' in vibratoRateParam) {
-          (vibratoRateParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoRate, this.configManager.getRampTime());
+          (vibratoRateParam as { rampTo: (value: number, time: number) => void }).rampTo(params.vibratoRate, this.configManager?.getRampTime() ?? 0);
         }
         result.updatedParams.push('vibratoRate');
       }

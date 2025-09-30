@@ -108,7 +108,7 @@ export function CameraToggleButton() {
         </p>
       ) : (
         <p className="text-xs text-red-400">
-          ⚠️ La cámara está bloqueada. Haz clic en "Activar Cámara" para desbloquear.
+          ⚠️ La cámara está bloqueada. Haz clic en &quot;Activar Cámara&quot; para desbloquear.
         </p>
       )}
 

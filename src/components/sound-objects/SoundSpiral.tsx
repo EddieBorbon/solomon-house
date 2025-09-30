@@ -62,30 +62,18 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
       }, 1000);
     };
 
-    // Animación de rotación continua
+    // Animación de rotación continua (optimizada)
     useFrame((state, delta) => {
-      if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
-        // Rotación lenta sobre el eje Y
-        ref.current.rotation.y += delta * 0.2;
-        
-        // Efecto de "respiración" sutil
-        const breathing = Math.sin(state.clock.elapsedTime * 2) * 0.05 + 1;
-        ref.current.scale.setScalar(breathing);
-      }
+      if (!ref || typeof ref !== 'object' || !('current' in ref) || !ref.current) return;
       
-      // Actualizar tiempo del pulso
-      if (isPlaying) {
-        setPulseTime(prev => prev + delta);
-      }
-
+      const mesh = ref.current;
+      
       // Solo ejecutar animaciones cuando el audio está activo o hay sonido reproduciéndose
       if (audioEnabled || isPlaying) {
         // Rotación automática
         if (audioParams.autoRotate) {
           const rotationSpeed = audioParams.rotationSpeed || 1.0;
-          if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
-            ref.current.rotation.y += (rotationSpeed * 0.01);
-          }
+          mesh.rotation.y += (rotationSpeed * 0.01);
         }
         
         // Efecto de pulsación basado en pulseSpeed y pulseIntensity
@@ -93,15 +81,20 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
           const pulseSpeed = audioParams.pulseSpeed || 2.0;
           const pulseIntensity = audioParams.pulseIntensity || 0.3;
           const pulseScale = 1 + Math.sin(state.clock.elapsedTime * pulseSpeed) * pulseIntensity * 0.2;
-          if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
-            ref.current.scale.setScalar(pulseScale);
-          }
+          mesh.scale.setScalar(pulseScale);
         }
       } else {
-        // Resetear escala cuando no hay audio
-        if (ref && typeof ref === 'object' && 'current' in ref && ref.current) {
-          ref.current.scale.setScalar(1);
-        }
+        // Rotación lenta básica cuando no hay audio
+        mesh.rotation.y += delta * 0.2;
+        
+        // Efecto de "respiración" sutil
+        const breathing = Math.sin(state.clock.elapsedTime * 2) * 0.05 + 1;
+        mesh.scale.setScalar(breathing);
+      }
+      
+      // Actualizar tiempo del pulso
+      if (isPlaying) {
+        setPulseTime(prev => prev + delta);
       }
     });
 

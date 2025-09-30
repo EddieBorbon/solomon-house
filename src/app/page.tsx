@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Experience } from '../components/world/Experience';
-import { ControlPanel } from '../components/ui/ControlPanel';
+import { GlobalControlPanel } from '../components/ui/GlobalControlPanel';
+import { GridSelector } from '../components/ui/GridSelector';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
@@ -30,8 +31,11 @@ export default function Home() {
         
         {/* Información del mundo */}
         
-        {/* Panel de control */}
-        <ControlPanel />
+        {/* Panel de control global */}
+        <GlobalControlPanel />
+        
+        {/* Selector de cuadrículas */}
+        <GridSelector />
         
         {/* Escena 3D */}
         <Experience />

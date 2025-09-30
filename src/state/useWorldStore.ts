@@ -2,27 +2,14 @@ import { create } from 'zustand';
 import { useGridStore } from '../stores/useGridStore';
 import { useEffectStore } from '../stores/useEffectStore';
 import { WorldStoreFacade } from './facades/WorldStoreFacade';
-import { type AudioParams } from '../lib/AudioManager';
+import { type AudioParams, audioManager } from '../lib/AudioManager';
+import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
 
-// Interfaz para una cuadrícula
-export interface Grid {
-  id: string;
-  coordinates: [number, number, number]; // X, Y, Z de la cuadrícula
-  position: [number, number, number]; // Posición 3D en el mundo
-  rotation: [number, number, number]; // Rotación 3D
-  scale: [number, number, number]; // Escala 3D
-  objects: SoundObject[];
-  mobileObjects: MobileObject[];
-  effectZones: EffectZone[];
-  gridSize: number;
-  gridColor: string;
-  isLoaded: boolean; // Si la cuadrícula está cargada en memoria
-  isSelected: boolean; // Si la cuadrícula está seleccionada
-  [key: string]: unknown; // Firma de índice para acceso dinámico
-}
+// Importar Grid desde useGridStore
+import type { Grid } from '../stores/useGridStore';
 
 // Tipos de movimiento para objetos móviles
 export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
@@ -37,6 +24,7 @@ export interface SoundObject {
   audioParams: AudioParams;
   isSelected: boolean;
   audioEnabled: boolean;
+  _pendingUpdate?: boolean; // Bandera para actualizaciones optimistas
 }
 
 // Interfaz para un objeto móvil
@@ -59,6 +47,8 @@ export interface MobileObject {
     amplitude: number;
     frequency: number;
     randomSeed: number;
+    height: number;
+    heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
   };
@@ -138,17 +128,11 @@ export interface EffectZone {
     // Parámetros generales de zona de efectos
     radius?: number;
   };
+  _pendingUpdate?: boolean; // Bandera para actualizaciones optimistas
 }
 
 // Estado del mundo 3D
 export interface WorldState {
-  // Sistema de cuadrículas contiguas
-  grids: Map<string, Grid>; // Mapa de cuadrículas por coordenadas
-  currentGridCoordinates: [number, number, number]; // Cuadrícula actual
-  activeGridId: string | null; // ID de la cuadrícula activa para crear objetos
-  gridSize: number; // Tamaño de cada cuadrícula
-  renderDistance: number; // Distancia de renderizado (cuántas cuadrículas cargar)
-  
   // Proyecto actual para sincronización
   currentProjectId: string | null;
   
@@ -160,6 +144,9 @@ export interface WorldState {
   transformMode: 'translate' | 'rotate' | 'scale';
   isEditingEffectZone: boolean; // Nuevo estado para indicar cuando se está editando una zona de efectos
   
+  // Estado para bloquear sincronización durante transformaciones
+  isSyncLocked: boolean;
+  
   // World management (placeholder implementation)
   worlds: Array<{ id: string; name: string }>;
   currentWorldId: string | null;
@@ -167,16 +154,6 @@ export interface WorldState {
 
 // Acciones disponibles en el store
 export interface WorldActions {
-  // Acciones para cuadrículas - Delegadas al useGridStore
-  moveToGrid: (coordinates: [number, number, number]) => void;
-  loadGrid: (coordinates: [number, number, number]) => void;
-  unloadGrid: (coordinates: [number, number, number]) => void;
-  getGridKey: (coordinates: [number, number, number]) => string;
-  getAdjacentGrids: () => Array<[number, number, number]>;
-  
-  // Acciones para manipulación de cuadrículas - Delegadas al useGridStore
-  createGrid: (position: [number, number, number], size?: number) => void;
-  selectGrid: (gridId: string | null) => void;
   
   // Acciones para proyecto actual
   setCurrentProjectId: (projectId: string | null) => void;
@@ -186,16 +163,10 @@ export interface WorldActions {
   createWorld: (name: string) => void;
   deleteWorld: (id: string) => void;
   switchWorld: (id: string) => void;
-  updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => void;
-  deleteGrid: (gridId: string) => void;
-  resizeGrid: (gridId: string, newSize: number) => void;
-  moveGrid: (gridId: string, position: [number, number, number]) => void;
-  rotateGrid: (gridId: string, rotation: [number, number, number]) => void;
-  scaleGrid: (gridId: string, scale: [number, number, number]) => void;
   
   // Acciones para objetos
   addObject: (type: SoundObjectType, position: [number, number, number]) => void;
-  removeObject: (id: string) => void;
+  removeObject: (id: string) => Promise<void>;
   selectEntity: (id: string | null) => void; // Renombrado de selectObject para ser más genérico
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => void;
   toggleObjectAudio: (id: string) => void;
@@ -210,7 +181,7 @@ export interface WorldActions {
   // Nuevas acciones para zonas de efectos
   addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape?: 'sphere' | 'cube') => void;
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
-  removeEffectZone: (id: string) => void;
+  removeEffectZone: (id: string) => Promise<void>;
   toggleLockEffectZone: (id: string) => void;
   // Nuevas acciones para controlar la edición de zonas de efectos
   setEditingEffectZone: (isEditing: boolean) => void;
@@ -220,8 +191,24 @@ export interface WorldActions {
   // Acciones para objetos móviles
   addMobileObject: (position: [number, number, number]) => void;
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => void;
-  removeMobileObject: (id: string) => void;
+  removeMobileObject: (id: string) => Promise<void>;
   updateMobileObjectPosition: (id: string, position: [number, number, number]) => void;
+  
+  // Acciones para el mundo global colaborativo
+  setGlobalStateFromFirestore: (state: GlobalWorldDoc) => void;
+  addGlobalSoundObject: (object: SoundObject) => Promise<void>;
+  updateGlobalSoundObject: (objectId: string, updates: Partial<Omit<SoundObject, 'id'>>) => Promise<void>;
+  removeGlobalSoundObject: (objectId: string) => Promise<void>;
+  toggleGlobalObjectAudio: (objectId: string, forceState?: boolean) => Promise<void>;
+  addGlobalMobileObject: (mobileObject: MobileObject) => Promise<void>;
+  updateGlobalMobileObject: (objectId: string, updates: Partial<Omit<MobileObject, 'id'>>) => Promise<void>;
+  removeGlobalMobileObject: (objectId: string) => Promise<void>;
+  addGlobalEffectZone: (effectZone: EffectZone) => Promise<void>;
+  updateGlobalEffectZone: (zoneId: string, updates: Partial<Omit<EffectZone, 'id'>>) => Promise<void>;
+  removeGlobalEffectZone: (zoneId: string) => Promise<void>;
+  
+  // Acciones para controlar bloqueo de sincronización
+  setSyncLock: (locked: boolean) => void;
 }
 
 // Función helper para obtener parámetros por defecto usando el provider
@@ -234,19 +221,8 @@ const worldStoreFacade = new WorldStoreFacade();
 
 // Creación del store de Zustand
 export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
-  // Estado inicial - Delegado al useGridStore
-  get grids() {
-    return useGridStore.getState().grids;
-  },
-  get currentGridCoordinates() {
-    return useGridStore.getState().currentGridCoordinates;
-  },
-  get activeGridId() {
-    return useGridStore.getState().activeGridId;
-  },
+  // Estado inicial
   currentProjectId: null, // No hay proyecto cargado inicialmente
-  gridSize: 20,
-  renderDistance: 2,
   objects: [],
   mobileObjects: [],
   effectZones: [],
@@ -254,14 +230,16 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   transformMode: 'translate',
   isEditingEffectZone: false,
   
+  // Estado para bloquear sincronización durante transformaciones
+  isSyncLocked: false,
+  
   // World management state
   worlds: [{ id: 'default', name: 'Default World' }],
   currentWorldId: 'default',
 
   // Acción para añadir un nuevo objeto - Delegada al WorldStoreFacade
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
-    const state = get();
-    const activeGridId = state.activeGridId;
+    const activeGridId = useGridStore.getState().activeGridId;
     
     if (!activeGridId) {
       return;
@@ -275,46 +253,60 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     console.log('useWorldStore.addObject: Objeto creado', newObject);
     
     // Actualizar la cuadrícula para reflejar el nuevo objeto
-    const activeGrid = state.grids.get(activeGridId);
+    const activeGrid = useGridStore.getState().grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
         ...activeGrid,
         objects: [...activeGrid.objects, newObject]
       };
       
-      set((state) => ({
-        grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-      }));
+      useGridStore.getState().updateGrid(activeGridId, updatedGrid);
     }
   },
 
   // Acción para eliminar un objeto - Delegada al WorldStoreFacade
-  removeObject: (id: string) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Buscar y eliminar el objeto de todas las cuadrículas
-      for (const [gridId, grid] of newGrids) {
-        const objectIndex = grid.objects.findIndex(obj => obj.id === id);
-        if (objectIndex !== -1) {
-          // Eliminar objeto usando el facade
-          worldStoreFacade.removeObject(id, gridId);
-          
-          const updatedObjects = grid.objects.filter(obj => obj.id !== id);
-          
-          newGrids.set(gridId, {
-            ...grid,
-            objects: updatedObjects
-          });
-          break;
+  removeObject: async (id: string) => {
+    const grids = useGridStore.getState().grids;
+    const activeGridId = useGridStore.getState().activeGridId;
+    
+    // Verificar si estamos en modo global
+    const isGlobalMode = activeGridId === 'global-world';
+    
+    // Buscar y eliminar el objeto de todas las cuadrículas
+    for (const [gridId, grid] of grids) {
+      const objectIndex = grid.objects.findIndex(obj => obj.id === id);
+      if (objectIndex !== -1) {
+        // Eliminar la fuente de sonido del AudioManager
+        try {
+          audioManager.removeSoundSource(id);
+        } catch (error) {
+          console.warn('Error al eliminar fuente de sonido:', error);
         }
+        
+        const updatedObjects = grid.objects.filter(obj => obj.id !== id);
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          objects: updatedObjects
+        });
+        
+        // Si estamos en modo global, también eliminar de Firebase
+        if (isGlobalMode) {
+          try {
+            await firebaseService.removeGlobalSoundObject(id);
+            console.log('Objeto eliminado de Firebase:', id);
+          } catch (error) {
+            console.error('Error al eliminar objeto de Firebase:', error);
+          }
+        }
+        
+        break;
       }
-      
-      return {
-        grids: newGrids,
-        selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
-      };
-    });
+    }
+    
+    set((state) => ({
+      selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
+    }));
   },
 
   // Acción para seleccionar una entidad - Delegada al WorldStoreFacade
@@ -322,103 +314,93 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     // Delegar al facade
     worldStoreFacade.selectEntity(id);
     
-    set((state) => {
-      const newGrids = new Map(state.grids);
+    const grids = useGridStore.getState().grids;
+    
+    // Actualizar la selección en todas las cuadrículas
+    grids.forEach((grid, gridId) => {
+      const updatedObjects = grid.objects.map((obj) => ({
+        ...obj,
+        isSelected: obj.id === id,
+      }));
       
-      // Actualizar la selección en todas las cuadrículas
-      newGrids.forEach((grid, gridId) => {
-        const updatedObjects = grid.objects.map((obj) => ({
-          ...obj,
-          isSelected: obj.id === id,
-        }));
-        
-        const updatedMobileObjects = grid.mobileObjects.map((obj) => ({
-          ...obj,
-          isSelected: obj.id === id,
-        }));
-        
-        const updatedEffectZones = grid.effectZones.map((zone) => ({
-          ...zone,
-          isSelected: zone.id === id,
-        }));
-        
-        newGrids.set(gridId, {
-          ...grid,
-          objects: updatedObjects,
-          mobileObjects: updatedMobileObjects,
-          effectZones: updatedEffectZones,
-        });
+      const updatedMobileObjects = grid.mobileObjects.map((obj) => ({
+        ...obj,
+        isSelected: obj.id === id,
+      }));
+      
+      const updatedEffectZones = grid.effectZones.map((zone) => ({
+        ...zone,
+        isSelected: zone.id === id,
+      }));
+      
+      useGridStore.getState().updateGrid(gridId, {
+        ...grid,
+        objects: updatedObjects,
+        mobileObjects: updatedMobileObjects,
+        effectZones: updatedEffectZones,
       });
-      
-      return {
-        grids: newGrids,
-        selectedEntityId: id,
-        transformMode: id === null ? 'translate' : state.transformMode,
-      };
     });
+    
+    set((state) => ({
+      selectedEntityId: id,
+      transformMode: id === null ? 'translate' : state.transformMode,
+    }));
   },
 
   // Acción para actualizar un objeto - Delegada al WorldStoreFacade
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Buscar el objeto en todas las cuadrículas y actualizarlo
-      for (const [gridId, grid] of newGrids) {
-        const objectIndex = grid.objects.findIndex(obj => obj.id === id);
-        if (objectIndex !== -1) {
-          // Actualizar objeto usando el facade
-          worldStoreFacade.updateObject(id, updates, gridId);
-          
-          const updatedObjects = [...grid.objects];
-          updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
-          
-          // Actualizar la cuadrícula
-          newGrids.set(gridId, {
-            ...grid,
-            objects: updatedObjects
-          });
-          break;
-        }
+    console.log('🎛️ useWorldStore.updateObject llamado', { id, updates });
+    const grids = useGridStore.getState().grids;
+    
+    // Buscar el objeto en todas las cuadrículas y actualizarlo
+    for (const [gridId, grid] of grids) {
+      const objectIndex = grid.objects.findIndex(obj => obj.id === id);
+      if (objectIndex !== -1) {
+        console.log('🎛️ useWorldStore.updateObject: Objeto encontrado en grid', gridId);
+        // Actualizar objeto usando el facade
+        worldStoreFacade.updateObject(id, updates, gridId);
+        
+        const updatedObjects = [...grid.objects];
+        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
+        
+        // Actualizar la cuadrícula
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          objects: updatedObjects
+        });
+        break;
       }
-      
-      return { grids: newGrids };
-    });
+    }
   },
 
   // Acción para activar/desactivar el audio de un objeto - Delegada al WorldStoreFacade
   toggleObjectAudio: (id: string, forceState?: boolean) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       // Delegar al facade
       worldStoreFacade.toggleObjectAudio(id, forceState, gridId);
       
       // Actualizar el estado local
-      set((state) => {
-        const newGrids = new Map(state.grids);
-        const grid = newGrids.get(gridId);
-        if (grid) {
-          const updatedObjects = grid.objects.map((obj) =>
-            obj.id === id ? { ...obj, audioEnabled: forceState !== undefined ? forceState : !obj.audioEnabled } : obj
-          );
-          
-          newGrids.set(gridId, {
-            ...grid,
-            objects: updatedObjects
-          });
-        }
+      const grid = grids.get(gridId);
+      if (grid) {
+        const updatedObjects = grid.objects.map((obj) =>
+          obj.id === id ? { ...obj, audioEnabled: forceState !== undefined ? forceState : !obj.audioEnabled } : obj
+        );
         
-        return { grids: newGrids };
-      });
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          objects: updatedObjects
+        });
+      }
     }
   },
 
   // Acción para disparar una nota percusiva - Delegada al WorldStoreFacade
   triggerObjectNote: (id: string) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectNote(id, gridId);
@@ -427,8 +409,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acción para disparar un objeto percusivo - Delegada al WorldStoreFacade
   triggerObjectPercussion: (id: string) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectPercussion(id, gridId);
@@ -437,8 +419,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acción para disparar una nota con duración específica - Delegada al WorldStoreFacade
   triggerObjectAttackRelease: (id: string) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       worldStoreFacade.triggerObjectAttackRelease(id, gridId);
@@ -447,8 +429,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acción para iniciar el gate - Delegada al WorldStoreFacade
   startObjectGate: (id: string) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       worldStoreFacade.startObjectGate(id, gridId);
@@ -457,8 +439,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acción para detener el gate - Delegada al WorldStoreFacade
   stopObjectGate: (id: string) => {
-    const state = get();
-    const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
+    const grids = useGridStore.getState().grids;
+    const { gridId } = worldStoreFacade.findObjectById(id, grids);
     
     if (gridId) {
       worldStoreFacade.stopObjectGate(id, gridId);
@@ -470,24 +452,21 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     // Limpiar objetos usando el facade
     worldStoreFacade.clearAllObjects();
     
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Limpiar objetos de todas las cuadrículas
-      newGrids.forEach((grid, gridId) => {
-        newGrids.set(gridId, {
-          ...grid,
-          objects: [],
-          mobileObjects: [],
-          effectZones: []
-        });
+    const grids = useGridStore.getState().grids;
+    
+    // Limpiar objetos de todas las cuadrículas
+    grids.forEach((grid, gridId) => {
+      useGridStore.getState().updateGrid(gridId, {
+        ...grid,
+        objects: [],
+        mobileObjects: [],
+        effectZones: []
       });
-      
-      return {
-        grids: newGrids,
-        selectedEntityId: null,
-      };
     });
+    
+    set((state) => ({
+      selectedEntityId: null,
+    }));
   },
 
   // Acción para establecer el modo de transformación - Delegada al WorldStoreFacade
@@ -498,8 +477,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Nuevas acciones para zonas de efectos - Delegadas al WorldStoreFacade
   addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
-    const state = get();
-    const activeGridId = state.activeGridId;
+    const activeGridId = useGridStore.getState().activeGridId;
     
     if (!activeGridId) {
       return;
@@ -509,79 +487,84 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const newEffectZone = worldStoreFacade.createEffectZone(type, position, shape, activeGridId);
     
     // Agregar zona de efecto a la cuadrícula activa
-    const activeGrid = state.grids.get(activeGridId);
+    const activeGrid = useGridStore.getState().grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
         ...activeGrid,
         effectZones: [...activeGrid.effectZones, newEffectZone]
       };
     
-      set((state) => ({
-        grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-      }));
+      useGridStore.getState().updateGrid(activeGridId, updatedGrid);
     }
   },
 
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Buscar la zona de efecto en todas las cuadrículas y actualizarla
-      for (const [gridId, grid] of newGrids) {
-        const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
-        if (zoneIndex !== -1) {
-          // Actualizar zona de efecto usando el facade
-          worldStoreFacade.updateEffectZone(id, updates, gridId);
-          
-          const updatedZones = [...grid.effectZones];
-          updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], ...updates };
-          
-          newGrids.set(gridId, {
-            ...grid,
-            effectZones: updatedZones
-          });
-          break;
-        }
+    const grids = useGridStore.getState().grids;
+    
+    // Buscar la zona de efecto en todas las cuadrículas y actualizarla
+    for (const [gridId, grid] of grids) {
+      const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
+      if (zoneIndex !== -1) {
+        // Actualizar zona de efecto usando el facade
+        worldStoreFacade.updateEffectZone(id, updates, gridId);
+        
+        const updatedZones = [...grid.effectZones];
+        updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], ...updates };
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          effectZones: updatedZones
+        });
+        break;
       }
-      
-      return { grids: newGrids };
-    });
+    }
   },
 
-  removeEffectZone: (id: string) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Buscar y eliminar la zona de efecto de todas las cuadrículas
-      for (const [gridId, grid] of newGrids) {
-        const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
-        if (zoneIndex !== -1) {
-          // Eliminar zona de efecto usando el facade
-          worldStoreFacade.removeEffectZone(id, gridId);
-          
-          const updatedZones = grid.effectZones.filter(zone => zone.id !== id);
-          
-          newGrids.set(gridId, {
-            ...grid,
-            effectZones: updatedZones
-          });
-          break;
+  removeEffectZone: async (id: string) => {
+    const grids = useGridStore.getState().grids;
+    const activeGridId = useGridStore.getState().activeGridId;
+    
+    // Verificar si estamos en modo global
+    const isGlobalMode = activeGridId === 'global-world';
+    
+    // Buscar y eliminar la zona de efecto de todas las cuadrículas
+    for (const [gridId, grid] of grids) {
+      const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
+      if (zoneIndex !== -1) {
+        // Las zonas de efecto no tienen fuentes de sonido que eliminar
+        
+        const updatedZones = grid.effectZones.filter(zone => zone.id !== id);
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          effectZones: updatedZones
+        });
+        
+        // Si estamos en modo global, también eliminar de Firebase
+        if (isGlobalMode) {
+          try {
+            await firebaseService.removeGlobalEffectZone(id);
+            console.log('Zona de efecto eliminada de Firebase:', id);
+          } catch (error) {
+            console.error('Error al eliminar zona de efecto de Firebase:', error);
+          }
         }
+        
+        break;
       }
-      
-      return {
-        grids: newGrids,
-        selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
-      };
-    });
+    }
+    
+    set((state) => ({
+      selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
+    }));
   },
 
   toggleLockEffectZone: (id: string) => {
-    const state = get();
+    const grids = useGridStore.getState().grids;
     let gridId: string | null = null;
     
     // Buscar la zona de efecto en todas las cuadrículas para obtener el gridId
-    for (const [gId, grid] of state.grids) {
+    for (const [gId, grid] of grids) {
       const zone = grid.effectZones.find(zone => zone.id === id);
       if (zone) {
         gridId = gId;
@@ -594,25 +577,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       worldStoreFacade.toggleLockEffectZone(id, gridId);
       
       // Actualizar el estado local
-      set((state) => {
-        const newGrids = new Map(state.grids);
-        
-        for (const [gId, grid] of newGrids) {
-          const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
-          if (zoneIndex !== -1) {
-            const updatedZones = [...grid.effectZones];
-            updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], isLocked: !updatedZones[zoneIndex].isLocked };
-            
-            newGrids.set(gId, {
-              ...grid,
-              effectZones: updatedZones
-            });
-            break;
-          }
+      const grid = grids.get(gridId);
+      if (grid) {
+        const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
+        if (zoneIndex !== -1) {
+          const updatedZones = [...grid.effectZones];
+          updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], isLocked: !updatedZones[zoneIndex].isLocked };
+          
+          useGridStore.getState().updateGrid(gridId, {
+            ...grid,
+            effectZones: updatedZones
+          });
         }
-        
-        return { grids: newGrids };
-      });
+      }
     }
   },
 
@@ -632,8 +609,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
   // Acciones para objetos móviles - Delegadas al WorldStoreFacade
   addMobileObject: (position: [number, number, number]) => {
-    const state = get();
-    const activeGridId = state.activeGridId;
+    const activeGridId = useGridStore.getState().activeGridId;
     
     if (!activeGridId) {
       return;
@@ -643,187 +619,112 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     const newMobileObject = worldStoreFacade.createMobileObject(position);
 
     // Agregar objeto móvil a la cuadrícula activa
-    const activeGrid = state.grids.get(activeGridId);
+    const activeGrid = useGridStore.getState().grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
         ...activeGrid,
         mobileObjects: [...activeGrid.mobileObjects, newMobileObject]
       };
 
-      set((state) => {
-        const newGrids = new Map(state.grids);
-        newGrids.set(activeGridId, updatedGrid);
-        return { grids: newGrids };
-      });
+      useGridStore.getState().updateGrid(activeGridId, updatedGrid);
     }
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Actualizar objeto móvil usando el facade
-      worldStoreFacade.updateMobileObject(id, updates, newGrids);
-      
-      // Buscar el objeto móvil en todas las cuadrículas y actualizarlo
-      for (const [gridId, grid] of newGrids) {
-        const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
-        if (objectIndex !== -1) {
-          const updatedObjects = [...grid.mobileObjects];
-          updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
-          
-          newGrids.set(gridId, {
-            ...grid,
-            mobileObjects: updatedObjects
-          });
-          break;
-        }
+    const grids = useGridStore.getState().grids;
+    
+    // Actualizar objeto móvil usando el facade
+    worldStoreFacade.updateMobileObject(id, updates, grids);
+    
+    // Buscar el objeto móvil en todas las cuadrículas y actualizarlo
+    for (const [gridId, grid] of grids) {
+      const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
+      if (objectIndex !== -1) {
+        const updatedObjects = [...grid.mobileObjects];
+        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          mobileObjects: updatedObjects
+        });
+        break;
       }
-      
-      return { grids: newGrids };
-    });
+    }
   },
 
-  removeMobileObject: (id: string) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Eliminar objeto móvil usando el facade
-      worldStoreFacade.removeMobileObject(id, newGrids);
-      
-      // Buscar y eliminar el objeto móvil de todas las cuadrículas
-      for (const [gridId, grid] of newGrids) {
-        const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
-        if (objectIndex !== -1) {
-          const updatedObjects = grid.mobileObjects.filter(obj => obj.id !== id);
-          
-          newGrids.set(gridId, {
-            ...grid,
-            mobileObjects: updatedObjects
-          });
-          break;
+  removeMobileObject: async (id: string) => {
+    const grids = useGridStore.getState().grids;
+    const activeGridId = useGridStore.getState().activeGridId;
+    
+    // Verificar si estamos en modo global
+    const isGlobalMode = activeGridId === 'global-world';
+    
+    // Eliminar la fuente de sonido del AudioManager si existe
+    try {
+      audioManager.removeSoundSource(id);
+    } catch (error) {
+      console.warn('Error al eliminar fuente de sonido móvil:', error);
+    }
+    
+    // Buscar y eliminar el objeto móvil de todas las cuadrículas
+    for (const [gridId, grid] of grids) {
+      const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
+      if (objectIndex !== -1) {
+        const updatedObjects = grid.mobileObjects.filter(obj => obj.id !== id);
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          mobileObjects: updatedObjects
+        });
+        
+        // Si estamos en modo global, también eliminar de Firebase
+        if (isGlobalMode) {
+          try {
+            await firebaseService.removeGlobalMobileObject(id);
+            console.log('Objeto móvil eliminado de Firebase:', id);
+          } catch (error) {
+            console.error('Error al eliminar objeto móvil de Firebase:', error);
+          }
         }
+        
+        break;
       }
-      
-      return {
-        grids: newGrids,
+    }
+    
+    set((state) => ({
       selectedEntityId: state.selectedEntityId === id ? null : state.selectedEntityId,
-      };
-    });
+    }));
   },
 
   updateMobileObjectPosition: (id: string, position: [number, number, number]) => {
-    set((state) => {
-      const newGrids = new Map(state.grids);
-      
-      // Actualizar posición usando el facade
-      worldStoreFacade.updateMobileObjectPosition(id, position, newGrids);
-      
-      // Buscar el objeto móvil en todas las cuadrículas y actualizar su posición
-      for (const [gridId, grid] of newGrids) {
-        const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
-        if (objectIndex !== -1) {
-          const updatedObjects = [...grid.mobileObjects];
-          updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], position };
-          
-          newGrids.set(gridId, {
-            ...grid,
-            mobileObjects: updatedObjects
-          });
-          break;
-        }
+    const grids = useGridStore.getState().grids;
+    
+    // Actualizar posición usando el facade
+    worldStoreFacade.updateMobileObjectPosition(id, position, grids);
+    
+    // Buscar el objeto móvil en todas las cuadrículas y actualizar su posición
+    for (const [gridId, grid] of grids) {
+      const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === id);
+      if (objectIndex !== -1) {
+        const updatedObjects = [...grid.mobileObjects];
+        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], position };
+        
+        useGridStore.getState().updateGrid(gridId, {
+          ...grid,
+          mobileObjects: updatedObjects
+        });
+        break;
       }
-      
-      return { grids: newGrids };
-    });
+    }
   },
 
-  // Acciones para cuadrículas - Delegadas al useGridStore
-  getGridKey: (coordinates: [number, number, number]) => {
-    return useGridStore.getState().getGridKey(coordinates);
-  },
 
-  loadGrid: (coordinates: [number, number, number]) => {
-    useGridStore.getState().loadGrid(coordinates);
-    
-    // Sincronizar el estado local
-    const gridStoreState = useGridStore.getState();
-    set(() => ({
-      grids: new Map(gridStoreState.grids)
-    }));
-  },
-
-  unloadGrid: (coordinates: [number, number, number]) => {
-    useGridStore.getState().unloadGrid(coordinates);
-  },
-
-  moveToGrid: (coordinates: [number, number, number]) => {
-    useGridStore.getState().moveToGrid(coordinates);
-    
-    // Sincronizar el estado local
-    const gridStoreState = useGridStore.getState();
-    set(() => ({
-      grids: new Map(gridStoreState.grids),
-      currentGridCoordinates: gridStoreState.currentGridCoordinates,
-      activeGridId: gridStoreState.activeGridId
-    }));
-    // Deseleccionar al cambiar de cuadrícula
-    set(() => ({
-      selectedEntityId: null,
-    }));
-  },
-
-  getAdjacentGrids: () => {
-    return useGridStore.getState().getAdjacentGrids();
-  },
-
-  // Acciones para manipulación de cuadrículas - Delegadas al useGridStore
-  createGrid: (position: [number, number, number], size: number = 20) => {
-    useGridStore.getState().createGrid(position, size);
-    
-    // Sincronizar el estado local con el useGridStore
-    const gridStoreState = useGridStore.getState();
-    set(() => ({
-      grids: new Map(gridStoreState.grids),
-      currentGridCoordinates: gridStoreState.currentGridCoordinates,
-      activeGridId: gridStoreState.activeGridId,
-      gridSize: gridStoreState.gridSize
-    }));
-    
+  setActiveGrid: (gridId: string | null) => {
+    useGridStore.getState().setActiveGrid(gridId);
   },
 
   selectGrid: (gridId: string | null) => {
     useGridStore.getState().selectGrid(gridId);
-    
-    // Sincronizar el estado local
-    const gridStoreState = useGridStore.getState();
-    set(() => ({
-      grids: new Map(gridStoreState.grids),
-      activeGridId: gridStoreState.activeGridId
-    }));
-  },
-
-  setActiveGrid: (gridId: string | null) => {
-    useGridStore.getState().setActiveGrid(gridId);
-    set(() => ({
-      activeGridId: gridId,
-    }));
-  },
-
-  updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => {
-    useGridStore.getState().updateGrid(gridId, updates);
-  },
-
-  deleteGrid: (gridId: string) => {
-    useGridStore.getState().deleteGrid(gridId);
-  },
-
-  resizeGrid: (gridId: string, newSize: number) => {
-    useGridStore.getState().resizeGrid(gridId, newSize);
-  },
-
-  moveGrid: (gridId: string, position: [number, number, number]) => {
-    useGridStore.getState().moveGrid(gridId, position);
   },
 
   // Acción para establecer el proyecto actual
@@ -831,13 +732,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     set({ currentProjectId: projectId });
   },
 
-  rotateGrid: (gridId: string, rotation: [number, number, number]) => {
-    useGridStore.getState().rotateGrid(gridId, rotation);
-  },
-
-  scaleGrid: (gridId: string, scale: [number, number, number]) => {
-    useGridStore.getState().scaleGrid(gridId, scale);
-  },
 
   // World management functions - Delegadas al WorldStoreFacade
   createWorld: (name: string) => {
@@ -866,6 +760,647 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     if (success) {
       set({ currentWorldId: worldStoreFacade.getCurrentWorld()?.id || null });
     }
+  },
+
+  // ===== ACCIONES PARA EL MUNDO GLOBAL COLABORATIVO =====
+
+  // Establecer el estado global desde Firestore
+  setGlobalStateFromFirestore: (state: GlobalWorldDoc) => {
+    // Verificar si la sincronización está bloqueada
+    const currentState = get();
+    if (currentState.isSyncLocked) {
+      console.log('🔒 Ignorando actualización de Firestore - sincronización bloqueada');
+      return;
+    }
+    
+    // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Recibiendo estado de Firebase', state);
+    set((currentState) => {
+      // Limpiar todas las fuentes de sonido existentes del AudioManager
+      try {
+        // Obtener todos los IDs de objetos existentes
+        const existingObjectIds = new Set<string>();
+        const grids = useGridStore.getState().grids;
+        grids.forEach((grid: Grid) => {
+          grid.objects.forEach((obj: SoundObject) => existingObjectIds.add(obj.id));
+          grid.mobileObjects.forEach((obj: MobileObject) => existingObjectIds.add(obj.id));
+        });
+
+        // Eliminar fuentes de sonido que ya no existen en el nuevo estado
+        const newObjectIds = new Set<string>();
+        (state.objects || []).forEach(obj => newObjectIds.add(obj.id));
+        (state.mobileObjects || []).forEach(obj => newObjectIds.add(obj.id));
+
+        existingObjectIds.forEach(id => {
+          if (!newObjectIds.has(id)) {
+            try {
+              audioManager.removeSoundSource(id);
+            } catch (error) {
+              console.warn('Error al limpiar fuente de sonido:', error);
+            }
+          }
+        });
+
+        // Crear fuentes de sonido para objetos nuevos y actualizar parámetros de objetos existentes
+        (state.objects || []).forEach(obj => {
+          try {
+            // Verificar si el objeto ya existe en el AudioManager
+            const existingSource = audioManager.getSoundSourceState(obj.id);
+            
+            if (existingSource) {
+              // Objeto existe - actualizar parámetros de audio
+              // console.log('🎵 Actualizando parámetros de audio para objeto existente:', obj.id, obj.audioParams);
+              audioManager.updateSoundParams(obj.id, obj.audioParams);
+              
+              // Actualizar posición si cambió
+              audioManager.updateSoundPosition(obj.id, obj.position);
+              
+              // VERIFICAR SI HAY UNA ACTUALIZACIÓN OPTIMISTA PENDIENTE
+              const currentLocalObject = get().objects.find(localObj => localObj.id === obj.id);
+              if (currentLocalObject && currentLocalObject._pendingUpdate) {
+                console.log('🎵 Ignorando actualización de Firestore para objeto con cambio pendiente:', obj.id);
+                return; // No sobrescribir cambios locales pendientes
+              }
+              
+              // Manejar estado de audio (habilitado/deshabilitado)
+              const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(obj.type);
+              
+              // Solo activar audio si no es percusivo y está habilitado
+              if (obj.audioEnabled && !isPercussiveObject) {
+                // Verificar si el audio ya está activo para evitar reactivación innecesaria
+                const sourceExists = audioManager.getSoundSourceState(obj.id);
+                if (!sourceExists) {
+                  console.log('🎵 Activando audio continuo desde Firestore para:', obj.id);
+                  audioManager.startContinuousSound(obj.id, obj.audioParams);
+                }
+              } else {
+                // Si el audio está deshabilitado o es percusivo, detener el sonido
+                console.log('🎵 Desactivando audio desde Firestore para:', obj.id);
+                audioManager.stopSound(obj.id);
+              }
+            } else {
+              // Objeto nuevo - crear fuente de sonido
+              // console.log('🎵 Creando nueva fuente de sonido:', obj.id, obj.audioParams);
+              audioManager.createSoundSource(
+                obj.id,
+                obj.type,
+                obj.audioParams,
+                obj.position
+              );
+              
+              // Iniciar sonido continuo si está habilitado y no es percusivo
+              const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(obj.type);
+              if (obj.audioEnabled && !isPercussiveObject) {
+                console.log('🎵 Activando audio continuo para objeto nuevo:', obj.id);
+                audioManager.startContinuousSound(obj.id, obj.audioParams);
+              }
+            }
+          } catch (error) {
+            console.warn('Error al sincronizar fuente de sonido:', error);
+          }
+        });
+      } catch (error) {
+        console.warn('Error al sincronizar AudioManager:', error);
+      }
+
+      // Crear una cuadrícula global con los objetos del mundo global
+      const globalGridId = 'global-world';
+      const globalGrid = {
+        id: globalGridId,
+        coordinates: state.currentGridCoordinates || [0, 0, 0],
+        position: [0, 0, 0] as [number, number, number],
+        rotation: [0, 0, 0] as [number, number, number],
+        scale: [1, 1, 1] as [number, number, number],
+        objects: state.objects || [],
+        mobileObjects: state.mobileObjects || [],
+        effectZones: state.effectZones || [],
+        gridSize: 20,
+        gridColor: '#404040',
+        isLoaded: true,
+        isSelected: false
+      };
+
+      // Actualizar solo la cuadrícula global sin limpiar las demás
+      // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Actualizando cuadrícula global', globalGrid);
+      useGridStore.getState().updateGrid(globalGridId, globalGrid);
+      
+      // Solo cambiar a la cuadrícula global si no hay una activa o si estamos en modo global
+      const currentActiveGridId = useGridStore.getState().activeGridId;
+      if (!currentActiveGridId || currentActiveGridId === globalGridId) {
+        // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Cambiando a cuadrícula global');
+        useGridStore.getState().setActiveGrid(globalGridId);
+      }
+
+      return {
+        objects: state.objects || [],
+        mobileObjects: state.mobileObjects || [],
+        effectZones: state.effectZones || []
+      };
+    });
+  },
+
+  // Agregar un objeto sonoro al mundo global
+  addGlobalSoundObject: async (object: SoundObject) => {
+    try {
+      // Agregar al estado local primero
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedGrid = {
+          ...globalGrid,
+          objects: [...globalGrid.objects, object]
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        objects: [...state.objects, object]
+      }));
+
+      // Sincronizar con Firestore
+      await firebaseService.addGlobalSoundObject(object);
+    } catch (error) {
+      console.error('Error al agregar objeto global:', error);
+      throw error;
+    }
+  },
+
+  // Actualizar un objeto sonoro en el mundo global
+  updateGlobalSoundObject: async (objectId: string, updates: Partial<Omit<SoundObject, 'id'>>) => {
+    console.log('🎛️ useWorldStore.updateGlobalSoundObject llamado', { objectId, updates });
+    try {
+      // ACTUALIZACIÓN OPTIMISTA: Actualizar estado local INMEDIATAMENTE
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        console.log('🎛️ useWorldStore.updateGlobalSoundObject: Cuadrícula global encontrada');
+        const updatedObjects = globalGrid.objects.map(obj => 
+          obj.id === objectId ? { ...obj, ...updates, _pendingUpdate: true } : obj
+        );
+        
+        const updatedGrid = {
+          ...globalGrid,
+          objects: updatedObjects
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        objects: state.objects.map(obj => 
+          obj.id === objectId ? { ...obj, ...updates, _pendingUpdate: true } : obj
+        )
+      }));
+
+      // Actualizar parámetros en el AudioManager
+      try {
+        if (updates.position) {
+          console.log('🎛️ useWorldStore.updateGlobalSoundObject: Actualizando posición en AudioManager');
+          audioManager.updateSoundPosition(objectId, updates.position);
+        }
+        if (updates.audioParams) {
+          console.log('🎛️ useWorldStore.updateGlobalSoundObject: Actualizando parámetros de audio en AudioManager', updates.audioParams);
+          audioManager.updateSoundParams(objectId, updates.audioParams);
+        }
+        if (updates.audioEnabled !== undefined) {
+          if (updates.audioEnabled) {
+            // Obtener el objeto actualizado para obtener los parámetros de audio
+            const globalGrid = useGridStore.getState().grids.get('global-world');
+            const updatedObject = globalGrid?.objects.find(obj => obj.id === objectId);
+            if (updatedObject) {
+              audioManager.startContinuousSound(objectId, updatedObject.audioParams);
+            }
+          } else {
+            audioManager.stopSound(objectId);
+          }
+        }
+      } catch (audioError) {
+        console.error('Error al actualizar AudioManager:', audioError);
+        // No lanzar el error para no interrumpir la sincronización con Firestore
+      }
+
+      // Sincronizar con Firestore (sin esperar respuesta)
+      console.log('🎛️ Sincronizando con Firestore (optimistic)');
+      firebaseService.updateGlobalSoundObject(objectId, updates)
+        .then(() => {
+          console.log('🎛️ Firestore confirmó el cambio para:', objectId);
+          // Marcar como sincronizado
+          const globalGridForConfirm = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForConfirm) {
+            const confirmedObjects = globalGridForConfirm.objects.map(obj => 
+              obj.id === objectId ? { ...obj, _pendingUpdate: false } : obj
+            );
+            
+            const confirmedGrid = {
+              ...globalGridForConfirm,
+              objects: confirmedObjects
+            };
+            
+            useGridStore.getState().updateGrid(globalGridId, confirmedGrid);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al sincronizar con Firestore:', error);
+          // Revertir cambio si falla
+          const globalGridForRevert = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForRevert) {
+            const originalObject = globalGridForRevert.objects.find(obj => obj.id === objectId);
+            if (originalObject) {
+              const revertedObjects = globalGridForRevert.objects.map(obj => 
+                obj.id === objectId ? { ...originalObject, _pendingUpdate: false } : obj
+              );
+              
+              const revertedGrid = {
+                ...globalGridForRevert,
+                objects: revertedObjects
+              };
+              
+              useGridStore.getState().updateGrid(globalGridId, revertedGrid);
+            }
+          }
+        });
+    } catch (error) {
+      console.error('Error al actualizar objeto global:', error);
+      throw error;
+    }
+  },
+
+  // Activar/desactivar audio de un objeto en el mundo global
+  toggleGlobalObjectAudio: async (objectId: string, forceState?: boolean) => {
+    try {
+      console.log('🎵 toggleGlobalObjectAudio iniciado para:', objectId, 'forceState:', forceState);
+      
+      // Obtener el objeto actual para determinar el nuevo estado
+      const globalGrid = useGridStore.getState().grids.get('global-world');
+      const currentObject = globalGrid?.objects.find(obj => obj.id === objectId);
+      
+      if (!currentObject) {
+        console.error('Objeto no encontrado:', objectId);
+        return;
+      }
+
+      // Determinar el nuevo estado del audio
+      const newAudioEnabled = forceState !== undefined ? forceState : !currentObject.audioEnabled;
+      console.log('🎵 Cambiando audio de', currentObject.audioEnabled, 'a', newAudioEnabled);
+
+      // ACTUALIZACIÓN OPTIMISTA: Actualizar estado local INMEDIATAMENTE
+      const globalGridId = 'global-world';
+      const globalGridForUpdate = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGridForUpdate) {
+        const updatedObjects = globalGridForUpdate.objects.map(obj => 
+          obj.id === objectId ? { ...obj, audioEnabled: newAudioEnabled, _pendingUpdate: true } : obj
+        );
+        
+        const updatedGrid = {
+          ...globalGridForUpdate,
+          objects: updatedObjects
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        objects: state.objects.map(obj => 
+          obj.id === objectId ? { ...obj, audioEnabled: newAudioEnabled, _pendingUpdate: true } : obj
+        )
+      }));
+
+      // Actualizar en el AudioManager
+      try {
+        if (newAudioEnabled) {
+          // Activar audio continuo
+          console.log('🎵 Activando audio continuo en AudioManager');
+          audioManager.startContinuousSound(objectId, currentObject.audioParams);
+        } else {
+          // Desactivar audio continuo
+          console.log('🎵 Desactivando audio continuo en AudioManager');
+          audioManager.stopSound(objectId);
+        }
+      } catch (audioError) {
+        console.error('Error al actualizar AudioManager:', audioError);
+      }
+
+      // Sincronizar con Firestore (sin esperar respuesta)
+      console.log('🎵 Sincronizando con Firestore (optimistic)');
+      firebaseService.updateGlobalSoundObject(objectId, { audioEnabled: newAudioEnabled })
+        .then(() => {
+          console.log('🎵 Firestore confirmó el cambio para:', objectId);
+          // Marcar como sincronizado
+          const globalGridForConfirm = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForConfirm) {
+            const confirmedObjects = globalGridForConfirm.objects.map(obj => 
+              obj.id === objectId ? { ...obj, _pendingUpdate: false } : obj
+            );
+            
+            const confirmedGrid = {
+              ...globalGridForConfirm,
+              objects: confirmedObjects
+            };
+            
+            useGridStore.getState().updateGrid(globalGridId, confirmedGrid);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al sincronizar con Firestore:', error);
+          // Revertir cambio si falla
+          const globalGridForRevert = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForRevert) {
+            const revertedObjects = globalGridForRevert.objects.map(obj => 
+              obj.id === objectId ? { ...obj, audioEnabled: currentObject.audioEnabled, _pendingUpdate: false } : obj
+            );
+            
+            const revertedGrid = {
+              ...globalGridForRevert,
+              objects: revertedObjects
+            };
+            
+            useGridStore.getState().updateGrid(globalGridId, revertedGrid);
+          }
+        });
+
+      console.log('🎵 toggleGlobalObjectAudio completado exitosamente');
+    } catch (error) {
+      console.error('Error al cambiar estado de audio global:', error);
+      throw error;
+    }
+  },
+
+  // Eliminar un objeto sonoro del mundo global
+  removeGlobalSoundObject: async (objectId: string) => {
+    try {
+      // Eliminar del AudioManager primero
+      try {
+        audioManager.removeSoundSource(objectId);
+      } catch (audioError) {
+        console.warn('Error al eliminar fuente de sonido del AudioManager:', audioError);
+      }
+
+      // Eliminar del estado local
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedObjects = globalGrid.objects.filter(obj => obj.id !== objectId);
+        
+        const updatedGrid = {
+          ...globalGrid,
+          objects: updatedObjects
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        objects: state.objects.filter(obj => obj.id !== objectId),
+        selectedEntityId: state.selectedEntityId === objectId ? null : state.selectedEntityId
+      }));
+
+      // Sincronizar con Firestore
+      await firebaseService.removeGlobalSoundObject(objectId);
+    } catch (error) {
+      console.error('Error al eliminar objeto global:', error);
+      throw error;
+    }
+  },
+
+  // Agregar un objeto móvil al mundo global
+  addGlobalMobileObject: async (mobileObject: MobileObject) => {
+    try {
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedGrid = {
+          ...globalGrid,
+          mobileObjects: [...globalGrid.mobileObjects, mobileObject]
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        mobileObjects: [...state.mobileObjects, mobileObject]
+      }));
+
+      await firebaseService.addGlobalMobileObject(mobileObject);
+    } catch (error) {
+      console.error('Error al agregar objeto móvil global:', error);
+      throw error;
+    }
+  },
+
+  // Actualizar un objeto móvil en el mundo global
+  updateGlobalMobileObject: async (objectId: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
+    try {
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedObjects = globalGrid.mobileObjects.map((obj: MobileObject) => 
+          obj.id === objectId ? { ...obj, ...updates } : obj
+        );
+        
+        const updatedGrid = {
+          ...globalGrid,
+          mobileObjects: updatedObjects
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        mobileObjects: state.mobileObjects.map(obj => 
+          obj.id === objectId ? { ...obj, ...updates } : obj
+        )
+      }));
+
+      await firebaseService.updateGlobalMobileObject(objectId, updates);
+    } catch (error) {
+      console.error('Error al actualizar objeto móvil global:', error);
+      throw error;
+    }
+  },
+
+  // Eliminar un objeto móvil del mundo global
+  removeGlobalMobileObject: async (objectId: string) => {
+    try {
+      // Eliminar del AudioManager si es necesario
+      try {
+        audioManager.removeSoundSource(objectId);
+      } catch (audioError) {
+        console.warn('Error al eliminar fuente de sonido del AudioManager:', audioError);
+      }
+
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedObjects = globalGrid.mobileObjects.filter((obj: MobileObject) => obj.id !== objectId);
+        
+        const updatedGrid = {
+          ...globalGrid,
+          mobileObjects: updatedObjects
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        mobileObjects: state.mobileObjects.filter(obj => obj.id !== objectId),
+        selectedEntityId: state.selectedEntityId === objectId ? null : state.selectedEntityId
+      }));
+
+      await firebaseService.removeGlobalMobileObject(objectId);
+    } catch (error) {
+      console.error('Error al eliminar objeto móvil global:', error);
+      throw error;
+    }
+  },
+
+  // Agregar una zona de efecto al mundo global
+  addGlobalEffectZone: async (effectZone: EffectZone) => {
+    try {
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedGrid = {
+          ...globalGrid,
+          effectZones: [...globalGrid.effectZones, effectZone]
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        effectZones: [...state.effectZones, effectZone]
+      }));
+
+      await firebaseService.addGlobalEffectZone(effectZone);
+    } catch (error) {
+      console.error('Error al agregar zona de efecto global:', error);
+      throw error;
+    }
+  },
+
+  // Actualizar una zona de efecto en el mundo global
+  updateGlobalEffectZone: async (zoneId: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
+    try {
+      console.log('🎛️ useWorldStore.updateGlobalEffectZone llamado', { zoneId, updates });
+      
+      // ACTUALIZACIÓN OPTIMISTA: Actualizar estado local INMEDIATAMENTE
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedZones = globalGrid.effectZones.map((zone: EffectZone) => 
+          zone.id === zoneId ? { ...zone, ...updates, _pendingUpdate: true } : zone
+        );
+        
+        const updatedGrid = {
+          ...globalGrid,
+          effectZones: updatedZones
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        effectZones: state.effectZones.map(zone => 
+          zone.id === zoneId ? { ...zone, ...updates, _pendingUpdate: true } : zone
+        )
+      }));
+
+      // Sincronizar con Firestore (sin esperar respuesta)
+      console.log('🎛️ Sincronizando zona de efecto con Firestore (optimistic)');
+      firebaseService.updateGlobalEffectZone(zoneId, updates)
+        .then(() => {
+          console.log('🎛️ Firestore confirmó el cambio de zona de efecto para:', zoneId);
+          // Marcar como sincronizado
+          const globalGridForConfirm = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForConfirm) {
+            const confirmedZones = globalGridForConfirm.effectZones.map((zone: EffectZone) => 
+              zone.id === zoneId ? { ...zone, _pendingUpdate: false } : zone
+            );
+            
+            const confirmedGrid = {
+              ...globalGridForConfirm,
+              effectZones: confirmedZones
+            };
+            
+            useGridStore.getState().updateGrid(globalGridId, confirmedGrid);
+          }
+        })
+        .catch((error) => {
+          console.error('Error al sincronizar zona de efecto con Firestore:', error);
+          // Revertir cambio si falla
+          const globalGridForRevert = useGridStore.getState().grids.get(globalGridId);
+          if (globalGridForRevert) {
+            const originalZone = globalGridForRevert.effectZones.find((zone: EffectZone) => zone.id === zoneId);
+            if (originalZone) {
+              const revertedZones = globalGridForRevert.effectZones.map((zone: EffectZone) => 
+                zone.id === zoneId ? { ...originalZone, _pendingUpdate: false } : zone
+              );
+              
+              const revertedGrid = {
+                ...globalGridForRevert,
+                effectZones: revertedZones
+              };
+              
+              useGridStore.getState().updateGrid(globalGridId, revertedGrid);
+            }
+          }
+        });
+    } catch (error) {
+      console.error('Error al actualizar zona de efecto global:', error);
+      throw error;
+    }
+  },
+
+  // Eliminar una zona de efecto del mundo global
+  removeGlobalEffectZone: async (zoneId: string) => {
+    try {
+      // Eliminar del EffectManager si es necesario
+      try {
+        // Usar el facade para eliminar la zona de efecto
+        worldStoreFacade.removeEffectZone(zoneId, 'global-world');
+      } catch (effectError) {
+        console.warn('Error al eliminar zona de efecto del EffectManager:', effectError);
+      }
+
+      const globalGridId = 'global-world';
+      const globalGrid = useGridStore.getState().grids.get(globalGridId);
+      
+      if (globalGrid) {
+        const updatedZones = globalGrid.effectZones.filter((zone: EffectZone) => zone.id !== zoneId);
+        
+        const updatedGrid = {
+          ...globalGrid,
+          effectZones: updatedZones
+        };
+        
+        useGridStore.getState().updateGrid(globalGridId, updatedGrid);
+      }
+      
+      set((state) => ({
+        effectZones: state.effectZones.filter(zone => zone.id !== zoneId),
+        selectedEntityId: state.selectedEntityId === zoneId ? null : state.selectedEntityId
+      }));
+
+      await firebaseService.removeGlobalEffectZone(zoneId);
+    } catch (error) {
+      console.error('Error al eliminar zona de efecto global:', error);
+      throw error;
+    }
+  },
+
+  // Acción para controlar bloqueo de sincronización
+  setSyncLock: (locked: boolean) => {
+    console.log('🔒 Cambiando estado de bloqueo de sincronización:', locked);
+    set({ isSyncLocked: locked });
   },
 
 }));

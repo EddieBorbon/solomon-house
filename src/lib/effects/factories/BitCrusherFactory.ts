@@ -15,9 +15,11 @@ export class BitCrusherFactory implements IEffectFactory {
    */
   createEffect(): EffectNode {
     const effectNode = new Tone.BitCrusher({
-      bits: 4,        // Reducir bits para efecto audible
-      wet: 0.5        // Mezcla entre señal seca y procesada
+      bits: 4        // Reducir bits para efecto audible
     });
+    
+    // Configurar wet después de la creación
+    effectNode.wet.value = 0.5;
 
     console.log(`🎛️ BitCrusherFactory: BitCrusher creado con parámetros iniciales:`, {
       bits: effectNode.bits,

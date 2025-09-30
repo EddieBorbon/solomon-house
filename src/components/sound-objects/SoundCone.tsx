@@ -22,7 +22,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo
     
-    const { triggerObjectNote, selectEntity } = useWorldStore();
+    const { triggerObjectAttackRelease, selectEntity } = useWorldStore();
 
     // Animación del golpe percusivo
     useFrame((state, delta) => {
@@ -64,10 +64,10 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
 
       // Solo ejecutar animaciones cuando el audio está activo o hay energía de clic
       if (audioEnabled || energyRef.current > 0) {
-        // Rotación automática
+        // Rotación automática - conos rotan sobre el eje Z (horizontal)
         if (audioParams.autoRotate) {
           const rotationSpeed = audioParams.rotationSpeed || 1.0;
-          meshRef.current.rotation.y += (rotationSpeed * 0.01);
+          meshRef.current.rotation.z += (rotationSpeed * 0.01);
         }
         
         // Efecto de pulsación basado en pulseSpeed y pulseIntensity
@@ -87,7 +87,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
-      triggerObjectNote(id);
+      triggerObjectAttackRelease(id);
       
       // Activar la animación de golpe
       energyRef.current = 1;

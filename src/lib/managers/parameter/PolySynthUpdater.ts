@@ -94,11 +94,13 @@ export class PolySynthUpdater extends BaseSynthesizerUpdater {
         result.updatedParams.push('chord');
       }
 
-      // Actualizar curve si cambia
+      // Actualizar curve si cambia - incluir en voiceOptions
       if (params.curve !== undefined) {
-        const curveOptions = { envelope: { curve: params.curve } };
-        synth.set(curveOptions);
-        result.updatedParams.push('curve');
+        if (!voiceOptions.envelope) {
+          voiceOptions.envelope = {};
+        }
+        (voiceOptions.envelope as { curve: Tone.EnvelopeCurve }).curve = params.curve as Tone.EnvelopeCurve;
+        hasVoiceOptions = true;
       }
 
       // Parámetros comunes

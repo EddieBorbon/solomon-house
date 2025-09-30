@@ -19,6 +19,7 @@ export interface SoundObject extends BaseEntity {
   type: SoundObjectType;
   audioParams: AudioParams;
   audioEnabled: boolean;
+  _pendingUpdate?: boolean; // Bandera para actualizaciones optimistas
 }
 
 // Interfaz para objetos móviles
@@ -36,6 +37,8 @@ export interface MobileObject extends BaseEntity {
     amplitude: number;
     frequency: number;
     randomSeed: number;
+    height: number; // Para movimiento vertical en movimientos circulares/polares
+    heightSpeed: number; // Velocidad del movimiento vertical
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
   };
@@ -47,6 +50,7 @@ export interface EffectZone extends BaseEntity {
   shape: 'sphere' | 'cube';
   isLocked: boolean;
   effectParams: Record<string, unknown>;
+  _pendingUpdate?: boolean; // Bandera para actualizaciones optimistas
 }
 
 // Interfaz para cuadrículas

@@ -11,9 +11,11 @@ import { type MobileObjectParams } from '../sound-objects/MobileObject';
 interface MobileObjectEditorProps {
   mobileObject: {
     id: string;
+    type: 'mobile';
     position: [number, number, number];
     rotation: [number, number, number];
     scale: [number, number, number];
+    isSelected: boolean;
     mobileParams: MobileObjectParams;
   };
   onRemove: (id: string) => void;
@@ -23,7 +25,7 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
   const { updateMobileObject } = useWorldStore();
   const { updateTransform, resetTransform, roundToDecimals } = useTransformHandler();
 
-  const handleParamChange = (param: string, value: any) => {
+  const handleParamChange = (param: string, value: string | number | boolean | [number, number, number]) => {
     updateMobileObject(mobileObject.id, {
       mobileParams: {
         ...mobileObject.mobileParams,
@@ -33,11 +35,11 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
   };
 
   const handleTransformChange = (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {
-    updateTransform(mobileObject.id, property, axis, value);
+    updateTransform(property, axis, value);
   };
 
   const handleResetTransform = () => {
-    resetTransform(mobileObject.id);
+    resetTransform();
   };
 
   return (

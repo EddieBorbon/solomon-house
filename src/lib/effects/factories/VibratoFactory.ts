@@ -20,9 +20,6 @@ export class VibratoFactory implements IEffectFactory {
       wet: 0.5         // Mezcla entre señal seca y procesada
     });
 
-    // Iniciar el vibrato
-    effectNode.start();
-
     console.log(`🎛️ VibratoFactory: Vibrato creado con parámetros iniciales:`, {
       frequency: effectNode.frequency.value,
       depth: effectNode.depth.value,

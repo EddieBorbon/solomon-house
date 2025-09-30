@@ -15,10 +15,7 @@ import {
   CursorArrowRaysIcon,
   TrashIcon,
   CommandLineIcon,
-  XMarkIcon,
-  PlayIcon,
-  PauseIcon,
-  ExclamationTriangleIcon
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { 
   Box, 

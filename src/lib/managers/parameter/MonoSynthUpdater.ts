@@ -14,7 +14,7 @@ export class MonoSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar parámetros del oscilador
       if (params.waveform !== undefined) {
         console.log('MonoSynthUpdater: Actualizando waveform de', synth.oscillator.type, 'a', params.waveform);
-        synth.oscillator.type = params.waveform as any;
+        synth.oscillator.type = params.waveform as 'sine' | 'square' | 'triangle' | 'sawtooth';
         result.updatedParams.push('waveform');
       }
 
@@ -83,7 +83,7 @@ export class MonoSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar parámetros del filtro
       if (params.filterQ !== undefined) {
         console.log('MonoSynthUpdater: Actualizando filterQ de', synth.filter.Q, 'a', params.filterQ);
-        synth.filter.Q = params.filterQ;
+        synth.filter.set({ Q: params.filterQ });
         result.updatedParams.push('filterQ');
       }
 

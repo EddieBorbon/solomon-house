@@ -278,9 +278,9 @@ export class PersistenceService {
           
           
           // Marcar que estamos actualizando desde Firebase para evitar bucles
-          setTimeout(() => {
-            // Resetear la bandera después de un tiempo
-          }, 1000);
+          // setTimeout(() => {
+          //   // Resetear la bandera después de un tiempo
+          // }, 1000);
           
           return {
             ...currentState,

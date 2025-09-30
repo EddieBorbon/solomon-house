@@ -16,15 +16,15 @@ export class PitchShiftFactory implements IEffectFactory {
   createEffect(): EffectNode {
     const effectNode = new Tone.PitchShift({
       pitch: 0,         // Desplazamiento de pitch en semitonos
-      windowSize: 0.1,  // Tamaño de ventana para análisis
-      overlap: 0.1,     // Solapamiento entre ventanas
-      wet: 0.5         // Mezcla entre señal seca y procesada
+      windowSize: 0.1   // Tamaño de ventana para análisis
     });
+    
+    // Configurar wet después de la creación
+    effectNode.wet.value = 0.5;
 
     console.log(`🎛️ PitchShiftFactory: PitchShift creado con parámetros iniciales:`, {
-      pitch: effectNode.pitch.value,
-      windowSize: effectNode.windowSize.value,
-      overlap: effectNode.overlap.value,
+      pitch: effectNode.pitch,
+      windowSize: effectNode.windowSize,
       wet: effectNode.wet?.value || 0.5,
       readyForSpatialConnection: true
     });

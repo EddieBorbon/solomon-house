@@ -168,17 +168,6 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
         </mesh>
       )}
 
-      {/* Indicador de estado de audio */}
-      {audioEnabled && (
-        <mesh position={[0, 1.5, 0]}>
-          <sphereGeometry args={[0.15, 8, 6]} />
-          <meshStandardMaterial
-            color="#00ff88"
-            emissive="#00ff88"
-            emissiveIntensity={0.8}
-          />
-        </mesh>
-      )}
 
       {/* Switch de audio - ELIMINADO */}
     </group>

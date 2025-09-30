@@ -125,7 +125,10 @@ export class MobileObjectManager {
       params.amplitude >= 0 &&
       typeof params.frequency === 'number' &&
       params.frequency > 0 &&
-      typeof params.randomSeed === 'number'
+      typeof params.randomSeed === 'number' &&
+      typeof params.height === 'number' &&
+      typeof params.heightSpeed === 'number' &&
+      params.heightSpeed >= 0
     );
   }
 
@@ -148,6 +151,8 @@ export class MobileObjectManager {
       amplitude: 0.5,
       frequency: 1,
       randomSeed: Math.random() * 1000,
+      height: 0, // Altura inicial para movimiento vertical
+      heightSpeed: 1, // Velocidad del movimiento vertical
       showRadiusIndicator: true,
       showProximityIndicator: true,
     };

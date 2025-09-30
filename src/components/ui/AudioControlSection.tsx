@@ -155,15 +155,35 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
         {selectedObject.type !== 'cone' && selectedObject.type !== 'icosahedron' && selectedObject.type !== 'torus' && selectedObject.type !== 'plane' && (
           <div className="mt-4">
             <button
-              onClick={() => {
-                const { toggleObjectAudio } = useWorldStore.getState();
-                toggleObjectAudio(selectedObject.id);
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🎵 Botón DEACTIVATE_CONTINUOUS_AUDIO clickeado');
+                
+                try {
+                  const { toggleObjectAudio, toggleGlobalObjectAudio, activeGridId } = useWorldStore.getState();
+                  const isGlobalMode = activeGridId === 'global-world';
+                  
+                  console.log('🎵 Modo global:', isGlobalMode, 'ID del objeto:', selectedObject.id);
+                  
+                  if (isGlobalMode) {
+                    await toggleGlobalObjectAudio(selectedObject.id);
+                  } else {
+                    toggleObjectAudio(selectedObject.id);
+                  }
+                  
+                  console.log('🎵 Audio toggle ejecutado exitosamente');
+                } catch (error) {
+                  console.error('🎵 Error al toggle audio:', error);
+                }
               }}
-              className={`relative w-full py-2 px-4 border border-white hover:bg-white hover:text-black transition-all duration-300 group ${
+              className={`relative w-full py-2 px-4 border border-white hover:bg-white hover:text-black transition-all duration-300 group cursor-pointer ${
                 selectedObject.audioEnabled ? 'bg-white' : 'bg-black'
               }`}
               style={{ 
-                color: selectedObject.audioEnabled ? '#000000' : '#FFFFFF'
+                color: selectedObject.audioEnabled ? '#000000' : '#FFFFFF',
+                zIndex: 10,
+                pointerEvents: 'auto'
               }}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>

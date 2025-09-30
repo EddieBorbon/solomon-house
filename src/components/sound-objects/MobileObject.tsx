@@ -280,15 +280,13 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     meshRef.current.position.set(...newPosition);
     onUpdatePosition(id, newPosition);
 
-    // Actualizar línea de conexión
+    // Actualizar línea de conexión (optimizado)
     if (connectionLineRef.current) {
       connectionLineGeometry.setFromPoints([
         new Vector3(0, 0, 0), // Punto de origen
         new Vector3(...newPosition) // Posición actual del objeto móvil
       ]);
-      if (connectionLineRef.current) {
-        connectionLineRef.current.geometry = connectionLineGeometry;
-      }
+      connectionLineRef.current.geometry = connectionLineGeometry;
     }
     
     // Detectar objetos cercanos
@@ -493,17 +491,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         <line ref={touchLineRef} geometry={touchLineGeometry} material={touchLineMaterial} />
       )}
 
-      {/* Indicador de estado activo */}
-      {mobileParams.isActive && (
-        <mesh position={[0, 0.5, 0]}>
-          <sphereGeometry args={[0.1, 8, 6]} />
-          <meshStandardMaterial
-            color="#00ff88"
-            emissive="#00ff88"
-            emissiveIntensity={0.8}
-          />
-        </mesh>
-      )}
 
       {/* Línea que conecta el objeto móvil con el punto de origen */}
       {/* @ts-expect-error - React Three Fiber line ref type compatibility */}

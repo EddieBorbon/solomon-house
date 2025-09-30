@@ -2,12 +2,12 @@
 
 import { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import * as THREE from 'three';
 
 export function CameraController() {
   const { camera } = useThree();
-  const { currentGridCoordinates, gridSize } = useWorldStore();
+  const { currentGridCoordinates, gridSize } = useGridStore();
   const targetPosition = useRef(new THREE.Vector3());
   const isMoving = useRef(false);
   const moveSpeed = useRef(0.05);
@@ -15,6 +15,8 @@ export function CameraController() {
 
   // Calcular la posición objetivo de la cámara solo para navegación por teclado
   useEffect(() => {
+    if (!currentGridCoordinates) return;
+    
     // Solo mover la cámara si las coordenadas cambiaron por teclado (no por clic manual)
     const coordinatesChanged = 
       currentGridCoordinates[0] !== lastGridCoordinates.current[0] ||
@@ -35,7 +37,7 @@ export function CameraController() {
 
   // Animación suave de la cámara
   useFrame(() => {
-    if (isMoving.current) {
+    if (isMoving.current && currentGridCoordinates) {
       const currentPos = camera.position;
       const target = targetPosition.current;
       

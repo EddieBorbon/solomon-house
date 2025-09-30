@@ -197,12 +197,6 @@ export class SoundSourceFactory {
     } else if (type === 'cylinder') {
       const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
       synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
-    } else if (type === 'cone') {
-      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
-      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
-    } else if (type === 'pyramid') {
-      const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
-      synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
     } else if (type === 'icosahedron') {
       const synthWithFreq = synth as { frequency: { setValueAtTime: (value: number, time: number) => void } };
       synthWithFreq.frequency.setValueAtTime(safeFrequency, Tone.now());
