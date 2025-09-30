@@ -60,7 +60,7 @@ export function Experience() {
   // Cargar el estado inicial del mundo global al montar el componente
   useEffect(() => {
     globalSync.loadInitialGlobalState();
-  }, []); // Solo ejecutar una vez al montar
+  }, [globalSync]); // Incluir globalSync en las dependencias
 
   return (
     <div className="w-full h-screen">

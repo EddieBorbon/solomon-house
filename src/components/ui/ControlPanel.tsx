@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { 
@@ -38,7 +39,8 @@ export function ControlPanel() {
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
+  const { addObject, addEffectZone, addMobileObject } = useWorldStore();
+  const { activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useGridStore();
   const { t } = useLanguage();
   
   // Obtener información de la cuadrícula activa

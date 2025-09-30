@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useWorldStore } from '../state/useWorldStore';
+import { useGridStore } from '../stores/useGridStore';
 import { useEntitySelector } from './useEntitySelector';
 
 /**
@@ -32,13 +33,14 @@ export const DEFAULT_TRANSFORM_VALUES = {
  */
 export function useTransformHandler() {
   const { 
-    updateObject, 
+    // updateObject, // No utilizado 
     updateEffectZone,
     // Funciones globales
     updateGlobalSoundObject,
-    updateGlobalEffectZone,
-    activeGridId
+    updateGlobalEffectZone
   } = useWorldStore();
+  
+  const { activeGridId } = useGridStore();
   const {
     hasSelection,
     isSoundObject,
@@ -118,7 +120,7 @@ export function useTransformHandler() {
     } else {
       // No hay entidad seleccionada válida
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Resetea todas las transformaciones a valores por defecto
@@ -151,7 +153,7 @@ export function useTransformHandler() {
         }
       }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Actualiza una transformación completa (todos los ejes)
@@ -196,7 +198,7 @@ export function useTransformHandler() {
         }
       }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
+  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateEffectZone, updateGlobalSoundObject, updateGlobalEffectZone, isGlobalMode]);
 
   /**
    * Obtiene los valores actuales de una propiedad de transformación

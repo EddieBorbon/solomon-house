@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { SoundObject, MobileObject, EffectZone } from '../types/world';
 
 // Tipos para las cuadrículas
 export interface Grid {
@@ -7,9 +8,9 @@ export interface Grid {
   position: [number, number, number]; // Posición 3D en el mundo
   rotation: [number, number, number]; // Rotación 3D
   scale: [number, number, number]; // Escala 3D
-  objects: any[]; // Será tipado cuando refactoricemos useObjectStore
-  mobileObjects: any[]; // Será tipado cuando refactoricemos useMobileObjectStore
-  effectZones: any[]; // Será tipado cuando refactoricemos useEffectStore
+  objects: SoundObject[]; // Objetos sonoros en esta cuadrícula
+  mobileObjects: MobileObject[]; // Objetos móviles en esta cuadrícula
+  effectZones: EffectZone[]; // Zonas de efectos en esta cuadrícula
   gridSize: number;
   gridColor: string;
   isLoaded: boolean; // Si la cuadrícula está cargada en memoria
@@ -74,7 +75,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
   loadGrid: (coordinates: [number, number, number]) => {
     const state = get();
-    const key = getGridKey(coordinates);
+    // const key = getGridKey(coordinates); // No utilizado
     const id = generateGridId(coordinates);
     
     // Si la cuadrícula ya existe, marcarla como cargada
@@ -138,7 +139,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
     });
 
     // Descargar cuadrículas lejanas
-    state.grids.forEach((grid, gridId) => {
+    state.grids.forEach((grid) => {
       const distance = Math.sqrt(
         Math.pow(grid.coordinates[0] - coordinates[0], 2) +
         Math.pow(grid.coordinates[1] - coordinates[1], 2) +

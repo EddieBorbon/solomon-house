@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { Grid, Text } from '@react-three/drei';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import * as THREE from 'three';
 
 interface ManipulatableGridProps {
@@ -20,7 +20,7 @@ interface ManipulatableGridProps {
 }
 
 export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
-  const { selectGrid, setActiveGrid } = useWorldStore();
+  const { selectGrid, setActiveGrid } = useGridStore();
   const groupRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
 

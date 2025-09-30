@@ -1,5 +1,6 @@
 import { firebaseService, type FirebaseProject, type FirebaseGrid } from './firebaseService';
-import { useWorldStore, type Grid, type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { useGridStore, type Grid } from '../stores/useGridStore';
 import { Timestamp } from 'firebase/firestore';
 
 // Convertir Grid del store a FirebaseGrid
@@ -86,12 +87,12 @@ export class PersistenceService {
   // Guardar el estado actual del mundo como un proyecto
   async saveCurrentWorldAsProject(projectName: string, description?: string): Promise<string> {
     try {
-      const state = useWorldStore.getState();
+      const gridState = useGridStore.getState();
       
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
       
-      for (const [, grid] of state.grids) {
+      for (const [, grid] of gridState.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
 
@@ -104,7 +105,7 @@ export class PersistenceService {
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
         })),
-        activeGridId: state.activeGridId
+        activeGridId: gridState.activeGridId
       };
 
       const projectId = await firebaseService.saveProject(projectData);
@@ -135,7 +136,7 @@ export class PersistenceService {
 
 
       // Actualizar el store con los datos cargados
-      useWorldStore.setState({
+      useGridStore.setState({
         grids,
         activeGridId: project.activeGridId,
         currentGridCoordinates: project.activeGridId ? 
@@ -161,8 +162,8 @@ export class PersistenceService {
   // Guardar una cuadrícula individual
   async saveGrid(gridId: string): Promise<string> {
     try {
-      const state = useWorldStore.getState();
-      const grid = state.grids.get(gridId);
+      const gridState = useGridStore.getState();
+      const grid = gridState.grids.get(gridId);
       
       if (!grid) {
         throw new Error('Cuadrícula no encontrada');
@@ -189,7 +190,7 @@ export class PersistenceService {
       const grid = firebaseToGrid(firebaseGrid);
       
       // Actualizar el store con la cuadrícula cargada
-      useWorldStore.setState((state) => ({
+      useGridStore.setState((state) => ({
         grids: new Map(state.grids.set(gridId, grid))
       }));
 
@@ -201,12 +202,12 @@ export class PersistenceService {
   // Actualizar un proyecto existente
   async updateProject(projectId: string, projectName?: string, description?: string): Promise<void> {
     try {
-      const state = useWorldStore.getState();
+      const gridState = useGridStore.getState();
       
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
       
-      for (const [, grid] of state.grids) {
+      for (const [, grid] of gridState.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
 
@@ -216,7 +217,7 @@ export class PersistenceService {
           createdAt: Timestamp.now(),
           updatedAt: Timestamp.now()
         })),
-        activeGridId: state.activeGridId
+        activeGridId: gridState.activeGridId
       };
 
       if (projectName) updateData.name = projectName;
@@ -261,7 +262,7 @@ export class PersistenceService {
 
         // Actualizar el store con los datos sincronizados
         // Usar setState con una función para evitar bucles
-        useWorldStore.setState((currentState) => {
+        useGridStore.setState((currentState) => {
           // Solo actualizar si realmente hay cambios
           const currentGrids = currentState.grids;
           let hasChanges = false;
@@ -293,7 +294,9 @@ export class PersistenceService {
             ...currentState,
             grids,
             activeGridId: 'global-world', // Siempre forzar modo global
-            currentGridCoordinates: globalWorld.currentGridCoordinates || [0, 0, 0]
+            currentGridCoordinates: project.activeGridId ? 
+              grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
+              [0, 0, 0]
           };
         });
       }
@@ -309,13 +312,19 @@ export class PersistenceService {
           id: 'global-world',
           coordinates: globalWorld.currentGridCoordinates,
           position: [0, 0, 0],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
           objects: globalWorld.objects || [],
           mobileObjects: globalWorld.mobileObjects || [],
-          effectZones: globalWorld.effectZones || []
+          effectZones: globalWorld.effectZones || [],
+          gridSize: 50,
+          gridColor: '#00ff00',
+          isLoaded: true,
+          isSelected: false
         };
 
         // Actualizar el store con los datos del mundo global
-        useWorldStore.setState((currentState) => {
+        useGridStore.setState((currentState) => {
           const currentGrids = new Map(currentState.grids);
           const currentGlobalGrid = currentGrids.get('global-world');
           
@@ -363,15 +372,21 @@ export class PersistenceService {
           id: 'global-world',
           coordinates: globalWorldDoc.currentGridCoordinates || [0, 0, 0],
           position: [0, 0, 0],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
           objects: globalWorldDoc.objects || [],
           mobileObjects: globalWorldDoc.mobileObjects || [],
-          effectZones: globalWorldDoc.effectZones || []
+          effectZones: globalWorldDoc.effectZones || [],
+          gridSize: 50,
+          gridColor: '#00ff00',
+          isLoaded: true,
+          isSelected: false
         };
         
         console.log('🌍 PersistenceService: Cuadrícula global creada con', globalGrid.objects.length, 'objetos');
         
         // Actualizar el store con los datos del mundo global
-        useWorldStore.setState((currentState) => {
+        useGridStore.setState((currentState) => {
           const currentGrids = new Map(currentState.grids);
           currentGrids.set('global-world', globalGrid);
           
@@ -392,12 +407,18 @@ export class PersistenceService {
           id: 'global-world',
           coordinates: [0, 0, 0],
           position: [0, 0, 0],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
           objects: [],
           mobileObjects: [],
-          effectZones: []
+          effectZones: [],
+          gridSize: 50,
+          gridColor: '#00ff00',
+          isLoaded: true,
+          isSelected: false
         };
         
-        useWorldStore.setState((currentState) => {
+        useGridStore.setState((currentState) => {
           const currentGrids = new Map(currentState.grids);
           currentGrids.set('global-world', globalGrid);
           
@@ -417,12 +438,18 @@ export class PersistenceService {
         id: 'global-world',
         coordinates: [0, 0, 0],
         position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
         objects: [],
         mobileObjects: [],
-        effectZones: []
+        effectZones: [],
+        gridSize: 50,
+        gridColor: '#00ff00',
+        isLoaded: true,
+        isSelected: false
       };
       
-      useWorldStore.setState((currentState) => {
+      useGridStore.setState((currentState) => {
         const currentGrids = new Map(currentState.grids);
         currentGrids.set('global-world', globalGrid);
         

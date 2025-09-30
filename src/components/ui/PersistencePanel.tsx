@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { persistenceService } from '../../lib/persistenceService';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
 import type { FirebaseProject } from '../../lib/firebaseService';
@@ -17,7 +18,8 @@ export function PersistencePanel() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
 
-  const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
+  const { currentProjectId, setCurrentProjectId } = useWorldStore();
+  const { grids } = useGridStore();
   const { isConnected } = useRealtimeSync(currentProjectId);
   const { t } = useLanguage();
 

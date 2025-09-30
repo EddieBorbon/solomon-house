@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 
 // Estilos CSS para los sliders
 const sliderStyles = `
@@ -52,9 +53,10 @@ export function TransformEditor() {
     updateEffectZone,
     // Funciones globales
     updateGlobalSoundObject,
-    updateGlobalEffectZone,
-    activeGridId
+    updateGlobalEffectZone
   } = useWorldStore();
+  
+  const { activeGridId } = useGridStore();
 
   const [transformValues, setTransformValues] = useState<TransformValues>({
     position: [0, 0, 0],

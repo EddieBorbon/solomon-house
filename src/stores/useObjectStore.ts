@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
+import { useGridStore } from './useGridStore';
 
 // Tipos para objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
@@ -287,7 +288,6 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     });
 
     // También actualizar en useGridStore para mantener sincronización
-    const { useGridStore } = require('./useGridStore');
     const grids = useGridStore.getState().grids;
     const grid = grids.get(gridId);
     if (grid) {

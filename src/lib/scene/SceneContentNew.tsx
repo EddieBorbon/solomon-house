@@ -3,7 +3,8 @@
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
-import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType, type Grid } from '../../state/useWorldStore';
+import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { useGridStore, type Grid } from '../../stores/useGridStore';
 import { SceneRenderer } from './SceneRenderer';
 import { 
   SceneObject, 
@@ -210,7 +211,6 @@ class AudioHandler implements IAudioHandler {
  */
 export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentProps) {
   const { 
-    grids,
     selectedEntityId, 
     transformMode, 
     updateObject, 
@@ -220,6 +220,8 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
     triggerObjectNote,
     toggleObjectAudio
   } = useWorldStore();
+  
+  const { grids } = useGridStore();
   
   // Configuración por defecto
   const defaultConfig: SceneConfig = {

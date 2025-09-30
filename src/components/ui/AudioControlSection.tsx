@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type SoundObject, useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 
 interface AudioControlSectionProps {
   selectedObject: SoundObject;
@@ -161,7 +162,8 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
                 console.log('🎵 Botón DEACTIVATE_CONTINUOUS_AUDIO clickeado');
                 
                 try {
-                  const { toggleObjectAudio, toggleGlobalObjectAudio, activeGridId } = useWorldStore.getState();
+                  const { toggleObjectAudio, toggleGlobalObjectAudio } = useWorldStore.getState();
+                  const { activeGridId } = useGridStore.getState();
                   const isGlobalMode = activeGridId === 'global-world';
                   
                   console.log('🎵 Modo global:', isGlobalMode, 'ID del objeto:', selectedObject.id);

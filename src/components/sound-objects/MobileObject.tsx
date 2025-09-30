@@ -4,6 +4,7 @@ import React, { forwardRef, useRef, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 
 // Tipos de movimiento disponibles
 export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
@@ -66,7 +67,8 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   const [touchedObjectId, setTouchedObjectId] = useState<string | null>(null);
   const [touchStartTime, setTouchStartTime] = useState<number>(0);
   
-  const { grids, triggerObjectAttackRelease } = useWorldStore();
+  const { triggerObjectAttackRelease } = useWorldStore();
+  const { grids } = useGridStore();
   
   // Obtener todos los objetos de todas las cuadrículas
   const allObjects = useMemo(() => {

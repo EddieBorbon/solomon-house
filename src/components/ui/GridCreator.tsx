@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 
 export function GridCreator() {
-  const { createGrid, currentGridCoordinates, gridSize, activeGridId, grids } = useWorldStore();
+  const { createGrid, currentGridCoordinates, gridSize, activeGridId, grids } = useGridStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);

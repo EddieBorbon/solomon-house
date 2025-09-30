@@ -461,7 +461,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       });
     });
     
-    set((state) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    set((_) => ({
       selectedEntityId: null,
     }));
   },
@@ -762,13 +763,14 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   // ===== ACCIONES PARA EL MUNDO GLOBAL COLABORATIVO =====
 
   // Establecer el estado global desde Firestore
-  setGlobalStateFromFirestore: (state: GlobalWorldDoc) => {
+  setGlobalStateFromFirestore: (globalState: GlobalWorldDoc) => {
     // Permitir actualizaciones de Firebase incluso si hay bloqueo de sincronización local
     // Esto asegura que otros usuarios puedan ver los cambios en tiempo real
     console.log('🌐 Procesando actualización de Firestore para el mundo global');
     
-    // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Recibiendo estado de Firebase', state);
-    set((currentState) => {
+    // console.log('🌐 useWorldStore.setGlobalStateFromFirestore: Recibiendo estado de Firebase', globalState);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    set((_) => {
       // Limpiar todas las fuentes de sonido existentes del AudioManager
       try {
         // Obtener todos los IDs de objetos existentes
@@ -781,8 +783,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
 
         // Eliminar fuentes de sonido que ya no existen en el nuevo estado
         const newObjectIds = new Set<string>();
-        (state.objects || []).forEach(obj => newObjectIds.add(obj.id));
-        (state.mobileObjects || []).forEach(obj => newObjectIds.add(obj.id));
+        (globalState.objects || []).forEach(obj => newObjectIds.add(obj.id));
+        (globalState.mobileObjects || []).forEach(obj => newObjectIds.add(obj.id));
 
         existingObjectIds.forEach(id => {
           if (!newObjectIds.has(id)) {
@@ -795,7 +797,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         });
 
         // Crear fuentes de sonido para objetos nuevos y actualizar parámetros de objetos existentes
-        (state.objects || []).forEach(obj => {
+        (globalState.objects || []).forEach(obj => {
           try {
             // Verificar si el objeto ya existe en el AudioManager
             const existingSource = audioManager.getSoundSourceState(obj.id);
@@ -861,13 +863,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       const globalGridId = 'global-world';
       const globalGrid = {
         id: globalGridId,
-        coordinates: state.currentGridCoordinates || [0, 0, 0],
+        coordinates: [0, 0, 0] as [number, number, number],
         position: [0, 0, 0] as [number, number, number],
         rotation: [0, 0, 0] as [number, number, number],
         scale: [1, 1, 1] as [number, number, number],
-        objects: state.objects || [],
-        mobileObjects: state.mobileObjects || [],
-        effectZones: state.effectZones || [],
+        objects: globalState.objects || [],
+        mobileObjects: globalState.mobileObjects || [],
+        effectZones: globalState.effectZones || [],
         gridSize: 20,
         gridColor: '#404040',
         isLoaded: true,
@@ -886,9 +888,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       }
 
       return {
-        objects: state.objects || [],
-        mobileObjects: state.mobileObjects || [],
-        effectZones: state.effectZones || []
+        objects: globalState.objects || [],
+        mobileObjects: globalState.mobileObjects || [],
+        effectZones: globalState.effectZones || []
       };
     });
   },

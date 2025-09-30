@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWorldStore, type EffectZone } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { ParameterComponentFactory } from './ParameterComponentFactory';
 import { 
@@ -99,10 +100,11 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     removeEffectZone,
     toggleLockEffectZone,
     setEditingEffectZone,
-    setSyncLock,
-    updateGlobalSoundObject,
-    activeGridId
+    // setSyncLock, // No utilizado
+    updateGlobalSoundObject
   } = useWorldStore();
+  
+  const { activeGridId } = useGridStore();
 
   const { isUpdatingParams } = useParameterHandlers();
 
@@ -268,7 +270,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     }
     
     console.log('🎛️ handleSoundTransformChange: FINALIZADO');
-  }, [isSoundObject, getSoundObject, updateObject, updateGlobalSoundObject, isGlobalMode]);
+  }, [isSoundObject, getSoundObject, updateObject, updateGlobalSoundObject, isGlobalMode, activeGridId]);
 
   // Función para resetear transformaciones de objeto sonoro
   const handleResetSoundTransform = useCallback(async () => {
@@ -277,9 +279,9 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     if (!soundObject) return;
     
     const resetValues = {
-      position: [0, 0, 0],
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1]
+      position: [0, 0, 0] as [number, number, number],
+      rotation: [0, 0, 0] as [number, number, number],
+      scale: [1, 1, 1] as [number, number, number]
     };
     
     // Usar función global o local según el modo (igual que los parámetros de audio)

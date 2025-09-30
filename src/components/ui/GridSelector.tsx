@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useWorldStore } from '../../state/useWorldStore';
+import { useGridStore } from '../../stores/useGridStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { 
   Squares2X2Icon
@@ -19,7 +19,7 @@ export function GridSelector() {
     setActiveGrid,
     currentGridCoordinates, 
     gridSize 
-  } = useWorldStore();
+  } = useGridStore();
   
   useLanguage();
 

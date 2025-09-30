@@ -35,7 +35,7 @@ interface SoundObjectContainerProps {
 
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
-    const { triggerObjectNote, toggleObjectAudio, triggerObjectAttackRelease } = useWorldStore();
+    const { triggerObjectNote, triggerObjectAttackRelease } = useWorldStore();
     
     const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
@@ -63,7 +63,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         // Para otros objetos, solo disparar la nota
         triggerObjectNote(object.id);
       }
-    }, [object.id, onSelect, triggerObjectNote, toggleObjectAudio, triggerObjectAttackRelease, object.type]);
+    }, [object.id, onSelect, triggerObjectNote, triggerObjectAttackRelease, object.type]);
 
     return (
       <group
@@ -238,14 +238,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       // });
       
       // Usar objetos de la cuadrícula directamente
-      objects.push(...gridObjects.filter((obj: any) => obj && obj.id));
+      objects.push(...gridObjects.filter((obj: SoundObject) => obj && obj.id));
       
       // Mantener objetos móviles y zonas de efectos de la cuadrícula
       if (Array.isArray(grid.mobileObjects)) {
-        mobileObjects.push(...grid.mobileObjects.filter((obj: any) => obj && obj.id));
+        mobileObjects.push(...grid.mobileObjects.filter((obj: MobileObjectType) => obj && obj.id));
       }
       if (Array.isArray(grid.effectZones)) {
-        effectZones.push(...grid.effectZones.filter((zone: any) => zone && zone.id));
+        effectZones.push(...grid.effectZones.filter((zone: EffectZoneType) => zone && zone.id));
       }
     });
     
@@ -256,7 +256,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     // });
     
     return { objects, mobileObjects, effectZones };
-  }, [grids, activeGridId]);
+  }, [grids]);
   
   // Usar el hook de detección de zonas de efectos
   useEffectZoneDetection();
@@ -314,9 +314,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
         if (!grids) return;
         for (const grid of grids.values()) {
-          if (grid.objects.some((obj: any) => obj.id === entityId) ||
-              grid.mobileObjects.some((obj: any) => obj.id === entityId) ||
-              grid.effectZones.some((zone: any) => zone.id === entityId)) {
+          if (grid.objects.some((obj: SoundObject) => obj.id === entityId) ||
+              grid.mobileObjects.some((obj: MobileObjectType) => obj.id === entityId) ||
+              grid.effectZones.some((zone: EffectZoneType) => zone.id === entityId)) {
             // Convertir a posición local: posición mundial - posición de la cuadrícula
             localPosition = [
               pendingTransform.position.x - grid.position[0],
@@ -426,9 +426,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
           if (!grids) return;
           for (const grid of grids.values()) {
-            if (grid.objects.some((obj: any) => obj.id === selectedEntityId) ||
-                grid.mobileObjects.some((obj: any) => obj.id === selectedEntityId) ||
-                grid.effectZones.some((zone: any) => zone.id === selectedEntityId)) {
+            if (grid.objects.some((obj: SoundObject) => obj.id === selectedEntityId) ||
+                grid.mobileObjects.some((obj: MobileObjectType) => obj.id === selectedEntityId) ||
+                grid.effectZones.some((zone: EffectZoneType) => zone.id === selectedEntityId)) {
               // Convertir a posición local: posición mundial - posición de la cuadrícula
               localPosition = [
                 pendingTransform.position.x - grid.position[0],
@@ -501,7 +501,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       orbitControlsRef.current.enabled = !isTransforming;
       console.log('🎮 OrbitControls enabled:', !isTransforming);
     }
-  }, [isTransforming]);
+  }, [isTransforming, orbitControlsRef]);
 
   // Limpiar timeouts cuando el componente se desmonte
   useEffect(() => {
@@ -548,7 +548,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         return (
           <group key={grid.id} position={grid.position}>
           {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {gridObjects.map((obj: any) => {
+          {gridObjects.map((obj: SoundObject) => {
             if (!obj || !obj.id) return null;
             const objectRef = entityRefs.get(obj.id);
             if (!objectRef) return null;
@@ -564,7 +564,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de objetos móviles de esta cuadrícula */}
-          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj: any) => {
+          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj: MobileObjectType) => {
             if (!mobileObj || !mobileObj.id) return null;
             const objectRef = entityRefs.get(mobileObj.id);
             if (!objectRef) return null;
@@ -589,7 +589,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           })}
 
           {/* Renderizado de zonas de efectos de esta cuadrícula */}
-          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone: any) => {
+          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone: EffectZoneType) => {
             if (!zone || !zone.id) return null;
             const zoneRef = entityRefs.get(zone.id);
             if (!zoneRef) return null;
@@ -625,9 +625,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // Buscar en todas las cuadrículas para encontrar dónde está el objeto
         if (!grids) return null;
         for (const grid of grids.values()) {
-          if (grid.objects.some((obj: any) => obj.id === selectedEntityId) ||
-              grid.mobileObjects.some((obj: any) => obj.id === selectedEntityId) ||
-              grid.effectZones.some((zone: any) => zone.id === selectedEntityId)) {
+          if (grid.objects.some((obj: SoundObject) => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some((obj: MobileObjectType) => obj.id === selectedEntityId) ||
+              grid.effectZones.some((zone: EffectZoneType) => zone.id === selectedEntityId)) {
             foundGrid = grid;
             break;
           }

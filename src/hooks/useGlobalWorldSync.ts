@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
 import { useWorldStore } from '../state/useWorldStore';
+import { useGridStore } from '../stores/useGridStore';
 import { Timestamp } from 'firebase/firestore';
 
 interface GlobalWorldSyncState {
@@ -27,11 +28,14 @@ export function useGlobalWorldSync() {
   const isInitializingRef = useRef<boolean>(false);
 
   const { 
-    setGlobalStateFromFirestore,
+    setGlobalStateFromFirestore
+  } = useWorldStore();
+  
+  const { 
     grids,
     activeGridId,
     currentGridCoordinates
-  } = useWorldStore();
+  } = useGridStore();
 
   // Iniciar sincronización automática con el mundo global
   const startGlobalSync = useCallback(() => {

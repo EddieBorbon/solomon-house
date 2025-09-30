@@ -6,15 +6,14 @@ import * as THREE from 'three';
 export function useEffectZoneDetection() {
   const { grids } = useGridStore();
   let lastDebugTime = 0;
-  
-  // Verificar que grids esté disponible
-  if (!grids) return;
-  
-  // Obtener todos los objetos de todas las cuadrículas
-  const allObjects = Array.from(grids.values()).flatMap(grid => grid.objects);
-  const allEffectZones = Array.from(grids.values()).flatMap(grid => grid.effectZones);
 
   useFrame(() => {
+    // Verificar que grids esté disponible
+    if (!grids) return;
+    
+    // Obtener todos los objetos de todas las cuadrículas
+    const allObjects = Array.from(grids.values()).flatMap(grid => grid.objects);
+    const allEffectZones = Array.from(grids.values()).flatMap(grid => grid.effectZones);
     // Solo procesar si hay zonas de efectos
     if (allEffectZones.length === 0) return;
 

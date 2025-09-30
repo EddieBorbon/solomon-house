@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useGridStore } from '../../stores/useGridStore';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Grid } from '../../types/world';
 import { 
   Cog6ToothIcon, 
   MusicalNoteIcon, 
@@ -37,7 +38,7 @@ export function GlobalControlPanel() {
   
   const { 
     // Funciones locales (para cuadrículas individuales)
-    addObject, 
+    // addObject, // No utilizado
     addEffectZone, 
     addMobileObject, 
     // Funciones globales (para el mundo global)
@@ -52,7 +53,7 @@ export function GlobalControlPanel() {
     createGrid,
     currentGridCoordinates,
     gridSize,
-    setActiveGrid
+    // setActiveGrid // No utilizado
   } = useGridStore();
   
   const { t } = useLanguage();
@@ -85,7 +86,7 @@ export function GlobalControlPanel() {
         isSelected: false
       };
       
-      const newGrids = new Map(grids as Map<string, any>);
+      const newGrids = new Map(grids as Map<string, Grid>);
       newGrids.set('global-world', globalGrid);
       useGridStore.setState({ grids: newGrids });
       
@@ -211,109 +212,7 @@ export function GlobalControlPanel() {
     console.log(`🎥 Camera controls ${newState ? 'enabled' : 'disabled'}`);
   };
 
-  // Cambiar entre modo global y local
-  const toggleGlobalMode = async () => {
-    if (isGlobalMode) {
-      // Cambiar a modo local (primera cuadrícula disponible)
-      const firstGridId = Array.from(grids.keys()).find(id => id !== 'global-world');
-      if (firstGridId && typeof firstGridId === 'string') {
-        setActiveGrid(firstGridId);
-      }
-    } else {
-      // Cambiar a modo global - cargar objetos desde Firebase
-      const globalGridId = 'global-world';
-      
-      console.log('🌍 GlobalControlPanel: Cambiando a modo global, cargando objetos desde Firebase');
-      
-      try {
-        // Importar firebaseService dinámicamente para evitar problemas de importación circular
-        const { firebaseService } = await import('../../lib/firebaseService');
-        
-        // Obtener el estado actual del mundo global desde Firebase
-        const globalWorldDoc = await firebaseService.getGlobalWorldState();
-        
-        if (globalWorldDoc) {
-          console.log('🌍 GlobalControlPanel: Datos del mundo global obtenidos desde Firebase', globalWorldDoc);
-          
-          // Crear la cuadrícula global con los datos de Firebase
-          const globalGrid = {
-            id: globalGridId,
-            coordinates: globalWorldDoc.currentGridCoordinates || [0, 0, 0],
-            position: [0, 0, 0] as [number, number, number],
-            rotation: [0, 0, 0] as [number, number, number],
-            scale: [1, 1, 1] as [number, number, number],
-            objects: globalWorldDoc.objects || [],
-            mobileObjects: globalWorldDoc.mobileObjects || [],
-            effectZones: globalWorldDoc.effectZones || [],
-            gridSize: 20,
-            gridColor: '#404040',
-            isLoaded: true,
-            isSelected: false
-          };
-          
-          console.log('🌍 GlobalControlPanel: Cuadrícula global creada con', globalGrid.objects.length, 'objetos');
-          
-          // Agregar la cuadrícula global al store
-          const newGrids = new Map(grids as Map<string, any>);
-          newGrids.set(globalGridId, globalGrid);
-          useGridStore.setState({ grids: newGrids });
-          
-          // Cambiar a la cuadrícula global
-          setActiveGrid(globalGridId);
-          
-          console.log('🌍 GlobalControlPanel: Modo global activado exitosamente');
-        } else {
-          console.log('🌍 GlobalControlPanel: No hay datos del mundo global en Firebase, creando cuadrícula vacía');
-          
-          // Crear cuadrícula global vacía si no hay datos en Firebase
-        const globalGrid = {
-          id: globalGridId,
-          coordinates: [0, 0, 0] as [number, number, number],
-          position: [0, 0, 0] as [number, number, number],
-          rotation: [0, 0, 0] as [number, number, number],
-          scale: [1, 1, 1] as [number, number, number],
-          objects: [],
-          mobileObjects: [],
-          effectZones: [],
-          gridSize: 20,
-          gridColor: '#404040',
-          isLoaded: true,
-          isSelected: false
-        };
-        
-        const newGrids = new Map(grids as Map<string, any>);
-        newGrids.set(globalGridId, globalGrid);
-        useGridStore.setState({ grids: newGrids });
-          
-          setActiveGrid(globalGridId);
-        }
-      } catch (error) {
-        console.error('🌍 GlobalControlPanel: Error al cargar mundo global desde Firebase:', error);
-        
-        // En caso de error, crear cuadrícula global vacía
-        const globalGrid = {
-          id: globalGridId,
-          coordinates: [0, 0, 0] as [number, number, number],
-          position: [0, 0, 0] as [number, number, number],
-          rotation: [0, 0, 0] as [number, number, number],
-          scale: [1, 1, 1] as [number, number, number],
-          objects: [],
-          mobileObjects: [],
-          effectZones: [],
-          gridSize: 20,
-          gridColor: '#404040',
-          isLoaded: true,
-          isSelected: false
-        };
-        
-        const newGrids = new Map(grids as Map<string, any>);
-        newGrids.set(globalGridId, globalGrid);
-        useGridStore.setState({ grids: newGrids });
-      
-      setActiveGrid(globalGridId);
-      }
-    }
-  };
+  // Función de creación de objetos
 
   // Funciones de creación de objetos
   const handleAddCube = () => createObjectInActiveGrid('cube');
