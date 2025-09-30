@@ -57,14 +57,39 @@ export function GlobalControlPanel() {
   
   const { t } = useLanguage();
   
-  // Detectar si estamos en modo global
-  const isGlobalMode = activeGridId === 'global-world';
-  const activeGrid = activeGridId ? grids.get(activeGridId) : null;
+  // Detectar si estamos en modo global - Siempre forzar modo global
+  const isGlobalMode = true; // Siempre en modo global
+  const activeGrid = grids.get('global-world') || null;
 
-  // Función helper para crear objetos (global o local según el modo)
+  // Función helper para crear objetos (siempre en modo global)
   const createObjectInActiveGrid = async (type: string) => {
-    if (!activeGrid && !isGlobalMode) {
-      return;
+    console.log('🌍 GlobalControlPanel.createObjectInActiveGrid: Creando objeto en modo global', { type });
+    
+    // Asegurar que la cuadrícula global existe
+    if (!activeGrid) {
+      console.log('🌍 GlobalControlPanel: Creando cuadrícula global porque no existe');
+      
+      // Crear cuadrícula global vacía
+      const globalGrid = {
+        id: 'global-world',
+        coordinates: [0, 0, 0] as [number, number, number],
+        position: [0, 0, 0] as [number, number, number],
+        rotation: [0, 0, 0] as [number, number, number],
+        scale: [1, 1, 1] as [number, number, number],
+        objects: [],
+        mobileObjects: [],
+        effectZones: [],
+        gridSize: 20,
+        gridColor: '#404040',
+        isLoaded: true,
+        isSelected: false
+      };
+      
+      const newGrids = new Map(grids as Map<string, any>);
+      newGrids.set('global-world', globalGrid);
+      useGridStore.setState({ grids: newGrids });
+      
+      console.log('🌍 GlobalControlPanel: Cuadrícula global creada');
     }
     
     // Calcular posición
@@ -72,38 +97,34 @@ export function GlobalControlPanel() {
     const z = (Math.random() - 0.5) * 10;
     const position: [number, number, number] = [x, 0.5, z];
     
-    if (isGlobalMode) {
-      // Crear objeto global
-      const object = {
-        id: crypto.randomUUID(),
-        type: type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral',
-        position,
-        rotation: [0, 0, 0] as [number, number, number],
-        scale: [1, 1, 1] as [number, number, number],
-        audioParams: {
-          frequency: 440,
-          volume: 0.5,
-          waveform: 'sine' as const,
-          harmonicity: 2,
-          modulationIndex: 10,
-          duration: 1.5,
-        },
-        isSelected: false,
-        audioEnabled: !['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(type)
-      };
-      
-      await addGlobalSoundObject(object);
-    } else {
-      // Crear objeto local
-      addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', position);
-    }
+    // Siempre crear objeto global
+    console.log('🌍 GlobalControlPanel: Creando objeto global', { type, position });
+    
+    const object = {
+      id: crypto.randomUUID(),
+      type: type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral',
+      position,
+      rotation: [0, 0, 0] as [number, number, number],
+      scale: [1, 1, 1] as [number, number, number],
+      audioParams: {
+        frequency: 440,
+        volume: 0.5,
+        waveform: 'sine' as const,
+        harmonicity: 2,
+        modulationIndex: 10,
+        duration: 1.5,
+      },
+      isSelected: false,
+      audioEnabled: !['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(type)
+    };
+    
+    await addGlobalSoundObject(object);
+    console.log('🌍 GlobalControlPanel: Objeto global creado exitosamente');
   };
 
-  // Función helper para crear zonas de efecto (global o local según el modo)
+  // Función helper para crear zonas de efecto (siempre en modo global)
   const createEffectZoneInActiveGrid = async (type: string) => {
-    if (!activeGrid && !isGlobalMode) {
-      return;
-    }
+    // Siempre crear en modo global
     
     // Calcular posición
     const x = (Math.random() - 0.5) * 10;
@@ -191,7 +212,7 @@ export function GlobalControlPanel() {
   };
 
   // Cambiar entre modo global y local
-  const toggleGlobalMode = () => {
+  const toggleGlobalMode = async () => {
     if (isGlobalMode) {
       // Cambiar a modo local (primera cuadrícula disponible)
       const firstGridId = Array.from(grids.keys()).find(id => id !== 'global-world');
@@ -199,10 +220,52 @@ export function GlobalControlPanel() {
         setActiveGrid(firstGridId);
       }
     } else {
-      // Cambiar a modo global - asegurar que la cuadrícula global existe
+      // Cambiar a modo global - cargar objetos desde Firebase
       const globalGridId = 'global-world';
-      if (!grids.has(globalGridId)) {
-        // Crear la cuadrícula global si no existe
+      
+      console.log('🌍 GlobalControlPanel: Cambiando a modo global, cargando objetos desde Firebase');
+      
+      try {
+        // Importar firebaseService dinámicamente para evitar problemas de importación circular
+        const { firebaseService } = await import('../../lib/firebaseService');
+        
+        // Obtener el estado actual del mundo global desde Firebase
+        const globalWorldDoc = await firebaseService.getGlobalWorldState();
+        
+        if (globalWorldDoc) {
+          console.log('🌍 GlobalControlPanel: Datos del mundo global obtenidos desde Firebase', globalWorldDoc);
+          
+          // Crear la cuadrícula global con los datos de Firebase
+          const globalGrid = {
+            id: globalGridId,
+            coordinates: globalWorldDoc.currentGridCoordinates || [0, 0, 0],
+            position: [0, 0, 0] as [number, number, number],
+            rotation: [0, 0, 0] as [number, number, number],
+            scale: [1, 1, 1] as [number, number, number],
+            objects: globalWorldDoc.objects || [],
+            mobileObjects: globalWorldDoc.mobileObjects || [],
+            effectZones: globalWorldDoc.effectZones || [],
+            gridSize: 20,
+            gridColor: '#404040',
+            isLoaded: true,
+            isSelected: false
+          };
+          
+          console.log('🌍 GlobalControlPanel: Cuadrícula global creada con', globalGrid.objects.length, 'objetos');
+          
+          // Agregar la cuadrícula global al store
+          const newGrids = new Map(grids as Map<string, any>);
+          newGrids.set(globalGridId, globalGrid);
+          useGridStore.setState({ grids: newGrids });
+          
+          // Cambiar a la cuadrícula global
+          setActiveGrid(globalGridId);
+          
+          console.log('🌍 GlobalControlPanel: Modo global activado exitosamente');
+        } else {
+          console.log('🌍 GlobalControlPanel: No hay datos del mundo global en Firebase, creando cuadrícula vacía');
+          
+          // Crear cuadrícula global vacía si no hay datos en Firebase
         const globalGrid = {
           id: globalGridId,
           coordinates: [0, 0, 0] as [number, number, number],
@@ -218,13 +281,37 @@ export function GlobalControlPanel() {
           isSelected: false
         };
         
-        // Agregar la cuadrícula global al store
         const newGrids = new Map(grids as Map<string, any>);
         newGrids.set(globalGridId, globalGrid);
         useGridStore.setState({ grids: newGrids });
-      }
+          
+          setActiveGrid(globalGridId);
+        }
+      } catch (error) {
+        console.error('🌍 GlobalControlPanel: Error al cargar mundo global desde Firebase:', error);
+        
+        // En caso de error, crear cuadrícula global vacía
+        const globalGrid = {
+          id: globalGridId,
+          coordinates: [0, 0, 0] as [number, number, number],
+          position: [0, 0, 0] as [number, number, number],
+          rotation: [0, 0, 0] as [number, number, number],
+          scale: [1, 1, 1] as [number, number, number],
+          objects: [],
+          mobileObjects: [],
+          effectZones: [],
+          gridSize: 20,
+          gridColor: '#404040',
+          isLoaded: true,
+          isSelected: false
+        };
+        
+        const newGrids = new Map(grids as Map<string, any>);
+        newGrids.set(globalGridId, globalGrid);
+        useGridStore.setState({ grids: newGrids });
       
       setActiveGrid(globalGridId);
+      }
     }
   };
 
@@ -373,19 +460,13 @@ export function GlobalControlPanel() {
                       MODO GLOBAL
                     </h3>
                     <button
-                      onClick={toggleGlobalMode}
-                      className={`relative border px-2 py-1 transition-all duration-300 group ${
-                        isGlobalMode 
-                          ? 'border-green-400 text-green-400 bg-green-400/10' 
-                          : 'border-white text-white hover:bg-white hover:text-black'
-                      }`}
-                      title={isGlobalMode ? "Cambiar a modo local" : "Cambiar a modo global"}
+                      disabled={true}
+                      className="relative border border-green-400 text-green-400 bg-green-400/10 cursor-not-allowed opacity-75"
+                      title="Modo global permanente - No se puede cambiar a modo local"
                     >
-                      <div className={`absolute -inset-0.5 border transition-colors duration-300 ${
-                        isGlobalMode ? 'border-green-600 group-hover:border-green-400' : 'border-gray-600 group-hover:border-white'
-                      }`}></div>
+                      <div className="absolute -inset-0.5 border border-green-600"></div>
                       <span className="relative text-xs font-mono tracking-wider">
-                        {isGlobalMode ? 'GLOBAL' : 'LOCAL'}
+                        GLOBAL
                       </span>
                     </button>
                   </div>

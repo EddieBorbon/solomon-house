@@ -60,10 +60,10 @@ const getGridKey = (coordinates: [number, number, number]): string => {
 
 // Creación del store de Zustand para gestión de cuadrículas
 export const useGridStore = create<GridState & GridActions>((set, get) => ({
-  // Estado inicial
+  // Estado inicial - Siempre iniciar en modo global
   grids: new Map(),
   currentGridCoordinates: [0, 0, 0],
-  activeGridId: null,
+  activeGridId: 'global-world',
   gridSize: 20,
   renderDistance: 2,
 

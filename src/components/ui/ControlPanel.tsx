@@ -46,14 +46,20 @@ export function ControlPanel() {
 
   // Función helper para crear objetos en la cuadrícula activa
   const createObjectInActiveGrid = (type: string) => {
+    console.log('🎛️ ControlPanel.createObjectInActiveGrid: INICIANDO', { type, activeGrid, activeGridId });
+    
     if (!activeGrid) {
+      console.log('🎛️ ControlPanel.createObjectInActiveGrid: ERROR - No hay cuadrícula activa');
       return;
     }
     
     // Calcular posición relativa a la cuadrícula activa (posición local)
     const x = (Math.random() - 0.5) * 10;
     const z = (Math.random() - 0.5) * 10;
-    addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', [x, 0.5, z]);
+    const position: [number, number, number] = [x, 0.5, z];
+    
+    console.log('🎛️ ControlPanel.createObjectInActiveGrid: Llamando addObject', { type, position });
+    addObject(type as 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral', position);
   };
 
   // Funciones para controlar la cámara

@@ -231,6 +231,31 @@ export class FirebaseService {
 
   // ===== MÉTODOS PARA EL MUNDO GLOBAL =====
 
+  // Obtener el estado actual del mundo global
+  async getGlobalWorldState(): Promise<GlobalWorldDoc | null> {
+    try {
+      console.log('🔥 FirebaseService.getGlobalWorldState: Obteniendo estado del mundo global');
+      const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
+      const docSnap = await getDoc(globalWorldRef);
+      
+      if (docSnap.exists()) {
+        const data = { id: docSnap.id, ...docSnap.data() } as GlobalWorldDoc;
+        console.log('🔥 FirebaseService.getGlobalWorldState: Estado obtenido', { 
+          objectsCount: data.objects?.length || 0,
+          mobileObjectsCount: data.mobileObjects?.length || 0,
+          effectZonesCount: data.effectZones?.length || 0
+        });
+        return data;
+      } else {
+        console.log('🔥 FirebaseService.getGlobalWorldState: No hay documento del mundo global');
+        return null;
+      }
+    } catch (error) {
+      console.error('🔥 FirebaseService.getGlobalWorldState: Error al obtener estado:', error);
+      throw error;
+    }
+  }
+
   // Guardar todo el estado del mundo global
   async saveGlobalWorldState(state: GlobalWorldDoc): Promise<void> {
     try {

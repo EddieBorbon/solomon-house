@@ -240,6 +240,13 @@ export class PersistenceService {
 
   // Sincronizar automáticamente los cambios con Firebase
   startAutoSync(projectId: string): () => void {
+    console.log('🌍 PersistenceService: Iniciando sincronización automática - Modo global forzado');
+    
+    // Asegurar que siempre estemos en modo global
+    useGridStore.setState({ activeGridId: 'global-world' });
+    
+    // Cargar inmediatamente los objetos del mundo global
+    this.loadGlobalWorldOnStartup();
     
     const unsubscribeProject = firebaseService.subscribeToProject(projectId, (project) => {
       if (project) {
@@ -285,10 +292,8 @@ export class PersistenceService {
           return {
             ...currentState,
             grids,
-            activeGridId: project.activeGridId,
-            currentGridCoordinates: project.activeGridId ? 
-              grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
-              [0, 0, 0]
+            activeGridId: 'global-world', // Siempre forzar modo global
+            currentGridCoordinates: globalWorld.currentGridCoordinates || [0, 0, 0]
           };
         });
       }
@@ -321,7 +326,7 @@ export class PersistenceService {
             return {
               ...currentState,
               grids: currentGrids,
-              activeGridId: globalWorld.activeGridId || currentState.activeGridId,
+              activeGridId: 'global-world', // Siempre forzar modo global
               currentGridCoordinates: globalWorld.currentGridCoordinates || currentState.currentGridCoordinates
             };
           }
@@ -336,6 +341,99 @@ export class PersistenceService {
       unsubscribeProject();
       unsubscribeGlobalWorld();
     };
+  }
+
+  // Cargar el mundo global al iniciar la aplicación
+  private async loadGlobalWorldOnStartup(): Promise<void> {
+    try {
+      console.log('🌍 PersistenceService: Cargando mundo global al iniciar aplicación');
+      
+      // Obtener el estado del mundo global desde Firebase
+      const globalWorldDoc = await firebaseService.getGlobalWorldState();
+      
+      if (globalWorldDoc) {
+        console.log('🌍 PersistenceService: Datos del mundo global obtenidos', { 
+          objectsCount: globalWorldDoc.objects?.length || 0,
+          mobileObjectsCount: globalWorldDoc.mobileObjects?.length || 0,
+          effectZonesCount: globalWorldDoc.effectZones?.length || 0
+        });
+        
+        // Crear la cuadrícula global con los datos de Firebase
+        const globalGrid: Grid = {
+          id: 'global-world',
+          coordinates: globalWorldDoc.currentGridCoordinates || [0, 0, 0],
+          position: [0, 0, 0],
+          objects: globalWorldDoc.objects || [],
+          mobileObjects: globalWorldDoc.mobileObjects || [],
+          effectZones: globalWorldDoc.effectZones || []
+        };
+        
+        console.log('🌍 PersistenceService: Cuadrícula global creada con', globalGrid.objects.length, 'objetos');
+        
+        // Actualizar el store con los datos del mundo global
+        useWorldStore.setState((currentState) => {
+          const currentGrids = new Map(currentState.grids);
+          currentGrids.set('global-world', globalGrid);
+          
+          return {
+            ...currentState,
+            grids: currentGrids,
+            activeGridId: 'global-world',
+            currentGridCoordinates: globalWorldDoc.currentGridCoordinates || currentState.currentGridCoordinates
+          };
+        });
+        
+        console.log('🌍 PersistenceService: Mundo global cargado exitosamente al iniciar');
+      } else {
+        console.log('🌍 PersistenceService: No hay datos del mundo global en Firebase, creando cuadrícula vacía');
+        
+        // Crear cuadrícula global vacía si no hay datos en Firebase
+        const globalGrid: Grid = {
+          id: 'global-world',
+          coordinates: [0, 0, 0],
+          position: [0, 0, 0],
+          objects: [],
+          mobileObjects: [],
+          effectZones: []
+        };
+        
+        useWorldStore.setState((currentState) => {
+          const currentGrids = new Map(currentState.grids);
+          currentGrids.set('global-world', globalGrid);
+          
+          return {
+            ...currentState,
+            grids: currentGrids,
+            activeGridId: 'global-world',
+            currentGridCoordinates: [0, 0, 0]
+          };
+        });
+      }
+    } catch (error) {
+      console.error('🌍 PersistenceService: Error al cargar mundo global al iniciar:', error);
+      
+      // En caso de error, crear cuadrícula global vacía
+      const globalGrid: Grid = {
+        id: 'global-world',
+        coordinates: [0, 0, 0],
+        position: [0, 0, 0],
+        objects: [],
+        mobileObjects: [],
+        effectZones: []
+      };
+      
+      useWorldStore.setState((currentState) => {
+        const currentGrids = new Map(currentState.grids);
+        currentGrids.set('global-world', globalGrid);
+        
+        return {
+          ...currentState,
+          grids: currentGrids,
+          activeGridId: 'global-world',
+          currentGridCoordinates: [0, 0, 0]
+        };
+      });
+    }
   }
 
   // Detener la sincronización automática

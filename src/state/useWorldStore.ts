@@ -241,16 +241,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
     const activeGridId = useGridStore.getState().activeGridId;
     
+    console.log('🎛️ useWorldStore.addObject: INICIANDO', { type, position, activeGridId });
+    
     if (!activeGridId) {
+      console.log('🎛️ useWorldStore.addObject: ERROR - No hay activeGridId');
       return;
     }
 
-    console.log('useWorldStore.addObject: Creando objeto', { type, position, activeGridId });
+    console.log('🎛️ useWorldStore.addObject: Creando objeto', { type, position, activeGridId });
 
     // Crear objeto usando el facade
     const newObject = worldStoreFacade.createObject(type, position, activeGridId);
     
-    console.log('useWorldStore.addObject: Objeto creado', newObject);
+    console.log('🎛️ useWorldStore.addObject: Objeto creado', newObject);
     
     // Actualizar la cuadrícula para reflejar el nuevo objeto
     const activeGrid = useGridStore.getState().grids.get(activeGridId);
@@ -261,6 +264,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       };
       
       useGridStore.getState().updateGrid(activeGridId, updatedGrid);
+      console.log('🎛️ useWorldStore.addObject: Cuadrícula actualizada', { gridId: activeGridId, objectsCount: updatedGrid.objects.length });
+    } else {
+      console.log('🎛️ useWorldStore.addObject: ERROR - No se encontró la cuadrícula activa', activeGridId);
     }
   },
 
