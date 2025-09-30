@@ -5,7 +5,7 @@ import { type MobileObject, type MobileObjectParams } from '../../../state/useWo
 
 interface MobileMovementControlsProps {
   mobileObject: MobileObject;
-  onParamChange: (param: keyof MobileObjectParams, value: any) => void;
+  onParamChange: (param: keyof MobileObjectParams, value: unknown) => void;
 }
 
 export function MobileMovementControls({

@@ -36,6 +36,8 @@ export interface MobileObject extends BaseEntity {
     amplitude: number;
     frequency: number;
     randomSeed: number;
+    height: number;
+    heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
   };

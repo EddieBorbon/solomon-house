@@ -5,7 +5,6 @@ import { TransformControls } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
-import { useObjectStore } from '../../stores/useObjectStore';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
 import { SoundCylinder } from '../sound-objects/SoundCylinder';
@@ -207,9 +206,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     const objects: SoundObject[] = [];
     const mobileObjects: MobileObjectType[] = [];
     const effectZones: EffectZoneType[] = [];
-    
-    // Obtener objetos del useObjectStore organizados por cuadrícula
-    const objectStore = useObjectStore.getState();
     
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());

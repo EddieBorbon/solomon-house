@@ -23,7 +23,7 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
   const { updateMobileObject } = useWorldStore();
   const { updateTransform, resetTransform, roundToDecimals } = useTransformHandler();
 
-  const handleParamChange = (param: string, value: any) => {
+  const handleParamChange = (param: string, value: unknown) => {
     updateMobileObject(mobileObject.id, {
       mobileParams: {
         ...mobileObject.mobileParams,

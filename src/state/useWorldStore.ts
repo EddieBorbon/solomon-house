@@ -59,6 +59,8 @@ export interface MobileObject {
     amplitude: number;
     frequency: number;
     randomSeed: number;
+    height: number;
+    heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
   };

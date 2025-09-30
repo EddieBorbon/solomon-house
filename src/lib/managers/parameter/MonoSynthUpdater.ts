@@ -14,7 +14,7 @@ export class MonoSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar parámetros del oscilador
       if (params.waveform !== undefined) {
         console.log('MonoSynthUpdater: Actualizando waveform de', synth.oscillator.type, 'a', params.waveform);
-        synth.oscillator.type = params.waveform as any;
+        synth.oscillator.type = params.waveform as Tone.ToneOscillatorType;
         result.updatedParams.push('waveform');
       }
 

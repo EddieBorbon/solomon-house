@@ -14,14 +14,14 @@ export class FMSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar parámetros del oscilador carrier
       if (params.waveform !== undefined) {
         console.log('FMSynthUpdater: Actualizando waveform de', synth.oscillator.type, 'a', params.waveform);
-        synth.oscillator.type = params.waveform as any;
+        synth.oscillator.type = params.waveform as Tone.ToneOscillatorType;
         result.updatedParams.push('waveform');
       }
 
       // Actualizar parámetros del oscilador modulator
       if (params.modWaveform !== undefined) {
         console.log('FMSynthUpdater: Actualizando modWaveform de', synth.modulation.type, 'a', params.modWaveform);
-        synth.modulation.type = params.modWaveform as any;
+        synth.modulation.type = params.modWaveform as Tone.ToneOscillatorType;
         result.updatedParams.push('modWaveform');
       }
 
@@ -91,7 +91,7 @@ export class FMSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar parámetros del filtro
       if (params.filterType !== undefined) {
         console.log('FMSynthUpdater: Actualizando filterType de', synth.filter.type, 'a', params.filterType);
-        synth.filter.type = params.filterType as any;
+        synth.filter.type = params.filterType as Tone.BiquadFilterType;
         result.updatedParams.push('filterType');
       }
 
