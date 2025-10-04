@@ -25,13 +25,13 @@ export function CameraToggleButton() {
   }, []);
 
   const toggleCamera = () => {
-    const newState = !isCameraEnabled;
+    // FORZAR SIEMPRE HABILITADO - NO PERMITIR DESHABILITAR LA CÁMARA
     const event = new CustomEvent('camera-toggle', { 
-      detail: { enabled: newState } 
+      detail: { enabled: true } 
     });
     window.dispatchEvent(event);
-    setIsCameraEnabled(newState);
-    console.log(`🎥 Camera controls ${newState ? 'enabled' : 'disabled'}`);
+    setIsCameraEnabled(true);
+    console.log('🎥 Camera controls SIEMPRE habilitado (toggle ignorado)');
   };
 
   const enableCamera = () => {
@@ -44,12 +44,13 @@ export function CameraToggleButton() {
   };
 
   const disableCamera = () => {
+    // FORZAR SIEMPRE HABILITADO - NO PERMITIR DESHABILITAR LA CÁMARA
     const event = new CustomEvent('camera-toggle', { 
-      detail: { enabled: false } 
+      detail: { enabled: true } 
     });
     window.dispatchEvent(event);
-    setIsCameraEnabled(false);
-    console.log('🎥 Camera controls disabled');
+    setIsCameraEnabled(true);
+    console.log('🎥 Camera controls SIEMPRE habilitado (disable ignorado)');
   };
 
   return (
@@ -57,24 +58,19 @@ export function CameraToggleButton() {
       <h3 className="text-lg font-semibold text-white">🎥 Control de Cámara</h3>
       
       <div className="flex items-center gap-2">
-        <div className={`w-3 h-3 rounded-full ${
-          isCameraEnabled ? 'bg-green-500' : 'bg-red-500'
-        }`} />
+        <div className="w-3 h-3 rounded-full bg-green-500" />
         <span className="text-sm text-gray-300">
-          {isCameraEnabled ? 'Cámara Activa' : 'Cámara Bloqueada'}
+          Cámara SIEMPRE Activa
         </span>
       </div>
 
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={toggleCamera}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-            isCameraEnabled
-              ? 'bg-red-600 hover:bg-red-700 text-white'
-              : 'bg-green-600 hover:bg-green-700 text-white'
-          }`}
+          className="px-4 py-2 rounded-md text-sm font-medium bg-green-600 hover:bg-green-700 text-white transition-colors"
+          disabled
         >
-          {isCameraEnabled ? 'Bloquear Cámara' : 'Activar Cámara'}
+          Cámara Siempre Activa
         </button>
 
         <button
@@ -87,8 +83,9 @@ export function CameraToggleButton() {
         <button
           onClick={disableCamera}
           className="px-3 py-2 rounded-md text-sm font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+          disabled
         >
-          Forzar OFF
+          Deshabilitado
         </button>
 
         <button
@@ -102,21 +99,19 @@ export function CameraToggleButton() {
         </button>
       </div>
 
-      {isCameraEnabled ? (
-        <p className="text-xs text-green-400">
-          ✅ Puedes rotar la cámara con el mouse (clic izquierdo + arrastrar)
-        </p>
-      ) : (
-        <p className="text-xs text-red-400">
-          ⚠️ La cámara está bloqueada. Haz clic en &quot;Activar Cámara&quot; para desbloquear.
-        </p>
-      )}
+      <p className="text-xs text-green-400">
+        ✅ La cámara está SIEMPRE habilitada y no se puede bloquear
+      </p>
 
       <div className="text-xs text-gray-400">
         <p><strong>Controles:</strong></p>
-        <p>• Clic izquierdo + arrastrar: Rotar</p>
-        <p>• Clic derecho + arrastrar: Pan</p>
+        <p>• Clic derecho + arrastrar: Rotar</p>
         <p>• Rueda del mouse: Zoom</p>
+        <p>• Botón medio + arrastrar: Pan</p>
+        <p className="text-yellow-400 mt-2"><strong>Teclas de Emergencia:</strong></p>
+        <p>• Tecla <kbd className="bg-gray-700 px-1 rounded">F</kbd>: Forzar habilitación inmediata</p>
+        <p>• Tecla <kbd className="bg-gray-700 px-1 rounded">C</kbd>: Reset rápido de cámara</p>
+        <p>• Tecla <kbd className="bg-gray-700 px-1 rounded">R</kbd>: Reset completo de cámara</p>
       </div>
     </div>
   );

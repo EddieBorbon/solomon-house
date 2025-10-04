@@ -175,23 +175,28 @@ export class EffectManagerRefactored implements IEffectManager {
    * @param params Parámetros a actualizar
    */
   updateGlobalEffect(effectId: string, params: EffectParams): void {
+    console.log('🎵 EffectManagerRefactored: updateGlobalEffect called', { effectId, params });
+    
     const effectData = this.globalEffects.get(effectId);
     if (!effectData) {
+      console.warn('⚠️ EffectManagerRefactored: Effect not found', effectId);
       return;
     }
 
     try {
       const { effectNode } = effectData;
+      console.log('🎵 EffectManagerRefactored: Effect node found', effectNode.constructor.name);
       
       // Usar updater registry para actualizar el efecto
       this.updaterRegistry.updateEffect(effectNode, params);
+      console.log('✅ EffectManagerRefactored: Effect updated via registry');
       
       // Refrescar el efecto para asegurar que los cambios se apliquen en tiempo real
       this.refreshGlobalEffect(effectId);
+      console.log('✅ EffectManagerRefactored: Effect refreshed');
       
-      // Log adicional para confirmar que los parámetros se aplicaron
-      
-    } catch {
+    } catch (error) {
+      console.error('❌ EffectManagerRefactored: Error updating effect:', error);
     }
   }
 

@@ -51,7 +51,9 @@ export class WorldStoreFacade {
     updates: Partial<Omit<SoundObject, 'id'>>,
     gridId: string
   ): void {
+    console.log('🔧 WorldStoreFacade: updateObject called', { id, updates, gridId });
     this.objectManager.updateObject(id, updates, gridId);
+    console.log('✅ WorldStoreFacade: updateObject completed');
   }
 
   /**

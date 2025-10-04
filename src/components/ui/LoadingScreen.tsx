@@ -69,7 +69,7 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
   const content = getContent();
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-sm z-50 p-8">
+    <div className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-sm z-50 p-4 sm:p-6 lg:p-8">
       {/* Main content container with border */}
       <div className="relative w-full h-full border border-white flex flex-col items-center justify-center">
         {/* Grid pattern background */}
@@ -86,7 +86,7 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
        
 
         {/* Complex border container */}
-        <div className="relative border border-white p-8">
+        <div className="relative border border-white p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full loading-screen-content">
           {/* Corner decorations */}
           <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
           <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
@@ -97,26 +97,26 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
           <div className="text-center">
 
             {/* Title */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-mono font-bold text-white tracking-wider mb-2">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-mono font-bold text-white tracking-wider mb-2">
                 {content.systemCode}
               </h2>
-              <div className="w-24 h-px bg-white mx-auto"></div>
-              <div className="w-16 h-px bg-gray-500 mx-auto mt-1"></div>
+              <div className="w-16 sm:w-20 lg:w-24 h-px bg-white mx-auto"></div>
+              <div className="w-12 sm:w-14 lg:w-16 h-px bg-gray-500 mx-auto mt-1"></div>
             </div>
 
             {/* Main title */}
-            <h1 className="text-3xl font-mono font-bold text-white tracking-wider mb-6">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white tracking-wider mb-4 sm:mb-6 loading-title">
               {content.title}
             </h1>
 
             {/* Welcome message */}
             {content.welcomeMessage && (
-              <div className="mb-6">
-                <p className="text-lg font-mono text-white tracking-wide mb-4 text-center">
+              <div className="mb-4 sm:mb-6">
+                <p className="text-sm sm:text-base lg:text-lg font-mono text-white tracking-wide mb-3 sm:mb-4 text-center loading-subtitle">
                   {content.welcomeMessage}
                 </p>
-                <p className="text-sm font-mono text-gray-300 tracking-wide leading-relaxed max-w-4xl mx-auto text-center px-8">
+                <p className="text-xs sm:text-sm font-mono text-gray-300 tracking-wide leading-relaxed max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
                   {content.description}
                 </p>
               </div>
@@ -124,13 +124,13 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
 
             {/* Action button */}
             {content.showButton && (
-              <div className="mb-8">
+              <div className="mb-6 sm:mb-8">
                 <button 
                   onClick={onStart}
-                  className="group relative px-8 py-3 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer"
+                  className="group relative px-4 sm:px-6 lg:px-8 py-2 sm:py-3 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer"
                 >
                   <div className="absolute -inset-1 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                  <span className="relative font-mono text-sm tracking-wider">
+                  <span className="relative font-mono text-xs sm:text-sm tracking-wider">
                     {t('loading.startButton')}
                   </span>
                 </button>
@@ -158,9 +158,9 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
             )}
 
             {/* Academic Information */}
-            <div className="mt-8 pt-6 border-t border-gray-600">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-600">
               {/* Project Information */}
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-1 sm:space-y-2">
                 <p className="text-xs font-mono text-gray-300 tracking-wider">
                   {t('loading.project')}
                 </p>
@@ -169,31 +169,31 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                 </p>
                 
                 {/* Author */}
-                <div className="mt-4 pt-2 border-t border-gray-700">
+                <div className="mt-3 sm:mt-4 pt-2 border-t border-gray-700">
                   <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
                     {t('loading.author')}
                   </p>
-                  <p className="text-sm font-mono text-white tracking-wider">
+                  <p className="text-xs sm:text-sm font-mono text-white tracking-wider">
                     {t('loading.authorName')}
                   </p>
                 </div>
 
                 {/* Tutor */}
-                <div className="mt-3">
+                <div className="mt-2 sm:mt-3">
                   <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
                     {t('loading.tutor')}
                   </p>
-                  <p className="text-sm font-mono text-white tracking-wider">
+                  <p className="text-xs sm:text-sm font-mono text-white tracking-wider">
                     {t('loading.tutorName')}
                   </p>
                 </div>
               </div>
 
               {/* Logos */}
-              <div className="flex justify-center items-center gap-8 mt-6 pt-4 border-t border-gray-700">
+              <div className="flex justify-center items-center gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
                 {/* UNAM Logo */}
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-2 flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-2 flex items-center justify-center logo-container">
                     <Image 
                       src="/Picture1-removebg-preview.png" 
                       alt="UNAM Logo" 
@@ -206,7 +206,7 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
                 
                 {/* FaM Logo */}
                 <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-2 flex items-center justify-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-2 flex items-center justify-center logo-container">
                     <Image 
                       src="/Picture2-removebg-preview.png" 
                       alt="FaM Logo" 
@@ -219,8 +219,8 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
               </div>
 
               {/* Language Selector - Centered below logos */}
-              <div className="mt-6 pt-4 border-t border-gray-700">
-                <LanguageSelector variant="loading-no-flag" />
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
+                <LanguageSelector variant="loading-no-flag" className="language-selector" />
               </div>
             </div>
 

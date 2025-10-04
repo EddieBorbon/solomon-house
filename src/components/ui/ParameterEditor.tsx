@@ -94,6 +94,13 @@ export function ParameterEditor() {
     const soundObject = getSoundObject();
     if (!soundObject) return;
 
+    console.log('🎵 ParameterEditor: handleParamChange called', { 
+      objectId: soundObject.id, 
+      param, 
+      value, 
+      currentParams: soundObject.audioParams 
+    });
+
     // Mostrar estado de actualización
     setIsUpdatingParams(true);
     setLastUpdatedParam(param);
@@ -103,9 +110,13 @@ export function ParameterEditor() {
       [param]: value,
     };
 
+    console.log('🎵 ParameterEditor: New audio params', newAudioParams);
+
     updateObject(soundObject.id, {
       audioParams: newAudioParams,
     });
+
+    console.log('✅ ParameterEditor: updateObject called');
 
     // Ocultar estado de actualización después de un breve delay
     setTimeout(() => {

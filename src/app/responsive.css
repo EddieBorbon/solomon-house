@@ -1,0 +1,114 @@
+/* Estilos responsive adicionales para Solomon House */
+
+/* Pantallas muy pequeñas (móviles) */
+@media (max-width: 640px) {
+  /* Asegurar que el contenido no se desborde */
+  .loading-screen-content {
+    max-width: 100%;
+    padding: 1rem;
+  }
+  
+  /* Botones más pequeños en móviles */
+  .language-selector button {
+    min-width: 60px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Logos más pequeños */
+  .logo-container {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+  /* Texto más pequeño */
+  .loading-title {
+    font-size: 1.25rem !important;
+  }
+  
+  .loading-subtitle {
+    font-size: 1rem !important;
+  }
+}
+
+/* Pantallas medianas (tablets) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .loading-screen-content {
+    max-width: 768px;
+    padding: 2rem;
+  }
+  
+  .logo-container {
+    width: 64px !important;
+    height: 64px !important;
+  }
+}
+
+/* Pantallas grandes (desktop) */
+@media (min-width: 1025px) {
+  .loading-screen-content {
+    max-width: 1024px;
+    padding: 3rem;
+  }
+}
+
+/* Pantallas muy grandes (ultrawide) */
+@media (min-width: 1440px) {
+  .loading-screen-content {
+    max-width: 1200px;
+    padding: 4rem;
+  }
+  
+  /* Asegurar que el contenido no se estire demasiado */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+}
+
+/* Mejoras para pantallas ultrawide */
+@media (min-width: 2560px) {
+  .loading-screen-content {
+    max-width: 1400px;
+  }
+}
+
+/* Asegurar que el contenido siempre esté centrado */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.loading-screen-content {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Flexbox para botones de idioma */
+.language-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.language-selector button {
+  flex: 1;
+  min-width: 60px;
+  max-width: 120px;
+}
+
+@media (min-width: 640px) {
+  .language-selector button {
+    flex: none;
+    min-width: 80px;
+  }
+}
+

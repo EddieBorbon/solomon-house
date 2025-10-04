@@ -298,18 +298,23 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
   },
 
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
+    console.log('🔧 useEffectStore: updateEffectZone called', { id, updates });
 
     // Si se actualiza la posición, actualizar también en el AudioManager
     if (updates.position) {
       try {
+        console.log('🔧 useEffectStore: Updating position', updates.position);
         audioManager.updateEffectZonePosition(id, updates.position);
-      } catch {
+      } catch (error) {
+        console.error('❌ useEffectStore: Error updating position:', error);
       }
     }
 
     // Si se actualizan los parámetros del efecto, actualizar también en el AudioManager
     if (updates.effectParams) {
       try {
+        console.log('🔧 useEffectStore: Updating effect params', updates.effectParams);
+        
         // Si se cambió el radio, actualizarlo en el AudioManager
         if (updates.effectParams.radius !== undefined) {
           audioManager.setEffectZoneRadius(id, updates.effectParams.radius);
@@ -317,7 +322,9 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
         
         // Actualizar otros parámetros del efecto
         audioManager.updateGlobalEffect(id, updates.effectParams);
-      } catch {
+        console.log('✅ useEffectStore: Effect params updated successfully');
+      } catch (error) {
+        console.error('❌ useEffectStore: Error updating effect params:', error);
       }
     }
 

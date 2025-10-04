@@ -68,14 +68,14 @@ export function LanguageSelector({ variant = 'loading', className = '' }: Langua
   // Variant 'loading-no-flag' - botones sin banderas para el loading screen
   if (variant === 'loading-no-flag') {
     return (
-      <div className={`flex gap-3 justify-center ${className}`}>
+      <div className={`flex gap-2 sm:gap-3 justify-center flex-wrap ${className}`}>
         {languages.map((lang) => (
           <button
             key={lang}
             onClick={() => changeLanguage(lang)}
             className={`
-              group relative px-4 py-2 border border-white transition-all duration-300 cursor-pointer
-              flex items-center justify-center min-w-[80px]
+              group relative px-3 sm:px-4 py-1.5 sm:py-2 border border-white transition-all duration-300 cursor-pointer
+              flex items-center justify-center min-w-[60px] sm:min-w-[80px] flex-1 sm:flex-none
               ${locale === lang 
                 ? 'bg-white text-black' 
                 : 'text-white hover:bg-white hover:text-black'

@@ -24,14 +24,24 @@ export class EffectUpdaterRegistry implements IEffectUpdaterRegistry {
    * @throws Error si no existe updater para el tipo de efecto
    */
   updateEffect(effect: Tone.ToneAudioNode, params: EffectParams): void {
+    console.log('🔧 EffectUpdaterRegistry: updateEffect called', { 
+      effectType: effect.constructor.name, 
+      params 
+    });
+    
     const updater = this.getUpdater(effect);
     if (!updater) {
+      console.error('❌ EffectUpdaterRegistry: No updater found', effect.constructor.name);
+      console.log('🔧 EffectUpdaterRegistry: Available updaters:', Array.from(this.updaters.keys()));
       throw new Error(`No updater registered for effect type: ${effect.constructor.name}`);
     }
 
     try {
+      console.log('🔧 EffectUpdaterRegistry: Using updater', updater.constructor.name);
       updater.updateParams(effect, params);
+      console.log('✅ EffectUpdaterRegistry: Effect params updated successfully');
     } catch (error) {
+      console.error('❌ EffectUpdaterRegistry: Error updating effect:', error);
       throw error;
     }
   }

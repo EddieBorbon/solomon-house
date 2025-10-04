@@ -240,11 +240,15 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   },
 
   removeObject: (id: string, gridId: string) => {
+    console.log('🎵 useObjectStore: removeObject called', { id, gridId });
 
     // Eliminar la fuente de sonido del AudioManager
     try {
+      console.log('🔧 useObjectStore: Calling audioManager.removeSoundSource', id);
       audioManager.removeSoundSource(id);
-    } catch {
+      console.log('✅ useObjectStore: audioManager.removeSoundSource called successfully');
+    } catch (error) {
+      console.error('❌ useObjectStore: Error removing sound source:', error);
     }
 
     // Eliminar objeto del estado local
@@ -262,21 +266,34 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       };
     });
 
+    console.log('✅ useObjectStore: Object removed from local state');
+
   },
 
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>, gridId: string) => {
+    console.log('🎵 useObjectStore: updateObject called', { id, updates, gridId });
+
+    // Obtener el objeto actual antes de la actualización
+    const currentObject = get().objects.find(obj => obj.id === id);
+    if (!currentObject) {
+      console.warn('⚠️ useObjectStore: Object not found before update', id);
+      return;
+    }
+
+    // Crear el objeto actualizado
+    const updatedObject = { ...currentObject, ...updates };
 
     // Actualizar objeto en el estado local
     set((state) => {
       const newObjects = state.objects.map(obj => 
-        obj.id === id ? { ...obj, ...updates } : obj
+        obj.id === id ? updatedObject : obj
       );
       const newObjectsByGrid = new Map(state.objectsByGrid);
       
       // Actualizar objeto en la cuadrícula específica
       const gridObjects = newObjectsByGrid.get(gridId) || [];
       newObjectsByGrid.set(gridId, gridObjects.map(obj => 
-        obj.id === id ? { ...obj, ...updates } : obj
+        obj.id === id ? updatedObject : obj
       ));
       
       return {
@@ -285,16 +302,19 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       };
     });
 
-    // Obtener el objeto actualizado para comunicar cambios al AudioManager
-    const updatedObject = get().objects.find(obj => obj.id === id);
-    if (updatedObject) {
-      // Comunicar cambios al AudioManager
-      if (updates.position) {
-        audioManager.updateSoundPosition(id, updatedObject.position);
-      }
-      if (updates.audioParams) {
-        audioManager.updateSoundParams(id, updatedObject.audioParams);
-      }
+    console.log('✅ useObjectStore: Local state updated');
+
+    // Comunicar cambios al AudioManager usando el objeto actualizado
+    console.log('🎵 useObjectStore: Updating audio with object', updatedObject);
+    
+    if (updates.position) {
+      console.log('🔧 useObjectStore: Updating position', updatedObject.position);
+      audioManager.updateSoundPosition(id, updatedObject.position);
+    }
+    if (updates.audioParams) {
+      console.log('🔧 useObjectStore: Updating audio params', updatedObject.audioParams);
+      audioManager.updateSoundParams(id, updatedObject.audioParams);
+      console.log('✅ useObjectStore: audioManager.updateSoundParams called');
     }
 
   },

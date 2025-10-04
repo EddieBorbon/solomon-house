@@ -22,7 +22,7 @@ import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
 interface SceneContentProps {
-  orbitControlsRef: React.RefObject<{ enabled: boolean } | null>;
+  orbitControlsRef: React.RefObject<any>;
 }
 
 // Componente contenedor para cada objeto de sonido
@@ -215,13 +215,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       // Usar objetos directamente de la cuadrícula (useWorldStore) en lugar del ObjectStore
       const gridObjects = grid.objects || [];
       
-      console.log(`Grid ${grid.id}:`, {
-        objectsFromGrid: gridObjects.length,
-        mobileObjects: grid.mobileObjects?.length || 0,
-        effectZones: grid.effectZones?.length || 0,
-        isActive: grid.id === activeGridId
-      });
-      
       // Usar objetos de la cuadrícula directamente
       objects.push(...gridObjects.filter(obj => obj && obj.id));
       
@@ -232,12 +225,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       if (Array.isArray(grid.effectZones)) {
         effectZones.push(...grid.effectZones.filter(zone => zone && zone.id));
       }
-    });
-    
-    console.log('Total objects:', {
-      objects: objects.length,
-      mobileObjects: mobileObjects.length,
-      effectZones: effectZones.length
     });
     
     return { objects, mobileObjects, effectZones };
@@ -335,33 +322,114 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
-    // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
-    if (orbitControlsRef.current && selectedEntityId && !selectedEntityId.includes(',')) {
-      orbitControlsRef.current.enabled = false;
-    }
+    console.log('🔧 SceneContent: handleTransformStart called', { selectedEntityId, enabled: orbitControlsRef.current?.enabled });
+    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    console.log('✅ SceneContent: OrbitControls mantenido habilitado durante transform');
   }, [orbitControlsRef, selectedEntityId]);
 
   // Función para manejar el fin de la manipulación
   const handleTransformEnd = useCallback(() => {
-    if (orbitControlsRef.current) {
-      orbitControlsRef.current.enabled = true;
-    }
+    console.log('🔧 SceneContent: handleTransformEnd called', { enabled: orbitControlsRef.current?.enabled });
+    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    console.log('✅ SceneContent: OrbitControls mantenido habilitado después de transform');
   }, [orbitControlsRef]);
 
-  // Efecto para controlar OrbitControls basado en el estado de edición de zona de efectos
-  // Solo deshabilitar OrbitControls cuando se estén usando TransformControls, no solo por editar
+  // Efecto para asegurar que OrbitControls SIEMPRE esté habilitado
   React.useEffect(() => {
     if (orbitControlsRef.current) {
-      // Solo deshabilitar OrbitControls cuando se estén usando TransformControls
-      // El estado isEditingEffectZone no debería bloquear la cámara
-      // Mantener OrbitControls habilitado para permitir movimiento de cámara
+      // FORZAR OrbitControls SIEMPRE HABILITADO - NUNCA BLOQUEAR LA CÁMARA
       orbitControlsRef.current.enabled = true;
+      console.log('✅ SceneContent: OrbitControls garantizado como habilitado');
     }
   }, [orbitControlsRef]);
 
-  // Log para verificar que está leyendo el estado correctamente (solo cuando cambie)
+  // Función de emergencia para desbloquear y resetear la cámara
+  const handleEmergencyCameraUnlock = useCallback((event: KeyboardEvent) => {
+    // Presionar 'C' para desbloquear la cámara
+    if (event.key.toLowerCase() === 'c' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
+      if (orbitControlsRef.current) {
+        const wasDisabled = !orbitControlsRef.current.enabled;
+        
+        // Reset completo de OrbitControls
+        try {
+          orbitControlsRef.current.enabled = true;
+          orbitControlsRef.current.update();
+          orbitControlsRef.current.reset();
+          console.log('🚨 SceneContent: OrbitControls reseteado completamente con tecla C', { wasDisabled });
+        } catch (error) {
+          console.warn('⚠️ SceneContent: Error al resetear OrbitControls:', error);
+          // Fallback: solo habilitar
+          orbitControlsRef.current.enabled = true;
+        }
+      } else {
+        console.warn('🚨 SceneContent: No se puede resetear cámara - OrbitControls no disponible');
+      }
+    }
+    
+    // Presionar 'R' para reset completo de cámara
+    if (event.key.toLowerCase() === 'r' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
+      if (orbitControlsRef.current) {
+        try {
+          orbitControlsRef.current.enabled = true;
+          orbitControlsRef.current.reset();
+          orbitControlsRef.current.update();
+          console.log('🔄 SceneContent: Reset completo de cámara con tecla R');
+        } catch (error) {
+          console.warn('⚠️ SceneContent: Error en reset completo de cámara:', error);
+        }
+      }
+    }
+    
+    // Presionar 'F' para forzar habilitación inmediata
+    if (event.key.toLowerCase() === 'f' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
+      if (orbitControlsRef.current) {
+        try {
+          orbitControlsRef.current.enabled = true;
+          orbitControlsRef.current.update();
+          console.log('⚡ SceneContent: OrbitControls forzado como habilitado con tecla F');
+        } catch (error) {
+          console.warn('⚠️ SceneContent: Error al forzar habilitación:', error);
+        }
+      }
+    }
+  }, [orbitControlsRef]);
+
+  // Agregar listener de teclado para desbloqueo de emergencia
   useEffect(() => {
+    window.addEventListener('keydown', handleEmergencyCameraUnlock);
+    return () => {
+      window.removeEventListener('keydown', handleEmergencyCameraUnlock);
+    };
+  }, [handleEmergencyCameraUnlock]);
+
+  // Verificar que está leyendo el estado correctamente (solo cuando cambie)
+  useEffect(() => {
+    // Log solo en desarrollo y solo cuando realmente cambien los objetos
+    if (process.env.NODE_ENV === 'development') {
+      console.log('SceneContent: Estado actualizado', {
+        objects: allObjects.objects.length,
+        mobileObjects: allObjects.mobileObjects.length,
+        effectZones: allObjects.effectZones.length,
+        grids: grids.size
+      });
+    }
   }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
+
+  // Estado para mostrar indicador de cámara bloqueada
+  const [showCameraBlockedIndicator, setShowCameraBlockedIndicator] = React.useState(false);
+  
+  // Efecto para detectar cuando la cámara está bloqueada
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (orbitControlsRef.current && !orbitControlsRef.current.enabled) {
+        setShowCameraBlockedIndicator(true);
+      } else {
+        setShowCameraBlockedIndicator(false);
+      }
+    }, 1000); // Verificar cada segundo
+    
+    return () => clearInterval(interval);
+  }, [orbitControlsRef]);
 
   return (
     <>
@@ -500,8 +568,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                 handleTransformChange(selectedEntityId, event.target.object);
               }
             }}
-            onMouseDown={handleTransformStart}
-            onMouseUp={handleTransformEnd}
             size={0.75}
           />
         );
@@ -515,6 +581,18 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             <meshStandardMaterial color="#6c5ce7" transparent opacity={0.3} />
           </mesh>
         </group>
+      )}
+
+      {/* Indicador de cámara bloqueada */}
+      {showCameraBlockedIndicator && (
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="bg-red-500/90 backdrop-blur-sm rounded-lg p-3 text-white text-sm font-medium shadow-lg">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-300 rounded-full animate-pulse" />
+              <span>🎥 Cámara bloqueada - Presiona 'C' para desbloquear</span>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

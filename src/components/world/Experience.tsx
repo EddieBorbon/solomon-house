@@ -12,6 +12,8 @@ import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
 import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
+import { QuotaWarning } from '../ui/QuotaWarning';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
@@ -27,6 +29,12 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
   useFrame(({ camera }) => {
     if (orbitControlsRef.current) {
       updateCameraPosition(camera, orbitControlsRef.current);
+      
+      // FORZAR OrbitControls SIEMPRE HABILITADO en cada frame
+      if (!orbitControlsRef.current.enabled) {
+        orbitControlsRef.current.enabled = true;
+        console.log('🎮 CameraControllerInternal: OrbitControls re-habilitado en frame');
+      }
     }
 
     // --- NUEVA FUNCIONALIDAD: Actualizar listener de audio en tiempo real ---
@@ -50,11 +58,85 @@ export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { currentProjectId } = useWorldStore();
   
+  // Inicializar sincronización del mundo global
+  const {
+    isConnected,
+    error,
+    isInitializing,
+    reconnect,
+    clearError
+  } = useGlobalWorldSync();
+  
+  // Estado para mostrar advertencia de cuota
+  const [showQuotaWarning, setShowQuotaWarning] = React.useState(false);
+  
+  // Detectar errores de cuota
+  React.useEffect(() => {
+    if (error?.includes('Cuota de Firestore excedida')) {
+      setShowQuotaWarning(true);
+    }
+  }, [error]);
+  
+
+  // Función para limpiar datos de Firestore
+  const handleCleanup = async () => {
+    try {
+      // Aquí podrías implementar la limpieza
+      console.log('Limpiando datos de Firestore...');
+      setShowQuotaWarning(false);
+      clearError();
+      // Recargar la página para reconectar
+      window.location.reload();
+    } catch (error) {
+      console.error('Error durante la limpieza:', error);
+    }
+  };
 
   return (
     <div className="w-full h-screen">
+      {/* Advertencia de cuota */}
+      <QuotaWarning 
+        isVisible={showQuotaWarning}
+        onDismiss={() => setShowQuotaWarning(false)}
+        onCleanup={handleCleanup}
+      />
+      
       {/* Estado de sincronización en tiempo real */}
       <RealtimeSyncStatus projectId={currentProjectId} />
+      
+      {/* Estado de conexión del mundo global */}
+      <div className="absolute top-4 right-4 z-10">
+        <div className="bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
+            <span>
+              {isInitializing ? 'Inicializando...' : 
+               isConnected ? 'Mundo Global Conectado' : 
+               'Mundo Global Desconectado'}
+            </span>
+          </div>
+          
+          {error && (
+            <div className="mt-2 text-red-300 text-xs">
+              <div className="flex items-center gap-2">
+                <span>Error: {error}</span>
+                <button 
+                  onClick={clearError}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  ✕
+                </button>
+              </div>
+              <button 
+                onClick={reconnect}
+                className="mt-1 text-blue-300 hover:text-blue-200 underline"
+              >
+                Reintentar conexión
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       
       <Canvas
         camera={{
@@ -90,7 +172,7 @@ export function Experience() {
         <CameraControllerInternal orbitControlsRef={orbitControlsRef} />
         
         {/* Manager de controles de cámara */}
-        <CameraControlsManager />
+        <CameraControlsManager orbitControlsRef={orbitControlsRef} />
         
         {/* Controles de cámara */}
         <OrbitControls 
@@ -100,8 +182,41 @@ export function Experience() {
           enableRotate={true}
           maxDistance={500}
           minDistance={0.5}
-          dampingFactor={0.05}
+          dampingFactor={0.1}
           enableDamping={true}
+          autoRotate={false}
+          autoRotateSpeed={0}
+          enableKeys={true}
+          mouseButtons={{
+            LEFT: undefined, // Desactivar botón izquierdo para rotar
+            MIDDLE: THREE.MOUSE.DOLLY, // Botón medio para zoom
+            RIGHT: THREE.MOUSE.ROTATE // Usar botón derecho para rotar
+          }}
+          touches={{
+            ONE: THREE.TOUCH.ROTATE,
+            TWO: THREE.TOUCH.DOLLY_PAN
+          }}
+          onStart={() => {
+            console.log('🎮 OrbitControls: Interacción iniciada');
+            // Forzar habilitación inmediata
+            if (orbitControlsRef.current) {
+              orbitControlsRef.current.enabled = true;
+            }
+          }}
+          onEnd={() => {
+            console.log('🎮 OrbitControls: Interacción terminada');
+            // Mantener habilitado después de la interacción
+            if (orbitControlsRef.current) {
+              orbitControlsRef.current.enabled = true;
+              orbitControlsRef.current.update();
+            }
+          }}
+          onChange={() => {
+            // Forzar actualización del estado interno para prevenir congelamiento
+            if (orbitControlsRef.current) {
+              orbitControlsRef.current.enabled = true;
+            }
+          }}
         />
 
         {/* Iluminación básica */}

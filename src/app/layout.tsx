@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./tailwind.css";
 import "./neon-sliders.css";
 import "./glassmorphism.css";
 import "./futuristic-sliders.css";
+import "./responsive.css";
 import { StoreProvider } from "../components/StoreProvider";
 import { LanguageProvider } from "../contexts/LanguageContext";
 
@@ -20,6 +21,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Casa de Salomon - Creación Musical 3D Colaborativa",
   description: "Aplicación de creación musical 3D colaborativa usando Next.js, Three.js y Zustand",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -34,7 +47,9 @@ export default function RootLayout({
       >
         <LanguageProvider>
           <StoreProvider>
-            {children}
+            <div className="w-full h-full">
+              {children}
+            </div>
           </StoreProvider>
         </LanguageProvider>
       </body>

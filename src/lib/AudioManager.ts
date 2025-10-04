@@ -292,22 +292,35 @@ export class AudioManager {
    * Elimina una fuente de sonido
    */
   public removeSoundSource(id: string): void {
+    console.log('🎵 AudioManager: removeSoundSource called', id);
+    
     const source = this.soundSources.get(id);
-    if (!source) return;
+    if (!source) {
+      console.warn('⚠️ AudioManager: Sound source not found', id);
+      return;
+    }
 
     try {
+      console.log('🎵 AudioManager: Found sound source, stopping audio');
+      
       // Detener el sonido si está sonando
       if (this.soundPlaybackManager.isSoundPlaying(id)) {
+        console.log('🔧 AudioManager: Stopping sound playback');
         this.soundPlaybackManager.stopSound(id, source);
+        console.log('✅ AudioManager: Sound stopped');
+      } else {
+        console.log('ℹ️ AudioManager: Sound was not playing');
       }
 
       // Limpiar todas las conexiones
+      console.log('🔧 AudioManager: Cleaning up connections');
       this.cleanupSourceEffectConnections(id);
       source.panner.disconnect();
       source.dryGain.disconnect();
       source.synth.disconnect();
 
       // Limpiar recursos
+      console.log('🔧 AudioManager: Disposing resources');
       source.synth.dispose();
       source.panner.dispose();
       source.dryGain.dispose();
@@ -324,7 +337,10 @@ export class AudioManager {
       // Eliminar del Map y limpiar el estado
       this.soundSources.delete(id);
       this.soundPlaybackManager.removePlaybackState(id);
-    } catch {
+      console.log('✅ AudioManager: Sound source removed successfully');
+      
+    } catch (error) {
+      console.error('❌ AudioManager: Error removing sound source:', error);
     }
   }
 

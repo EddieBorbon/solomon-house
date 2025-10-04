@@ -127,16 +127,13 @@ class TransformHandler implements ITransformHandler {
   }
 
   handleTransformStart(): void {
-    // Solo deshabilitar OrbitControls si hay una entidad seleccionada que NO sea una cuadrícula
-    if (this.orbitControlsRef.current) {
-      this.orbitControlsRef.current.enabled = false;
-    }
+    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    console.log('✅ SceneContentNew: OrbitControls mantenido habilitado durante transform');
   }
 
   handleTransformEnd(): void {
-    if (this.orbitControlsRef.current) {
-      this.orbitControlsRef.current.enabled = true;
-    }
+    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    console.log('✅ SceneContentNew: OrbitControls mantenido habilitado después de transform');
   }
 }
 
