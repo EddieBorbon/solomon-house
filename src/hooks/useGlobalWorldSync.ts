@@ -223,6 +223,24 @@ export function useGlobalWorldSync() {
           }
         } else {
           console.log(`🆕 Nuevo objeto detectado: ${newObject.id}`);
+          
+          // IMPORTANTE: Añadir el nuevo objeto al estado local del usuario
+          // Esto es lo que faltaba para que el usuario A vea los objetos del usuario B
+          const { addGlobalSoundObject } = useWorldStore.getState();
+          
+          // Marcar temporalmente que estamos actualizando desde Firestore para evitar bucles
+          const { setIsUpdatingFromFirestore } = useWorldStore.getState();
+          setIsUpdatingFromFirestore(true);
+          
+          // Añadir el objeto al estado local
+          addGlobalSoundObject(newObject);
+          
+          // Resetear la bandera después de un breve delay
+          setTimeout(() => {
+            setIsUpdatingFromFirestore(false);
+          }, 100);
+          
+          console.log(`✅ Nuevo objeto ${newObject.id} añadido al estado local`);
         }
       }
       
@@ -276,6 +294,25 @@ export function useGlobalWorldSync() {
               updateGlobalMobileObject(newMobileObject.id, updates);
             }
           }
+        } else {
+          console.log(`🆕 Nuevo objeto móvil detectado: ${newMobileObject.id}`);
+          
+          // IMPORTANTE: Añadir el nuevo objeto móvil al estado local del usuario
+          const { addGlobalMobileObject } = useWorldStore.getState();
+          
+          // Marcar temporalmente que estamos actualizando desde Firestore para evitar bucles
+          const { setIsUpdatingFromFirestore } = useWorldStore.getState();
+          setIsUpdatingFromFirestore(true);
+          
+          // Añadir el objeto móvil al estado local
+          addGlobalMobileObject(newMobileObject);
+          
+          // Resetear la bandera después de un breve delay
+          setTimeout(() => {
+            setIsUpdatingFromFirestore(false);
+          }, 100);
+          
+          console.log(`✅ Nuevo objeto móvil ${newMobileObject.id} añadido al estado local`);
         }
       }
     }
@@ -312,6 +349,25 @@ export function useGlobalWorldSync() {
               updateGlobalEffectZone(newEffectZone.id, updates);
             }
           }
+        } else {
+          console.log(`🆕 Nueva zona de efecto detectada: ${newEffectZone.id}`);
+          
+          // IMPORTANTE: Añadir la nueva zona de efecto al estado local del usuario
+          const { addGlobalEffectZone } = useWorldStore.getState();
+          
+          // Marcar temporalmente que estamos actualizando desde Firestore para evitar bucles
+          const { setIsUpdatingFromFirestore } = useWorldStore.getState();
+          setIsUpdatingFromFirestore(true);
+          
+          // Añadir la zona de efecto al estado local
+          addGlobalEffectZone(newEffectZone);
+          
+          // Resetear la bandera después de un breve delay
+          setTimeout(() => {
+            setIsUpdatingFromFirestore(false);
+          }, 100);
+          
+          console.log(`✅ Nueva zona de efecto ${newEffectZone.id} añadida al estado local`);
         }
       }
     }
