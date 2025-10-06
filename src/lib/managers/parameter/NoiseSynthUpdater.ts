@@ -9,7 +9,7 @@ import { ParameterConfigManager } from './ParameterConfigManager';
  */
 export class NoiseSynthUpdater extends BaseSynthesizerUpdater {
   constructor(configManager?: ParameterConfigManager) {
-    super(configManager);
+    super(configManager || new ParameterConfigManager());
   }
   /**
    * Actualiza parámetros específicos del NoiseSynth

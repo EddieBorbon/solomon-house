@@ -38,8 +38,23 @@ export class AutoWahUpdater implements IEffectUpdater<Tone.AutoWah> {
    * @param effect Nodo de efecto a validar
    * @returns true si puede manejar el efecto, false en caso contrario
    */
-  canHandle(effect: Tone.ToneAudioNode): boolean {
+  canUpdate(effect: Tone.ToneAudioNode): boolean {
     return effect instanceof Tone.AutoWah;
+  }
+
+  /**
+   * Obtiene los parámetros actuales del efecto
+   * @param effect Nodo de efecto
+   * @returns Objeto con los parámetros actuales
+   */
+  getCurrentParams(effect: Tone.AutoWah): Record<string, unknown> {
+    return {
+      baseFrequency: effect.baseFrequency,
+      octaves: effect.octaves,
+      sensitivity: effect.sensitivity,
+      qValue: effect.Q?.value,
+      wet: effect.wet?.value
+    };
   }
 
   /**
@@ -102,7 +117,7 @@ export class AutoWahUpdater implements IEffectUpdater<Tone.AutoWah> {
           break;
         default:
           // Intentar acceso genérico
-          const typedEffect = effect as Record<string, unknown>;
+          const typedEffect = effect as unknown as Record<string, unknown>;
           const param = typedEffect[paramName];
           if (param && typeof param === 'object' && 'value' in param) {
             (param as { value: number | string }).value = value;

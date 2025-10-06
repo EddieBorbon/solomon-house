@@ -1,3 +1,4 @@
+import * as Tone from 'tone';
 import { AudioParams } from '../../factories/SoundSourceFactory';
 import { BaseSynthesizerUpdater, ParameterUpdateResult } from './BaseSynthesizerUpdater';
 
@@ -28,13 +29,13 @@ export class DuoSynthUpdater extends BaseSynthesizerUpdater {
       // Actualizar frecuencia usando el método base
       if (params.frequency !== undefined) {
         console.log('DuoSynthUpdater: Actualizando frecuencia a', params.frequency);
-        this.updateFrequency(synth as Record<string, unknown>, params.frequency, result);
+        this.updateFrequency(synth as Tone.DuoSynth, params.frequency, result);
       }
       
       // Actualizar volumen usando el método base
       if (params.volume !== undefined) {
         console.log('DuoSynthUpdater: Actualizando volumen a', params.volume);
-        this.updateVolume(synth as Record<string, unknown>, params.volume, result);
+        this.updateVolume(synth as Tone.DuoSynth, params.volume, result);
       }
       
       // Actualizar harmonicity

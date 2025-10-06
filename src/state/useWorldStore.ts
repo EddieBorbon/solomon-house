@@ -1024,7 +1024,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
       console.log('🎵 Inicializando audio para objetos sincronizados...');
       
       // Iterar sobre todas las cuadrículas y sus objetos
-      newGrids.forEach((grid, gridId) => {
+      newGrids.forEach((grid) => {
         grid.objects.forEach(object => {
           try {
             console.log(`🎵 Inicializando audio para objeto ${object.id} de tipo ${object.type}`);

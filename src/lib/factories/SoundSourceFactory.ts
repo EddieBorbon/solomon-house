@@ -24,6 +24,7 @@ export interface AudioParams {
   autoRotate?: boolean; // Activar/desactivar rotación automática
   harmonicity?: number;
   modulationWaveform?: OscillatorType;
+  modWaveform?: OscillatorType; // Alias para modulationWaveform
   modulationIndex?: number;
   waveform2?: OscillatorType;
   vibratoAmount?: number;
@@ -34,6 +35,10 @@ export interface AudioParams {
   ampDecay?: number;
   ampSustain?: number;
   ampRelease?: number;
+  modAttack?: number;
+  modDecay?: number;
+  modSustain?: number;
+  modRelease?: number;
   filterAttack?: number;
   filterDecay?: number;
   filterSustain?: number;
@@ -41,6 +46,8 @@ export interface AudioParams {
   filterBaseFreq?: number;
   filterOctaves?: number;
   filterQ?: number;
+  filterType?: string;
+  filterFrequency?: number;
   resonance?: number;
   noiseType?: 'white' | 'pink' | 'brown';
   attack?: number;

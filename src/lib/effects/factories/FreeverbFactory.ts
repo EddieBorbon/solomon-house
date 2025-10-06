@@ -22,7 +22,7 @@ export class FreeverbFactory implements IEffectFactory {
 
     console.log(`🎛️ FreeverbFactory: Freeverb creado con parámetros iniciales:`, {
       roomSize: effectNode.roomSize.value,
-      dampening: effectNode.dampening.value,
+      dampening: effectNode.dampening,
       wet: effectNode.wet?.value || 0.5,
       readyForSpatialConnection: true
     });

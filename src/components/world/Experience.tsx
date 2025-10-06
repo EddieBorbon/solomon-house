@@ -186,7 +186,7 @@ export function Experience() {
           enableDamping={true}
           autoRotate={false}
           autoRotateSpeed={0}
-          enableKeys={true}
+          // enableKeys={true} // Propiedad no existe en OrbitControls
           mouseButtons={{
             LEFT: undefined, // Desactivar botón izquierdo para rotar
             MIDDLE: THREE.MOUSE.DOLLY, // Botón medio para zoom

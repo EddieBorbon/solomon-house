@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
 import { useWorldStore } from '../state/useWorldStore';
 
@@ -10,7 +10,7 @@ export function useGlobalWorldSync() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  // const [isOfflineMode, setIsOfflineMode] = useState(false); // No se utiliza actualmente
   
   const isUpdatingFromFirestoreRef = useRef(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -28,7 +28,7 @@ export function useGlobalWorldSync() {
   } = useWorldStore();
 
   // Función helper para detectar cambios específicos en objetos
-  const detectAndProcessChanges = (newState: GlobalWorldDoc, previousState: GlobalWorldDoc | null) => {
+  const detectAndProcessChanges = useCallback((newState: GlobalWorldDoc, previousState: GlobalWorldDoc | null) => {
     if (!previousState) {
       // Primera carga, no hay cambios específicos que procesar
       console.log('🔍 Primera carga - no hay estado anterior para comparar');
@@ -48,7 +48,7 @@ export function useGlobalWorldSync() {
     });
 
     // Función helper para comparar objetos de manera más robusta
-    const hasSignificantChange = (prev: any, curr: any, fields: string[]): boolean => {
+    const hasSignificantChange = (prev: Record<string, unknown>, curr: Record<string, unknown>, fields: string[]): boolean => {
       for (const field of fields) {
         if (field === 'audioParams') {
           // Comparación más específica para audioParams
@@ -67,8 +67,10 @@ export function useGlobalWorldSync() {
           ];
           
           for (const numericField of numericFields) {
-            if (typeof prevParams[numericField] === 'number' && typeof currParams[numericField] === 'number') {
-              if (Math.abs(prevParams[numericField] - currParams[numericField]) > 0.001) {
+            const prevValue = (prevParams as Record<string, unknown>)[numericField];
+            const currValue = (currParams as Record<string, unknown>)[numericField];
+            if (typeof prevValue === 'number' && typeof currValue === 'number') {
+              if (Math.abs(prevValue - currValue) > 0.001) {
                 return true;
               }
             }
@@ -77,7 +79,9 @@ export function useGlobalWorldSync() {
           // Comparar campos de string
           const stringFields = ['waveform', 'waveform2', 'modulationWaveform', 'noiseType', 'curve'];
           for (const stringField of stringFields) {
-            if (prevParams[stringField] !== currParams[stringField]) {
+            const prevValue = (prevParams as Record<string, unknown>)[stringField];
+            const currValue = (currParams as Record<string, unknown>)[stringField];
+            if (prevValue !== currValue) {
               return true;
             }
           }
@@ -85,8 +89,8 @@ export function useGlobalWorldSync() {
           // Comparar arrays
           const arrayFields = ['chord', 'notes'];
           for (const arrayField of arrayFields) {
-            const prevArray = prevParams[arrayField];
-            const currArray = currParams[arrayField];
+            const prevArray = (prevParams as Record<string, unknown>)[arrayField];
+            const currArray = (currParams as Record<string, unknown>)[arrayField];
             if (Array.isArray(prevArray) && Array.isArray(currArray)) {
               if (prevArray.length !== currArray.length) return true;
               for (let i = 0; i < prevArray.length; i++) {
@@ -100,14 +104,14 @@ export function useGlobalWorldSync() {
           // Comparar objetos
           const objectFields = ['urls'];
           for (const objectField of objectFields) {
-            const prevObj = prevParams[objectField];
-            const currObj = currParams[objectField];
+            const prevObj = (prevParams as Record<string, unknown>)[objectField];
+            const currObj = (currParams as Record<string, unknown>)[objectField];
             if (typeof prevObj === 'object' && typeof currObj === 'object') {
               const prevKeys = Object.keys(prevObj || {});
               const currKeys = Object.keys(currObj || {});
               if (prevKeys.length !== currKeys.length) return true;
               for (const key of prevKeys) {
-                if (prevObj[key] !== currObj[key]) return true;
+                if ((prevObj as Record<string, unknown>)[key] !== (currObj as Record<string, unknown>)[key]) return true;
               }
             } else if (prevObj !== currObj) {
               return true;
@@ -115,8 +119,8 @@ export function useGlobalWorldSync() {
           }
         } else if (field === 'position' || field === 'rotation' || field === 'scale') {
           // Comparación para arrays de números
-          const prevArray = prev[field];
-          const currArray = curr[field];
+          const prevArray = prev[field] as number[] | undefined;
+          const currArray = curr[field] as number[] | undefined;
           if (!prevArray || !currArray || prevArray.length !== currArray.length) return true;
           
           for (let i = 0; i < prevArray.length; i++) {
@@ -126,8 +130,8 @@ export function useGlobalWorldSync() {
           }
         } else if (field === 'mobileParams' || field === 'effectParams') {
           // Comparación para objetos complejos
-          const prevObj = prev[field];
-          const currObj = curr[field];
+          const prevObj = prev[field] as Record<string, unknown> | undefined;
+          const currObj = curr[field] as Record<string, unknown> | undefined;
           if (!prevObj || !currObj) return true;
           
           // Comparar campos específicos de mobileParams
@@ -141,8 +145,8 @@ export function useGlobalWorldSync() {
             // Comparar arrays numéricos
             const arrayFields = ['centerPosition', 'direction', 'axis'];
             for (const arrayField of arrayFields) {
-              const prevArray = prevObj[arrayField];
-              const currArray = currObj[arrayField];
+              const prevArray = prevObj[arrayField] as number[] | undefined;
+              const currArray = currObj[arrayField] as number[] | undefined;
               if (!prevArray || !currArray || prevArray.length !== currArray.length) return true;
               
               for (let i = 0; i < prevArray.length; i++) {
@@ -157,7 +161,9 @@ export function useGlobalWorldSync() {
           if (field === 'effectParams') {
             const effectFields = ['frequency', 'depth', 'feedback', 'decay', 'wet', 'width'];
             for (const effectField of effectFields) {
-              if (Math.abs((prevObj[effectField] || 0) - (currObj[effectField] || 0)) > 0.001) {
+              const prevValue = prevObj[effectField] as number | undefined;
+              const currValue = currObj[effectField] as number | undefined;
+              if (Math.abs((prevValue || 0) - (currValue || 0)) > 0.001) {
                 return true;
               }
             }
@@ -182,7 +188,7 @@ export function useGlobalWorldSync() {
         
         if (previousObject) {
           // Verificar cambios específicos con comparación más robusta
-          const hasChanges = hasSignificantChange(previousObject, newObject, [
+          const hasChanges = hasSignificantChange(previousObject as unknown as Record<string, unknown>, newObject as unknown as Record<string, unknown>, [
             'audioParams', 'audioEnabled', 'position', 'rotation', 'scale'
           ]);
           
@@ -192,19 +198,19 @@ export function useGlobalWorldSync() {
             // Determinar qué campos han cambiado específicamente
             const updates: Partial<Omit<typeof newObject, 'id'>> = {};
             
-            if (hasSignificantChange(previousObject, newObject, ['audioParams'])) {
+            if (hasSignificantChange(previousObject as unknown as Record<string, unknown>, newObject as unknown as Record<string, unknown>, ['audioParams'])) {
               updates.audioParams = newObject.audioParams;
             }
             if (previousObject.audioEnabled !== newObject.audioEnabled) {
               updates.audioEnabled = newObject.audioEnabled;
             }
-            if (hasSignificantChange(previousObject, newObject, ['position'])) {
+            if (hasSignificantChange(previousObject as unknown as Record<string, unknown>, newObject as unknown as Record<string, unknown>, ['position'])) {
               updates.position = newObject.position;
             }
-            if (hasSignificantChange(previousObject, newObject, ['rotation'])) {
+            if (hasSignificantChange(previousObject as unknown as Record<string, unknown>, newObject as unknown as Record<string, unknown>, ['rotation'])) {
               updates.rotation = newObject.rotation;
             }
-            if (hasSignificantChange(previousObject, newObject, ['scale'])) {
+            if (hasSignificantChange(previousObject as unknown as Record<string, unknown>, newObject as unknown as Record<string, unknown>, ['scale'])) {
               updates.scale = newObject.scale;
             }
 
@@ -244,7 +250,7 @@ export function useGlobalWorldSync() {
         const previousMobileObject = previousState.mobileObjects.find(obj => obj.id === newMobileObject.id);
         
         if (previousMobileObject) {
-          const hasChanges = hasSignificantChange(previousMobileObject, newMobileObject, [
+          const hasChanges = hasSignificantChange(previousMobileObject as unknown as Record<string, unknown>, newMobileObject as unknown as Record<string, unknown>, [
             'position', 'rotation', 'scale', 'mobileParams'
           ]);
           
@@ -253,16 +259,16 @@ export function useGlobalWorldSync() {
             
             const updates: Partial<Omit<typeof newMobileObject, 'id'>> = {};
             
-            if (hasSignificantChange(previousMobileObject, newMobileObject, ['position'])) {
+            if (hasSignificantChange(previousMobileObject as unknown as Record<string, unknown>, newMobileObject as unknown as Record<string, unknown>, ['position'])) {
               updates.position = newMobileObject.position;
             }
-            if (hasSignificantChange(previousMobileObject, newMobileObject, ['rotation'])) {
+            if (hasSignificantChange(previousMobileObject as unknown as Record<string, unknown>, newMobileObject as unknown as Record<string, unknown>, ['rotation'])) {
               updates.rotation = newMobileObject.rotation;
             }
-            if (hasSignificantChange(previousMobileObject, newMobileObject, ['scale'])) {
+            if (hasSignificantChange(previousMobileObject as unknown as Record<string, unknown>, newMobileObject as unknown as Record<string, unknown>, ['scale'])) {
               updates.scale = newMobileObject.scale;
             }
-            if (hasSignificantChange(previousMobileObject, newMobileObject, ['mobileParams'])) {
+            if (hasSignificantChange(previousMobileObject as unknown as Record<string, unknown>, newMobileObject as unknown as Record<string, unknown>, ['mobileParams'])) {
               updates.mobileParams = newMobileObject.mobileParams;
             }
             
@@ -280,7 +286,7 @@ export function useGlobalWorldSync() {
         const previousEffectZone = previousState.effectZones.find(zone => zone.id === newEffectZone.id);
         
         if (previousEffectZone) {
-          const hasChanges = hasSignificantChange(previousEffectZone, newEffectZone, [
+          const hasChanges = hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, [
             'effectParams', 'position', 'rotation', 'scale'
           ]);
           
@@ -289,16 +295,16 @@ export function useGlobalWorldSync() {
             
             const updates: Partial<Omit<typeof newEffectZone, 'id'>> = {};
             
-            if (hasSignificantChange(previousEffectZone, newEffectZone, ['effectParams'])) {
+            if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['effectParams'])) {
               updates.effectParams = newEffectZone.effectParams;
             }
-            if (hasSignificantChange(previousEffectZone, newEffectZone, ['position'])) {
+            if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['position'])) {
               updates.position = newEffectZone.position;
             }
-            if (hasSignificantChange(previousEffectZone, newEffectZone, ['rotation'])) {
+            if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['rotation'])) {
               updates.rotation = newEffectZone.rotation;
             }
-            if (hasSignificantChange(previousEffectZone, newEffectZone, ['scale'])) {
+            if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['scale'])) {
               updates.scale = newEffectZone.scale;
             }
             
@@ -311,7 +317,7 @@ export function useGlobalWorldSync() {
     }
 
     console.log('✅ Procesamiento de cambios específicos completado');
-  };
+  }, [updateGlobalSoundObject, updateGlobalMobileObject, updateGlobalEffectZone]);
 
   // Inicializar el mundo global y establecer suscripción
   useEffect(() => {
@@ -416,7 +422,7 @@ export function useGlobalWorldSync() {
         unsubscribeRef.current = null;
       }
     };
-  }, [setGlobalStateFromFirestore, setIsUpdatingFromFirestore]);
+  }, [setGlobalStateFromFirestore, setIsUpdatingFromFirestore, detectAndProcessChanges]);
 
   // Función para verificar si se está actualizando desde Firestore
   const isUpdatingFromFirestore = () => {

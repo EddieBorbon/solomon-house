@@ -6,16 +6,10 @@ import { MobileObjectHeader } from './mobile-editor/MobileObjectHeader';
 import { MobileMovementControls } from './mobile-editor/MobileMovementControls';
 import { MobileTransformControls } from './mobile-editor/MobileTransformControls';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
-import { type MobileObjectParams } from '../sound-objects/MobileObject';
+import { type MobileObject } from '../../state/useWorldStore';
 
 interface MobileObjectEditorProps {
-  mobileObject: {
-    id: string;
-    position: [number, number, number];
-    rotation: [number, number, number];
-    scale: [number, number, number];
-    mobileParams: MobileObjectParams;
-  };
+  mobileObject: MobileObject;
   onRemove: (id: string) => void;
 }
 
@@ -33,11 +27,11 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
   };
 
   const handleTransformChange = (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {
-    updateTransform(mobileObject.id, property, axis, value);
+    updateTransform(property, axis, value);
   };
 
   const handleResetTransform = () => {
-    resetTransform(mobileObject.id);
+    resetTransform();
   };
 
   return (

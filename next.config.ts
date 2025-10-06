@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
   },
   // Configuración para evitar problemas de hidratación
   reactStrictMode: true,
-  swcMinify: true,
   // Configuración de assets
   assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
   // Configuración para manejar errores 404

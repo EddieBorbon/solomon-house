@@ -150,6 +150,8 @@ export class MobileObjectManager {
       randomSeed: Math.random() * 1000,
       showRadiusIndicator: true,
       showProximityIndicator: true,
+      height: 0,
+      heightSpeed: 0,
     };
   }
 

@@ -147,7 +147,7 @@ class AutoWahUpdater implements EffectUpdater {
           break;
         default:
           // Intentar acceso genérico
-          const typedNode = node as Record<string, unknown>;
+          const typedNode = node as unknown as Record<string, unknown>;
           const param = typedNode[paramName];
           if (param && typeof param === 'object' && 'value' in param) {
             (param as { value: number | string }).value = value;

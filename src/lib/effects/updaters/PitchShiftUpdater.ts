@@ -25,9 +25,8 @@ export class PitchShiftUpdater implements IEffectUpdater<Tone.PitchShift> {
     });
     
     console.log('PitchShift actualizado:', {
-      pitch: effect.pitch.value,
-      windowSize: effect.windowSize.value,
-      overlap: effect.overlap.value,
+      pitch: effect.pitch,
+      windowSize: effect.windowSize,
       wet: effect.wet?.value || 'N/A'
     });
   }
@@ -48,9 +47,8 @@ export class PitchShiftUpdater implements IEffectUpdater<Tone.PitchShift> {
    */
   getCurrentParams(effect: Tone.PitchShift): Record<string, unknown> {
     return {
-      pitch: effect.pitch.value,
-      windowSize: effect.windowSize.value,
-      overlap: effect.overlap.value,
+      pitch: effect.pitch,
+      windowSize: effect.windowSize,
       wet: effect.wet?.value || 0.5
     };
   }
@@ -86,13 +84,14 @@ export class PitchShiftUpdater implements IEffectUpdater<Tone.PitchShift> {
     try {
       switch (paramName) {
         case 'pitch':
-          effect.pitch.value = value as number;
+          effect.pitch = value as number;
           break;
         case 'windowSize':
-          effect.windowSize.value = value as number;
+          effect.windowSize = value as number;
           break;
         case 'overlap':
-          effect.overlap.value = value as number;
+          // overlap no existe en PitchShift, se maneja internamente
+          console.warn('⚠️ PitchShiftUpdater: overlap no es configurable en PitchShift');
           break;
         case 'wet':
           if (effect.wet) {

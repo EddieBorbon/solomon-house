@@ -22,7 +22,11 @@ import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 
 interface SceneContentProps {
-  orbitControlsRef: React.RefObject<any>;
+  orbitControlsRef: React.RefObject<{
+    enabled: boolean;
+    update: () => void;
+    reset: () => void;
+  } | null>;
 }
 
 // Componente contenedor para cada objeto de sonido
@@ -188,8 +192,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     selectEntity,
     loadGrid,
     setActiveGrid,
-    getGridKey,
-    activeGridId
+    getGridKey
   } = useWorldStore();
 
   // Inicializar la cuadrícula por defecto si no hay ninguna
@@ -228,7 +231,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     });
     
     return { objects, mobileObjects, effectZones };
-  }, [grids, activeGridId]);
+  }, [grids]);
   
   // Usar el hook de detección de zonas de efectos
   useEffectZoneDetection();
@@ -320,19 +323,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [selectEntity]);
 
-  // Función para manejar el inicio de la manipulación
-  const handleTransformStart = useCallback(() => {
-    console.log('🔧 SceneContent: handleTransformStart called', { selectedEntityId, enabled: orbitControlsRef.current?.enabled });
-    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
-    console.log('✅ SceneContent: OrbitControls mantenido habilitado durante transform');
-  }, [orbitControlsRef, selectedEntityId]);
-
-  // Función para manejar el fin de la manipulación
-  const handleTransformEnd = useCallback(() => {
-    console.log('🔧 SceneContent: handleTransformEnd called', { enabled: orbitControlsRef.current?.enabled });
-    // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
-    console.log('✅ SceneContent: OrbitControls mantenido habilitado después de transform');
-  }, [orbitControlsRef]);
+  // Funciones de transformación removidas - no se utilizan actualmente
 
   // Efecto para asegurar que OrbitControls SIEMPRE esté habilitado
   React.useEffect(() => {
@@ -589,7 +580,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           <div className="bg-red-500/90 backdrop-blur-sm rounded-lg p-3 text-white text-sm font-medium shadow-lg">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-red-300 rounded-full animate-pulse" />
-              <span>🎥 Cámara bloqueada - Presiona 'C' para desbloquear</span>
+              <span>🎥 Cámara bloqueada - Presiona &apos;C&apos; para desbloquear</span>
             </div>
           </div>
         </div>

@@ -20,7 +20,7 @@ const OPTIMIZATIONS = {
 };
 
 // Cache local para reducir lecturas
-const localCache = new Map<string, { data: any; timestamp: number }>();
+const localCache = new Map<string, { data: unknown; timestamp: number }>();
 
 /**
  * Obtiene datos del cache local si están frescos

@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { type MobileObject, type MobileObjectParams } from '../../../state/useWorldStore';
+import { type MobileObject } from '../../../state/useWorldStore';
 
 interface MobileMovementControlsProps {
   mobileObject: MobileObject;
-  onParamChange: (param: keyof MobileObjectParams, value: unknown) => void;
+  onParamChange: (param: keyof MobileObject['mobileParams'], value: unknown) => void;
 }
 
 export function MobileMovementControls({

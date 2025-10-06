@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 export function CameraToggleButton() {
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [, setIsCameraEnabled] = useState(true);
 
   // Escuchar eventos de cambio de estado de la cámara
   useEffect(() => {

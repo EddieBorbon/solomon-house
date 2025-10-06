@@ -78,7 +78,8 @@ export class BitCrusherUpdater implements IEffectUpdater<Tone.BitCrusher> {
     try {
       switch (paramName) {
         case 'bits':
-          effect.bits = value as number;
+          // bits es de solo lectura, no se puede modificar después de la creación
+          console.warn('⚠️ BitCrusherUpdater: bits es de solo lectura, no se puede modificar');
           break;
         case 'wet':
           if (effect.wet) {

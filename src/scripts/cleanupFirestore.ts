@@ -37,7 +37,7 @@ export async function cleanupFirestore() {
 }
 
 // Función para ejecutar desde la consola del navegador
-(window as any).cleanupFirestore = cleanupFirestore;
+(window as unknown as Record<string, unknown>).cleanupFirestore = cleanupFirestore;
 
 
 

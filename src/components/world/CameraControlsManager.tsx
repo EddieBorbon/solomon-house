@@ -24,7 +24,7 @@ export function CameraControlsManager({ orbitControlsRef }: CameraControlsManage
       console.log('❌ CameraControlsManager: Referencia de controles perdida');
       setControlsReady(false);
     }
-  }, [orbitControlsRef.current]);
+  }, [orbitControlsRef]);
 
   // Esperar a que los controles estén disponibles con reintentos
   useEffect(() => {
@@ -80,7 +80,7 @@ export function CameraControlsManager({ orbitControlsRef }: CameraControlsManage
       window.dispatchEvent(event);
     };
 
-    const handleCameraToggle = (event: CustomEvent) => {
+    const handleCameraToggle = () => {
       if (orbitControlsRef.current) {
         // FORZAR OrbitControls SIEMPRE HABILITADO - NUNCA BLOQUEAR LA CÁMARA
         orbitControlsRef.current.enabled = true;
@@ -177,7 +177,7 @@ export function CameraControlsManager({ orbitControlsRef }: CameraControlsManage
       }, 500); // Verificar cada 500ms
 
       // Función para detectar interacciones
-      const handleInteraction = (event: Event) => {
+      const handleInteraction = () => {
         lastInteractionTime = Date.now();
         isFrozen = false;
         consecutiveFailures = 0;

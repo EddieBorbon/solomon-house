@@ -82,8 +82,8 @@ export class MonoSynthUpdater extends BaseSynthesizerUpdater {
 
       // Actualizar parámetros del filtro
       if (params.filterQ !== undefined) {
-        console.log('MonoSynthUpdater: Actualizando filterQ de', synth.filter.Q, 'a', params.filterQ);
-        synth.filter.Q = params.filterQ;
+        console.log('MonoSynthUpdater: Actualizando filterQ de', synth.filter.Q.value, 'a', params.filterQ);
+        synth.filter.Q.value = params.filterQ;
         result.updatedParams.push('filterQ');
       }
 

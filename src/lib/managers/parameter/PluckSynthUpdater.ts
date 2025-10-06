@@ -9,7 +9,7 @@ import { ParameterConfigManager } from './ParameterConfigManager';
  */
 export class PluckSynthUpdater extends BaseSynthesizerUpdater {
   constructor(configManager?: ParameterConfigManager) {
-    super(configManager);
+    super(configManager || new ParameterConfigManager());
   }
 
   /**
