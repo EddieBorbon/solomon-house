@@ -116,14 +116,14 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
       };
     case 'plane':
       return {
-        frequency: 0,
+        frequency: 440,
         volume: 0.7,
-        waveform: 'sine',
-        noiseType: 'white',
-        attack: 0.001,
+        waveform: 'square',
+        attack: 0.01,
         decay: 0.1,
         sustain: 0,
-        duration: 0.1,
+        release: 0.5,
+        duration: 0.5,
       };
     case 'torus':
       return {
@@ -139,10 +139,12 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
         frequency: 220,
         volume: 0.7,
         waveform: 'sine',
-        polyphony: 4,
-        chord: ["C4", "E4", "G4", "B4"],
-        attack: 1.5,
-        release: 2.0,
+        chord: ["C4", "E4", "G4", "B4"], // El polyphony se ajusta automáticamente basado en chord.length
+        attack: 0.01,
+        decay: 0.2,
+        sustain: 0,
+        release: 0.5,
+        duration: 0.5,
         harmonicity: 1,
         modulationIndex: 2,
         modulationWaveform: 'triangle',
@@ -187,9 +189,9 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => {
 
     // Determinar si el objeto debe tener audio habilitado por defecto
-    // Los objetos percusivos (icosahedron, torus, spiral, pyramid) no deberían tener audio continuo
+    // Los objetos percusivos (icosahedron, torus, spiral, pyramid, cone) no deberían tener audio continuo
     // El plane (NoiseSynth) puede tener sonido continuo
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(type);
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(type);
     const defaultAudioEnabled = !isPercussiveObject;
     
     // Los objetos personalizados NO deben tener audio por defecto - el usuario programará la síntesis
@@ -461,7 +463,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  triggerObjectAttackRelease: (id: string) => {
+  triggerObjectAttackRelease: (id: string, gridId?: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -493,8 +495,8 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
-    // Para objetos percusivos (icosahedron, torus, spiral, pyramid), siempre disparar
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(object.type);
+    // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing, plane), siempre disparar
+    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing', 'plane'].includes(object.type);
     
     if (isPercussiveObject) {
       audioManager.triggerAttackRelease(id, object.audioParams);

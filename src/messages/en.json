@@ -134,5 +134,55 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文"
+  },
+  "codeEditor": {
+    "examples": "EXAMPLES",
+    "basic": "BASIC",
+    "intermediate": "INTERMEDIATE",
+    "advanced": "ADVANCED",
+    "cancel": "CANCEL",
+    "saveAndExecute": "SAVE AND EXECUTE",
+    "tonePlaceholder": "Write your javascript code here...",
+    "threePlaceholder": "Write your webgl code here...",
+    "toneApi": "Tone.js Audio API",
+    "threeApi": "Three.js WebGL",
+    "examplesTitle": "EXAMPLES"
+  },
+  "noSelection": {
+    "selectObject": "SELECT_OBJECT",
+    "clickToEdit": "CLICK_ANY_SOUND_OBJECT_OR_EFFECT_ZONE_TO_EDIT",
+    "objectsAppear": "OBJECTS_APPEAR_IN_3D_SCENE"
+  },
+  "transformEditor": {
+    "title": "Transform",
+    "position": "Position",
+    "rotation": "Rotation",
+    "scale": "Scale",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "reset": "Reset",
+    "copy": "Copy",
+    "copyClipboard": "Copy to clipboard",
+    "noEntitySelected": "No Entity Selected",
+    "clickToEditTransform": "Click on a sound object or effect zone to edit its transformation",
+    "resetTransform": "Reset transformation to default values",
+    "objetoSonoro": "Sound Object",
+    "zonadeEfecto": "Effect Zone",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "confirmations": {
+    "deleteObject": "Are you sure you want to delete this object?",
+    "deleteMobileObject": "Are you sure you want to delete this mobile object?",
+    "deleteEffectZone": "Are you sure you want to delete this effect zone?",
+    "deleteProject": "Are you sure you want to delete this project?",
+    "deleteWorld": "Are you sure you want to delete this world? All objects will be lost."
+  },
+  "titles": {
+    "deleteObject": "Delete object",
+    "deleteMobileObject": "Delete mobile object",
+    "deleteEffectZone": "Delete effect zone",
+    "mobileObjectEditor": "Mobile Object Editor",
+    "mobileObject": "Mobile Object"
   }
 }

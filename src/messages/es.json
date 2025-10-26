@@ -134,5 +134,55 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文"
+  },
+  "codeEditor": {
+    "examples": "EJEMPLOS",
+    "basic": "BÁSICO",
+    "intermediate": "INTERMEDIO",
+    "advanced": "AVANZADO",
+    "cancel": "CANCELAR",
+    "saveAndExecute": "GUARDAR Y EJECUTAR",
+    "tonePlaceholder": "Escribe tu código javascript aquí...",
+    "threePlaceholder": "Escribe tu código webgl aquí...",
+    "toneApi": "Tone.js Audio API",
+    "threeApi": "Three.js WebGL",
+    "examplesTitle": "EJEMPLOS"
+  },
+  "noSelection": {
+    "selectObject": "SELECT_OBJECT",
+    "clickToEdit": "CLICK_ANY_SOUND_OBJECT_OR_EFFECT_ZONE_TO_EDIT",
+    "objectsAppear": "OBJECTS_APPEAR_IN_3D_SCENE"
+  },
+  "transformEditor": {
+    "title": "Transform",
+    "position": "Position",
+    "rotation": "Rotation",
+    "scale": "Scale",
+    "collapse": "Colapsar",
+    "expand": "Expandir",
+    "reset": "Reset",
+    "copy": "Copiar",
+    "copyClipboard": "Copiar portapapeles",
+    "noEntitySelected": "Sin Entidad Seleccionada",
+    "clickToEditTransform": "Haz clic en un objeto sonoro o zona de efecto para editar su transformación",
+    "resetTransform": "Resetear transformación a valores por defecto",
+    "objetoSonoro": "Objeto Sonoro",
+    "zonadeEfecto": "Zona de Efecto",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "confirmations": {
+    "deleteObject": "¿Estás seguro de que quieres eliminar este objeto?",
+    "deleteMobileObject": "¿Estás seguro de que quieres eliminar este objeto móvil?",
+    "deleteEffectZone": "¿Estás seguro de que quieres eliminar esta zona de efecto?",
+    "deleteProject": "¿Estás seguro de que quieres eliminar este proyecto?",
+    "deleteWorld": "¿Estás seguro de que quieres eliminar este mundo? Todos los objetos se perderán."
+  },
+  "titles": {
+    "deleteObject": "Eliminar objeto",
+    "deleteMobileObject": "Eliminar objeto móvil",
+    "deleteEffectZone": "Eliminar zona de efecto",
+    "mobileObjectEditor": "Editor de Objeto Móvil",
+    "mobileObject": "Objeto Móvil"
   }
 }

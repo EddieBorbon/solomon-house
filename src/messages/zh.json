@@ -134,5 +134,55 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文"
+  },
+  "codeEditor": {
+    "examples": "示例",
+    "basic": "基础",
+    "intermediate": "中级",
+    "advanced": "高级",
+    "cancel": "取消",
+    "saveAndExecute": "保存并执行",
+    "tonePlaceholder": "在此输入您的javascript代码...",
+    "threePlaceholder": "在此输入您的webgl代码...",
+    "toneApi": "Tone.js Audio API",
+    "threeApi": "Three.js WebGL",
+    "examplesTitle": "示例"
+  },
+  "noSelection": {
+    "selectObject": "选择对象",
+    "clickToEdit": "点击任何声音对象或效果区域进行编辑",
+    "objectsAppear": "对象出现在3D场景中"
+  },
+  "transformEditor": {
+    "title": "变换",
+    "position": "位置",
+    "rotation": "旋转",
+    "scale": "缩放",
+    "collapse": "折叠",
+    "expand": "展开",
+    "reset": "重置",
+    "copy": "复制",
+    "copyClipboard": "复制到剪贴板",
+    "noEntitySelected": "未选择实体",
+    "clickToEditTransform": "点击声音对象或效果区域来编辑其变换",
+    "resetTransform": "将变换重置为默认值",
+    "objetoSonoro": "声音对象",
+    "zonadeEfecto": "效果区域",
+    "active": "激活",
+    "inactive": "未激活"
+  },
+  "confirmations": {
+    "deleteObject": "您确定要删除此对象吗？",
+    "deleteMobileObject": "您确定要删除此移动对象吗？",
+    "deleteEffectZone": "您确定要删除此效果区域吗？",
+    "deleteProject": "您确定要删除此项目吗？",
+    "deleteWorld": "您确定要删除此世界吗？所有对象将丢失。"
+  },
+  "titles": {
+    "deleteObject": "删除对象",
+    "deleteMobileObject": "删除移动对象",
+    "deleteEffectZone": "删除效果区域",
+    "mobileObjectEditor": "移动对象编辑器",
+    "mobileObject": "移动对象"
   }
 }

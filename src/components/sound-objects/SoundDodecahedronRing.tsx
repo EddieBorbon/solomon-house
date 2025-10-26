@@ -19,10 +19,10 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const groupRef = useRef<THREE.Group>(null);
     const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
     const energyRef = useRef(0); // Para la animación de clic
-    const { selectEntity, triggerObjectNote } = useWorldStore();
+    const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
     
-    // Obtener la polifonía del objeto (número de dodecaedros)
-    const polyphony = audioParams?.polyphony || 4;
+    // Obtener la polifonía del objeto (número de dodecaedros) basado en la longitud del chord
+    const polyphony = audioParams?.chord?.length || 4;
     
     // Crear geometría de dodecaedro con más detalle
     const dodecahedronGeometry = useMemo(() => {
@@ -33,11 +33,11 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
-      triggerObjectNote(id);
+      triggerObjectAttackRelease(id);
       
       // Activar la animación de clic
       energyRef.current = 1;
-    }, [id, selectEntity, triggerObjectNote]);
+    }, [id, selectEntity, triggerObjectAttackRelease]);
 
     // Animación del clic y efectos de audio
     useFrame((state, delta) => {

@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { useWorldStore, type SoundObject, type EffectZone, type MobileObject } from '../state/useWorldStore';
+import { useEffect } from 'react';
+import { useWorldStore } from '../state/useWorldStore';
 
 export function useKeyboardShortcuts() {
   const { 
@@ -7,25 +7,8 @@ export function useKeyboardShortcuts() {
     selectEntity, 
     removeObject, 
     removeEffectZone, 
-    removeMobileObject,
-    selectedEntityId,
-    grids
+    removeMobileObject
   } = useWorldStore();
-
-  // Obtener todos los objetos de todas las cuadrículas
-  const allObjects = useMemo(() => {
-    const objects: SoundObject[] = [];
-    const effectZones: EffectZone[] = [];
-    const mobileObjects: MobileObject[] = [];
-    
-    grids.forEach((grid) => {
-      objects.push(...grid.objects);
-      effectZones.push(...grid.effectZones);
-      mobileObjects.push(...grid.mobileObjects);
-    });
-    
-    return { objects, effectZones, mobileObjects };
-  }, [grids]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -61,28 +44,33 @@ export function useKeyboardShortcuts() {
         case 'backspace':
           event.preventDefault();
           // DEL/BACKSPACE: Eliminar la entidad seleccionada
-          if (selectedEntityId) {
-            // Buscar si es un objeto sonoro
-            const soundObject = allObjects.objects.find(obj => obj.id === selectedEntityId);
-            if (soundObject) {
-              removeObject(selectedEntityId);
-              return;
-            }
+          const currentState = useWorldStore.getState();
+          if (currentState.selectedEntityId) {
+            const currentGrids = currentState.grids;
             
-            // Buscar si es una zona de efecto
-            const effectZone = allObjects.effectZones.find(zone => zone.id === selectedEntityId);
-            if (effectZone) {
-              removeEffectZone(selectedEntityId);
-              return;
+            // Buscar en todas las cuadrículas para encontrar el tipo de entidad
+            for (const grid of currentGrids.values()) {
+              // Buscar si es un objeto sonoro
+              const soundObject = grid.objects.find(obj => obj.id === currentState.selectedEntityId);
+              if (soundObject) {
+                removeObject(currentState.selectedEntityId);
+                break;
+              }
+              
+              // Buscar si es una zona de efecto
+              const effectZone = grid.effectZones.find(zone => zone.id === currentState.selectedEntityId);
+              if (effectZone) {
+                removeEffectZone(currentState.selectedEntityId);
+                break;
+              }
+              
+              // Buscar si es un objeto móvil
+              const mobileObject = grid.mobileObjects.find(obj => obj.id === currentState.selectedEntityId);
+              if (mobileObject) {
+                removeMobileObject(currentState.selectedEntityId);
+                break;
+              }
             }
-            
-            // Buscar si es un objeto móvil
-            const mobileObject = allObjects.mobileObjects.find(obj => obj.id === selectedEntityId);
-            if (mobileObject) {
-              removeMobileObject(selectedEntityId);
-              return;
-            }
-            
           }
           break;
         // Controles de cámara WASD - no interceptar, dejar que se manejen en useCameraControls
@@ -104,5 +92,5 @@ export function useKeyboardShortcuts() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [setTransformMode, selectEntity, removeObject, removeEffectZone, removeMobileObject, selectedEntityId, allObjects]);
+  }, [setTransformMode, selectEntity, removeObject, removeEffectZone, removeMobileObject]);
 }

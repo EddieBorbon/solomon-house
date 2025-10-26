@@ -134,5 +134,55 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文"
+  },
+  "codeEditor": {
+    "examples": "ПРИМЕРЫ",
+    "basic": "БАЗОВЫЙ",
+    "intermediate": "СРЕДНИЙ",
+    "advanced": "ПРОДВИНУТЫЙ",
+    "cancel": "ОТМЕНА",
+    "saveAndExecute": "СОХРАНИТЬ И ВЫПОЛНИТЬ",
+    "tonePlaceholder": "Введите ваш код javascript здесь...",
+    "threePlaceholder": "Введите ваш код webgl здесь...",
+    "toneApi": "Tone.js Audio API",
+    "threeApi": "Three.js WebGL",
+    "examplesTitle": "ПРИМЕРЫ"
+  },
+  "noSelection": {
+    "selectObject": "ВЫБРАТЬ_ОБЪЕКТ",
+    "clickToEdit": "КЛИКНУТЬ_НА_ЗВУКОВОЙ_ОБЪЕКТ_ИЛИ_ЗОНУ_ЭФФЕКТОВ_ДЛЯ_РЕДАКТИРОВАНИЯ",
+    "objectsAppear": "ОБЪЕКТЫ_ПОЯВЛЯЮТСЯ_В_3D_СЦЕНЕ"
+  },
+  "transformEditor": {
+    "title": "Трансформация",
+    "position": "Позиция",
+    "rotation": "Поворот",
+    "scale": "Масштаб",
+    "collapse": "Свернуть",
+    "expand": "Развернуть",
+    "reset": "Сброс",
+    "copy": "Копировать",
+    "copyClipboard": "Копировать в буфер обмена",
+    "noEntitySelected": "Нет выбранной сущности",
+    "clickToEditTransform": "Кликните на звуковой объект или зону эффектов для редактирования его трансформации",
+    "resetTransform": "Сбросить трансформацию к значениям по умолчанию",
+    "objetoSonoro": "Звуковой объект",
+    "zonadeEfecto": "Зона эффектов",
+    "active": "Активен",
+    "inactive": "Неактивен"
+  },
+  "confirmations": {
+    "deleteObject": "Вы уверены, что хотите удалить этот объект?",
+    "deleteMobileObject": "Вы уверены, что хотите удалить этот мобильный объект?",
+    "deleteEffectZone": "Вы уверены, что хотите удалить эту зону эффектов?",
+    "deleteProject": "Вы уверены, что хотите удалить этот проект?",
+    "deleteWorld": "Вы уверены, что хотите удалить этот мир? Все объекты будут потеряны."
+  },
+  "titles": {
+    "deleteObject": "Удалить объект",
+    "deleteMobileObject": "Удалить мобильный объект",
+    "deleteEffectZone": "Удалить зону эффектов",
+    "mobileObjectEditor": "Редактор мобильного объекта",
+    "mobileObject": "Мобильный объект"
   }
 }

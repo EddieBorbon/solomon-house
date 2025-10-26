@@ -201,12 +201,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   const detectNearbyObjects = (relativePos: [number, number, number]): string | null => {
     const { proximityThreshold } = mobileParams;
     
-    // Calcular la posición absoluta del objeto móvil
-    const absolutePos: [number, number, number] = [
-      position[0] + relativePos[0],
-      position[1] + relativePos[1],
-      position[2] + relativePos[2]
-    ];
+    // Los objetos están en el espacio local del grid, así que usamos directamente relativePos
+    // position ya es [0, 0, 0] porque está dentro de un grupo con posición grid.position
+    const absolutePos = relativePos;
     
     // Debug: Log de objetos disponibles
     if (allObjects.length > 0) {

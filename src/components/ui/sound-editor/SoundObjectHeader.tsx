@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface SoundObjectHeaderProps {
   selectedObject: SoundObject;
@@ -12,6 +13,7 @@ export function SoundObjectHeader({
   selectedObject,
   onRemove
 }: SoundObjectHeaderProps) {
+  const { t } = useLanguage();
   return (
     <div className="mb-6 relative">
       {/* Contenedor con borde complejo */}
@@ -41,12 +43,12 @@ export function SoundObjectHeader({
           </div>
           <button
             onClick={() => {
-              if (confirm('¿Estás seguro de que quieres eliminar este objeto?')) {
+              if (confirm(t('confirmations.deleteObject'))) {
                 onRemove(selectedObject.id);
               }
             }}
             className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-            title="Eliminar objeto"
+            title={t('titles.deleteObject')}
           >
             <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
             <span className="relative text-xs font-mono tracking-wider">DELETE</span>

@@ -5,13 +5,32 @@ import { Move, RotateCcw, Scale, X, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export function TransformToolbar() {
-  const { selectedEntityId, transformMode, setTransformMode } = useWorldStore();
+  const { selectedEntityId, transformMode, setTransformMode, removeObject, removeEffectZone, removeMobileObject, grids } = useWorldStore();
   const { t } = useLanguage();
   
   const handleDelete = () => {
-    // Simular la acción de Delete
-    const deleteEvent = new KeyboardEvent('keydown', { key: 'Delete' });
-    window.dispatchEvent(deleteEvent);
+    if (!selectedEntityId) return;
+    
+    // Buscar en todas las cuadrículas para determinar el tipo de entidad
+    for (const grid of grids.values()) {
+      const soundObject = grid.objects.find(obj => obj.id === selectedEntityId);
+      if (soundObject) {
+        removeObject(selectedEntityId);
+        return;
+      }
+      
+      const effectZone = grid.effectZones.find(zone => zone.id === selectedEntityId);
+      if (effectZone) {
+        removeEffectZone(selectedEntityId);
+        return;
+      }
+      
+      const mobileObject = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
+      if (mobileObject) {
+        removeMobileObject(selectedEntityId);
+        return;
+      }
+    }
   };
 
   // Solo mostrar si hay un objeto seleccionado

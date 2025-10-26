@@ -327,6 +327,18 @@ export function useGlobalWorldSync() {
           console.log(`✅ Nuevo objeto móvil ${newMobileObject.id} añadido al estado local`);
         }
       }
+      
+      // Detectar objetos móviles eliminados
+      for (const previousMobileObject of previousState.mobileObjects) {
+        const stillExists = newState.mobileObjects.find(obj => obj.id === previousMobileObject.id);
+        if (!stillExists) {
+          console.log(`🗑️ Objeto móvil eliminado detectado: ${previousMobileObject.id}`);
+          
+          // Importar removeGlobalMobileObject desde useWorldStore
+          const { removeGlobalMobileObject } = useWorldStore.getState();
+          removeGlobalMobileObject(previousMobileObject.id);
+        }
+      }
     }
 
     // Detectar cambios en zonas de efectos
@@ -382,6 +394,18 @@ export function useGlobalWorldSync() {
           console.log(`✅ Nueva zona de efecto ${newEffectZone.id} añadida al estado local`);
         }
       }
+      
+      // Detectar zonas de efecto eliminadas
+      for (const previousEffectZone of previousState.effectZones) {
+        const stillExists = newState.effectZones.find(zone => zone.id === previousEffectZone.id);
+        if (!stillExists) {
+          console.log(`🗑️ Zona de efecto eliminada detectada: ${previousEffectZone.id}`);
+          
+          // Importar removeGlobalEffectZone desde useWorldStore
+          const { removeGlobalEffectZone } = useWorldStore.getState();
+          removeGlobalEffectZone(previousEffectZone.id);
+        }
+      }
     }
 
     console.log('✅ Procesamiento de cambios específicos completado');
@@ -433,28 +457,36 @@ export function useGlobalWorldSync() {
             
             // IMPORTANTE: setGlobalStateFromFirestore ya sincroniza las cuadrículas con sus objetos
             // Los objetos están organizados por cuadrícula en state.grids[], no en el array plano
-            // NO llamar a detectAndProcessChanges porque intentaría agregar objetos a cuadrículas incorrectas
             
-            // Actualizar el estado de referencia anterior
+            // Actualizar el estado de referencia anterior ANTES de cambiar el estado
+            const oldPreviousState = previousStateRef.current;
             previousStateRef.current = state;
+            
+            // Establecer bandera para prevenir bucles bidireccionales ANTES de procesar cambios
+            isUpdatingFromFirestoreRef.current = true;
+            setIsUpdatingFromFirestore(true);
             
             // Sincronizar las cuadrículas desde Firestore (esto incluye los objetos organizados por cuadrícula)
             setGlobalStateFromFirestore(state);
             
-            // Establecer bandera para prevenir bucles bidireccionales
-            isUpdatingFromFirestoreRef.current = true;
-            setIsUpdatingFromFirestore(true);
+            // Detectar y procesar cambios específicos (nuevos objetos, eliminaciones, actualizaciones)
+            // Esto es esencial para que los usuarios vean los cambios de otros usuarios en tiempo real
+            // IMPORTANTE: Mantener la bandera activa durante el procesamiento de cambios
+            setTimeout(() => {
+              // Detectar cambios con la bandera activa para prevenir bucles bidireccionales
+              detectAndProcessChanges(state, oldPreviousState);
+              
+              // Resetear bandera después de procesar los cambios
+              if (mounted) {
+                setTimeout(() => {
+                  isUpdatingFromFirestoreRef.current = false;
+                  setIsUpdatingFromFirestore(false);
+                }, 100);
+              }
+            }, 200); // Delay para asegurar que setGlobalStateFromFirestore haya completado
             
             // Marcar como conectado
             setIsConnected(true);
-            
-            // Resetear bandera después de un breve delay
-            setTimeout(() => {
-              if (mounted) {
-                isUpdatingFromFirestoreRef.current = false;
-                setIsUpdatingFromFirestore(false);
-              }
-            }, 100); // Aumentado el delay para mayor estabilidad
           } else {
             // No hay estado en Firestore, crear estado inicial
             console.warn('No global world state found in Firestore');

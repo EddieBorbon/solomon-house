@@ -168,6 +168,7 @@ export interface WorldState {
   // Estado de sincronización global
   isUpdatingFromFirestore: boolean; // Bandera para prevenir bucles bidireccionales
   globalWorldConnected: boolean; // Estado de conexión al mundo global
+  locallyDeletedObjects: Set<string>; // IDs de objetos eliminados localmente
   
   // World management (placeholder implementation)
   worlds: Array<{ id: string; name: string }>;
@@ -293,6 +294,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Estado de sincronización global
     isUpdatingFromFirestore: false,
     globalWorldConnected: false,
+    locallyDeletedObjects: new Set<string>(),
     
     // World management state
     worlds: [{ id: 'default', name: 'Default World' }],
@@ -1041,15 +1043,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
             });
             
             // Agregar objetos nuevos de Firestore que no existen localmente
-            const newObjects = grid.objects.filter(remoteObj => 
-              !existingGrid.objects.find(localObj => localObj.id === remoteObj.id)
-            );
+            // IMPORTANTE: Excluir objetos que fueron eliminados localmente
+            const newObjects = grid.objects.filter(remoteObj => {
+              const existsLocally = existingGrid.objects.find(localObj => localObj.id === remoteObj.id);
+              const wasDeletedLocally = currentState.locallyDeletedObjects.has(remoteObj.id);
+              return !existsLocally && !wasDeletedLocally;
+            });
             
             // Verificar si hay zonas de efectos locales que fueron agregadas recientemente
             const localEffectZones = existingGrid.effectZones.filter(localZone => {
               const remoteZone = grid.effectZones.find(rz => rz.id === localZone.id);
-              if (!remoteZone) {
-                // La zona solo existe localmente - preservarla
+              const wasDeletedLocally = currentState.locallyDeletedObjects.has(localZone.id);
+              if (!remoteZone && !wasDeletedLocally) {
+                // La zona solo existe localmente y no fue eliminada - preservarla
                 return true;
               }
               return false;
@@ -1058,8 +1064,9 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
             // Verificar si hay objetos móviles locales que fueron agregados recientemente
             const localMobileObjects = existingGrid.mobileObjects.filter(localObj => {
               const remoteObj = grid.mobileObjects.find(ro => ro.id === localObj.id);
-              if (!remoteObj) {
-                // El objeto móvil solo existe localmente - preservarlo
+              const wasDeletedLocally = currentState.locallyDeletedObjects.has(localObj.id);
+              if (!remoteObj && !wasDeletedLocally) {
+                // El objeto móvil solo existe localmente y no fue eliminado - preservarlo
                 return true;
               }
               return false;
@@ -1410,6 +1417,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     console.log('🎵 useWorldStore: removeGlobalSoundObject called', { objectId, isFromFirestore: state.isUpdatingFromFirestore });
     
+    // Agregar el objeto a la lista de objetos eliminados localmente
+    const newDeletedObjects = new Set(state.locallyDeletedObjects);
+    newDeletedObjects.add(objectId);
+    
     // Actualizar el estado local inmediatamente
     const newGrids = new Map(state.grids);
     let gridId: string | null = null;
@@ -1432,9 +1443,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     set({
       grids: newGrids,
       selectedEntityId: state.selectedEntityId === objectId ? null : state.selectedEntityId,
+      locallyDeletedObjects: newDeletedObjects,
     });
     
     console.log('✅ useWorldStore: Local state updated');
+    
+    // Limpiar el ID del Set después de 5 segundos
+    setTimeout(() => {
+      const currentState = get();
+      const updatedDeletedObjects = new Set(currentState.locallyDeletedObjects);
+      updatedDeletedObjects.delete(objectId);
+      set({ locallyDeletedObjects: updatedDeletedObjects });
+      console.log(`🧹 Limpiando ${objectId} de la lista de objetos eliminados`);
+    }, 5000);
     
     // SIEMPRE limpiar el audio, tanto si viene de Firestore como si es local
     console.log('🔧 useWorldStore: Cleaning up audio for removed object', objectId);
@@ -1648,6 +1669,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return;
     }
     
+    // Agregar la zona a la lista de objetos eliminados localmente
+    const newDeletedObjects = new Set(state.locallyDeletedObjects);
+    newDeletedObjects.add(zoneId);
+    
     // Actualizar el estado local inmediatamente
     const newGrids = new Map(state.grids);
     
@@ -1668,7 +1693,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     set({
       grids: newGrids,
       selectedEntityId: state.selectedEntityId === zoneId ? null : state.selectedEntityId,
+      locallyDeletedObjects: newDeletedObjects,
     });
+    
+    // Limpiar el ID del Set después de 5 segundos
+    setTimeout(() => {
+      const currentState = get();
+      const updatedDeletedObjects = new Set(currentState.locallyDeletedObjects);
+      updatedDeletedObjects.delete(zoneId);
+      set({ locallyDeletedObjects: updatedDeletedObjects });
+      console.log(`🧹 Limpiando ${zoneId} de la lista de objetos eliminados`);
+    }, 5000);
     
     // Sincronizar con Firestore
     firebaseService.removeGlobalEffectZone(zoneId).then(async () => {
@@ -1851,6 +1886,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return;
     }
     
+    // Agregar el objeto a la lista de objetos eliminados localmente
+    const newDeletedObjects = new Set(state.locallyDeletedObjects);
+    newDeletedObjects.add(objectId);
+    
     // Actualizar el estado local inmediatamente
     const newGrids = new Map(state.grids);
     
@@ -1871,7 +1910,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     set({
       grids: newGrids,
       selectedEntityId: state.selectedEntityId === objectId ? null : state.selectedEntityId,
+      locallyDeletedObjects: newDeletedObjects,
     });
+    
+    // Limpiar el ID del Set después de 5 segundos
+    setTimeout(() => {
+      const currentState = get();
+      const updatedDeletedObjects = new Set(currentState.locallyDeletedObjects);
+      updatedDeletedObjects.delete(objectId);
+      set({ locallyDeletedObjects: updatedDeletedObjects });
+      console.log(`🧹 Limpiando ${objectId} de la lista de objetos eliminados`);
+    }, 5000);
     
     // Sincronizar con Firestore
     firebaseService.removeGlobalMobileObject(objectId).then(async () => {

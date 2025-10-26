@@ -10,6 +10,7 @@ import { MetalSynthUpdater } from './MetalSynthUpdater';
 import { MonoSynthUpdater } from './MonoSynthUpdater';
 import { FMSynthUpdater } from './FMSynthUpdater';
 import { NoiseSynthUpdater } from './NoiseSynthUpdater';
+import { SynthUpdater } from './SynthUpdater';
 
 // Union type for all possible synthesizer types
 type SynthesizerType = Tone.Synth | Tone.FMSynth | Tone.AMSynth | Tone.DuoSynth | Tone.MonoSynth | Tone.MetalSynth | Tone.NoiseSynth | Tone.PluckSynth | Tone.MembraneSynth | Tone.PolySynth | Tone.Sampler;
@@ -32,6 +33,7 @@ export class SynthesizerUpdaterFacade {
    * Inicializa todos los updaters específicos
    */
   private initializeUpdaters(): void {
+    this.updaters.set('Synth', new SynthUpdater(this.configManager));
     this.updaters.set('PolySynth', new PolySynthUpdater(this.configManager));
     this.updaters.set('PluckSynth', new PluckSynthUpdater(this.configManager));
     this.updaters.set('DuoSynth', new DuoSynthUpdater(this.configManager));
@@ -110,6 +112,10 @@ export class SynthesizerUpdaterFacade {
     console.log('🔍 getSynthesizerType: Constructor name:', synth.constructor.name);
     console.log('🔍 getSynthesizerType: Propiedades:', Object.keys(synth));
     
+    if (synth instanceof Tone.Synth) {
+      console.log('🔍 getSynthesizerType: Detectado Synth');
+      return 'Synth';
+    }
     if (synth instanceof Tone.PolySynth) {
       console.log('🔍 getSynthesizerType: Detectado PolySynth');
       return 'PolySynth';
@@ -307,6 +313,7 @@ export class SynthesizerUpdaterFacade {
     return {
       availableUpdaters: Array.from(this.updaters.keys()),
       supportedSynthesizers: [
+        'Synth',
         'PolySynth',
         'PluckSynth',
         'DuoSynth',

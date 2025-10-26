@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useRef, useEffect } from 'react';
+import { forwardRef, useRef, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -22,7 +22,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo
     
-    const { triggerObjectNote, selectEntity } = useWorldStore();
+    const { triggerObjectNote, selectEntity, triggerObjectAttackRelease } = useWorldStore();
 
     // Animación del golpe percusivo
     useFrame((state, delta) => {
@@ -84,14 +84,23 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     });
 
     // Función para manejar el clic y disparar la nota percusiva
-    const handleClick = (event: React.MouseEvent) => {
+    const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
       triggerObjectNote(id);
       
       // Activar la animación de golpe
       energyRef.current = 1;
-    };
+    }, [id, selectEntity, triggerObjectNote]);
+    
+    // Función para disparar sonido cuando el objeto móvil toca el cono
+    const handleMobileObjectTouch = useCallback(() => {
+      // Disparar sonido de ataque/release
+      triggerObjectAttackRelease(id);
+      
+      // Activar la animación de golpe
+      energyRef.current = 1;
+    }, [id, triggerObjectAttackRelease]);
 
 
 
@@ -107,6 +116,13 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
         }
       }
     }, [audioParams.color]);
+
+    // Exponer la función de touch al objeto móvil usando useEffect
+    useEffect(() => {
+      if (ref && 'current' in ref && ref.current) {
+        (ref.current as any).handleTouch = handleMobileObjectTouch;
+      }
+    }, [ref, handleMobileObjectTouch]);
 
     return (
       <group ref={ref} position={position} rotation={rotation}>

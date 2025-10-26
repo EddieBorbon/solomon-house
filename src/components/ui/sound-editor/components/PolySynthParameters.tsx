@@ -42,34 +42,6 @@ export function PolySynthParameters({
         POLY_SYNTH_PARAMETERS
       </h4>
 
-      {/* Polifonía */}
-      <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          POLYPHONY (MAX_VOICES)
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="32"
-            step="1"
-            value={selectedObject.audioParams.polyphony || 8}
-            onChange={(e) => onParamChange('polyphony', Number(e.target.value))}
-            className="futuristic-slider flex-1"
-          />
-          <span className="text-white font-mono text-xs min-w-[4rem] text-right tracking-wider">
-            {selectedObject.audioParams.polyphony || 8}
-          </span>
-        </div>
-        <div className="flex justify-between text-xs text-white mt-1 font-mono tracking-wider">
-          <span>1</span>
-          <span>32</span>
-        </div>
-        <p className="text-xs text-gray-400 mt-1 font-mono">
-          MAX_SIMULTANEOUS_NOTES
-        </p>
-      </div>
-
       {/* Tipo de Acorde */}
       <div className="mb-4">
         <label className="futuristic-label block mb-1 text-white text-xs">

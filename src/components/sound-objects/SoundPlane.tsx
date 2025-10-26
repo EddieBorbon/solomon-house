@@ -20,7 +20,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
-    const { selectEntity, triggerObjectPercussion } = useWorldStore();
+    const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
     
     // Estado para la animación de ondulación
     const [isAnimating, setIsAnimating] = useState(false);
@@ -33,7 +33,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
     const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
       selectEntity(id);
-      triggerObjectPercussion(id);
+      triggerObjectAttackRelease(id);
       
       // Activar animación de ondulación
       setIsAnimating(true);
@@ -120,9 +120,11 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
         position={position}
         rotation={rotation}
         scale={scale}
-        onClick={handleClick}
       >
-        <mesh ref={meshRef}>
+        <mesh 
+          ref={meshRef}
+          onClick={handleClick}
+        >
           <planeGeometry args={[2.5, 2.5, 32, 32]} />
           <meshStandardMaterial
             ref={materialRef}

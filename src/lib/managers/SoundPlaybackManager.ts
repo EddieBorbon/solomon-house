@@ -77,19 +77,27 @@ export class SoundPlaybackManager {
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
         
+        // Validar y filtrar frecuencias inválidas
+        const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
+        
         console.log('🎵 PolySynth startContinuousSound:');
-        console.log('  - Acorde:', chord);
-        console.log('  - Notas en acorde:', chord.length);
+        console.log('  - Acorde original:', chord.length, 'notas');
+        console.log('  - Acorde válido:', validChord.length, 'notas');
         console.log('  - Polyphony:', source.synth.maxPolyphony);
         console.log('  - Voces activas antes:', source.synth.activeVoices);
         
-        // Validar que el polyphony sea suficiente para el acorde
-        if (chord.length > source.synth.maxPolyphony) {
-          console.warn(`PolySynth: Acorde tiene ${chord.length} notas pero polyphony es ${source.synth.maxPolyphony}. Ajustando polyphony.`);
-          source.synth.maxPolyphony = chord.length;
+        if (validChord.length === 0) {
+          console.error('❌ PolySynth: No hay frecuencias válidas en el acorde');
+          return;
         }
         
-        source.synth.triggerAttack(chord, this.getUniqueStartTime());
+        // Ajustar el polyphony automáticamente para que coincida con el número de notas del acorde
+        if (validChord.length !== source.synth.maxPolyphony) {
+          console.log(`🔧 PolySynth: Ajustando polyphony de ${source.synth.maxPolyphony} a ${validChord.length} voces`);
+          source.synth.maxPolyphony = Math.max(validChord.length, source.synth.maxPolyphony);
+        }
+        
+        source.synth.triggerAttack(validChord, this.getUniqueStartTime());
         
         // Log después del trigger
         setTimeout(() => {
@@ -162,7 +170,15 @@ export class SoundPlaybackManager {
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
         
-        source.synth.triggerAttack(chord, Tone.now());
+        // Validar y filtrar frecuencias inválidas
+        const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
+        
+        if (validChord.length === 0) {
+          console.error('❌ PolySynth triggerNoteAttack: No hay frecuencias válidas');
+          return;
+        }
+        
+        source.synth.triggerAttack(validChord, Tone.now());
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
@@ -334,6 +350,14 @@ export class SoundPlaybackManager {
       // Aplicar parámetros antes de disparar
       updateParamsCallback(soundId, params);
       
+      // Para NoiseSynth, usar triggerAttackRelease con duración
+      if (source.synth instanceof Tone.NoiseSynth) {
+        const duration = params.duration || '8n';
+        source.synth.triggerAttackRelease(duration, Tone.now());
+        this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
+        return;
+      }
+      
       // Para PolySynth, usar triggerAttackRelease con acordes
       if (source.synth instanceof Tone.PolySynth) {
         let chord: number[];
@@ -345,20 +369,28 @@ export class SoundPlaybackManager {
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
         
-        console.log('🎵 PolySynth triggerNoteAttack:');
-        console.log('  - Acorde:', chord);
-        console.log('  - Notas en acorde:', chord.length);
-        console.log('  - Polyphony:', source.synth.maxPolyphony);
-        console.log('  - Voces activas antes:', source.synth.activeVoices);
+        // Validar y filtrar frecuencias inválidas
+        const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
         
-        // Validar que el polyphony sea suficiente para el acorde
-        if (chord.length > source.synth.maxPolyphony) {
-          console.warn(`PolySynth: Acorde tiene ${chord.length} notas pero polyphony es ${source.synth.maxPolyphony}. Ajustando polyphony.`);
-          source.synth.maxPolyphony = chord.length;
+        console.log('🎵 PolySynth triggerAttackRelease:');
+        console.log('  - Acorde original:', chord.length, 'notas');
+        console.log('  - Acorde válido:', validChord.length, 'notas');
+        console.log('  - Polyphony actual:', source.synth.maxPolyphony);
+        console.log('  - Primeras 5 frecuencias:', validChord.slice(0, 5));
+        
+        if (validChord.length === 0) {
+          console.error('❌ PolySynth: No hay frecuencias válidas en el acorde');
+          return;
+        }
+        
+        // Ajustar el polyphony automáticamente para que coincida con el número de notas del acorde
+        if (validChord.length !== source.synth.maxPolyphony) {
+          console.log(`🔧 PolySynth: Ajustando polyphony de ${source.synth.maxPolyphony} a ${validChord.length} voces`);
+          source.synth.maxPolyphony = Math.max(validChord.length, source.synth.maxPolyphony);
         }
         
         const duration = params.duration || '8n';
-        source.synth.triggerAttackRelease(chord, duration, Tone.now());
+        source.synth.triggerAttackRelease(validChord, duration, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
       }
@@ -521,8 +553,10 @@ export class SoundPlaybackManager {
    */
   private frequencyToNote(frequency: number): string {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const octave = Math.floor(Math.log2(frequency / 440) / 12) + 4; // 440Hz es A4
-    const noteIndex = Math.round(12 * Math.log2(frequency / 440)) % 12;
+    // A4 = 440Hz (nota índice 9 en el array)
+    const noteIndexFromA4 = Math.round(12 * Math.log2(frequency / 440));
+    const noteIndex = (9 + noteIndexFromA4 + 12) % 12;
+    const octave = Math.floor((9 + noteIndexFromA4) / 12) + 4;
     return notes[noteIndex] + octave;
   }
 
@@ -611,16 +645,29 @@ export class SoundPlaybackManager {
   private generateChordFrequencies(baseFrequency: number, chord: string[]): number[] {
     const baseNote = this.frequencyToNote(baseFrequency);
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
-    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
+    const baseNoteName = baseNote.replace(/[0-9]/g, '');
+    const baseNoteIndex = notes.indexOf(baseNoteName);
+    const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, '')) || 4;
     
-    const chordFrequencies = chord.map(note => {
+    const chordFrequencies = chord.map((note, index) => {
       const noteName = note.replace(/[0-9]/g, '');
       const noteIndex = notes.indexOf(noteName);
+      
+      if (noteIndex === -1) {
+        // Si no se encuentra la nota, usar la frecuencia base
+        return baseFrequency;
+      }
+      
+      // Calcular la diferencia en semitonos
       const semitoneDiff = noteIndex - baseNoteIndex;
+      // Calcular el octave correcto, considerando que puede exceder de 0-8
+      const noteOctave = parseInt(note.replace(/[A-G#]/g, '')) || baseOctave;
+      
+      // Generar la nota correcta
       const newNoteName = notes[(semitoneDiff + 12) % 12];
-      const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
+      const newOctave = noteOctave;
       const newNote = newNoteName + newOctave;
+      
       return this.noteToFrequency(newNote);
     });
     
@@ -631,7 +678,15 @@ export class SoundPlaybackManager {
    * Helper para convertir acorde de notas a frecuencias
    */
   private convertChordToFrequencies(chord: string[]): number[] {
-    return chord.map(note => this.noteToFrequency(note));
+    return chord.map(note => {
+      // Si la nota ya tiene un octave especificado, usarlo directamente
+      const frequency = this.noteToFrequency(note);
+      if (isNaN(frequency) || frequency <= 0) {
+        console.warn(`⚠️ Frecuencia inválida para nota: ${note}`);
+        return 440; // Fallback a A4
+      }
+      return frequency;
+    });
   }
 
   /**

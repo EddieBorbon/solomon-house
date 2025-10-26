@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface TransformValues {
   position: [number, number, number];
@@ -10,6 +11,7 @@ interface TransformValues {
 }
 
 export function TransformEditor() {
+  const { t } = useLanguage();
   const { 
     selectedEntityId, 
     objects, 
@@ -67,7 +69,7 @@ export function TransformEditor() {
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="text-gray-400 hover:text-white transition-colors p-1 rounded text-xs"
-                title={isExpanded ? "Colapsar" : "Expandir"}
+                title={isExpanded ? t('transformEditor.collapse') : t('transformEditor.expand')}
               >
                 {isExpanded ? '▼' : '▶'}
               </button>
@@ -79,9 +81,9 @@ export function TransformEditor() {
             <div className="p-4">
               <div className="text-center text-gray-400">
                 <div className="text-4xl mb-2">🎯</div>
-                <p className="text-sm font-medium mb-2">Sin Entidad Seleccionada</p>
+                <p className="text-sm font-medium mb-2">{t('transformEditor.noEntitySelected')}</p>
                 <p className="text-xs text-gray-500">
-                  Haz clic en un objeto sonoro o zona de efecto para editar su transformación
+                  {t('transformEditor.clickToEditTransform')}
                 </p>
               </div>
             </div>
@@ -146,7 +148,7 @@ export function TransformEditor() {
         <div className="flex items-center justify-between p-3 border-b border-gray-700">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-gradient-to-br from-red-500 via-green-500 to-blue-500 rounded-sm"></div>
-            <h3 className="text-sm font-semibold text-white">Transform</h3>
+            <h3 className="text-sm font-semibold text-white">{t('transformEditor.title')}</h3>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -166,7 +168,7 @@ export function TransformEditor() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-300 flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
-                Position
+                {t('transformEditor.position')}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -198,7 +200,7 @@ export function TransformEditor() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-300 flex items-center gap-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-sm"></div>
-                Rotation
+                {t('transformEditor.rotation')}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -230,7 +232,7 @@ export function TransformEditor() {
             <div className="space-y-2">
               <label className="text-xs font-medium text-gray-300 flex items-center gap-2">
                 <div className="w-3 h-3 bg-purple-500 rounded-sm"></div>
-                Scale
+                {t('transformEditor.scale')}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
@@ -265,9 +267,9 @@ export function TransformEditor() {
                 <button
                   onClick={resetTransform}
                   className="flex-1 px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
-                  title="Resetear transformación a valores por defecto"
+                  title={t('transformEditor.resetTransform')}
                 >
-                  🔄 Reset
+                  🔄 {t('transformEditor.reset')}
                 </button>
                 <button
                   onClick={() => {
@@ -276,7 +278,7 @@ export function TransformEditor() {
                     navigator.clipboard.writeText(transformText);
                   }}
                   className="px-3 py-2 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded border border-gray-600 transition-colors"
-                  title="Copiar valores al portapapeles"
+                  title={t('transformEditor.copyClipboard')}
                 >
                   📋
                 </button>
@@ -286,10 +288,10 @@ export function TransformEditor() {
             {/* Información de la entidad */}
             <div className="pt-2 border-t border-gray-700">
               <div className="text-xs text-gray-400 space-y-1">
-                <p>Tipo: <span className="text-white">{selectedEntity.type === 'soundObject' ? 'Objeto Sonoro' : 'Zona de Efecto'}</span></p>
+                <p>Tipo: <span className="text-white">{selectedEntity.type === 'soundObject' ? t('transformEditor.objetoSonoro') : t('transformEditor.zonadeEfecto')}</span></p>
                 <p>ID: <span className="text-white font-mono text-xs">{selectedEntity.data.id.slice(0, 8)}...</span></p>
                 {selectedEntity.type === 'soundObject' && 'audioEnabled' in selectedEntity.data && (
-                  <p>Sonido: <span className="text-white">{selectedEntity.data.audioEnabled ? '🟢 Activo' : '🔴 Inactivo'}</span></p>
+                  <p>Sonido: <span className="text-white">{selectedEntity.data.audioEnabled ? `🟢 ${t('transformEditor.active')}` : `🔴 ${t('transformEditor.inactive')}`}</span></p>
                 )}
               </div>
             </div>

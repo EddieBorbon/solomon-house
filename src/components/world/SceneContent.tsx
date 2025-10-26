@@ -50,9 +50,9 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         return;
       }
       
-      // Para conos, activar/desactivar el audio
+      // Para conos, disparar la nota (el audio se maneja con triggerObjectNote)
       if (object.type === 'cone') {
-        toggleObjectAudio(object.id);
+        triggerObjectNote(object.id);
       } else if (object.type === 'icosahedron' || object.type === 'plane' || object.type === 'torus') {
         // Para icosaedros, planos y toroides, solo disparar la nota (sonido percusivo)
         triggerObjectNote(object.id);
@@ -74,7 +74,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         position={object.position}
         rotation={object.rotation}
         scale={object.scale}
-        onClick={handleClick}
+        onClick={object.type !== 'cone' ? handleClick : undefined}
       >
         {/* Renderizado según el tipo de objeto */}
         {object.type === 'cube' ? (

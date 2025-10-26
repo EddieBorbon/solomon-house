@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface EffectZoneHeaderProps {
   zone: EffectZone;
@@ -14,6 +15,7 @@ export function EffectZoneHeader({
   onRemove,
   onToggleLock
 }: EffectZoneHeaderProps) {
+  const { t } = useLanguage();
   return (
     <div className="mb-6 relative">
       {/* Contenedor con borde complejo */}
@@ -72,12 +74,12 @@ export function EffectZoneHeader({
             </button>
             <button
               onClick={() => {
-                if (confirm('¿Estás seguro de que quieres eliminar esta zona de efecto?')) {
+                if (confirm(t('confirmations.deleteEffectZone'))) {
                   onRemove(zone.id);
                 }
               }}
               className="relative border border-white p-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title="Eliminar zona de efecto"
+              title={t('titles.deleteEffectZone')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <div className="relative w-4 h-4 flex items-center justify-center">

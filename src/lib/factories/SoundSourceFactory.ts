@@ -131,10 +131,12 @@ export class SoundSourceFactory {
       case 'icosahedron':
         return this.createMetalSynth(params);
       case 'plane':
-        return this.createNoiseSynth(params);
+        // Cambiar a Synth percusivo en lugar de NoiseSynth
+        return this.createSimpleSynth(params);
       case 'torus':
         return this.createPluckSynth(params);
       case 'dodecahedronRing':
+        // Mantener PolySynth para polifonía
         return this.createPolySynth(params);
       case 'spiral':
         return this.createSampler(params);
@@ -217,7 +219,12 @@ export class SoundSourceFactory {
       const pluckSynth = synth as { toFrequency: (freq: number) => void };
       pluckSynth.toFrequency(safeFrequency);
     }
-    // Para 'plane', 'dodecahedronRing', 'spiral' no se configura frecuencia inicial
+    // Para 'plane' (usa Synth)
+    else if (type === 'plane') {
+      const synthWithOsc = synth as { oscillator: { frequency: { setValueAtTime: (value: number, time: number) => void } } };
+      synthWithOsc.oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
+    }
+    // Para 'dodecahedronRing' y 'spiral' no se configura frecuencia inicial
   }
 
   // Métodos específicos para crear cada tipo de sintetizador
@@ -342,6 +349,20 @@ export class SoundSourceFactory {
     });
   }
 
+  private createSimpleSynth(params: AudioParams): Tone.Synth {
+    return new Tone.Synth({
+      oscillator: {
+        type: params.waveform || 'sine',
+      },
+      envelope: {
+        attack: 0.01, // Attack muy corto para sonido percusivo
+        decay: 0.1,
+        sustain: 0, // Sustain a 0 para sonido percusivo
+        release: params.release || 0.5,
+      },
+    });
+  }
+
   private createPluckSynth(params: AudioParams): Tone.PluckSynth {
     return new Tone.PluckSynth({
       attackNoise: params.attackNoise || 1,
@@ -367,7 +388,9 @@ export class SoundSourceFactory {
         release: params.release || 2.0,
       },
     });
-    polySynth.maxPolyphony = params.polyphony || 8;
+    // Establecer polyphony automáticamente basado en el número de notas en el chord
+    const chordLength = params.chord ? params.chord.length : 4;
+    polySynth.maxPolyphony = Math.max(chordLength, 32); // Mínimo 32 voces para soportar acordes grandes
     return polySynth;
   }
 
