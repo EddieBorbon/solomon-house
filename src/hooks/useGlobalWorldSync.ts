@@ -226,21 +226,33 @@ export function useGlobalWorldSync() {
           
           // IMPORTANTE: Añadir el nuevo objeto al estado local del usuario
           // Esto es lo que faltaba para que el usuario A vea los objetos del usuario B
-          const { addGlobalSoundObject } = useWorldStore.getState();
+          const { addGlobalSoundObject, grids } = useWorldStore.getState();
           
-          // Marcar temporalmente que estamos actualizando desde Firestore para evitar bucles
-          const { setIsUpdatingFromFirestore } = useWorldStore.getState();
-          setIsUpdatingFromFirestore(true);
+          // Verificar si el objeto ya existe en alguna cuadrícula local
+          let alreadyExists = false;
+          for (const grid of grids.values()) {
+            if (grid.objects.some(obj => obj.id === newObject.id)) {
+              alreadyExists = true;
+              console.log(`ℹ️ Objeto ${newObject.id} ya existe localmente, no agregando duplicado`);
+              break;
+            }
+          }
           
-          // Añadir el objeto al estado local
-          addGlobalSoundObject(newObject);
-          
-          // Resetear la bandera después de un breve delay
-          setTimeout(() => {
-            setIsUpdatingFromFirestore(false);
-          }, 100);
-          
-          console.log(`✅ Nuevo objeto ${newObject.id} añadido al estado local`);
+          if (!alreadyExists) {
+            // Marcar temporalmente que estamos actualizando desde Firestore para evitar bucles
+            const { setIsUpdatingFromFirestore } = useWorldStore.getState();
+            setIsUpdatingFromFirestore(true);
+            
+            // Añadir el objeto al estado local
+            addGlobalSoundObject(newObject);
+            
+            // Resetear la bandera después de un breve delay
+            setTimeout(() => {
+              setIsUpdatingFromFirestore(false);
+            }, 100);
+            
+            console.log(`✅ Nuevo objeto ${newObject.id} añadido al estado local`);
+          }
         }
       }
       
@@ -415,21 +427,23 @@ export function useGlobalWorldSync() {
               objects: state.objects?.length || 0,
               mobileObjects: state.mobileObjects?.length || 0,
               effectZones: state.effectZones?.length || 0,
+              grids: state.grids?.length || 0,
               timestamp: new Date().toISOString()
             });
             
-            // Detectar y procesar cambios específicos antes de actualizar el estado completo
-            detectAndProcessChanges(state, previousStateRef.current);
+            // IMPORTANTE: setGlobalStateFromFirestore ya sincroniza las cuadrículas con sus objetos
+            // Los objetos están organizados por cuadrícula en state.grids[], no en el array plano
+            // NO llamar a detectAndProcessChanges porque intentaría agregar objetos a cuadrículas incorrectas
             
             // Actualizar el estado de referencia anterior
             previousStateRef.current = state;
             
+            // Sincronizar las cuadrículas desde Firestore (esto incluye los objetos organizados por cuadrícula)
+            setGlobalStateFromFirestore(state);
+            
             // Establecer bandera para prevenir bucles bidireccionales
             isUpdatingFromFirestoreRef.current = true;
             setIsUpdatingFromFirestore(true);
-            
-            // Actualizar el estado local desde Firestore
-            setGlobalStateFromFirestore(state);
             
             // Marcar como conectado
             setIsConnected(true);
@@ -504,14 +518,15 @@ export function useGlobalWorldSync() {
         if (state) {
           console.log('📡 Reconexión: Recibiendo actualización desde Firestore');
           
-          // Detectar y procesar cambios específicos
-          detectAndProcessChanges(state, previousStateRef.current);
+          // Actualizar el estado de referencia anterior
           previousStateRef.current = state;
+          
+          // Sincronizar las cuadrículas desde Firestore (esto incluye los objetos organizados por cuadrícula)
+          setGlobalStateFromFirestore(state);
           
           isUpdatingFromFirestoreRef.current = true;
           setIsUpdatingFromFirestore(true);
           
-          setGlobalStateFromFirestore(state);
           setIsConnected(true);
           
           setTimeout(() => {

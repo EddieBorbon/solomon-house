@@ -87,8 +87,21 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
     
     set((state) => {
       // Si la cuadrícula ya existe, solo marcarla como cargada
+      // NO sobrescribir cuadrículas que vienen de Firestore con objetos
       if (state.grids.has(gridKey)) {
         const existingGrid = state.grids.get(gridKey)!;
+        // Si la cuadrícula ya tiene objetos (viene de Firestore), NO sobrescribir
+        if (existingGrid.objects.length > 0 || existingGrid.mobileObjects.length > 0 || existingGrid.effectZones.length > 0) {
+          console.log(`ℹ️ Cuadrícula ${gridKey} ya tiene objetos, no sobrescribiendo`);
+          return {
+            grids: new Map(state.grids.set(gridKey, {
+              ...existingGrid,
+              isLoaded: true
+            }))
+          };
+        }
+        
+        // Si la cuadrícula está vacía, marcarla como cargada
         return {
           grids: new Map(state.grids.set(gridKey, {
             ...existingGrid,
@@ -97,7 +110,10 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
         };
       }
 
-      // Crear nueva cuadrícula
+      // Crear nueva cuadrícula SOLO si no existe en Firestore
+      // Esperar a que venga de Firestore antes de crear una vacía
+      console.log(`ℹ️ Cuadrícula ${gridKey} no existe, esperando sincronización de Firestore...`);
+      
       const newGrid: Grid = {
         id: gridKey,
         coordinates,

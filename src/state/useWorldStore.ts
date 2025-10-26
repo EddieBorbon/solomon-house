@@ -1012,19 +1012,46 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       // Procesar cuadrículas desde Firestore - solo actualizar existentes, no reemplazar todas
       if (state.grids && state.grids.length > 0) {
         state.grids.forEach(grid => {
-          // Si la cuadrícula ya existe, actualizar sus objetos pero mantener su estructura
+          // Si la cuadrícula ya existe, hacer merge preservando elementos locales recientes
           const existingGrid = newGrids.get(grid.id);
           if (existingGrid) {
-            // Preservar objetos existentes que no están en Firestore
-            const localObjects = existingGrid.objects.filter(localObj => 
-              !grid.objects.some(remoteObj => remoteObj.id === localObj.id)
-            );
+            // Verificar si hay objetos locales que fueron agregados recientemente
+            const localObjects = existingGrid.objects.filter(localObj => {
+              const remoteObj = grid.objects.find(ro => ro.id === localObj.id);
+              if (!remoteObj) {
+                // El objeto solo existe localmente - preservarlo
+                return true;
+              }
+              return false;
+            });
             
+            // Verificar si hay zonas de efectos locales que fueron agregadas recientemente
+            const localEffectZones = existingGrid.effectZones.filter(localZone => {
+              const remoteZone = grid.effectZones.find(rz => rz.id === localZone.id);
+              if (!remoteZone) {
+                // La zona solo existe localmente - preservarla
+                return true;
+              }
+              return false;
+            });
+            
+            // Verificar si hay objetos móviles locales que fueron agregados recientemente
+            const localMobileObjects = existingGrid.mobileObjects.filter(localObj => {
+              const remoteObj = grid.mobileObjects.find(ro => ro.id === localObj.id);
+              if (!remoteObj) {
+                // El objeto móvil solo existe localmente - preservarlo
+                return true;
+              }
+              return false;
+            });
+            
+            // Merge: Usar datos de Firestore pero agregar elementos locales que no están en Firestore
             newGrids.set(grid.id, {
-              ...existingGrid,
-              objects: [...localObjects, ...grid.objects],
-              mobileObjects: grid.mobileObjects || existingGrid.mobileObjects,
-              effectZones: grid.effectZones || existingGrid.effectZones,
+              ...grid, // Usar los datos de Firestore como base
+              // Agregar objetos, zonas de efectos y objetos móviles locales que no están en Firestore
+              objects: [...grid.objects, ...localObjects],
+              effectZones: [...grid.effectZones, ...localEffectZones],
+              mobileObjects: [...grid.mobileObjects, ...localMobileObjects],
             });
           } else {
             // Cuadrícula nueva desde Firestore - agregarla
@@ -1033,11 +1060,16 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         });
       }
       
-      return {
+      const updatedState = {
         grids: newGrids,
         activeGridId: currentState.activeGridId || newGrids.keys().next().value || null,
         globalWorldConnected: true
       };
+      
+      // Sincronizar con useGridStore para mantener consistencia
+      useGridStore.setState({ grids: newGrids });
+      
+      return updatedState;
     });
     
     console.log('🌐 Estado global conectado - Sincronización activada');
@@ -1119,33 +1151,60 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     console.log('🎵 addGlobalSoundObject called', { objectId: object.id, isUpdatingFromFirestore: state.isUpdatingFromFirestore });
     
-    // Prevenir bucles bidireccionales
-    if (state.isUpdatingFromFirestore) {
-      console.log('⚠️ Skipping addGlobalSoundObject - updating from Firestore');
-      return;
-    }
-    
-    // Actualizar el estado local inmediatamente
-    const activeGridId = state.activeGridId;
+    // Actualizar el estado local inmediatamente (SIEMPRE)
+    set((state) => {
+      const newGrids = new Map(state.grids);
+      const activeGridId = state.activeGridId;
+      
+      // Buscar si el objeto ya existe en alguna cuadrícula para evitar duplicados
+      let objectExists = false;
+      for (const grid of newGrids.values()) {
+        if (grid.objects.some(obj => obj.id === object.id)) {
+          objectExists = true;
+          console.log(`ℹ️ Objeto ${object.id} ya existe en una cuadrícula, no agregando duplicado`);
+          break;
+        }
+      }
+      
+      if (!objectExists) {
+        // Si viene de Firestore, agregar solo a la primera cuadrícula cargada
+        if (state.isUpdatingFromFirestore) {
+          const firstGridId = newGrids.keys().next().value;
+          if (firstGridId) {
+            const firstGrid = newGrids.get(firstGridId);
+            if (firstGrid) {
+              const updatedGrid = {
+                ...firstGrid,
+                objects: [...firstGrid.objects, object]
+              };
+              
+              newGrids.set(firstGridId, updatedGrid);
+              // Sincronizar con useGridStore DE FORMA ATOMICA
+              useGridStore.setState({ grids: newGrids });
+              console.log('✅ Local state updated with new object (from Firestore, agregado a primera cuadrícula)');
+            }
+          }
+        } else {
+          // Si es una acción local, agregar a la cuadrícula activa
     if (activeGridId) {
-      const activeGrid = state.grids.get(activeGridId);
+            const activeGrid = newGrids.get(activeGridId);
       if (activeGrid) {
         const updatedGrid = {
           ...activeGrid,
           objects: [...activeGrid.objects, object]
         };
         
-        set((state) => {
-          const newGrids = new Map(state.grids);
           newGrids.set(activeGridId, updatedGrid);
           // Sincronizar con useGridStore DE FORMA ATOMICA
           useGridStore.setState({ grids: newGrids });
-          return { grids: newGrids };
-        });
-        
-        console.log('✅ Local state updated with new object');
+              console.log('✅ Local state updated with new object (local action)');
+            }
+          }
+        }
       }
-    }
+      
+      return { grids: newGrids };
+    });
     
     // Inicializar audio para el nuevo objeto
     setTimeout(() => {
@@ -1177,10 +1236,22 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       }
     }, 50);
     
-    // Sincronizar con Firestore
-    firebaseService.addGlobalSoundObject(object).catch(error => {
-      console.error('Error adding global sound object:', error);
-      // Si es error de cuota, continuar en modo local
+    // Prevenir bucles bidireccionales - Solo sincronizar con Firestore si NO viene de Firestore
+    if (state.isUpdatingFromFirestore) {
+      console.log('ℹ️ Skipping Firestore sync - object came from Firestore');
+      return;
+    }
+    
+    // IMPORTANTE: Sincronizar con Firestore
+    // Primero agregar el objeto al array plano, luego sincronizar todas las cuadrículas
+    firebaseService.addGlobalSoundObject(object).then(async () => {
+      // Después de agregar el objeto, sincronizar TODAS las cuadrículas actualizadas
+      const currentState = get();
+      const allGrids = Array.from(currentState.grids.values());
+      await firebaseService.updateGlobalGrids(allGrids);
+      console.log('✅ Cuadrículas sincronizadas después de agregar objeto');
+    }).catch(error => {
+      console.error('Error syncing to Firestore:', error);
       if (error.message?.includes('Quota exceeded')) {
         console.warn('Firestore quota exceeded, continuing in local mode');
       }
@@ -1199,6 +1270,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       isUpdatingFromFirestore: state.isUpdatingFromFirestore,
       globalWorldConnected: state.globalWorldConnected
     });
+    
+    // IMPORTANTE: NO actualizar si viene de Firestore
+    // setGlobalStateFromFirestore ya actualiza el estado desde Firestore
+    if (state.isUpdatingFromFirestore) {
+      console.log('ℹ️ Ignorando updateGlobalSoundObject - update ya viene de Firestore');
+      return;
+    }
     
     // Throttle para prevenir actualizaciones excesivas
     const now = Date.now();
@@ -1285,7 +1363,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         const updatedObject = currentState.grids.get(currentState.activeGridId || '')?.objects.find(obj => obj.id === objectId);
         
         if (updatedObject) {
+          // Sincronizar el objeto individual
           await firebaseService.updateGlobalSoundObject(objectId, updatedObject);
+          
+          // IMPORTANTE: Sincronizar TODAS las cuadrículas para mantener consistencia
+          const allGrids = Array.from(currentState.grids.values());
+          await firebaseService.updateGlobalGrids(allGrids);
+          console.log('✅ Cuadrículas sincronizadas después de actualizar objeto');
         }
       } catch (error) {
         console.error('Error updating global sound object:', error);
@@ -1351,8 +1435,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Solo sincronizar con Firestore si NO viene de Firestore (prevenir bucles bidireccionales)
     if (!state.isUpdatingFromFirestore) {
-      firebaseService.removeGlobalSoundObject(objectId).catch(error => {
-        console.error('Error removing global sound object:', error);
+      // Primero eliminar el objeto del array plano
+      firebaseService.removeGlobalSoundObject(objectId).then(async () => {
+        // IMPORTANTE: Después de eliminar el objeto, sincronizar TODAS las cuadrículas actualizadas
+        const currentState = get();
+        const allGrids = Array.from(currentState.grids.values());
+        await firebaseService.updateGlobalGrids(allGrids);
+        console.log('✅ Cuadrículas sincronizadas después de eliminar objeto');
+      }).catch(error => {
+        console.error('Error removing object from Firestore:', error);
       });
     } else {
       console.log('ℹ️ useWorldStore: Skipping Firestore sync - removal came from Firestore');
@@ -1367,34 +1458,78 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   addGlobalEffectZone: (effectZone: EffectZone) => {
     const state = get();
     
-    // Prevenir bucles bidireccionales
-    if (state.isUpdatingFromFirestore) {
-      return;
-    }
+    console.log('🎵 addGlobalEffectZone called', { zoneId: effectZone.id, isUpdatingFromFirestore: state.isUpdatingFromFirestore });
     
-    // Actualizar el estado local inmediatamente
+    // Actualizar el estado local inmediatamente (SIEMPRE)
+    set((state) => {
+      const newGrids = new Map(state.grids);
     const activeGridId = state.activeGridId;
+      
+      // Buscar si la zona ya existe en alguna cuadrícula para evitar duplicados
+      let zoneExists = false;
+      for (const grid of newGrids.values()) {
+        if (grid.effectZones.some(zone => zone.id === effectZone.id)) {
+          zoneExists = true;
+          console.log(`ℹ️ Zona de efecto ${effectZone.id} ya existe en una cuadrícula, no agregando duplicado`);
+          break;
+        }
+      }
+      
+      if (!zoneExists) {
+        // Si viene de Firestore, agregar solo a la primera cuadrícula cargada
+        if (state.isUpdatingFromFirestore) {
+          const firstGridId = newGrids.keys().next().value;
+          if (firstGridId) {
+            const firstGrid = newGrids.get(firstGridId);
+            if (firstGrid) {
+              const updatedGrid = {
+                ...firstGrid,
+                effectZones: [...firstGrid.effectZones, effectZone]
+              };
+              
+              newGrids.set(firstGridId, updatedGrid);
+              // Sincronizar con useGridStore DE FORMA ATOMICA
+              useGridStore.setState({ grids: newGrids });
+              console.log('✅ Local state updated with new effect zone (from Firestore, agregado a primera cuadrícula)');
+            }
+          }
+        } else {
+          // Si es una acción local, agregar a la cuadrícula activa
     if (activeGridId) {
-      const activeGrid = state.grids.get(activeGridId);
+            const activeGrid = newGrids.get(activeGridId);
       if (activeGrid) {
         const updatedGrid = {
           ...activeGrid,
           effectZones: [...activeGrid.effectZones, effectZone]
         };
         
-        set((state) => {
-          const newGrids = new Map(state.grids);
           newGrids.set(activeGridId, updatedGrid);
           // Sincronizar con useGridStore DE FORMA ATOMICA
           useGridStore.setState({ grids: newGrids });
+              console.log('✅ Local state updated with new effect zone (local action)');
+            }
+          }
+        }
+      }
+      
           return { grids: newGrids };
         });
-      }
+    
+    // Prevenir bucles bidireccionales - Solo sincronizar con Firestore si NO viene de Firestore
+    if (state.isUpdatingFromFirestore) {
+      console.log('ℹ️ Skipping Firestore sync - zone came from Firestore');
+      return;
     }
     
-    // Sincronizar con Firestore
-    firebaseService.addGlobalEffectZone(effectZone).catch(error => {
-      console.error('Error adding global effect zone:', error);
+    // Sincronizar con Firestore (solo si es una acción local)
+    firebaseService.addGlobalEffectZone(effectZone).then(async () => {
+      // IMPORTANTE: Después de agregar la zona, sincronizar TODAS las cuadrículas actualizadas
+      const currentState = get();
+      const allGrids = Array.from(currentState.grids.values());
+      await firebaseService.updateGlobalGrids(allGrids);
+      console.log('✅ Cuadrículas sincronizadas después de agregar zona de efecto');
+    }).catch(error => {
+      console.error('Error adding effect zone to Firestore:', error);
     });
   },
 
@@ -1464,7 +1599,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         const updatedZone = currentState.grids.get(currentState.activeGridId || '')?.effectZones.find(zone => zone.id === zoneId);
         
         if (updatedZone) {
+          // Sincronizar la zona individual
           await firebaseService.updateGlobalEffectZone(zoneId, updatedZone);
+          
+          // IMPORTANTE: Sincronizar TODAS las cuadrículas para mantener consistencia
+          const allGrids = Array.from(currentState.grids.values());
+          await firebaseService.updateGlobalGrids(allGrids);
+          console.log('✅ Cuadrículas sincronizadas después de actualizar zona de efecto');
         }
       } catch (error) {
         console.error('Error updating global effect zone:', error);
@@ -1510,8 +1651,14 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     });
     
     // Sincronizar con Firestore
-    firebaseService.removeGlobalEffectZone(zoneId).catch(error => {
-      console.error('Error removing global effect zone:', error);
+    firebaseService.removeGlobalEffectZone(zoneId).then(async () => {
+      // IMPORTANTE: Después de eliminar la zona, sincronizar TODAS las cuadrículas actualizadas
+      const currentState = get();
+      const allGrids = Array.from(currentState.grids.values());
+      await firebaseService.updateGlobalGrids(allGrids);
+      console.log('✅ Cuadrículas sincronizadas después de eliminar zona de efecto');
+    }).catch(error => {
+      console.error('Error removing effect zone from Firestore:', error);
     });
   },
 
@@ -1525,38 +1672,71 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     console.log('🎵 addGlobalMobileObject called', { objectId: mobileObject.id, isUpdatingFromFirestore: state.isUpdatingFromFirestore });
     
-    // Prevenir bucles bidireccionales
-    if (state.isUpdatingFromFirestore) {
-      console.log('⚠️ Skipping addGlobalMobileObject - updating from Firestore');
-      return;
-    }
-    
-    // Actualizar el estado local inmediatamente
-    const activeGridId = state.activeGridId;
+    // Actualizar el estado local inmediatamente (SIEMPRE)
+    set((state) => {
+      const newGrids = new Map(state.grids);
+      const activeGridId = state.activeGridId;
+      
+      // Buscar si el objeto ya existe en alguna cuadrícula para evitar duplicados
+      let objectExists = false;
+      for (const grid of newGrids.values()) {
+        if (grid.mobileObjects.some(obj => obj.id === mobileObject.id)) {
+          objectExists = true;
+          console.log(`ℹ️ Objeto móvil ${mobileObject.id} ya existe en una cuadrícula, no agregando duplicado`);
+          break;
+        }
+      }
+      
+      if (!objectExists) {
+        // Si viene de Firestore, agregar solo a la primera cuadrícula cargada
+        if (state.isUpdatingFromFirestore) {
+          const firstGridId = newGrids.keys().next().value;
+          if (firstGridId) {
+            const firstGrid = newGrids.get(firstGridId);
+            if (firstGrid) {
+              const updatedGrid = {
+                ...firstGrid,
+                mobileObjects: [...firstGrid.mobileObjects, mobileObject]
+              };
+              
+              newGrids.set(firstGridId, updatedGrid);
+              // Sincronizar con useGridStore DE FORMA ATOMICA
+              useGridStore.setState({ grids: newGrids });
+              console.log('✅ Local state updated with new mobile object (from Firestore, agregado a primera cuadrícula)');
+            }
+          }
+        } else {
+          // Si es una acción local, agregar a la cuadrícula activa
     if (activeGridId) {
-      const activeGrid = state.grids.get(activeGridId);
+            const activeGrid = newGrids.get(activeGridId);
       if (activeGrid) {
         const updatedGrid = {
           ...activeGrid,
           mobileObjects: [...activeGrid.mobileObjects, mobileObject]
         };
         
-        set((state) => {
-          const newGrids = new Map(state.grids);
           newGrids.set(activeGridId, updatedGrid);
           // Sincronizar con useGridStore DE FORMA ATOMICA
           useGridStore.setState({ grids: newGrids });
-          return { grids: newGrids };
-        });
-        
-        console.log('✅ Local state updated with new mobile object');
+              console.log('✅ Local state updated with new mobile object (local action)');
+            }
+          }
+        }
       }
-    }
+      
+      return { grids: newGrids };
+    });
     
     // Los objetos móviles no tienen audio por ahora
     console.log(`🎵 Nuevo objeto móvil ${mobileObject.id} creado - sin inicialización de audio`);
     
-    // Sincronizar con Firestore
+    // Prevenir bucles bidireccionales - Solo sincronizar con Firestore si NO viene de Firestore
+    if (state.isUpdatingFromFirestore) {
+      console.log('ℹ️ Skipping Firestore sync - object came from Firestore');
+      return;
+    }
+    
+    // Sincronizar con Firestore (solo si es una acción local)
     firebaseService.addGlobalMobileObject(mobileObject).catch(error => {
       console.error('Error adding global mobile object:', error);
     });
@@ -1674,9 +1854,16 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     });
     
     // Sincronizar con Firestore
-    firebaseService.removeGlobalMobileObject(objectId).catch(error => {
-      console.error('Error removing global mobile object:', error);
+    firebaseService.removeGlobalMobileObject(objectId).then(async () => {
+      // IMPORTANTE: Después de eliminar el objeto móvil, sincronizar TODAS las cuadrículas actualizadas
+      const currentState = get();
+      const allGrids = Array.from(currentState.grids.values());
+      await firebaseService.updateGlobalGrids(allGrids);
+      console.log('✅ Cuadrículas sincronizadas después de eliminar objeto móvil');
+    }).catch(error => {
+      console.error('Error removing mobile object from Firestore:', error);
     });
   }
   } as WorldState & WorldActions
 });
+
