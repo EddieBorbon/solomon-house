@@ -67,7 +67,7 @@ export interface AudioParams {
 }
 
 // Tipos para las fuentes de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
 
 // Estructura de una fuente de sonido
 export interface SoundSource {

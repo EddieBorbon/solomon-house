@@ -191,6 +191,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // El plane (NoiseSynth) puede tener sonido continuo
     const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid'].includes(type);
     const defaultAudioEnabled = !isPercussiveObject;
+    
+    // Los objetos personalizados NO deben tener audio por defecto - el usuario programará la síntesis
+    const isCustomObject = type === 'custom';
+    const shouldCreateAudio = !isCustomObject;
 
     const newObject: SoundObject = {
       id: uuidv4(),
@@ -200,25 +204,27 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       scale: [1, 1, 1],
       audioParams: getDefaultAudioParams(type),
       isSelected: false,
-      audioEnabled: defaultAudioEnabled,
+      audioEnabled: isCustomObject ? false : defaultAudioEnabled, // Custom objects no tienen audio por defecto
     };
 
 
-    // Crear la fuente de sonido en el AudioManager
-    try {
-      audioManager.createSoundSource(
-        newObject.id,
-        newObject.type,
-        newObject.audioParams,
-        newObject.position
-      );
-      
-      // Solo iniciar el sonido continuo si no es un objeto percusivo
-      if (defaultAudioEnabled) {
-        audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+    // Crear la fuente de sonido en el AudioManager SOLO si NO es un objeto personalizado
+    if (shouldCreateAudio) {
+      try {
+        audioManager.createSoundSource(
+          newObject.id,
+          newObject.type,
+          newObject.audioParams,
+          newObject.position
+        );
+        
+        // Solo iniciar el sonido continuo si no es un objeto percusivo
+        if (defaultAudioEnabled) {
+          audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+        }
+      } catch (error) {
+        throw error;
       }
-    } catch (error) {
-      throw error;
     }
 
     // Agregar objeto al estado local
@@ -363,6 +369,32 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       return;
     }
 
+    // Si es un objeto personalizado con código de síntesis, ejecutarlo
+    if (object.type === 'custom' && object.customSynthesisCode) {
+      console.log('🎵 Ejecutando síntesis personalizada para objeto', id);
+      
+      // Ejecutar el código de síntesis personalizado
+      import('tone').then((ToneModule) => {
+        try {
+          const Tone = ToneModule.default || ToneModule;
+          
+          // Evaluar el código
+          const func = new Function('Tone', object.customSynthesisCode);
+          const synth = func(Tone);
+          
+          if (synth && typeof synth.triggerAttack === 'function') {
+            // Usar la frecuencia de los audioParams si existe
+            const frequency = object.audioParams.frequency || 440;
+            console.log('🎵 Reproduciendo síntesis personalizada con frecuencia', frequency);
+            synth.triggerAttackRelease(frequency, "8n");
+          }
+        } catch (error) {
+          console.error('❌ Error ejecutando síntesis personalizada:', error);
+        }
+      });
+      return;
+    }
+
     // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar la nota
     const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
     
@@ -379,6 +411,32 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   triggerObjectPercussion: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
+      return;
+    }
+
+    // Si es un objeto personalizado con código de síntesis, ejecutarlo
+    if (object.type === 'custom' && object.customSynthesisCode) {
+      console.log('🎵 Ejecutando síntesis personalizada (Percussion) para objeto', id);
+      
+      // Ejecutar el código de síntesis personalizado
+      import('tone').then((ToneModule) => {
+        try {
+          const Tone = ToneModule.default || ToneModule;
+          
+          // Evaluar el código
+          const func = new Function('Tone', object.customSynthesisCode);
+          const synth = func(Tone);
+          
+          if (synth && typeof synth.triggerAttack === 'function') {
+            // Usar la frecuencia de los audioParams si existe
+            const frequency = object.audioParams.frequency || 440;
+            console.log('🎵 Reproduciendo síntesis personalizada con frecuencia', frequency);
+            synth.triggerAttackRelease(frequency, "8n");
+          }
+        } catch (error) {
+          console.error('❌ Error ejecutando síntesis personalizada:', error);
+        }
+      });
       return;
     }
 
@@ -406,6 +464,32 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
   triggerObjectAttackRelease: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
+      return;
+    }
+
+    // Si es un objeto personalizado con código de síntesis, ejecutarlo
+    if (object.type === 'custom' && object.customSynthesisCode) {
+      console.log('🎵 Ejecutando síntesis personalizada (AttackRelease) para objeto', id);
+      
+      // Ejecutar el código de síntesis personalizado
+      import('tone').then((ToneModule) => {
+        try {
+          const Tone = ToneModule.default || ToneModule;
+          
+          // Evaluar el código
+          const func = new Function('Tone', object.customSynthesisCode);
+          const synth = func(Tone);
+          
+          if (synth && typeof synth.triggerAttack === 'function') {
+            // Usar la frecuencia de los audioParams si existe
+            const frequency = object.audioParams.frequency || 440;
+            console.log('🎵 Reproduciendo síntesis personalizada con frecuencia', frequency);
+            synth.triggerAttackRelease(frequency, "8n");
+          }
+        } catch (error) {
+          console.error('❌ Error ejecutando síntesis personalizada:', error);
+        }
+      });
       return;
     }
 

@@ -6,7 +6,7 @@ import { type AudioParams, audioManager } from '../lib/AudioManager';
 import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
 
 // Tipos para los objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
 
 // Interfaz para una cuadrícula
 export interface Grid {
@@ -38,6 +38,8 @@ export interface SoundObject {
   audioParams: AudioParams;
   isSelected: boolean;
   audioEnabled: boolean;
+  customShapeCode?: string; // Código Three.js para la forma personalizada
+  customSynthesisCode?: string; // Código Tone.js para la síntesis personalizada
 }
 
 // Interfaz para un objeto móvil
@@ -1015,15 +1017,33 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
           // Si la cuadrícula ya existe, hacer merge preservando elementos locales recientes
           const existingGrid = newGrids.get(grid.id);
           if (existingGrid) {
-            // Verificar si hay objetos locales que fueron agregados recientemente
-            const localObjects = existingGrid.objects.filter(localObj => {
+            // Merge inteligente: combinar objetos locales y remotos preservando cambios recientes
+            const mergedObjects = existingGrid.objects.map(localObj => {
               const remoteObj = grid.objects.find(ro => ro.id === localObj.id);
+              
               if (!remoteObj) {
                 // El objeto solo existe localmente - preservarlo
-                return true;
+                return localObj;
               }
-              return false;
+              
+              // El objeto existe en ambos - verificar si hay cambios locales recientes
+              const lastUpdateTime = lastUpdateTimes.get(localObj.id) || 0;
+              const timeSinceLocalUpdate = Date.now() - lastUpdateTime;
+              
+              // Si el objeto fue actualizado hace menos de 3 segundos, preservar versión local
+              if (timeSinceLocalUpdate < 3000) {
+                console.log(`ℹ️ Preservando posición local para ${localObj.id} (cambio reciente de ${timeSinceLocalUpdate}ms)`);
+                return localObj;
+              }
+              
+              // Usar versión de Firestore si no hay cambios recientes
+              return remoteObj;
             });
+            
+            // Agregar objetos nuevos de Firestore que no existen localmente
+            const newObjects = grid.objects.filter(remoteObj => 
+              !existingGrid.objects.find(localObj => localObj.id === remoteObj.id)
+            );
             
             // Verificar si hay zonas de efectos locales que fueron agregadas recientemente
             const localEffectZones = existingGrid.effectZones.filter(localZone => {
@@ -1045,11 +1065,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
               return false;
             });
             
-            // Merge: Usar datos de Firestore pero agregar elementos locales que no están en Firestore
+            // Merge final: objetos fusionados, zonas de efectos y objetos móviles
             newGrids.set(grid.id, {
-              ...grid, // Usar los datos de Firestore como base
-              // Agregar objetos, zonas de efectos y objetos móviles locales que no están en Firestore
-              objects: [...grid.objects, ...localObjects],
+              ...grid, // Usar los datos de Firestore como base para otras propiedades
+              // Usar objetos fusionados (con preservación de cambios recientes)
+              objects: [...mergedObjects, ...newObjects],
               effectZones: [...grid.effectZones, ...localEffectZones],
               mobileObjects: [...grid.mobileObjects, ...localMobileObjects],
             });

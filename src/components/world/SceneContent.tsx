@@ -15,6 +15,7 @@ import { SoundPlane } from '../sound-objects/SoundPlane';
 import { SoundTorus } from '../sound-objects/SoundTorus';
 import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
 import { SoundSpiral } from '../sound-objects/SoundSpiral';
+import { SoundCustom } from '../sound-objects/SoundCustom';
 import { MobileObject } from '../sound-objects/MobileObject';
 import { EffectZone } from './EffectZone';
 import { GridRenderer } from './GridRenderer';
@@ -171,6 +172,17 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
             isSelected={object.isSelected}
             audioEnabled={object.audioEnabled}
             audioParams={object.audioParams as unknown as AudioParams}
+          />
+        ) : object.type === 'custom' ? (
+          <SoundCustom
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams as unknown as AudioParams}
+            customShapeCode={object.customShapeCode}
           />
         ) : null}
       </group>

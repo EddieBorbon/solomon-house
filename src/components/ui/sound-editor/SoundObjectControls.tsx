@@ -25,8 +25,20 @@ export function SoundObjectControls({
   roundToDecimals,
   // onRemove
 }: SoundObjectControlsProps) {
+  const isCustomObject = selectedObject.type === 'custom';
+
   return (
     <div className="space-y-4">
+      {/* Para objetos personalizados, solo mostrar transformación */}
+      {isCustomObject ? (
+        <SoundTransformSection 
+          selectedObject={selectedObject}
+          onTransformChange={onTransformChange}
+          onResetTransform={onResetTransform}
+          roundToDecimals={roundToDecimals}
+        />
+      ) : (
+        <>
       {/* Control de activación de audio */}
       <AudioControlSection 
         selectedObject={selectedObject} 
@@ -62,6 +74,8 @@ export function SoundObjectControls({
         onResetTransform={onResetTransform}
         roundToDecimals={roundToDecimals}
       />
+        </>
+      )}
     </div>
   );
 }

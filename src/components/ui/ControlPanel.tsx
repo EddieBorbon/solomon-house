@@ -142,6 +142,7 @@ export function ControlPanel() {
   const handleAddTorus = () => createObjectInActiveGrid('torus');
   const handleAddDodecahedronRing = () => createObjectInActiveGrid('dodecahedronRing');
   const handleAddSpiral = () => createObjectInActiveGrid('spiral');
+  const handleAddCustomObject = () => createObjectInActiveGrid('custom');
 
   const handleAddPhaserZone = () => createEffectZoneInActiveGrid('phaser');
   const handleAddAutoFilterZone = () => createEffectZoneInActiveGrid('autoFilter');
@@ -441,6 +442,10 @@ export function ControlPanel() {
                 <button onClick={handleAddSpiral} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group">
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><Loader2 className="w-3 h-3" />SPIRAL</span>
+                </button>
+                <button onClick={handleAddCustomObject} className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group border-purple-500">
+                  <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
+                  <span className="relative text-xs font-mono tracking-wider flex items-center gap-2"><CommandLineIcon className="w-3 h-3" />CUSTOM</span>
                 </button>
               </div>
             </div>

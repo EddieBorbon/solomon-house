@@ -31,9 +31,13 @@ import { SoundObjectControls } from './sound-editor/SoundObjectControls';
 import { NoSelectionMessage } from './NoSelectionMessage';
 import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
+import { CodeEditor } from './CodeEditor';
+import { CommandLineIcon } from '@heroicons/react/24/outline';
 
 export function ParameterEditor() {
   const [isPanelExpanded, setIsPanelExpanded] = React.useState(false);
+  const [showShapeCodeEditor, setShowShapeCodeEditor] = React.useState(false);
+  const [showSynthesisCodeEditor, setShowSynthesisCodeEditor] = React.useState(false);
   const {
     updateObject,
     updateEffectZone,
@@ -154,6 +158,32 @@ export function ParameterEditor() {
 
   // Alias para mantener compatibilidad con el código existente
   const handleTransformChange = updateTransform;
+
+  // Funciones para manejar el código personalizado
+  const handleSaveShapeCode = (code: string) => {
+    if (!isSoundObject) return;
+    const soundObject = getSoundObject();
+    if (!soundObject) return;
+    
+    updateObject(soundObject.id, {
+      customShapeCode: code,
+    });
+  };
+
+  const handleSaveSynthesisCode = (code: string) => {
+    if (!isSoundObject) return;
+    const soundObject = getSoundObject();
+    if (!soundObject) return;
+    
+    // Guardar el código de síntesis
+    updateObject(soundObject.id, {
+      customSynthesisCode: code,
+    });
+
+    // Ejecutar el código de síntesis personalizado
+    console.log('🎵 Guardando código de síntesis personalizado...');
+    console.log('💡 Nota: El código se ejecutará cuando se reproduzca el objeto');
+  };
 
   // Si no hay entidad seleccionada, mostrar solo el botón de toggle
   if (!selectedEntity) {
@@ -488,6 +518,42 @@ export function ParameterEditor() {
           onRemove={removeObject}
         />
 
+        {/* Botones para objetos personalizados */}
+        {isSoundObject && getSoundObject()?.type === 'custom' && (
+          <div className="mt-4 mb-4 p-3 border border-purple-500">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-xs font-mono font-bold text-purple-400 tracking-wider flex items-center gap-2">
+                <CommandLineIcon className="w-4 h-4" />
+                PROGRAMACIÓN PERSONALIZADA
+              </h3>
+            </div>
+            
+            <div className="space-y-2">
+              <button
+                onClick={() => setShowShapeCodeEditor(true)}
+                className="relative w-full border border-purple-500 px-4 py-3 text-purple-400 hover:bg-purple-500 hover:text-white transition-all duration-300 group"
+              >
+                <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
+                <span className="relative text-sm font-mono tracking-wider flex items-center gap-2">
+                  <CommandLineIcon className="w-4 h-4" />
+                  PROGRAMAR FORMA (Three.js)
+                </span>
+              </button>
+              
+              <button
+                onClick={() => setShowSynthesisCodeEditor(true)}
+                className="relative w-full border border-purple-500 px-4 py-3 text-purple-400 hover:bg-purple-500 hover:text-white transition-all duration-300 group"
+              >
+                <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
+                <span className="relative text-sm font-mono tracking-wider flex items-center gap-2">
+                  <CommandLineIcon className="w-4 h-4" />
+                  PROGRAMAR SÍNTESIS (Tone.js)
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <SoundObjectControls
           selectedObject={selectedObject}
           onParamChange={handleParamChange}
@@ -523,6 +589,29 @@ export function ParameterEditor() {
           </svg>
         )}
       </button>
+
+      {/* Editores de código para objetos personalizados */}
+      {showShapeCodeEditor && isSoundObject && (
+        <CodeEditor
+          title="EDITOR DE FORMA - Three.js"
+          code={getSoundObject()?.customShapeCode || ''}
+          onSave={handleSaveShapeCode}
+          onClose={() => setShowShapeCodeEditor(false)}
+          example=""
+          language="webgl"
+        />
+      )}
+
+      {showSynthesisCodeEditor && isSoundObject && (
+        <CodeEditor
+          title="EDITOR DE SÍNTESIS - Tone.js"
+          code={getSoundObject()?.customSynthesisCode || ''}
+          onSave={handleSaveSynthesisCode}
+          onClose={() => setShowSynthesisCodeEditor(false)}
+          example=""
+          language="javascript"
+        />
+      )}
     </div>
 
   );
