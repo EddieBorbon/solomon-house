@@ -193,31 +193,48 @@ export function CameraControlsManager({ orbitControlsRef }: CameraControlsManage
         }
       };
 
+      // Manejar evento de menú contextual con más cuidado
+      const handleContextMenu = (e: MouseEvent) => {
+        // Permitir que OrbitControls maneje el botón derecho correctamente
+        // Solo prevenir el menú contextual si estamos sobre el canvas
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'CANVAS') {
+          e.preventDefault();
+        }
+      };
+
       // Escuchar eventos de interacción más específicos
       const canvas = document.querySelector('canvas');
       if (canvas) {
-        canvas.addEventListener('mousedown', handleInteraction);
-        canvas.addEventListener('mousemove', handleInteraction);
-        canvas.addEventListener('wheel', handleInteraction);
-        canvas.addEventListener('touchstart', handleInteraction);
-        canvas.addEventListener('touchmove', handleInteraction);
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevenir menú contextual
+        // Usar { passive: false } para mousedown/mouseup para permitir preventDefault
+        canvas.addEventListener('mousedown', handleInteraction, { passive: true });
+        canvas.addEventListener('mouseup', handleInteraction, { passive: true });
+        canvas.addEventListener('mousemove', handleInteraction, { passive: true });
+        canvas.addEventListener('wheel', handleInteraction, { passive: true });
+        canvas.addEventListener('touchstart', handleInteraction, { passive: true });
+        canvas.addEventListener('touchmove', handleInteraction, { passive: true });
+        // Prevenir menú contextual solo en el canvas para mejor rotación
+        canvas.addEventListener('contextmenu', handleContextMenu, { passive: false });
       }
 
       // También escuchar eventos globales como fallback
-      window.addEventListener('mousedown', handleInteraction);
-      window.addEventListener('wheel', handleInteraction);
+      window.addEventListener('mousedown', handleInteraction, { passive: true });
+      window.addEventListener('mouseup', handleInteraction, { passive: true });
+      window.addEventListener('wheel', handleInteraction, { passive: true });
 
       return () => {
         clearInterval(interval);
         if (canvas) {
           canvas.removeEventListener('mousedown', handleInteraction);
+          canvas.removeEventListener('mouseup', handleInteraction);
           canvas.removeEventListener('mousemove', handleInteraction);
           canvas.removeEventListener('wheel', handleInteraction);
           canvas.removeEventListener('touchstart', handleInteraction);
           canvas.removeEventListener('touchmove', handleInteraction);
+          canvas.removeEventListener('contextmenu', handleContextMenu);
         }
         window.removeEventListener('mousedown', handleInteraction);
+        window.removeEventListener('mouseup', handleInteraction);
         window.removeEventListener('wheel', handleInteraction);
       };
     }

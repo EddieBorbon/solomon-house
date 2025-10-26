@@ -186,6 +186,7 @@ export function Experience() {
           enableDamping={true}
           autoRotate={false}
           autoRotateSpeed={0}
+          screenSpacePanning={false} // Asegurar que el pan se haga en el plano perpendicular a la cámara
           // enableKeys={true} // Propiedad no existe en OrbitControls
           mouseButtons={{
             LEFT: undefined, // Desactivar botón izquierdo para rotar

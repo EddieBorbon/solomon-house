@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { v4 as uuidv4 } from 'uuid';
 import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
 
 // Tipos para cuadrículas
@@ -164,31 +163,58 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
   // Acciones para manipulación de cuadrículas
   createGrid: (position: [number, number, number], size: number = 10) => {
-    const gridId = uuidv4();
+    // Calcular coordenadas de cuadrícula
     const coordinates: [number, number, number] = [
       Math.floor(position[0] / size),
       Math.floor(position[1] / size),
       Math.floor(position[2] / size)
     ];
 
-    const newGrid: Grid = {
-      id: gridId,
-      coordinates,
-      position,
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1],
-      objects: [],
-      mobileObjects: [],
-      effectZones: [],
-      gridSize: size,
-      gridColor: '#ffffff',
-      isLoaded: true,
-      isSelected: false
-    };
+    // Usar coordenadas como ID en lugar de UUID
+    const gridId = get().getGridKey(coordinates);
 
-    set((state) => ({
-      grids: new Map(state.grids.set(gridId, newGrid))
-    }));
+    set((state) => {
+      // Si la cuadrícula ya existe, no hacer nada
+      if (state.grids.has(gridId)) {
+        return state;
+      }
+
+      // Crear nueva cuadrícula
+      const newGrid: Grid = {
+        id: gridId, // Usar coordenadas como ID
+        coordinates,
+        position,
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        objects: [],
+        mobileObjects: [],
+        effectZones: [],
+        gridSize: size,
+        gridColor: '#ffffff',
+        isLoaded: true,
+        isSelected: false
+      };
+
+      return {
+        grids: new Map(state.grids.set(gridId, newGrid)),
+        activeGridId: gridId, // Establecer como cuadrícula activa
+        currentGridCoordinates: coordinates
+      };
+    });
+
+    // Sincronizar con Firestore si está conectado
+    import('../state/useWorldStore').then(({ useWorldStore }) => {
+      const worldStore = useWorldStore.getState();
+      if (worldStore.globalWorldConnected) {
+        // Importar firebaseService dinámicamente para evitar dependencias circulares
+        import('../lib/firebaseService').then(({ firebaseService }) => {
+          const allGrids = Array.from(get().grids.values());
+          firebaseService.updateGlobalGrids(allGrids).catch(error => {
+            console.error('Error syncing new grid to Firestore:', error);
+          });
+        });
+      }
+    });
 
   },
 

@@ -265,34 +265,36 @@ const lastUpdateTimes = new Map<string, number>();
 const UPDATE_THROTTLE = 50; // ms - Throttle mínimo entre actualizaciones
 
 // Creación del store de Zustand
-export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
-  // Estado inicial - Delegado al useGridStore
-  get grids() {
-    return useGridStore.getState().grids;
-  },
-  get currentGridCoordinates() {
-    return useGridStore.getState().currentGridCoordinates;
-  },
-  get activeGridId() {
-    return useGridStore.getState().activeGridId;
-  },
-  currentProjectId: null, // No hay proyecto cargado inicialmente
-  gridSize: 20,
-  renderDistance: 2,
-  objects: [],
-  mobileObjects: [],
-  effectZones: [],
-  selectedEntityId: null,
-  transformMode: 'translate',
-  isEditingEffectZone: false,
+export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
+  // Obtener el estado inicial de useGridStore
+  const initialGridState = useGridStore.getState();
   
-  // Estado de sincronización global
-  isUpdatingFromFirestore: false,
-  globalWorldConnected: false,
-  
-  // World management state
-  worlds: [{ id: 'default', name: 'Default World' }],
-  currentWorldId: 'default',
+  return {
+    // Estado inicial - Sincronizado con useGridStore
+    grids: new Map(initialGridState.grids),
+    currentGridCoordinates: initialGridState.currentGridCoordinates,
+    activeGridId: initialGridState.activeGridId,
+    gridSize: initialGridState.gridSize,
+    renderDistance: initialGridState.renderDistance,
+    
+    // Proyecto actual
+    currentProjectId: null,
+    
+    // Estado de objetos (de la cuadrícula actual)
+    objects: [],
+    mobileObjects: [],
+    effectZones: [],
+    selectedEntityId: null,
+    transformMode: 'translate' as const,
+    isEditingEffectZone: false,
+    
+    // Estado de sincronización global
+    isUpdatingFromFirestore: false,
+    globalWorldConnected: false,
+    
+    // World management state
+    worlds: [{ id: 'default', name: 'Default World' }],
+    currentWorldId: 'default',
 
   // Acción para añadir un nuevo objeto - Delegada al WorldStoreFacade
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
@@ -319,9 +321,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         objects: [...activeGrid.objects, newObject]
       };
       
-      set((state) => ({
-        grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-      }));
+      set((state) => {
+        const newGrids = new Map(state.grids);
+        newGrids.set(activeGridId, updatedGrid);
+        // Sincronizar con useGridStore DE FORMA ATOMICA
+        useGridStore.setState({ grids: newGrids });
+        return { grids: newGrids };
+      });
       }
     }
   },
@@ -576,9 +582,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
         effectZones: [...activeGrid.effectZones, newEffectZone]
       };
     
-      set((state) => ({
-        grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-      }));
+      set((state) => {
+        const newGrids = new Map(state.grids);
+        newGrids.set(activeGridId, updatedGrid);
+        // Sincronizar con useGridStore DE FORMA ATOMICA
+        useGridStore.setState({ grids: newGrids });
+        return { grids: newGrids };
+      });
       }
     }
   },
@@ -903,17 +913,30 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     
     // Sincronizar el estado local
     const gridStoreState = useGridStore.getState();
-    set(() => ({
+    const state = get();
+    
+    // Actualizar el estado con los valores actuales de useGridStore
+    // Esto fuerza a que los componentes que usan estos valores se re-rendericen
+    set({
+      ...state,
       grids: new Map(gridStoreState.grids),
-      activeGridId: gridStoreState.activeGridId
-    }));
+      activeGridId: gridStoreState.activeGridId,
+      currentGridCoordinates: gridStoreState.currentGridCoordinates
+    });
   },
 
   setActiveGrid: (gridId: string | null) => {
     useGridStore.getState().setActiveGrid(gridId);
-    set(() => ({
+    
+    // Forzar actualización del estado para que los componentes se re-rendericen
+    const gridStoreState = useGridStore.getState();
+    const state = get();
+    
+    set({
+      ...state,
       activeGridId: gridId,
-    }));
+      grids: new Map(gridStoreState.grids)
+    });
   },
 
   updateGrid: (gridId: string, updates: Partial<Omit<Grid, 'id'>>) => {
@@ -982,40 +1005,40 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
   setGlobalStateFromFirestore: (state: GlobalWorldDoc) => {
     set({ isUpdatingFromFirestore: true });
     
-    // Actualizar el estado local con los datos de Firestore
-    const newGrids = new Map<string, Grid>();
-    
-    // Procesar cuadrículas desde Firestore
-    if (state.grids && state.grids.length > 0) {
-      state.grids.forEach(grid => {
-        newGrids.set(grid.id, grid);
-      });
-    } else {
-      // Si no hay cuadrículas en Firestore, crear una por defecto
-      const defaultGridKey = useGridStore.getState().getGridKey([0, 0, 0]);
-      const defaultGrid: Grid = {
-        id: defaultGridKey,
-        coordinates: [0, 0, 0],
-        position: [0, 0, 0],
-        rotation: [0, 0, 0],
-        scale: [1, 1, 1],
-        objects: state.objects || [],
-        mobileObjects: state.mobileObjects || [],
-        effectZones: state.effectZones || [],
-        gridSize: 20,
-        gridColor: '#6c5ce7',
-        isLoaded: true,
-        isSelected: false
+    // NO reemplazar completamente - hacer merge con las cuadrículas existentes
+    set((currentState) => {
+      const newGrids = new Map(currentState.grids);
+      
+      // Procesar cuadrículas desde Firestore - solo actualizar existentes, no reemplazar todas
+      if (state.grids && state.grids.length > 0) {
+        state.grids.forEach(grid => {
+          // Si la cuadrícula ya existe, actualizar sus objetos pero mantener su estructura
+          const existingGrid = newGrids.get(grid.id);
+          if (existingGrid) {
+            // Preservar objetos existentes que no están en Firestore
+            const localObjects = existingGrid.objects.filter(localObj => 
+              !grid.objects.some(remoteObj => remoteObj.id === localObj.id)
+            );
+            
+            newGrids.set(grid.id, {
+              ...existingGrid,
+              objects: [...localObjects, ...grid.objects],
+              mobileObjects: grid.mobileObjects || existingGrid.mobileObjects,
+              effectZones: grid.effectZones || existingGrid.effectZones,
+            });
+          } else {
+            // Cuadrícula nueva desde Firestore - agregarla
+            newGrids.set(grid.id, grid);
+          }
+        });
+      }
+      
+      return {
+        grids: newGrids,
+        activeGridId: currentState.activeGridId || newGrids.keys().next().value || null,
+        globalWorldConnected: true
       };
-      newGrids.set(defaultGridKey, defaultGrid);
-    }
-    
-    // Actualizar el estado
-    set((state) => ({
-      grids: newGrids,
-      activeGridId: state.activeGridId || state.grids.keys().next().value,
-      globalWorldConnected: true
-    }));
+    });
     
     console.log('🌐 Estado global conectado - Sincronización activada');
     
@@ -1023,8 +1046,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     setTimeout(() => {
       console.log('🎵 Inicializando audio para objetos sincronizados...');
       
+      // Obtener las cuadrículas actualizadas del estado
+      const currentState = useWorldStore.getState();
+      
       // Iterar sobre todas las cuadrículas y sus objetos
-      newGrids.forEach((grid) => {
+      currentState.grids.forEach((grid) => {
         grid.objects.forEach(object => {
           try {
             console.log(`🎵 Inicializando audio para objeto ${object.id} de tipo ${object.type}`);
@@ -1109,9 +1135,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
           objects: [...activeGrid.objects, object]
         };
         
-        set((state) => ({
-          grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-        }));
+        set((state) => {
+          const newGrids = new Map(state.grids);
+          newGrids.set(activeGridId, updatedGrid);
+          // Sincronizar con useGridStore DE FORMA ATOMICA
+          useGridStore.setState({ grids: newGrids });
+          return { grids: newGrids };
+        });
         
         console.log('✅ Local state updated with new object');
       }
@@ -1202,6 +1232,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
     
     set({ grids: newGrids });
+    
+    // Sincronizar con useGridStore
+    useGridStore.setState({ grids: newGrids });
+    
     console.log('✅ useWorldStore: Local state updated');
     
     // SIEMPRE actualizar el objeto de audio, tanto si viene de Firestore como si es local
@@ -1348,9 +1382,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
           effectZones: [...activeGrid.effectZones, effectZone]
         };
         
-        set((state) => ({
-          grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-        }));
+        set((state) => {
+          const newGrids = new Map(state.grids);
+          newGrids.set(activeGridId, updatedGrid);
+          // Sincronizar con useGridStore DE FORMA ATOMICA
+          useGridStore.setState({ grids: newGrids });
+          return { grids: newGrids };
+        });
       }
     }
     
@@ -1391,6 +1429,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
     
     set({ grids: newGrids });
+    
+    // Sincronizar con useGridStore
+    useGridStore.setState({ grids: newGrids });
+    
     console.log('✅ useWorldStore: Local state updated for effect zone');
     
     // SIEMPRE actualizar el efecto de audio, tanto si viene de Firestore como si es local
@@ -1499,9 +1541,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
           mobileObjects: [...activeGrid.mobileObjects, mobileObject]
         };
         
-        set((state) => ({
-          grids: new Map(state.grids.set(activeGridId, updatedGrid)),
-        }));
+        set((state) => {
+          const newGrids = new Map(state.grids);
+          newGrids.set(activeGridId, updatedGrid);
+          // Sincronizar con useGridStore DE FORMA ATOMICA
+          useGridStore.setState({ grids: newGrids });
+          return { grids: newGrids };
+        });
         
         console.log('✅ Local state updated with new mobile object');
       }
@@ -1547,6 +1593,10 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     }
     
     set({ grids: newGrids });
+    
+    // Sincronizar con useGridStore
+    useGridStore.setState({ grids: newGrids });
+    
     console.log('✅ useWorldStore: Local state updated for mobile object');
     
     // SIEMPRE actualizar el objeto de audio, tanto si viene de Firestore como si es local
@@ -1627,6 +1677,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => ({
     firebaseService.removeGlobalMobileObject(objectId).catch(error => {
       console.error('Error removing global mobile object:', error);
     });
-  },
-
-}));
+  }
+  } as WorldState & WorldActions
+});
