@@ -16,6 +16,7 @@ export function PersistencePanel() {
   const [projectDescription, setProjectDescription] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
   const { isConnected } = useRealtimeSync(currentProjectId);
@@ -118,6 +119,36 @@ export function PersistencePanel() {
     }
   };
 
+  const handleCreateNewProject = async () => {
+    if (!projectName.trim()) {
+      alert('Por favor ingresa un nombre para el proyecto');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // Crear un proyecto vacío (con una cuadrícula vacía)
+      const projectId = await persistenceService.createEmptyProject(
+        projectName.trim(),
+        projectDescription.trim() || undefined
+      );
+      
+      setCurrentProjectId(projectId);
+      setShowCreateDialog(false);
+      setProjectName('');
+      setProjectDescription('');
+      await loadProjects(); // Recargar la lista de proyectos
+      
+      // Cargar el proyecto recién creado
+      await persistenceService.loadProject(projectId);
+      
+    } catch {
+      alert('Error al crear el proyecto. Inténtalo de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getGridCount = () => {
     return grids.size;
   };
@@ -178,7 +209,19 @@ export function PersistencePanel() {
           </div>
 
           {/* Botones futuristas */}
-          <div className="grid grid-cols-2 gap-1">
+          <div className="grid grid-cols-3 gap-1">
+            <button
+              onClick={() => setShowCreateDialog(true)}
+              disabled={isLoading}
+              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
+            >
+              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
+                <span>➕</span>
+                <span>NUEVO</span>
+              </span>
+            </button>
+
             <button
               onClick={() => setShowSaveDialog(true)}
               disabled={isLoading}
@@ -339,6 +382,66 @@ export function PersistencePanel() {
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                     <span className="relative text-xs font-mono tracking-wider">CLOSE</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Diálogo de crear nuevo proyecto */}
+          {showCreateDialog && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="relative bg-black border border-white p-6 w-80">
+                {/* Decoraciones de esquina */}
+                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
+                
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">CREAR_NUEVO_PROYECTO</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">PROJECT_NAME</label>
+                    <input
+                      type="text"
+                      value={projectName}
+                      onChange={(e) => setProjectName(e.target.value)}
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="MY_NEW_PROJECT"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">DESCRIPTION</label>
+                    <textarea
+                      value={projectDescription}
+                      onChange={(e) => setProjectDescription(e.target.value)}
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="PROJECT_DESCRIPTION..."
+                      rows={2}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    onClick={handleCreateNewProject}
+                    disabled={isLoading || !projectName.trim()}
+                    className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
+                  >
+                    <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+                    <span className="relative text-xs font-mono tracking-wider">
+                      {isLoading ? 'CREATING...' : 'CREAR'}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setShowCreateDialog(false)}
+                    className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
+                  >
+                    <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                    <span className="relative text-xs font-mono tracking-wider">CANCEL</span>
                   </button>
                 </div>
               </div>

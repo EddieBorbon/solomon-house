@@ -553,9 +553,6 @@ export function ControlPanel() {
         </div>
       </div>
 
-      {/* Panel de Persistencia */}
-      <PersistencePanel />
-
       {/* Sección de Objeto Móvil */}
       <div className="mb-4 relative">
         {/* Contenedor con borde complejo */}
@@ -759,6 +756,10 @@ export function ControlPanel() {
         )}
         </div>
       </div>
+
+      {/* Panel de Persistencia */}
+      <PersistencePanel />
+
             </>
           )}
         </div>

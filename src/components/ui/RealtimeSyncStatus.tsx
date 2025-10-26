@@ -1,6 +1,7 @@
 'use client';
 
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { useWorldStore } from '../../state/useWorldStore';
 
 interface RealtimeSyncStatusProps {
   projectId: string | null;
@@ -8,8 +9,19 @@ interface RealtimeSyncStatusProps {
 
 export function RealtimeSyncStatus({ projectId }: RealtimeSyncStatusProps) {
   const { isConnected, isSyncing, lastSyncTime, error, startSync, stopSync, syncChanges } = useRealtimeSync(projectId);
+  const { grids } = useWorldStore();
 
   if (!projectId) {
+    return null;
+  }
+
+  // Verificar si el proyecto tiene contenido (objetos, zonas de efectos o objetos móviles)
+  const hasContent = Array.from(grids.values()).some(grid => 
+    grid.objects.length > 0 || grid.effectZones.length > 0 || grid.mobileObjects.length > 0
+  );
+
+  // No mostrar el modal si el proyecto está vacío (recién creado sin objetos)
+  if (!hasContent) {
     return null;
   }
 

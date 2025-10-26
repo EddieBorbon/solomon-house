@@ -115,6 +115,45 @@ export class PersistenceService {
     }
   }
 
+  // Crear un nuevo proyecto vacío
+  async createEmptyProject(projectName: string, description?: string): Promise<string> {
+    try {
+      // Crear una cuadrícula vacía por defecto
+      const defaultGrid: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'> = {
+        id: 'grid_0_0_0',
+        coordinates: [0, 0, 0],
+        position: [0, 0, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        objects: [],
+        mobileObjects: [],
+        effectZones: [],
+        gridSize: 10,
+        gridColor: '#ffffff',
+        isLoaded: true,
+        isSelected: false
+      };
+
+      // Crear el proyecto
+      const projectData: Omit<FirebaseProject, 'id' | 'createdAt' | 'updatedAt'> = {
+        name: projectName,
+        description: description || '',
+        grids: [{
+          ...defaultGrid,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now()
+        }],
+        activeGridId: 'grid_0_0_0'
+      };
+
+      const projectId = await firebaseService.saveProject(projectData);
+      
+      return projectId;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Cargar un proyecto desde Firebase
   async loadProject(projectId: string): Promise<void> {
     try {
