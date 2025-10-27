@@ -55,8 +55,8 @@ export function TutorialOverlay() {
   };
 
   // Determinar qué bloquear según el paso actual
-  const shouldBlockLeftPanel = isActive && currentStep !== 4 && currentStep !== 5 && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10; // Bloquear excepto en pasos 5, 6, 8, 9, 10 y 11
-  const shouldBlockRightPanel = isActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10; // Bloquear el panel derecho excepto en pasos 8, 9, 10 y 11
+  const shouldBlockLeftPanel = isActive && currentStep !== 4 && currentStep !== 5 && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 && currentStep !== 11; // Bloquear excepto en pasos 5, 6, 8, 9, 10, 11 y 12
+  const shouldBlockRightPanel = isActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 && currentStep !== 11; // Bloquear el panel derecho excepto en pasos 8, 9, 10, 11 y 12
 
   return (
     <>

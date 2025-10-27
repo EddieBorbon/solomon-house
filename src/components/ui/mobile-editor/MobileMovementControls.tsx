@@ -24,6 +24,7 @@ export function MobileMovementControls({
     heightSpeed: mobileParams?.heightSpeed ?? 0.5,
     showRadiusIndicator: mobileParams?.showRadiusIndicator ?? true,
     showProximityIndicator: mobileParams?.showProximityIndicator ?? true,
+    showSphere: mobileParams?.showSphere ?? true,
     movementType: mobileParams?.movementType ?? 'circular',
     direction: mobileParams?.direction ?? [1, 0, 0],
     amplitude: mobileParams?.amplitude ?? 0.5,
@@ -364,6 +365,20 @@ export function MobileMovementControls({
               }`}
             >
               {safeParams.showProximityIndicator ? 'ON' : 'OFF'}
+            </button>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono text-gray-400">ESFERA:</span>
+            <button
+              onClick={() => onParamChange('showSphere', !safeParams.showSphere)}
+              className={`relative border border-white px-3 py-1 text-xs font-mono transition-all duration-300 ${
+                safeParams.showSphere 
+                  ? 'bg-green-400 text-black border-green-400' 
+                  : 'text-white hover:bg-white hover:text-black'
+              }`}
+            >
+              {safeParams.showSphere ? 'ON' : 'OFF'}
             </button>
           </div>
         </div>

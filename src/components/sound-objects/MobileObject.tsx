@@ -448,7 +448,8 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
           ref={materialRef}
           color="#ff6b6b"
           transparent
-          opacity={0.9}
+          opacity={(mobileParams?.showSphere ?? true) ? 0.9 : 0}
+          visible={(mobileParams?.showSphere ?? true)}
           roughness={0.2}
           metalness={0.3}
           emissive="#000000"

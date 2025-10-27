@@ -33,12 +33,12 @@ export function ControlPanel() {
   const { isActive: isTutorialActive, currentStep } = useTutorialStore();
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   
-  // Colapsar panel automáticamente cuando inicia el tutorial (excepto paso 5, 6, 10 y 11)
+  // Colapsar panel automáticamente cuando inicia el tutorial (excepto paso 5, 6, 10, 11 y 12)
   useEffect(() => {
-    if (isTutorialActive && currentStep !== 4 && currentStep !== 5 && currentStep !== 9 && currentStep !== 10) { // Paso 5 es index 4, paso 6 es index 5, paso 10 es index 9, paso 11 es index 10
+    if (isTutorialActive && currentStep !== 4 && currentStep !== 5 && currentStep !== 9 && currentStep !== 10 && currentStep !== 11) { // Paso 5 es index 4, paso 6 es index 5, paso 10 es index 9, paso 11 es index 10, paso 12 es index 11
       setIsPanelExpanded(false);
-    } else if (isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10)) {
-      // En los pasos 5, 6, 10 y 11, mantener el panel expandido
+    } else if (isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11)) {
+      // En los pasos 5, 6, 10, 11 y 12, mantener el panel expandido
       setIsPanelExpanded(true);
     }
   }, [isTutorialActive, currentStep]);
@@ -316,7 +316,7 @@ export function ControlPanel() {
           {isPanelExpanded && (
             <>
               {/* Sección de Controles */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -421,7 +421,7 @@ export function ControlPanel() {
 
 
       {/* Sección de Añadir Objeto */}
-      <div className={`mb-4 relative ${isTutorialActive && currentStep === 9 ? 'opacity-30 pointer-events-none' : ''} ${isTutorialActive && currentStep === 10 ? '' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -502,7 +502,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Zonas de Efectos */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -607,7 +607,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Objeto Móvil */}
-      <div className={`mb-4 relative ${isTutorialActive && currentStep === 9 ? 'opacity-30 pointer-events-none' : ''} ${isTutorialActive && currentStep === 10 ? '' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -650,7 +650,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Cuadrículas */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -811,7 +811,7 @@ export function ControlPanel() {
       </div>
 
       {/* Panel de Persistencia */}
-      <div className={isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}>
+      <div className={isTutorialActive && currentStep !== 11 ? 'opacity-30 pointer-events-none' : ''}>
         <PersistencePanel />
       </div>
 

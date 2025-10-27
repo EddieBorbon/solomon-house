@@ -278,5 +278,58 @@ export const tutorialSteps: TutorialStep[] = [
     estimatedTime: 300,
     skipAllowed: false,
   },
+  {
+    id: 'step-12',
+    title: 'Guardar y Cargar Proyectos',
+    description: 'Guarda tu composición actual para poder recuperarla más tarde.',
+    targetElement: undefined,
+    position: 'center',
+    action: {
+      type: 'info',
+      message: 'Guarda la composición actual usando el panel de persistencia',
+    },
+    verification: {
+      check: () => {
+        // Se verifica dinámicamente en el componente TutorialOverlay
+        return false; // Se actualiza dinámicamente
+      },
+      successMessage: '¡Excelente! Ya sabes cómo guardar y cargar tus proyectos.',
+      failureMessage: 'Guarda tu composición usando el botón "GUARDAR PROYECTO" en el panel de persistencia.',
+    },
+    hints: [
+      '➕ Haz clic en "NUEVO" para crear un proyecto vacío',
+      '💾 Guarda tu escultura sonora usando "GUARDAR"',
+      '📂 Puedes cargar proyectos guardados anteriormente',
+      '🌐 Tus proyectos se guardan en la nube',
+    ],
+    estimatedTime: 240,
+    skipAllowed: false,
+  },
+  {
+    id: 'step-13',
+    title: '¡Crea tu Escultura Sonora!',
+    description: 'Ahora tienes todas las herramientas para crear una escultura sonora compleja. Experimenta con diferentes objetos sonoros, zonas de efectos y objetos móviles para construir tu composición única.',
+    targetElement: undefined,
+    position: 'center',
+    action: {
+      type: 'info',
+      message: 'Usa tu creatividad para construir una escultura sonora compleja',
+    },
+    verification: {
+      check: () => false, // Siempre permitir avanzar
+      successMessage: '¡Excelente trabajo! ¡Sigue experimentando y creando!',
+      failureMessage: '¡Explora todas las posibilidades y crea algo increíble!',
+    },
+    hints: [
+      '🎨 Combina diferentes tipos de objetos sonoros',
+      '🎚️ Usa zonas de efectos para añadir profundidad espacial',
+      '🔄 Crea objetos móviles para generar movimiento dinámico',
+      '🎭 Experimenta con diferentes materiales y texturas visuales',
+      '🎵 Ajusta parámetros de audio para crear atmósferas únicas',
+      '✨ ¡No hay límites para tu creatividad!',
+    ],
+    estimatedTime: 600,
+    skipAllowed: false,
+  },
 ];
 

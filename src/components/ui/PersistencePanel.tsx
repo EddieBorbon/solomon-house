@@ -5,10 +5,12 @@ import { persistenceService } from '../../lib/persistenceService';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useRealtimeSync } from '../../hooks/useRealtimeSync';
+import { useTutorialStore } from '../../stores/useTutorialStore';
 import type { FirebaseProject } from '../../lib/firebaseService';
 import { CloudArrowUpIcon } from '@heroicons/react/24/outline';
 
 export function PersistencePanel() {
+  const { isActive: isTutorialActive, currentStep } = useTutorialStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [projects, setProjects] = useState<FirebaseProject[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +28,13 @@ export function PersistencePanel() {
   useEffect(() => {
     loadProjects();
   }, []);
+
+  // Expandir automáticamente el panel de persistencia en el paso 12 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 11) { // Step 12 is index 11
+      setIsExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
 
   const loadProjects = async () => {
     try {
@@ -242,7 +251,7 @@ export function PersistencePanel() {
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
                 <span>📂</span>
-                <span>LOAD</span>
+                <span>{t('controls.load')}</span>
               </span>
             </button>
           </div>
@@ -359,14 +368,7 @@ export function PersistencePanel() {
                               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                             >
                               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                              <span className="relative text-xs font-mono tracking-wider">LOAD</span>
-                            </button>
-                            <button
-                              onClick={() => handleDeleteProject(project.id)}
-                              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                            >
-                              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                              <span className="relative text-xs font-mono tracking-wider">DELETE</span>
+                              <span className="relative text-xs font-mono tracking-wider">{t('controls.load')}</span>
                             </button>
                           </div>
                         </div>

@@ -40,6 +40,7 @@ export interface MobileObject extends BaseEntity {
     heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
+    showSphere?: boolean;
   };
 }
 

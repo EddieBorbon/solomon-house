@@ -9,23 +9,47 @@ import { LoadingScreen } from '../components/ui/LoadingScreen';
 import { TutorialOverlay } from '../components/tutorial/TutorialOverlay';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useTutorialStore } from '../stores/useTutorialStore';
+import { useWorldStore } from '../state/useWorldStore';
+import { persistenceService } from '../lib/persistenceService';
+import { firebaseService } from '../lib/firebaseService';
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   const { startTutorial, isActive } = useTutorialStore();
+  const { createGrid, setCurrentProjectId, setGlobalWorldConnected } = useWorldStore();
   
   // Hook para atajos de teclado
   useKeyboardShortcuts();
 
-  const handleStartTutorial = () => {
-    setShowWelcome(false);
-    // Iniciar el tutorial
-    startTutorial();
+  const handleStartTutorial = async () => {
+    try {
+      // Crear un mundo vacío para el tutorial
+      createGrid([0, 0, 0], 20);
+      
+      // No conectar con el mundo global durante el tutorial
+      setGlobalWorldConnected(false);
+      
+      setShowWelcome(false);
+      // Iniciar el tutorial
+      startTutorial();
+    } catch (error) {
+      console.error('Error al inicializar el tutorial:', error);
+      setShowWelcome(false);
+      startTutorial();
+    }
   };
 
-  const handleSkipTutorial = () => {
-    setShowWelcome(false);
-    // Entrar sin tutorial
+  const handleSkipTutorial = async () => {
+    try {
+      // Conectar con el mundo global existente
+      setGlobalWorldConnected(true);
+      
+      setShowWelcome(false);
+      // Entrar sin tutorial
+    } catch (error) {
+      console.error('Error al conectar con el mundo global:', error);
+      setShowWelcome(false);
+    }
   };
 
   return (
