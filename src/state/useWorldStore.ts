@@ -1103,11 +1103,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return updatedState;
     });
     
-    console.log('🌐 Estado global conectado - Sincronización activada');
+    // Log silenciado - sincronización activada (muy frecuente)
     
     // Inicializar audio para objetos que se reciben desde Firestore
     setTimeout(() => {
-      console.log('🎵 Inicializando audio para objetos sincronizados...');
+      // Log silenciado - inicialización de audio (muy frecuente)
       
       // Obtener las cuadrículas actualizadas del estado
       const currentState = useWorldStore.getState();
@@ -1116,7 +1116,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       currentState.grids.forEach((grid) => {
         grid.objects.forEach(object => {
           try {
-            console.log(`🎵 Inicializando audio para objeto ${object.id} de tipo ${object.type}`);
+            // Log silenciado - inicialización individual de audio
             
             // Inicializar solo el audio, no crear el objeto (ya existe en el estado)
             // Importar AudioManager dinámicamente para evitar problemas de dependencias circulares
@@ -1132,7 +1132,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
                 
                 // Si el objeto tiene audio habilitado, iniciar el sonido continuo
                 if (object.audioEnabled) {
-                  console.log(`🎵 Iniciando audio continuo para objeto ${object.id}`);
+                  // Log silenciado - inicio de audio continuo
                   audioManager.startContinuousSound(object.id, object.audioParams);
                 }
               }
@@ -1156,7 +1156,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         });
       });
       
-      console.log('✅ Audio inicializado para todos los objetos sincronizados');
+      // Log silenciado - audio inicializado
     }, 100); // Pequeño delay para asegurar que el estado se haya actualizado
     
     // Resetear la bandera después de un breve delay
@@ -1629,30 +1629,18 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Sincronizar con useGridStore
     useGridStore.setState({ grids: newGrids });
     
-    console.log('✅ useWorldStore: Local state updated for effect zone', {
-      zoneId,
-      updates,
-      isFromFirestore: state.isUpdatingFromFirestore,
-      updatedPosition: updatedZone?.position
-    });
-    
     // SIEMPRE actualizar el efecto de audio, tanto si viene de Firestore como si es local
     if (updatedZone && gridId) {
-      console.log('🔧 useWorldStore: Updating audio directly', { zoneId, gridId, isFromFirestore: state.isUpdatingFromFirestore });
-      
       // Actualizar audio directamente sin pasar por worldStoreFacade para movimiento fluido
       // para evitar problemas de sincronización entre stores
       if (updates.position) {
-        console.log('🔧 useWorldStore: Updating position', updatedZone.position);
         audioManager.updateEffectZonePosition(zoneId, updatedZone.position);
       }
       
       // Solo llamar a worldStoreFacade.updateEffectZone si NO viene de Firestore
       // para evitar bucles de sincronización
       if (!state.isUpdatingFromFirestore) {
-        console.log('🔧 useWorldStore: Calling worldStoreFacade.updateEffectZone for local update');
         worldStoreFacade.updateEffectZone(zoneId, updates, gridId);
-        console.log('✅ useWorldStore: worldStoreFacade.updateEffectZone called');
       }
     } else {
       console.warn('⚠️ useWorldStore: Could not find effect zone or gridId', { zoneId, gridId });

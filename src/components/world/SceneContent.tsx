@@ -322,6 +322,33 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   // Estado para rastrear si se está arrastrando
   const [isDragging, setIsDragging] = React.useState(false);
   const [draggingEntityId, setDraggingEntityId] = React.useState<string | null>(null);
+  
+  // Protección: Resetear estado de arrastre si el mouse se suelta fuera del viewport
+  React.useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        // Log silenciado - reset global de arrastre
+        setIsDragging(false);
+        setDraggingEntityId(null);
+      }
+    };
+    
+    const handleGlobalMouseLeave = () => {
+      if (isDragging) {
+        // Log silenciado - reset global de arrastre
+        setIsDragging(false);
+        setDraggingEntityId(null);
+      }
+    };
+    
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    window.addEventListener('mouseleave', handleGlobalMouseLeave);
+    
+    return () => {
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+      window.removeEventListener('mouseleave', handleGlobalMouseLeave);
+    };
+  }, [isDragging]);
 
   // Función para manejar cambios en las transformaciones
   const handleTransformChange = useCallback((entityId: string, newTransform: { position?: { x: number, y: number, z: number }, rotation?: { x: number, y: number, z: number }, scale?: { x: number, y: number, z: number } }) => {
@@ -332,6 +359,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       const isSoundObject = allObjects.objects.some(obj => obj.id === entityId);
       const isMobileObject = allObjects.mobileObjects.some(obj => obj.id === entityId);
       const isEffectZone = allObjects.effectZones.some(zone => zone.id === entityId);
+      
+      // Durante el arrastre, solo actualizar objetos visualmente sin tocar el store
+      const isCurrentlyDragging = isDragging && draggingEntityId === entityId;
       
       if (newTransform.position) {
         // Convertir posición mundial a posición local
@@ -354,48 +384,25 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         
         updates.position = localPosition;
         
-        // Para zonas de efectos durante el arrastre, actualizar directamente el grupo de Three.js
-        if (isEffectZone && isDragging && draggingEntityId === entityId) {
-          const zoneRef = entityRefs.get(entityId);
-          if (zoneRef?.current) {
-            // DEBUG: Log de la posición que estamos estableciendo
-            console.log('🎯 DRAG ACTIVE - Setting position:', {
-              entityId,
-              localPosition,
-              currentWorldPos: zoneRef.current.position.toArray(),
-              isDragging,
-              draggingEntityId
-            });
-            
+        // Durante el arrastre, actualizar directamente el grupo de Three.js sin tocar el store
+        if (isCurrentlyDragging) {
+          const objectRef = entityRefs.get(entityId);
+          if (objectRef?.current) {
             // Actualizar directamente la posición del grupo de Three.js
-            zoneRef.current.position.set(localPosition[0], localPosition[1], localPosition[2]);
+            objectRef.current.position.set(localPosition[0], localPosition[1], localPosition[2]);
             
-            // Verificar que se estableció correctamente
-            const afterSet = zoneRef.current.position.toArray();
-            if (
-              Math.abs(afterSet[0] - localPosition[0]) > 0.001 ||
-              Math.abs(afterSet[1] - localPosition[1]) > 0.001 ||
-              Math.abs(afterSet[2] - localPosition[2]) > 0.001
-            ) {
-              console.error('❌ Position NOT set correctly!', {
-                expected: localPosition,
-                actual: afterSet
-              });
+            // Para zonas de efectos, actualizar audio inmediatamente
+            if (isEffectZone) {
+              try {
+                audioManager.updateEffectZonePosition(entityId, localPosition as [number, number, number]);
+              } catch (error) {
+                console.error('Error updating effect zone position:', error);
+              }
             }
             
-            // Actualizar audio inmediatamente
-            try {
-              audioManager.updateEffectZonePosition(entityId, localPosition as [number, number, number]);
-            } catch (error) {
-              console.error('Error updating effect zone position:', error);
-            }
-            
-            // NO actualizar el estado durante el arrastre para evitar re-renders
+            // NO actualizar el estado durante el arrastre para evitar re-renders que bloquean el gizmo
             // El estado se actualizará cuando se suelte el mouse
-            
-            return; // No llamar a updateEffectZone durante el arrastre
-          } else {
-            console.warn('⚠️ Zone ref not found during drag:', entityId);
+            return;
           }
         }
       }
@@ -408,7 +415,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         updates.scale = [newTransform.scale.x, newTransform.scale.y, newTransform.scale.z];
       }
       
-      if (Object.keys(updates).length > 0) {
+      // Solo actualizar el store si NO estamos arrastrando
+      if (Object.keys(updates).length > 0 && !isCurrentlyDragging) {
         if (isSoundObject) {
           updateObject(entityId, updates);
         } else if (isMobileObject) {
@@ -427,11 +435,16 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Función para manejar clic en el espacio vacío
   const handleBackgroundClick = useCallback((event: { object?: { type?: string; geometry?: { type?: string } } }) => {
+    // No deseleccionar si estamos arrastrando el gizmo
+    if (isDragging) {
+      return;
+    }
+    
     // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
     if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry?.type === 'PlaneGeometry') {
       selectEntity(null);
     }
-  }, [selectEntity]);
+  }, [selectEntity, isDragging]);
 
   // Funciones de transformación removidas - no se utilizan actualmente
 
@@ -692,66 +705,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                 setIsDragging(true);
                 setDraggingEntityId(selectedEntityId);
               }}
-              onMouseUp={() => {
-                const wasDraggingEffectZone = isDragging && draggingEntityId === selectedEntityId && allObjects.effectZones.some(zone => zone.id === selectedEntityId);
-                const wasDragging = isDragging && draggingEntityId === selectedEntityId;
-                
-                setIsDragging(false);
-                setDraggingEntityId(null);
-                
-                // Actualizar estado con la posición final después de soltar
-                if (wasDragging) {
-                  // Obtener la posición actual del grupo de Three.js
-                  const zoneRef = entityRefs.get(selectedEntityId);
-                  if (zoneRef?.current) {
-                    const worldPos = zoneRef.current.position;
-                    let finalPosition: [number, number, number] | null = null;
-                    
-                    // Encontrar la cuadrícula para convertir a posición local
-                    for (const grid of grids.values()) {
-                      if (grid.effectZones.some(z => z.id === selectedEntityId)) {
-                        finalPosition = [
-                          worldPos.x - grid.position[0],
-                          worldPos.y - grid.position[1],
-                          worldPos.z - grid.position[2]
-                        ] as [number, number, number];
-                        break;
-                      }
-                    }
-                    
-                    if (finalPosition) {
-                      // Actualizar estado con la posición final
-                      updateEffectZone(selectedEntityId, { position: finalPosition });
-                    }
-                  }
-                }
-              }}
-              size={0.75}
-            />
-          );
-        }
-        
-        return (
-          <TransformControls
-            key={`${selectedEntityId}-${transformMode}`}
-            object={entityRefs.get(selectedEntityId)?.current || undefined}
-            mode={transformMode}
-            position={worldPosition}
-            // No aplicar la rotación del objeto al gizmo para que se mantenga alineado con la vista
-            rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
-            scale={selectedEntity.scale}
-            enabled={!isLocked} // Deshabilitar si está bloqueada
-            onObjectChange={(e) => {
-              const event = e as { target?: { object?: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number }; scale?: { x: number; y: number; z: number } } } };
-              if (event?.target?.object) {
-                handleTransformChange(selectedEntityId, event.target.object);
-              }
-            }}
-            onMouseDown={() => {
-              setIsDragging(true);
-              setDraggingEntityId(selectedEntityId);
-            }}
             onMouseUp={() => {
+              const wasDraggingEffectZone = isDragging && draggingEntityId === selectedEntityId && allObjects.effectZones.some(zone => zone.id === selectedEntityId);
               const wasDragging = isDragging && draggingEntityId === selectedEntityId;
               
               setIsDragging(false);
@@ -783,8 +738,86 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                   }
                 }
               }
+              
+              // Asegurar que el objeto permanezca seleccionado después de mover
+              // No deseleccionar explícitamente aquí
             }}
-            size={0.75}
+            size={1.0}
+            />
+          );
+        }
+        
+        return (
+          <TransformControls
+            key={`${selectedEntityId}-${transformMode}`}
+            object={entityRefs.get(selectedEntityId)?.current || undefined}
+            mode={transformMode}
+            position={worldPosition}
+            // No aplicar la rotación del objeto al gizmo para que se mantenga alineado con la vista
+            rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
+            scale={selectedEntity.scale}
+            enabled={!isLocked} // Deshabilitar si está bloqueada
+            onObjectChange={(e) => {
+              const event = e as { target?: { object?: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number }; scale?: { x: number; y: number; z: number } } } };
+              if (event?.target?.object) {
+                handleTransformChange(selectedEntityId, event.target.object);
+              }
+            }}
+            onMouseDown={() => {
+              // Log silenciado - inicio de arrastre
+              setIsDragging(true);
+              setDraggingEntityId(selectedEntityId);
+            }}
+            onMouseUp={() => {
+              const wasDragging = isDragging && draggingEntityId === selectedEntityId;
+              
+              // Siempre resetear el estado de arrastre, incluso si algo sale mal
+              setIsDragging(false);
+              setDraggingEntityId(null);
+              
+              // Actualizar estado con la posición final después de soltar
+              if (wasDragging) {
+                try {
+                  // Obtener la posición actual del grupo de Three.js
+                  const objectRef = entityRefs.get(selectedEntityId);
+                  if (objectRef?.current) {
+                    const worldPos = objectRef.current.position;
+                    let finalPosition: [number, number, number] | null = null;
+                    
+                    // Encontrar la cuadrícula para convertir a posición local
+                    for (const grid of grids.values()) {
+                      const isSoundObject = grid.objects.some(obj => obj.id === selectedEntityId);
+                      const isMobileObject = grid.mobileObjects.some(obj => obj.id === selectedEntityId);
+                      const isEffectZone = grid.effectZones.some(zone => zone.id === selectedEntityId);
+                      
+                      if (isSoundObject || isMobileObject || isEffectZone) {
+                        finalPosition = [
+                          worldPos.x - grid.position[0],
+                          worldPos.y - grid.position[1],
+                          worldPos.z - grid.position[2]
+                        ] as [number, number, number];
+                        
+                        // Actualizar el store según el tipo de objeto
+                        if (isSoundObject) {
+                          updateObject(selectedEntityId, { position: finalPosition });
+                        } else if (isMobileObject) {
+                          updateMobileObject(selectedEntityId, { position: finalPosition });
+                        } else if (isEffectZone) {
+                          updateEffectZone(selectedEntityId, { position: finalPosition });
+                        }
+                        break;
+                      }
+                    }
+                  }
+                } catch (error) {
+                  console.error('❌ Error actualizando posición final:', error);
+                }
+              }
+              
+              // Asegurar que el objeto permanezca seleccionado después de mover
+              // No deseleccionar explícitamente aquí
+            }}
+            size={1.0}
           />
         );
       })()}

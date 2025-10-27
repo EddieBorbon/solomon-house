@@ -87,19 +87,33 @@ export function useEffectZoneDetection() {
         }
 
         // APLICAR EFECTO CON AMOUNT VARIABLE para transiciones suaves
-        if (isInside) {
-          // Objeto está dentro de la zona - aplicar efecto con amount variable
-          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, effectAmount);
-        } else {
-          // Objeto está fuera de la zona - remover efecto completamente
-          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
+        // Solo intentar establecer el efecto si el EffectSend existe
+        try {
+          if (audioManager.hasEffectSend(soundObject.id, effectZone.id)) {
+            if (isInside) {
+              // Objeto está dentro de la zona - aplicar efecto con amount variable
+              audioManager.setEffectSendAmount(soundObject.id, effectZone.id, effectAmount);
+            } else {
+              // Objeto está fuera de la zona - remover efecto completamente
+              audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
+            }
+          }
+        } catch (error) {
+          // Silenciar errores de EffectSend no encontrado (puede ser normal durante inicialización)
         }
       });
 
       // IMPORTANTE: Si el objeto no está dentro de ninguna zona, asegurar que todos los efectos estén desconectados
       if (!isInsideAnyZone && allEffectZones.length > 0) {
         allEffectZones.forEach((effectZone) => {
-          audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
+          // Solo desconectar si el EffectSend existe
+          try {
+            if (audioManager.hasEffectSend(soundObject.id, effectZone.id)) {
+              audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
+            }
+          } catch (error) {
+            // Silenciar errores de EffectSend no encontrado
+          }
         });
         
         if (shouldDebug) {

@@ -13,48 +13,83 @@ interface EffectZoneProps {
 export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
   ({ zone, onSelect }, ref) => {
     const groupRef = React.useRef<THREE.Group | null>(null);
-    const hasBeenControlledRef = React.useRef(false);
+    const isDraggingRef = React.useRef(false);
+    const lastControlledPositionRef = React.useRef<[number, number, number] | null>(null);
     
-    // Ref para mantener la última posición controlada externamente
-    const controlledPositionRef = React.useRef<[number, number, number] | null>(null);
-    
-    // Actualizar posición solo cuando cambia y NO está siendo controlada externamente
+    // Actualizar posición solo cuando NO está siendo arrastrado
     React.useEffect(() => {
       if (!groupRef.current) return;
       
-      // Verificar si hay un ref externo controlando este grupo
+      // Verificar si hay un ref externo controlando este grupo (TransformControls)
       const externalRef = ref && typeof ref !== 'function' && (ref as React.MutableRefObject<THREE.Group | null>).current;
-      const isControlled = externalRef && externalRef === groupRef.current;
+      const isControlledExternally = externalRef && externalRef === groupRef.current;
       
-      // Si está siendo controlado externamente, guardar la posición controlada
-      if (isControlled) {
-        hasBeenControlledRef.current = true;
+      // Si está siendo controlado externamente (durante arrastre), guardar la posición y no hacer nada
+      if (isControlledExternally) {
         const pos = groupRef.current.position;
-        controlledPositionRef.current = [pos.x, pos.y, pos.z] as [number, number, number];
-        return; // No actualizar desde props
+        lastControlledPositionRef.current = [pos.x, pos.y, pos.z] as [number, number, number];
+        isDraggingRef.current = true;
+        return; // No actualizar desde props durante el arrastre
       }
       
-      // Si nunca ha sido controlado externamente, actualizar desde props
-      if (!hasBeenControlledRef.current) {
-        groupRef.current.position.set(...zone.position);
+      // Si ya terminó el arrastre, verificar si necesitamos sincronizar
+      if (isDraggingRef.current && lastControlledPositionRef.current) {
+        const [lastX, lastY, lastZ] = lastControlledPositionRef.current;
+        const [storeX, storeY, storeZ] = zone.position;
+        const [currentX, currentY, currentZ] = [
+          groupRef.current.position.x,
+          groupRef.current.position.y,
+          groupRef.current.position.z
+        ];
+        
+        // Comparar la posición actual del grupo con la posición del store
+        const threshold = 0.01; // Umbral muy pequeño para detección precisa
+        const positionMatches = (
+          Math.abs(currentX - storeX) < threshold &&
+          Math.abs(currentY - storeY) < threshold &&
+          Math.abs(currentZ - storeZ) < threshold
+        );
+        
+        // Si la posición actual ya coincide con el store, solo resetear flags
+        if (positionMatches) {
+          isDraggingRef.current = false;
+          lastControlledPositionRef.current = null;
+          return;
+        }
+        
+        // Si el store fue actualizado y la posición actual es diferente, sincronizar
+        const storeMatchesLastControlled = (
+          Math.abs(lastX - storeX) < threshold &&
+          Math.abs(lastY - storeY) < threshold &&
+          Math.abs(lastZ - storeZ) < threshold
+        );
+        
+        if (storeMatchesLastControlled) {
+          // El store ya refleja la última posición controlada, sincronizar y resetear
+          groupRef.current.position.set(...zone.position);
+          isDraggingRef.current = false;
+          lastControlledPositionRef.current = null;
+          return;
+        }
       }
-      // Si fue controlado externamente, verificar si el usuario dejó de arrastrar
-      else {
-        // Si la posición controlada es similar a la posición actual, resetear el flag
-        if (controlledPositionRef.current) {
-          const [cx, cy, cz] = controlledPositionRef.current;
-          const [px, py, pz] = zone.position;
-          
-          if (
-            Math.abs(cx - px) < 0.1 &&
-            Math.abs(cy - py) < 0.1 &&
-            Math.abs(cz - pz) < 0.1
-          ) {
-            // El usuario ya terminó de arrastrar, podemos usar props de nuevo
-            hasBeenControlledRef.current = false;
-            controlledPositionRef.current = null;
-            groupRef.current.position.set(...zone.position);
-          }
+      
+      // Si no está siendo arrastrado, verificar si necesitamos actualizar
+      if (!isDraggingRef.current) {
+        const [currentX, currentY, currentZ] = [
+          groupRef.current.position.x,
+          groupRef.current.position.y,
+          groupRef.current.position.z
+        ];
+        const [storeX, storeY, storeZ] = zone.position;
+        
+        // Solo actualizar si hay una diferencia significativa
+        const threshold = 0.01;
+        if (
+          Math.abs(currentX - storeX) > threshold ||
+          Math.abs(currentY - storeY) > threshold ||
+          Math.abs(currentZ - storeZ) > threshold
+        ) {
+          groupRef.current.position.set(...zone.position);
         }
       }
     }, [zone.position, ref]);
@@ -154,21 +189,8 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
           }
           
           // Inicializar posición solo en el montaje
-          if (node) {
-            // Solo establecer posición inicial si no ha sido controlada externamente
-            if (!hasBeenControlledRef.current && !controlledPositionRef.current) {
-              node.position.set(...zone.position);
-              console.log('🎬 EFFECTZONE: Component mounted', {
-                zoneId: zone.id,
-                initialPosition: zone.position,
-                willUseProps: true
-              });
-            } else {
-              console.log('🎬 EFFECTZONE: Component mounted (preserving position)', {
-                zoneId: zone.id,
-                preservedPosition: controlledPositionRef.current || zone.position
-              });
-            }
+          if (node && !isDraggingRef.current) {
+            node.position.set(...zone.position);
           }
         }}
         rotation={zone.rotation}

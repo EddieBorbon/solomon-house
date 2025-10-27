@@ -18,6 +18,7 @@ export class AudioManager {
   private static instance: AudioManager;
   private soundSources: Map<string, SoundSource> = new Map();
   private lastSendAmounts: Map<string, number> = new Map(); // Para reducir logs de send amounts
+  private warnedMissingSends: Set<string> = new Set(); // Para evitar logs repetitivos
   private soundSourceFactory: SoundSourceFactory;
   private effectManager: EffectManager;
   private spatialAudioManager: SpatialAudioManager;
@@ -176,20 +177,33 @@ export class AudioManager {
   }
 
   /**
+   * Verifica si un EffectSend existe para una fuente de sonido
+   */
+  public hasEffectSend(soundSourceId: string, effectId: string): boolean {
+    const source = this.soundSources.get(soundSourceId);
+    if (!source) return false;
+    return source.effectSends.has(effectId);
+  }
+
+  /**
    * Controla la cantidad de señal enviada a un efecto específico
    */
   public setEffectSendAmount(soundSourceId: string, effectId: string, amount: number): void {
     try {
       const source = this.soundSources.get(soundSourceId);
       if (!source) {
-        console.warn(`⚠️ AudioManager: Fuente de sonido ${soundSourceId} no encontrada`);
+        // Solo loguear la primera vez que falta la fuente
+        const warningKey = `source:${soundSourceId}`;
+        if (!this.warnedMissingSends.has(warningKey)) {
+          console.warn(`⚠️ AudioManager: Fuente de sonido ${soundSourceId} no encontrada`);
+          this.warnedMissingSends.add(warningKey);
+        }
         return;
       }
 
       const effectSend = source.effectSends.get(effectId);
       if (!effectSend) {
-        console.warn(`⚠️ AudioManager: EffectSend para ${effectId} no encontrado en fuente ${soundSourceId}`);
-        console.log(`🔍 AudioManager: EffectSends disponibles:`, Array.from(source.effectSends.keys()));
+        // Silenciar: simplemente retornar sin loguear (puede ser normal durante inicialización o cuando el objeto no tiene ese efecto configurado)
         return;
       }
 

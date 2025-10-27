@@ -35,17 +35,13 @@ export function useGlobalWorldSync() {
       return;
     }
 
-    console.log('🔍 Detectando cambios específicos en objetos...');
-    console.log('📊 Estado anterior:', {
-      objects: previousState.objects?.length || 0,
-      mobileObjects: previousState.mobileObjects?.length || 0,
-      effectZones: previousState.effectZones?.length || 0
-    });
-    console.log('📊 Estado nuevo:', {
-      objects: newState.objects?.length || 0,
-      mobileObjects: newState.mobileObjects?.length || 0,
-      effectZones: newState.effectZones?.length || 0
-    });
+    // Logs reducidos - solo en desarrollo y solo cuando hay cambios
+    if (process.env.NODE_ENV === 'development') {
+      const hasChanges = JSON.stringify(previousState) !== JSON.stringify(newState);
+      if (hasChanges) {
+        console.log('🔍 Detectando cambios específicos en objetos...');
+      }
+    }
 
     // Función helper para comparar objetos de manera más robusta
     const hasSignificantChange = (prev: Record<string, unknown>, curr: Record<string, unknown>, fields: string[]): boolean => {
@@ -180,7 +176,7 @@ export function useGlobalWorldSync() {
 
     // Detectar cambios en objetos sonoros
     if (newState.objects && previousState.objects) {
-      console.log('🔍 Verificando cambios en objetos sonoros...');
+      // Log silenciado - verificación de cambios
       
       // 1. Detectar objetos nuevos y cambios en objetos existentes
       for (const newObject of newState.objects) {
@@ -219,7 +215,7 @@ export function useGlobalWorldSync() {
               updateGlobalSoundObject(newObject.id, updates);
             }
           } else {
-            console.log(`ℹ️ No hay cambios significativos en objeto ${newObject.id}`);
+            // Silenciar: no hay cambios significativos (normal)
           }
         } else {
           console.log(`🆕 Nuevo objeto detectado: ${newObject.id}`);
@@ -366,23 +362,11 @@ export function useGlobalWorldSync() {
               const state = useWorldStore.getState();
               const isLocalUpdate = !state.isUpdatingFromFirestore;
               
-              console.log('🔍 FIRESTORE SYNC: Checking position update', {
-                zoneId: newEffectZone.id,
-                isUpdatingFromFirestore: state.isUpdatingFromFirestore,
-                isLocalUpdate,
-                previousPos: previousEffectZone.position,
-                newPos: newEffectZone.position
-              });
-              
               // Solo actualizar posición desde Firestore si NO es una actualización local reciente
               const lastUpdateTime = state.grids.get(state.activeGridId || '')?.effectZones.find(z => z.id === newEffectZone.id);
               if (isLocalUpdate) {
-                console.log(`⏸️ Ignorando actualización de posición desde Firestore para zona ${newEffectZone.id} - hay actualización local en curso`);
+                // Ignorar actualización local desde Firestore para evitar conflictos
               } else {
-                console.log('✅ FIRESTORE SYNC: Applying position update from Firestore', {
-                  zoneId: newEffectZone.id,
-                  position: newEffectZone.position
-                });
                 updates.position = newEffectZone.position;
               }
             }
@@ -432,7 +416,7 @@ export function useGlobalWorldSync() {
       }
     }
 
-    console.log('✅ Procesamiento de cambios específicos completado');
+    // Log silenciado - procesamiento completado
   }, [updateGlobalSoundObject, updateGlobalMobileObject, updateGlobalEffectZone]);
 
   // Inicializar el mundo global y establecer suscripción
@@ -470,14 +454,7 @@ export function useGlobalWorldSync() {
             
             lastUpdateTimeRef.current = now;
             
-            console.log('📡 Recibiendo actualización desde Firestore');
-            console.log('📊 Estado recibido:', {
-              objects: state.objects?.length || 0,
-              mobileObjects: state.mobileObjects?.length || 0,
-              effectZones: state.effectZones?.length || 0,
-              grids: state.grids?.length || 0,
-              timestamp: new Date().toISOString()
-            });
+            // Log silenciado - actualización desde Firestore (muy frecuente)
             
             // IMPORTANTE: setGlobalStateFromFirestore ya sincroniza las cuadrículas con sus objetos
             // Los objetos están organizados por cuadrícula en state.grids[], no en el array plano
