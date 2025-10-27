@@ -5,6 +5,7 @@ import { TransformControls } from '@react-three/drei';
 import { Group, Mesh } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { useTutorialStore } from '../../stores/useTutorialStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
@@ -461,36 +462,34 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   const handleEmergencyCameraUnlock = useCallback((event: KeyboardEvent) => {
     // Presionar 'C' para desbloquear la cámara
     if (event.key.toLowerCase() === 'c' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
+      // Prevenir que otros handlers procesen C
+      event.preventDefault();
+      event.stopPropagation();
+      
       if (orbitControlsRef.current) {
         const wasDisabled = !orbitControlsRef.current.enabled;
         
         // Reset completo de OrbitControls
         try {
+          // Primero habilitar los controles
           orbitControlsRef.current.enabled = true;
-          orbitControlsRef.current.update();
+          
+          // Luego resetear (esto restaura posición y orientación)
           orbitControlsRef.current.reset();
-          console.log('🚨 SceneContent: OrbitControls reseteado completamente con tecla C', { wasDisabled });
+          
+          // Finalmente forzar actualización
+          orbitControlsRef.current.update();
+          
+          console.log('🎮 SceneContent: OrbitControls reseteado completamente con tecla C', { wasDisabled });
         } catch (error) {
           console.warn('⚠️ SceneContent: Error al resetear OrbitControls:', error);
           // Fallback: solo habilitar
-          orbitControlsRef.current.enabled = true;
+          if (orbitControlsRef.current) {
+            orbitControlsRef.current.enabled = true;
+          }
         }
       } else {
         console.warn('🚨 SceneContent: No se puede resetear cámara - OrbitControls no disponible');
-      }
-    }
-    
-    // Presionar 'R' para reset completo de cámara
-    if (event.key.toLowerCase() === 'r' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
-      if (orbitControlsRef.current) {
-        try {
-          orbitControlsRef.current.enabled = true;
-          orbitControlsRef.current.reset();
-          orbitControlsRef.current.update();
-          console.log('🔄 SceneContent: Reset completo de cámara con tecla R');
-        } catch (error) {
-          console.warn('⚠️ SceneContent: Error en reset completo de cámara:', error);
-        }
       }
     }
     

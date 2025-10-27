@@ -6,16 +6,26 @@ import { ControlPanel } from '../components/ui/ControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
+import { TutorialOverlay } from '../components/tutorial/TutorialOverlay';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useTutorialStore } from '../stores/useTutorialStore';
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
+  const { startTutorial, isActive } = useTutorialStore();
   
   // Hook para atajos de teclado
   useKeyboardShortcuts();
 
-  const handleStartExperience = () => {
+  const handleStartTutorial = () => {
     setShowWelcome(false);
+    // Iniciar el tutorial
+    startTutorial();
+  };
+
+  const handleSkipTutorial = () => {
+    setShowWelcome(false);
+    // Entrar sin tutorial
   };
 
   return (
@@ -39,7 +49,18 @@ export default function Home() {
 
       {/* Modal de bienvenida - superpuesto sobre la aplicación */}
       {showWelcome && (
-        <LoadingScreen variant="initial" onStart={handleStartExperience} />
+        <LoadingScreen 
+          variant="initial" 
+          onStart={handleStartTutorial}
+          onSkipTutorial={handleSkipTutorial}
+        />
+      )}
+
+      {/* Tutorial Overlay */}
+      {!showWelcome && isActive ? (
+        <TutorialOverlay />
+      ) : (
+        !showWelcome && console.log('🔴 Tutorial no activo:', { isActive, showWelcome })
       )}
 
     </div>

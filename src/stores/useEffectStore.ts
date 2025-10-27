@@ -251,8 +251,8 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
     // Obtener parámetros por defecto
     const defaultParams = getDefaultEffectParams(type);
     
-    // Agregar radio por defecto para todas las zonas de efectos
-    defaultParams.radius = 2.0;
+    // Agregar radio por defecto para todas las zonas de efectos (10x10x10)
+    defaultParams.radius = 5.0;
 
     const newEffectZone: EffectZone = {
       id: uuidv4(),
@@ -260,7 +260,7 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       shape,
       position,
       rotation: [0, 0, 0],
-      scale: [1, 1, 1],
+      scale: [5, 5, 5], // Tamaño por defecto 10x10x10 (5 de radio por eje)
       isSelected: false,
       isLocked: false,
       effectParams: defaultParams,

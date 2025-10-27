@@ -777,7 +777,21 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
           worldStoreFacade.updateMobileObject(id, updates, newGrids);
           
           const updatedObjects = [...grid.mobileObjects];
-          updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
+          const currentObject = updatedObjects[objectIndex];
+          
+          // Si hay mobileParams, hacer merge profundo para mantener todos los parámetros
+          if (updates.mobileParams && currentObject.mobileParams) {
+            updatedObjects[objectIndex] = { 
+              ...currentObject, 
+              ...updates,
+              mobileParams: {
+                ...currentObject.mobileParams,
+                ...updates.mobileParams,
+              }
+            };
+          } else {
+            updatedObjects[objectIndex] = { ...currentObject, ...updates };
+          }
           
           newGrids.set(gId, {
             ...grid,
@@ -1842,7 +1856,22 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       const objectIndex = grid.mobileObjects.findIndex(obj => obj.id === objectId);
       if (objectIndex !== -1) {
         const updatedObjects = [...grid.mobileObjects];
-        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
+        const currentObject = updatedObjects[objectIndex];
+        
+        // Si hay mobileParams, hacer merge profundo para mantener todos los parámetros
+        if (updates.mobileParams && currentObject.mobileParams) {
+          updatedObjects[objectIndex] = { 
+            ...currentObject, 
+            ...updates,
+            mobileParams: {
+              ...currentObject.mobileParams,
+              ...updates.mobileParams,
+            }
+          };
+        } else {
+          updatedObjects[objectIndex] = { ...currentObject, ...updates };
+        }
+        
         updatedObject = updatedObjects[objectIndex];
         gridId = gId;
         

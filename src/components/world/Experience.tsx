@@ -14,17 +14,20 @@ import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
 import { QuotaWarning } from '../ui/QuotaWarning';
+import { useTutorialStore } from '../../stores/useTutorialStore';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
   const { } = useThree();
   const { updateCameraPosition } = useCameraControls();
+  const { isActive, currentStep, addCameraPosition } = useTutorialStore();
   
   // Inicializar la espacialización de audio
   useAudioListener();
 
   // Vector para almacenar la dirección de la cámara (evitar recrearlo en cada frame)
   const forwardVector = useRef(new THREE.Vector3());
+  const lastCameraPosition = useRef<THREE.Vector3 | null>(null);
 
   useFrame(({ camera }) => {
     if (orbitControlsRef.current) {
@@ -47,6 +50,16 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
       
       // Actualizar el listener de audio con la nueva posición y orientación
       audioManager.updateListener(position, forwardVector.current);
+      
+      // Rastrear posición de cámara para el tutorial (paso 7)
+      if (isActive && currentStep === 6) {
+        const currentPos = camera.position;
+        // Solo registrar si la posición cambió significativamente (evitar spam)
+        if (!lastCameraPosition.current || currentPos.distanceTo(lastCameraPosition.current) > 0.5) {
+          addCameraPosition(currentPos.x, currentPos.y, currentPos.z);
+          lastCameraPosition.current = currentPos.clone();
+        }
+      }
     } catch {
     }
   });

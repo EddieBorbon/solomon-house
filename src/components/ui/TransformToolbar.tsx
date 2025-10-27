@@ -41,7 +41,7 @@ export function TransformToolbar() {
   const modes = [
     { key: 'translate', label: t('ui.move'), shortcut: 'G', icon: Move },
     { key: 'rotate', label: t('ui.rotate'), shortcut: 'R', icon: RotateCcw },
-    { key: 'scale', label: t('ui.scale'), shortcut: 'S', icon: Scale },
+    { key: 'scale', label: t('ui.scale'), shortcut: 'X', icon: Scale },
   ] as const;
 
   return (

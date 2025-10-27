@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTutorialStore } from '../../stores/useTutorialStore';
 import { 
   Cog6ToothIcon, 
   MusicalNoteIcon, 
@@ -29,8 +30,47 @@ import {
 } from 'lucide-react';
 
 export function ControlPanel() {
+  const { isActive: isTutorialActive, currentStep } = useTutorialStore();
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
+  
+  // Colapsar panel automáticamente cuando inicia el tutorial (excepto paso 5, 6, 10 y 11)
+  useEffect(() => {
+    if (isTutorialActive && currentStep !== 4 && currentStep !== 5 && currentStep !== 9 && currentStep !== 10) { // Paso 5 es index 4, paso 6 es index 5, paso 10 es index 9, paso 11 es index 10
+      setIsPanelExpanded(false);
+    } else if (isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10)) {
+      // En los pasos 5, 6, 10 y 11, mantener el panel expandido
+      setIsPanelExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
   const [isAddMenuExpanded, setIsAddMenuExpanded] = useState(false);
+  
+  // Expandir automáticamente el menú de objetos sonoros en el paso 5 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 4) {
+      setIsAddMenuExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
+  
+  // Expandir automáticamente la sección de zonas de efectos en el paso 10 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 9) {
+      setIsEffectsExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
+  
+  // Expandir automáticamente la sección de objetos móviles en el paso 11 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 10) {
+      setIsMobileObjectExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
+  
+  // Expandir automáticamente la sección de objetos sonoros en el paso 11 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 10) {
+      setIsAddMenuExpanded(true);
+    }
+  }, [isTutorialActive, currentStep]);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
   const [isMobileObjectExpanded, setIsMobileObjectExpanded] = useState(false);
@@ -214,9 +254,17 @@ export function ControlPanel() {
     <div className="fixed left-0 top-0 h-full z-50 flex">
       {/* Botón de toggle futurista */}
       <button
-        onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-        className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
-        title={isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel')}
+        onClick={() => {
+          // Permitir toggle en los pasos 5 y 6 del tutorial
+          if (!isTutorialActive || currentStep === 4 || currentStep === 5) {
+            setIsPanelExpanded(!isPanelExpanded);
+          }
+        }}
+        className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
+          (isTutorialActive && currentStep !== 4 && currentStep !== 5) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
+        }`}
+        title={(isTutorialActive && currentStep !== 4 && currentStep !== 5) ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel'))}
+        disabled={isTutorialActive && currentStep !== 4 && currentStep !== 5}
       >
         {/* Decoraciones de esquina */}
         <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
@@ -268,7 +316,7 @@ export function ControlPanel() {
           {isPanelExpanded && (
             <>
               {/* Sección de Controles */}
-      <div className="mb-4 relative">
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -303,7 +351,7 @@ export function ControlPanel() {
                   <p className="flex items-center gap-2"><ComputerDesktopIcon className="w-3 h-3" /><span className="text-white">{t('controls.wasd')}</span> {t('controls.movementShiftFast')}</p>
                   <p className="flex items-center gap-2"><CursorArrowRaysIcon className="w-3 h-3" /><span className="text-white">{t('controls.click')}</span> {t('controls.selectObjects')}</p>
                   <p className="flex items-center gap-2"><TrashIcon className="w-3 h-3" /><span className="text-white">{t('controls.delete')}</span> {t('controls.removeSelected')}</p>
-                  <p className="flex items-center gap-2"><CommandLineIcon className="w-3 h-3" /><span className="text-white">{t('controls.grs')}</span> {t('controls.transformModes')}</p>
+                  <p className="flex items-center gap-2"><CommandLineIcon className="w-3 h-3" /><span className="text-white">{t('controls.grx')}</span> {t('controls.transformModes')}</p>
                   <p className="flex items-center gap-2"><XMarkIcon className="w-3 h-3" /><span className="text-white">{t('controls.esc')}</span> {t('controls.exitEditMode')}</p>
                 </div>
               </div>
@@ -373,7 +421,7 @@ export function ControlPanel() {
 
 
       {/* Sección de Añadir Objeto */}
-      <div className="mb-4 relative">
+      <div className={`mb-4 relative ${isTutorialActive && currentStep === 9 ? 'opacity-30 pointer-events-none' : ''} ${isTutorialActive && currentStep === 10 ? '' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -454,7 +502,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Zonas de Efectos */}
-      <div className="mb-4 relative">
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -559,7 +607,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Objeto Móvil */}
-      <div className="mb-4 relative">
+      <div className={`mb-4 relative ${isTutorialActive && currentStep === 9 ? 'opacity-30 pointer-events-none' : ''} ${isTutorialActive && currentStep === 10 ? '' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -602,7 +650,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Cuadrículas */}
-      <div className="mb-4 relative">
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -763,7 +811,9 @@ export function ControlPanel() {
       </div>
 
       {/* Panel de Persistencia */}
-      <PersistencePanel />
+      <div className={isTutorialActive && (currentStep === 9 || currentStep === 10) ? 'opacity-30 pointer-events-none' : ''}>
+        <PersistencePanel />
+      </div>
 
             </>
           )}

@@ -18,20 +18,29 @@ export function useKeyboardShortcuts() {
       }
 
       // Log para debug de atajos de teclado
-      if (['delete', 'backspace', 'escape', 'g', 'r', 's'].includes(event.key.toLowerCase())) {
+      if (['delete', 'backspace', 'escape', 'g', 'r', 'x'].includes(event.key.toLowerCase())) {
       }
 
+      const currentState = useWorldStore.getState(); // Declarar una sola vez al inicio
+      
       switch (event.key.toLowerCase()) {
         case 'g':
           event.preventDefault();
+          event.stopPropagation(); // Prevenir que otros handlers procesen G
           setTransformMode('translate');
           break;
         case 'r':
-          event.preventDefault();
-          setTransformMode('rotate');
+          // Solo usar R para rotar si hay objeto seleccionado
+          if (currentState.selectedEntityId) {
+            event.preventDefault();
+            event.stopPropagation(); // Prevenir reset de cámara
+            setTransformMode('rotate');
+          }
+          // Si no hay objeto seleccionado, permitir que SceneContent maneje el reset de cámara
           break;
-        case 's':
+        case 'x':
           event.preventDefault();
+          event.stopPropagation(); // Prevenir que otros handlers procesen X
           setTransformMode('scale');
           break;
         case 'escape':
@@ -44,7 +53,6 @@ export function useKeyboardShortcuts() {
         case 'backspace':
           event.preventDefault();
           // DEL/BACKSPACE: Eliminar la entidad seleccionada
-          const currentState = useWorldStore.getState();
           if (currentState.selectedEntityId) {
             const currentGrids = currentState.grids;
             
@@ -76,7 +84,7 @@ export function useKeyboardShortcuts() {
         // Controles de cámara WASD - no interceptar, dejar que se manejen en useCameraControls
         case 'w':
         case 'a':
-        case 's':
+        case 's': // S se usa para mover cámara hacia atrás
         case 'd':
         case 'q':
         case 'e':

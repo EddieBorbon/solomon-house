@@ -7,9 +7,10 @@ import { LanguageSelector } from './LanguageSelector';
 interface LoadingScreenProps {
   variant?: 'initial' | 'scene' | 'audio';
   onStart?: () => void;
+  onSkipTutorial?: () => void;
 }
 
-export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenProps) {
+export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: LoadingScreenProps) {
   const { t } = useLanguage();
   
   const getContent = () => {
@@ -122,16 +123,26 @@ export function LoadingScreen({ variant = 'initial', onStart }: LoadingScreenPro
               </div>
             )}
 
-            {/* Action button */}
+            {/* Action buttons */}
             {content.showButton && (
-              <div className="mb-6 sm:mb-8">
+              <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button 
                   onClick={onStart}
-                  className="group relative px-4 sm:px-6 lg:px-8 py-2 sm:py-3 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer"
+                  className="group relative px-6 sm:px-8 lg:px-10 py-3 sm:py-4 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 cursor-pointer"
                 >
                   <div className="absolute -inset-1 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative font-mono text-xs sm:text-sm tracking-wider">
-                    {t('loading.startButton')}
+                    Iniciar Tutorial
+                  </span>
+                </button>
+                
+                <button 
+                  onClick={onSkipTutorial}
+                  className="group relative px-6 sm:px-8 lg:px-10 py-3 sm:py-4 border border-gray-500 text-gray-300 hover:border-white hover:text-white transition-all duration-300 cursor-pointer"
+                >
+                  <div className="absolute -inset-1 border border-gray-700 group-hover:border-gray-500 transition-colors duration-300"></div>
+                  <span className="relative font-mono text-xs sm:text-sm tracking-wider">
+                    Saltar Tutorial
                   </span>
                 </button>
               </div>

@@ -33,9 +33,18 @@ import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
 import { CodeEditor } from './CodeEditor';
 import { CommandLineIcon } from '@heroicons/react/24/outline';
+import { useTutorialStore } from '../../stores/useTutorialStore';
 
 export function ParameterEditor() {
+  const { isActive: isTutorialActive, currentStep } = useTutorialStore();
   const [isPanelExpanded, setIsPanelExpanded] = React.useState(false);
+  
+  // Colapsar panel automáticamente cuando inicia el tutorial (excepto en pasos 8, 9, 10 y 11)
+  React.useEffect(() => {
+    if (isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10) {
+      setIsPanelExpanded(false);
+    }
+  }, [isTutorialActive, currentStep]);
   const [showShapeCodeEditor, setShowShapeCodeEditor] = React.useState(false);
   const [showSynthesisCodeEditor, setShowSynthesisCodeEditor] = React.useState(false);
   const {
@@ -61,12 +70,12 @@ export function ParameterEditor() {
     getEffectZone
   } = useEntitySelector();
 
-  // Expandir automáticamente el panel cuando se selecciona una entidad
+  // Expandir automáticamente el panel cuando se selecciona una entidad (excepto durante el tutorial, pero permitir en pasos 8, 9, 10 y 11)
   React.useEffect(() => {
-    if (selectedEntity) {
+    if (selectedEntity && (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10)) {
       setIsPanelExpanded(true);
     }
-  }, [selectedEntity]);
+  }, [selectedEntity, isTutorialActive, currentStep]);
 
   // Usar el hook personalizado para transformaciones
   const {
@@ -226,9 +235,16 @@ export function ParameterEditor() {
 
         {/* Botón de toggle futurista */}
         <button
-          onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-          className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
-          title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+          onClick={() => {
+            if (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10) {
+              setIsPanelExpanded(!isPanelExpanded);
+            }
+          }}
+          className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
+            isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
+          }`}
+          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+          disabled={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10}
         >
           {/* Decoraciones de esquina */}
           <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
@@ -443,9 +459,16 @@ export function ParameterEditor() {
 
         {/* Botón de toggle futurista */}
         <button
-          onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-          className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
-          title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+          onClick={() => {
+            if (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10) {
+              setIsPanelExpanded(!isPanelExpanded);
+            }
+          }}
+          className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
+            isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
+          }`}
+          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+          disabled={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10}
         >
           {/* Decoraciones de esquina */}
           <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
@@ -570,9 +593,16 @@ export function ParameterEditor() {
 
       {/* Botón de toggle futurista */}
       <button
-        onClick={() => setIsPanelExpanded(!isPanelExpanded)}
-        className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
-        title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
+        onClick={() => {
+          if (!isTutorialActive) {
+            setIsPanelExpanded(!isPanelExpanded);
+          }
+        }}
+        className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
+          isTutorialActive ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
+        }`}
+        title={isTutorialActive ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+        disabled={isTutorialActive}
       >
         {/* Decoraciones de esquina */}
         <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
