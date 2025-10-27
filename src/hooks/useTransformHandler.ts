@@ -31,13 +31,15 @@ export const DEFAULT_TRANSFORM_VALUES = {
  * - Dependency Inversion: Depende de abstracciones (hooks)
  */
 export function useTransformHandler() {
-  const { updateObject, updateEffectZone } = useWorldStore();
+  const { updateObject, updateEffectZone, updateMobileObject } = useWorldStore();
   const {
     hasSelection,
     isSoundObject,
     isEffectZone,
+    isMobileObject,
     getSoundObject,
-    getEffectZone
+    getEffectZone,
+    getMobileObject
   } = useEntitySelector();
 
   /**
@@ -81,9 +83,22 @@ export function useTransformHandler() {
       updateEffectZone(effectZone.id, {
         [property]: newValues
       });
+    } else if (isMobileObject) {
+      const mobileObject = getMobileObject();
+      if (!mobileObject) {
+        return;
+      }
+
+      const newValues = [...mobileObject[property]] as [number, number, number];
+      newValues[axis] = value;
+
+      
+      updateMobileObject(mobileObject.id, {
+        [property]: newValues
+      });
     } else {
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, isMobileObject, getSoundObject, getEffectZone, getMobileObject, updateObject, updateEffectZone, updateMobileObject]);
 
   /**
    * Resetea todas las transformaciones a valores por defecto
@@ -104,8 +119,13 @@ export function useTransformHandler() {
       if (effectZone) {
         updateEffectZone(effectZone.id, DEFAULT_TRANSFORM_VALUES);
       }
+    } else if (isMobileObject) {
+      const mobileObject = getMobileObject();
+      if (mobileObject) {
+        updateMobileObject(mobileObject.id, DEFAULT_TRANSFORM_VALUES);
+      }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, isMobileObject, getSoundObject, getEffectZone, getMobileObject, updateObject, updateEffectZone, updateMobileObject]);
 
   /**
    * Actualiza una transformación completa (todos los ejes)
@@ -135,8 +155,15 @@ export function useTransformHandler() {
           [property]: values
         });
       }
+    } else if (isMobileObject) {
+      const mobileObject = getMobileObject();
+      if (mobileObject) {
+        updateMobileObject(mobileObject.id, {
+          [property]: values
+        });
+      }
     }
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone, updateObject, updateEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, isMobileObject, getSoundObject, getEffectZone, getMobileObject, updateObject, updateEffectZone, updateMobileObject]);
 
   /**
    * Obtiene los valores actuales de una propiedad de transformación
@@ -154,10 +181,13 @@ export function useTransformHandler() {
     } else if (isEffectZone) {
       const effectZone = getEffectZone();
       return effectZone?.[property] || DEFAULT_TRANSFORM_VALUES[property];
+    } else if (isMobileObject) {
+      const mobileObject = getMobileObject();
+      return mobileObject?.[property] || DEFAULT_TRANSFORM_VALUES[property];
     }
 
     return DEFAULT_TRANSFORM_VALUES[property];
-  }, [hasSelection, isSoundObject, isEffectZone, getSoundObject, getEffectZone]);
+  }, [hasSelection, isSoundObject, isEffectZone, isMobileObject, getSoundObject, getEffectZone, getMobileObject]);
 
   /**
    * Utilidad para redondear valores decimales
@@ -184,6 +214,6 @@ export function useTransformHandler() {
     
     // Estado
     hasSelection,
-    canTransform: hasSelection && (isSoundObject || isEffectZone)
+    canTransform: hasSelection && (isSoundObject || isEffectZone || isMobileObject)
   };
 }

@@ -3,19 +3,23 @@
 import React from 'react';
 import { type MobileObject } from '../../../state/useWorldStore';
 
-interface MobileTransformControlsProps {
+interface MobileSphereControlsProps {
   mobileObject: MobileObject;
-  onTransformChange: (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => void;
-  onResetTransform: () => void;
+  onSphereTransformChange: (property: 'spherePosition' | 'sphereRotation' | 'sphereScale', axis: 0 | 1 | 2, value: number) => void;
+  onResetSphereTransform: () => void;
   roundToDecimals: (value: number) => number;
 }
 
-export function MobileTransformControls({
+export function MobileSphereControls({
   mobileObject,
-  onTransformChange,
-  onResetTransform,
+  onSphereTransformChange,
+  onResetSphereTransform,
   roundToDecimals
-}: MobileTransformControlsProps) {
+}: MobileSphereControlsProps) {
+  const spherePosition = mobileObject.mobileParams.spherePosition || [0, 0, 0];
+  const sphereRotation = mobileObject.mobileParams.sphereRotation || [0, 0, 0];
+  const sphereScale = mobileObject.mobileParams.sphereScale || [1, 1, 1];
+
   return (
     <div className="relative border border-white p-4">
       {/* Decoraciones de esquina */}
@@ -26,20 +30,20 @@ export function MobileTransformControls({
       
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-mono font-bold text-white tracking-wider">
-          007_TRANSFORMACIONES_GRUPO
+          008_TRANSFORMACIONES_ESFERA
         </h4>
         <button
-          onClick={onResetTransform}
+          onClick={onResetSphereTransform}
           className="relative border border-white px-2 py-1 text-xs font-mono text-white hover:bg-white hover:text-black transition-all duration-300"
         >
           RESET
         </button>
       </div>
 
-      {/* Posición */}
+      {/* Posición de la esfera */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          POSICION
+          POSICION ESFERA
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -51,12 +55,12 @@ export function MobileTransformControls({
                   min="-10"
                   max="10"
                   step="0.1"
-                  value={mobileObject.position[index]}
-                  onChange={(e) => onTransformChange('position', index as 0 | 1 | 2, parseFloat(e.target.value))}
+                  value={spherePosition[index]}
+                  onChange={(e) => onSphereTransformChange('spherePosition', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.position[index])}
+                  {roundToDecimals(spherePosition[index])}
                 </span>
               </div>
             </div>
@@ -64,10 +68,10 @@ export function MobileTransformControls({
         </div>
       </div>
 
-      {/* Rotación */}
+      {/* Rotación de la esfera */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ROTACION
+          ROTACION ESFERA
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -79,12 +83,12 @@ export function MobileTransformControls({
                   min="-3.14"
                   max="3.14"
                   step="0.1"
-                  value={mobileObject.rotation[index]}
-                  onChange={(e) => onTransformChange('rotation', index as 0 | 1 | 2, parseFloat(e.target.value))}
+                  value={sphereRotation[index]}
+                  onChange={(e) => onSphereTransformChange('sphereRotation', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.rotation[index])}
+                  {roundToDecimals(sphereRotation[index])}
                 </span>
               </div>
             </div>
@@ -92,10 +96,10 @@ export function MobileTransformControls({
         </div>
       </div>
 
-      {/* Escala */}
+      {/* Escala de la esfera */}
       <div>
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ESCALA
+          ESCALA ESFERA
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -107,12 +111,12 @@ export function MobileTransformControls({
                   min="0.1"
                   max="3"
                   step="0.1"
-                  value={mobileObject.scale[index]}
-                  onChange={(e) => onTransformChange('scale', index as 0 | 1 | 2, parseFloat(e.target.value))}
+                  value={sphereScale[index]}
+                  onChange={(e) => onSphereTransformChange('sphereScale', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.scale[index])}
+                  {roundToDecimals(sphereScale[index])}
                 </span>
               </div>
             </div>
@@ -122,3 +126,4 @@ export function MobileTransformControls({
     </div>
   );
 }
+

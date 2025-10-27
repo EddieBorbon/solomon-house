@@ -5,6 +5,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import { MobileObjectHeader } from './mobile-editor/MobileObjectHeader';
 import { MobileMovementControls } from './mobile-editor/MobileMovementControls';
 import { MobileTransformControls } from './mobile-editor/MobileTransformControls';
+import { MobileSphereControls } from './mobile-editor/MobileSphereControls';
 import { useTransformHandler } from '../../hooks/useTransformHandler';
 import { type MobileObject } from '../../state/useWorldStore';
 
@@ -34,6 +35,31 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
     resetTransform();
   };
 
+  const handleSphereTransformChange = (property: 'spherePosition' | 'sphereRotation' | 'sphereScale', axis: 0 | 1 | 2, value: number) => {
+    const currentSphereValue = mobileObject.mobileParams[property] || 
+      (property === 'spherePosition' ? [0, 0, 0] : property === 'sphereRotation' ? [0, 0, 0] : [1, 1, 1]);
+    const newValues = [...currentSphereValue] as [number, number, number];
+    newValues[axis] = value;
+    
+    updateMobileObject(mobileObject.id, {
+      mobileParams: {
+        ...mobileObject.mobileParams,
+        [property]: newValues,
+      },
+    });
+  };
+
+  const handleResetSphereTransform = () => {
+    updateMobileObject(mobileObject.id, {
+      mobileParams: {
+        ...mobileObject.mobileParams,
+        spherePosition: [0, 0, 0],
+        sphereRotation: [0, 0, 0],
+        sphereScale: [1, 1, 1],
+      },
+    });
+  };
+
   return (
     <div className="space-y-4">
       {/* Header con información del objeto móvil */}
@@ -48,11 +74,19 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
         onParamChange={handleParamChange}
       />
 
-      {/* Controles de transformación */}
+      {/* Controles de transformación del grupo completo */}
       <MobileTransformControls
         mobileObject={mobileObject}
         onTransformChange={handleTransformChange}
         onResetTransform={handleResetTransform}
+        roundToDecimals={roundToDecimals}
+      />
+
+      {/* Controles de transformación de la esfera móvil */}
+      <MobileSphereControls
+        mobileObject={mobileObject}
+        onSphereTransformChange={handleSphereTransformChange}
+        onResetSphereTransform={handleResetSphereTransform}
         roundToDecimals={roundToDecimals}
       />
     </div>

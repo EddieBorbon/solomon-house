@@ -48,6 +48,10 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
         heightSpeed: 0.5, // Velocidad del movimiento vertical
         showRadiusIndicator: true,
         showProximityIndicator: true,
+        // Propiedades de la esfera móvil pequeña
+        spherePosition: [0, 0, 0], // Posición inicial de la esfera (relativa al origen)
+        sphereRotation: [0, 0, 0], // Rotación de la esfera
+        sphereScale: [1, 1, 1], // Escala de la esfera
       },
     };
 

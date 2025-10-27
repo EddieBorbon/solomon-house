@@ -66,6 +66,10 @@ export interface MobileObject {
     heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
+    // Propiedades para la esfera móvil pequeña
+    spherePosition?: [number, number, number]; // Posición inicial/offset de la esfera
+    sphereRotation?: [number, number, number]; // Rotación de la esfera
+    sphereScale?: [number, number, number]; // Escala de la esfera
   };
 }
 
@@ -1582,6 +1586,22 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     console.log('🎵 useWorldStore: updateGlobalEffectZone called', { zoneId, updates, isUpdatingFromFirestore: state.isUpdatingFromFirestore });
     
+    // IMPORTANTE: NO actualizar si viene de Firestore
+    // setGlobalStateFromFirestore ya actualiza el estado desde Firestore
+    if (state.isUpdatingFromFirestore) {
+      console.log('ℹ️ Ignorando updateGlobalEffectZone - update ya viene de Firestore');
+      return;
+    }
+    
+    // Throttle para prevenir actualizaciones excesivas
+    const now = Date.now();
+    const lastUpdateTime = lastUpdateTimes.get(zoneId) || 0;
+    if (now - lastUpdateTime < UPDATE_THROTTLE) {
+      console.log('⏸️ updateGlobalEffectZone throttled - demasiado frecuente');
+      return;
+    }
+    lastUpdateTimes.set(zoneId, now);
+    
     // Actualizar el estado local inmediatamente
     const newGrids = new Map(state.grids);
     let updatedZone: EffectZone | null = null;
@@ -1609,13 +1629,31 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Sincronizar con useGridStore
     useGridStore.setState({ grids: newGrids });
     
-    console.log('✅ useWorldStore: Local state updated for effect zone');
+    console.log('✅ useWorldStore: Local state updated for effect zone', {
+      zoneId,
+      updates,
+      isFromFirestore: state.isUpdatingFromFirestore,
+      updatedPosition: updatedZone?.position
+    });
     
     // SIEMPRE actualizar el efecto de audio, tanto si viene de Firestore como si es local
     if (updatedZone && gridId) {
-      console.log('🔧 useWorldStore: Calling worldStoreFacade.updateEffectZone', { zoneId, gridId, isFromFirestore: state.isUpdatingFromFirestore });
-      worldStoreFacade.updateEffectZone(zoneId, updates, gridId);
-      console.log('✅ useWorldStore: worldStoreFacade.updateEffectZone called');
+      console.log('🔧 useWorldStore: Updating audio directly', { zoneId, gridId, isFromFirestore: state.isUpdatingFromFirestore });
+      
+      // Actualizar audio directamente sin pasar por worldStoreFacade para movimiento fluido
+      // para evitar problemas de sincronización entre stores
+      if (updates.position) {
+        console.log('🔧 useWorldStore: Updating position', updatedZone.position);
+        audioManager.updateEffectZonePosition(zoneId, updatedZone.position);
+      }
+      
+      // Solo llamar a worldStoreFacade.updateEffectZone si NO viene de Firestore
+      // para evitar bucles de sincronización
+      if (!state.isUpdatingFromFirestore) {
+        console.log('🔧 useWorldStore: Calling worldStoreFacade.updateEffectZone for local update');
+        worldStoreFacade.updateEffectZone(zoneId, updates, gridId);
+        console.log('✅ useWorldStore: worldStoreFacade.updateEffectZone called');
+      }
     } else {
       console.warn('⚠️ useWorldStore: Could not find effect zone or gridId', { zoneId, gridId });
     }
@@ -1652,6 +1690,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         console.error('Error updating global effect zone:', error);
       } finally {
         updateDebounceTimers.delete(timerKey);
+        lastUpdateTimes.delete(zoneId);
       }
     }, DEBOUNCE_DELAY);
     

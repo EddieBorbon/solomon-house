@@ -66,10 +66,14 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
  * Handler para transformaciones usando Strategy Pattern
  */
 class TransformHandler implements ITransformHandler {
+  private isDragging = false;
+  private dragEntityId: string | null = null;
+  
   constructor(
     private updateObject: (id: string, updates: Partial<SoundObject>) => void,
     private updateMobileObject: (id: string, updates: Partial<MobileObjectType>) => void,
     private updateEffectZone: (id: string, updates: Partial<EffectZoneType>) => void,
+    private updateEffectZoneDirect: (id: string, updates: Partial<EffectZoneType>) => void,
     private allObjects: { objects: SceneObject[]; mobileObjects: SceneMobileObject[]; effectZones: SceneEffectZone[] },
     private grids: Map<string, Grid>,
     private orbitControlsRef: React.RefObject<{ enabled: boolean } | null>
@@ -121,18 +125,30 @@ class TransformHandler implements ITransformHandler {
       } else if (isMobileObject) {
         this.updateMobileObject(entityId, updates);
       } else if (isEffectZone) {
-        this.updateEffectZone(entityId, updates);
+        // Durante el arrastre, usar actualización directa para movimiento fluido
+        if (this.isDragging && this.dragEntityId === entityId) {
+          this.updateEffectZoneDirect(entityId, updates);
+        } else {
+          this.updateEffectZone(entityId, updates);
+        }
       }
     }
   }
 
-  handleTransformStart(): void {
+  setDragging(isDragging: boolean, entityId: string | null = null): void {
+    this.isDragging = isDragging;
+    this.dragEntityId = entityId;
+  }
+
+  handleTransformStart(entityId: string): void {
     // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    this.setDragging(true, entityId);
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado durante transform');
   }
 
-  handleTransformEnd(): void {
+  handleTransformEnd(entityId: string): void {
     // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
+    this.setDragging(false, null);
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado después de transform');
   }
 }
@@ -218,6 +234,49 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
     toggleObjectAudio
   } = useWorldStore();
   
+  // Función para actualización directa de zonas de efectos (sin sincronización Firestore durante arrastre)
+  const updateEffectZoneDirect = useCallback((id: string, updates: Partial<EffectZoneType>) => {
+    // Actualizar directamente el estado local sin pasar por sincronización global
+    useWorldStore.setState((state) => {
+      const newGrids = new Map(state.grids);
+      
+      // Buscar la zona de efecto en todas las cuadrículas y actualizarla directamente
+      for (const [gridId, grid] of newGrids) {
+        const zoneIndex = grid.effectZones.findIndex(zone => zone.id === id);
+        if (zoneIndex !== -1) {
+          const updatedZones = [...grid.effectZones];
+          updatedZones[zoneIndex] = { ...updatedZones[zoneIndex], ...updates };
+          
+          newGrids.set(gridId, {
+            ...grid,
+            effectZones: updatedZones
+          });
+          
+          // Sincronizar con useGridStore inmediatamente
+          useGridStore.setState({ grids: newGrids });
+          
+          // Actualizar el audio inmediatamente durante el arrastre para movimiento fluido
+          if (updates.position) {
+            try {
+              // Importar AudioManager dinámicamente para evitar problemas de dependencias circulares
+              import('../../lib/AudioManager').then(({ audioManager }) => {
+                audioManager.updateEffectZonePosition(id, updates.position as [number, number, number]);
+              }).catch(error => {
+                console.error('❌ Error importando AudioManager durante arrastre:', error);
+              });
+            } catch (error) {
+              console.error('❌ Error actualizando posición de audio durante arrastre:', error);
+            }
+          }
+          
+          break;
+        }
+      }
+      
+      return { grids: newGrids };
+    });
+  }, []);
+  
   // Configuración por defecto
   const defaultConfig: SceneConfig = {
     enableTransformControls: true,
@@ -276,10 +335,23 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
     return refs;
   }, [allObjects]);
 
+  // Crear refs auxiliares para los gizmos de objetos móviles
+  // Estos grupos vacíos estarán siempre en el centro del objeto móvil (esfera grande de wireframe)
+  const mobileGizmoRefs = useMemo(() => {
+    const refs = new Map<string, React.RefObject<Group | null>>();
+    
+    allObjects.mobileObjects.forEach(obj => {
+      refs.set(obj.id, React.createRef<Group | null>());
+    });
+    
+    return refs;
+  }, [allObjects.mobileObjects]);
+
+
   // Crear handlers usando Strategy Pattern
   const transformHandler = useMemo(() => 
-    new TransformHandler(updateObject, updateMobileObject, updateEffectZone, allObjects, grids, orbitControlsRef),
-    [updateObject, updateMobileObject, updateEffectZone, allObjects, grids, orbitControlsRef]
+    new TransformHandler(updateObject, updateMobileObject, updateEffectZone, updateEffectZoneDirect, allObjects, grids, orbitControlsRef),
+    [updateObject, updateMobileObject, updateEffectZone, updateEffectZoneDirect, allObjects, grids, orbitControlsRef]
   );
 
   const selectionHandler = useMemo(() => 
@@ -309,13 +381,39 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
 
   // Función para manejar el inicio de la manipulación
   const handleTransformStart = useCallback(() => {
-    transformHandler.handleTransformStart();
-  }, [transformHandler]);
+    if (selectedEntityId) {
+      transformHandler.handleTransformStart(selectedEntityId);
+    }
+  }, [transformHandler, selectedEntityId]);
 
   // Función para manejar el fin de la manipulación
   const handleTransformEnd = useCallback(() => {
-    transformHandler.handleTransformEnd();
-  }, [transformHandler]);
+    if (selectedEntityId) {
+      transformHandler.handleTransformEnd(selectedEntityId);
+      
+      // Sincronizar con Firestore después de soltar
+      const state = useWorldStore.getState();
+      
+      // Buscar la zona en todas las cuadrículas
+      let zone: EffectZoneType | null = null;
+      for (const grid of state.grids.values()) {
+        const foundZone = grid.effectZones.find(z => z.id === selectedEntityId);
+        if (foundZone) {
+          zone = foundZone;
+          break;
+        }
+      }
+      
+      if (zone && state.globalWorldConnected) {
+        // Usar updateEffectZone para sincronizar con Firestore
+        updateEffectZone(selectedEntityId, {
+          position: zone.position,
+          rotation: zone.rotation,
+          scale: zone.scale
+        });
+      }
+    }
+  }, [transformHandler, selectedEntityId, updateEffectZone]);
 
   // Función para manejar interacciones de audio
   const handleAudioInteraction = useCallback((object: SceneObject) => {
@@ -383,15 +481,19 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
                 <MobileObject
                   key={`mobile-${mobileObj.id}`}
                   id={mobileObj.id}
-                  position={[0, 0, 0]}
+                  position={mobileObj.position} // Posición del objeto móvil completo en el mundo
                   rotation={mobileObj.rotation}
                   scale={mobileObj.scale}
                   isSelected={mobileObj.isSelected}
                   mobileParams={{
                     ...mobileObj.mobileParams,
-                    centerPosition: [0, 0, 0]
+                    centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
                   }}
-                  onUpdatePosition={(id, position) => updateMobileObject(id, { position })}
+                  onUpdatePosition={(id, position) => {
+                    // Actualizar la posición de la esfera móvil dentro del grupo
+                    // Esto NO afecta la posición del grupo completo
+                    updateMobileObject(id, { position });
+                  }}
                   onSelect={handleEntitySelect}
                   ref={objectRef}
                 />
@@ -428,6 +530,9 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
         // Verificar si la zona está bloqueada
         const isLocked = 'isLocked' in selectedEntity && selectedEntity.isLocked;
         
+        // Determinar si es un objeto móvil
+        const isMobileObject = allObjects.mobileObjects.some(obj => obj.id === selectedEntityId);
+        
         // Encontrar la cuadrícula que contiene este objeto para calcular la posición mundial
         let worldPosition = selectedEntity.position;
         for (const grid of grids.values()) {
@@ -441,6 +546,41 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
             ] as [number, number, number];
             break;
           }
+        }
+        
+        // Para objetos móviles, usar un grupo auxiliar vacío para el gizmo
+        // Este grupo está en el centro exacto del objeto móvil (donde está la esfera grande de wireframe)
+        if (isMobileObject) {
+          const gizmoRef = mobileGizmoRefs.get(selectedEntityId);
+          
+          return (
+            <>
+              {/* Grupo auxiliar vacío en el centro del objeto móvil */}
+              <group 
+                key={`gizmo-target-${selectedEntityId}`}
+                position={worldPosition} 
+                ref={gizmoRef}
+              />
+              {/* TransformControls apunta al grupo auxiliar */}
+              <TransformControls
+                key={`${selectedEntityId}-${transformMode}`}
+                object={gizmoRef?.current || undefined}
+                mode={transformMode}
+                rotation={[0, 0, 0]}
+                scale={selectedEntity.scale}
+                enabled={!isLocked}
+                onObjectChange={(e) => {
+                  const event = e as { target?: { object?: TransformData } };
+                  if (event?.target?.object) {
+                    handleTransformChange(selectedEntityId, event.target.object);
+                  }
+                }}
+                onMouseDown={handleTransformStart}
+                onMouseUp={handleTransformEnd}
+                size={defaultConfig.transformControlSize}
+              />
+            </>
+          );
         }
         
         return (

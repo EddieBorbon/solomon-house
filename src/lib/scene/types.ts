@@ -77,8 +77,8 @@ export interface ISceneEffectZoneRenderer {
 // Interfaces para el sistema de transformación
 export interface ITransformHandler {
   handleTransformChange(entityId: string, transform: TransformData): void;
-  handleTransformStart(): void;
-  handleTransformEnd(): void;
+  handleTransformStart(entityId: string): void;
+  handleTransformEnd(entityId: string): void;
 }
 
 export interface TransformData {

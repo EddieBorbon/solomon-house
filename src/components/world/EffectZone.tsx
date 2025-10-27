@@ -1,6 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
@@ -11,8 +12,52 @@ interface EffectZoneProps {
 
 export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
   ({ zone, onSelect }, ref) => {
-
-    // Eliminamos la rotación automática para que el gizmo no se gire
+    const groupRef = React.useRef<THREE.Group | null>(null);
+    const hasBeenControlledRef = React.useRef(false);
+    
+    // Ref para mantener la última posición controlada externamente
+    const controlledPositionRef = React.useRef<[number, number, number] | null>(null);
+    
+    // Actualizar posición solo cuando cambia y NO está siendo controlada externamente
+    React.useEffect(() => {
+      if (!groupRef.current) return;
+      
+      // Verificar si hay un ref externo controlando este grupo
+      const externalRef = ref && typeof ref !== 'function' && (ref as React.MutableRefObject<THREE.Group | null>).current;
+      const isControlled = externalRef && externalRef === groupRef.current;
+      
+      // Si está siendo controlado externamente, guardar la posición controlada
+      if (isControlled) {
+        hasBeenControlledRef.current = true;
+        const pos = groupRef.current.position;
+        controlledPositionRef.current = [pos.x, pos.y, pos.z] as [number, number, number];
+        return; // No actualizar desde props
+      }
+      
+      // Si nunca ha sido controlado externamente, actualizar desde props
+      if (!hasBeenControlledRef.current) {
+        groupRef.current.position.set(...zone.position);
+      }
+      // Si fue controlado externamente, verificar si el usuario dejó de arrastrar
+      else {
+        // Si la posición controlada es similar a la posición actual, resetear el flag
+        if (controlledPositionRef.current) {
+          const [cx, cy, cz] = controlledPositionRef.current;
+          const [px, py, pz] = zone.position;
+          
+          if (
+            Math.abs(cx - px) < 0.1 &&
+            Math.abs(cy - py) < 0.1 &&
+            Math.abs(cz - pz) < 0.1
+          ) {
+            // El usuario ya terminó de arrastrar, podemos usar props de nuevo
+            hasBeenControlledRef.current = false;
+            controlledPositionRef.current = null;
+            groupRef.current.position.set(...zone.position);
+          }
+        }
+      }
+    }, [zone.position, ref]);
 
     const handleClick = (event: React.MouseEvent) => {
       event.stopPropagation();
@@ -98,8 +143,34 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
 
     return (
       <group
-        ref={ref}
-        position={zone.position}
+        ref={(node) => {
+          groupRef.current = node;
+          
+          // Manejar tanto el ref interno como el ref externo
+          if (typeof ref === 'function') {
+            ref(node);
+          } else if (ref) {
+            (ref as React.MutableRefObject<THREE.Group | null>).current = node;
+          }
+          
+          // Inicializar posición solo en el montaje
+          if (node) {
+            // Solo establecer posición inicial si no ha sido controlada externamente
+            if (!hasBeenControlledRef.current && !controlledPositionRef.current) {
+              node.position.set(...zone.position);
+              console.log('🎬 EFFECTZONE: Component mounted', {
+                zoneId: zone.id,
+                initialPosition: zone.position,
+                willUseProps: true
+              });
+            } else {
+              console.log('🎬 EFFECTZONE: Component mounted (preserving position)', {
+                zoneId: zone.id,
+                preservedPosition: controlledPositionRef.current || zone.position
+              });
+            }
+          }
+        }}
         rotation={zone.rotation}
         scale={zone.scale}
         onClick={handleClick}

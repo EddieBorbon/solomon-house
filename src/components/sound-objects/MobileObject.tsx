@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useState, useMemo } from 'react';
+import React, { forwardRef, useRef, useState, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
@@ -42,6 +42,7 @@ interface MobileObjectProps {
   mobileParams: MobileObjectParams;
   onUpdatePosition: (id: string, position: [number, number, number]) => void;
   onSelect?: (id: string) => void;
+  isBeingDragged?: boolean; // Nueva prop para pausar la animación durante el arrastre
 }
 
 export const MobileObject = forwardRef<Group, MobileObjectProps>(({
@@ -53,6 +54,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   mobileParams,
   onUpdatePosition,
   onSelect,
+  isBeingDragged = false,
 }, ref) => {
   const meshRef = useRef<Mesh>(null);
   const materialRef = useRef<MeshStandardMaterial>(null);
@@ -124,11 +126,12 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       frequency = 1, 
       randomSeed = 0, 
       height = 1, 
-      heightSpeed = 0.5 
+      heightSpeed = 0.5,
+      spherePosition = [0, 0, 0] // Posición inicial/offset de la esfera
     } = mobileParams;
     
-    // El objeto se mueve desde el origen (0,0,0) del grupo
-    const origin = [0, 0, 0] as [number, number, number];
+    // El objeto se mueve desde la posición inicial de la esfera (spherePosition)
+    const origin = spherePosition as [number, number, number];
     
     switch (movementType) {
       case 'linear': {
@@ -264,23 +267,49 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     }
   };
 
+  // Aplicar transformaciones de rotación y escala de la esfera al montar o cuando cambian los parámetros
+  useEffect(() => {
+    if (meshRef.current) {
+      const sphereRotation = mobileParams.sphereRotation || [0, 0, 0];
+      const sphereScale = mobileParams.sphereScale || [1, 1, 1];
+      
+      meshRef.current.rotation.set(...sphereRotation);
+      meshRef.current.scale.set(...sphereScale);
+      // La posición se calcula dinámicamente en useFrame basándose en spherePosition como offset
+    }
+  }, [mobileParams.sphereRotation, mobileParams.sphereScale]);
+
   // Animación del objeto móvil
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current || !mobileParams.isActive) return;
+    
+    // Pausar la animación si el objeto está siendo arrastrado manualmente
+    if (isBeingDragged) return;
 
     timeRef.current += delta;
     
-    // Calcular nueva posición
+    // Calcular nueva posición relativa al origen del grupo
     const newPosition = calculateNewPosition(timeRef.current);
     
-    // Actualizar posición del objeto
+    // Actualizar posición de la esfera móvil dentro del grupo
+    // Esto NO afecta la posición del grupo completo
     meshRef.current.position.set(...newPosition);
-    onUpdatePosition(id, newPosition);
+    
+    // Aplicar rotación y escala de la esfera desde los parámetros
+    const sphereRotation = mobileParams.sphereRotation || [0, 0, 0];
+    const sphereScale = mobileParams.sphereScale || [1, 1, 1];
+    meshRef.current.rotation.set(...sphereRotation);
+    meshRef.current.scale.set(...sphereScale);
+    
+    // NO actualizar la posición del grupo completo durante el movimiento
+    // La posición del grupo se controla desde los controles de transformación
+    // onUpdatePosition(id, newPosition); // Comentado para evitar conflictos
 
     // Actualizar línea de conexión
     if (connectionLineRef.current) {
+      const spherePos = mobileParams.spherePosition || [0, 0, 0];
       connectionLineGeometry.setFromPoints([
-        new Vector3(0, 0, 0), // Punto de origen
+        new Vector3(...spherePos), // Punto de origen (posición inicial de la esfera)
         new Vector3(...newPosition) // Posición actual del objeto móvil
       ]);
       if (connectionLineRef.current) {

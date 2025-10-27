@@ -359,8 +359,32 @@ export function useGlobalWorldSync() {
             if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['effectParams'])) {
               updates.effectParams = newEffectZone.effectParams;
             }
+            // NO actualizar posición si está siendo arrastrada localmente
+            // La posición se sincronizará cuando se suelte el mouse
             if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['position'])) {
-              updates.position = newEffectZone.position;
+              // Verificar si esta zona está siendo actualizada localmente
+              const state = useWorldStore.getState();
+              const isLocalUpdate = !state.isUpdatingFromFirestore;
+              
+              console.log('🔍 FIRESTORE SYNC: Checking position update', {
+                zoneId: newEffectZone.id,
+                isUpdatingFromFirestore: state.isUpdatingFromFirestore,
+                isLocalUpdate,
+                previousPos: previousEffectZone.position,
+                newPos: newEffectZone.position
+              });
+              
+              // Solo actualizar posición desde Firestore si NO es una actualización local reciente
+              const lastUpdateTime = state.grids.get(state.activeGridId || '')?.effectZones.find(z => z.id === newEffectZone.id);
+              if (isLocalUpdate) {
+                console.log(`⏸️ Ignorando actualización de posición desde Firestore para zona ${newEffectZone.id} - hay actualización local en curso`);
+              } else {
+                console.log('✅ FIRESTORE SYNC: Applying position update from Firestore', {
+                  zoneId: newEffectZone.id,
+                  position: newEffectZone.position
+                });
+                updates.position = newEffectZone.position;
+              }
             }
             if (hasSignificantChange(previousEffectZone as unknown as Record<string, unknown>, newEffectZone as unknown as Record<string, unknown>, ['rotation'])) {
               updates.rotation = newEffectZone.rotation;
