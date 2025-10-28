@@ -363,7 +363,6 @@ export function useGlobalWorldSync() {
               const isLocalUpdate = !state.isUpdatingFromFirestore;
               
               // Solo actualizar posición desde Firestore si NO es una actualización local reciente
-              const lastUpdateTime = state.grids.get(state.activeGridId || '')?.effectZones.find(z => z.id === newEffectZone.id);
               if (isLocalUpdate) {
                 // Ignorar actualización local desde Firestore para evitar conflictos
               } else {
@@ -421,6 +420,14 @@ export function useGlobalWorldSync() {
 
   // Inicializar el mundo global y establecer suscripción
   useEffect(() => {
+    // Solo conectar si globalWorldConnected es true
+    if (!globalWorldConnected) {
+      console.log('ℹ️ Sincronización global deshabilitada (modo tutorial)');
+      setIsInitializing(false);
+      setIsConnected(false);
+      return;
+    }
+
     let mounted = true;
 
     const initializeGlobalWorld = async () => {
@@ -525,7 +532,9 @@ export function useGlobalWorldSync() {
         unsubscribeRef.current = null;
       }
     };
-  }, [setGlobalStateFromFirestore, setIsUpdatingFromFirestore, detectAndProcessChanges]);
+
+    return undefined;
+  }, [setGlobalStateFromFirestore, setIsUpdatingFromFirestore, detectAndProcessChanges, globalWorldConnected]);
 
   // Función para verificar si se está actualizando desde Firestore
   const isUpdatingFromFirestore = () => {

@@ -98,7 +98,7 @@ export function useEffectZoneDetection() {
               audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
             }
           }
-        } catch (error) {
+        } catch {
           // Silenciar errores de EffectSend no encontrado (puede ser normal durante inicialización)
         }
       });
@@ -111,7 +111,7 @@ export function useEffectZoneDetection() {
             if (audioManager.hasEffectSend(soundObject.id, effectZone.id)) {
               audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
             }
-          } catch (error) {
+          } catch {
             // Silenciar errores de EffectSend no encontrado
           }
         });

@@ -43,12 +43,9 @@ export class SceneRenderer {
           isSelected={object.isSelected}
           mobileParams={{
             ...object.mobileParams,
-            centerPosition: [0, 0, 0] // Centro relativo a la cuadrícula
-          }}
-          onUpdatePosition={() => {
-            // Esta función será manejada por el componente padre
-          }}
-          onSelect={() => {
+          centerPosition: [0, 0, 0] // Centro relativo a la cuadrícula 
+        }}
+        onSelect={() => {
             // Esta función será manejada por el componente padre
           }}
         />

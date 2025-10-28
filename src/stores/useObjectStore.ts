@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { audioManager, type AudioParams } from '../lib/AudioManager';
 
 // Tipos para objetos de sonido
-export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
+export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -15,6 +15,8 @@ export interface SoundObject {
   audioParams: AudioParams;
   isSelected: boolean;
   audioEnabled: boolean;
+  customShapeCode?: string; // Código Three.js para la forma personalizada
+  customSynthesisCode?: string; // Código Tone.js para la síntesis personalizada
 }
 
 // Estado específico para objetos
@@ -378,10 +380,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
-          const Tone = ToneModule.default || ToneModule;
+          const Tone = ToneModule;
           
           // Evaluar el código
-          const func = new Function('Tone', object.customSynthesisCode);
+          const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
           
           if (synth && typeof synth.triggerAttack === 'function') {
@@ -423,10 +425,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
-          const Tone = ToneModule.default || ToneModule;
+          const Tone = ToneModule;
           
           // Evaluar el código
-          const func = new Function('Tone', object.customSynthesisCode);
+          const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
           
           if (synth && typeof synth.triggerAttack === 'function') {
@@ -463,7 +465,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     }
   },
 
-  triggerObjectAttackRelease: (id: string, gridId?: string) => {
+  triggerObjectAttackRelease: (id: string) => {
     const object = get().objects.find(obj => obj.id === id);
     if (!object) {
       return;
@@ -476,10 +478,10 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
-          const Tone = ToneModule.default || ToneModule;
+          const Tone = ToneModule;
           
           // Evaluar el código
-          const func = new Function('Tone', object.customSynthesisCode);
+          const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
           
           if (synth && typeof synth.triggerAttack === 'function') {

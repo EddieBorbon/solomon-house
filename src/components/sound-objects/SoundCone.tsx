@@ -16,7 +16,11 @@ interface SoundConeProps {
   audioParams: AudioParams;
 }
 
-export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
+interface SoundConeRef extends THREE.Group {
+  handleTouch?: () => void;
+}
+
+export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
@@ -120,7 +124,7 @@ export const SoundCone = forwardRef<THREE.Group, SoundConeProps>(
     // Exponer la función de touch al objeto móvil usando useEffect
     useEffect(() => {
       if (ref && 'current' in ref && ref.current) {
-        (ref.current as any).handleTouch = handleMobileObjectTouch;
+        ref.current.handleTouch = handleMobileObjectTouch;
       }
     }, [ref, handleMobileObjectTouch]);
 

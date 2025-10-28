@@ -33,7 +33,6 @@ export function TutorialOverlay() {
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === tutorialSteps.length - 1;
-  const progressPercentage = ((currentStep + 1) / tutorialSteps.length) * 100;
 
   const handleNext = () => {
     // Permitir avanzar siempre (la experiencia del paso 7 es opcional)

@@ -123,15 +123,9 @@ export class PersistenceService {
         id: 'grid_0_0_0',
         coordinates: [0, 0, 0],
         position: [0, 0, 0],
-        rotation: [0, 0, 0],
-        scale: [1, 1, 1],
         objects: [],
         mobileObjects: [],
-        effectZones: [],
-        gridSize: 10,
-        gridColor: '#ffffff',
-        isLoaded: true,
-        isSelected: false
+        effectZones: []
       };
 
       // Crear el proyecto

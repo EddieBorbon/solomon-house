@@ -40,7 +40,10 @@ export interface MobileObject extends BaseEntity {
     heightSpeed: number;
     showRadiusIndicator?: boolean;
     showProximityIndicator?: boolean;
-    showSphere?: boolean;
+    spherePosition?: [number, number, number]; // Posición inicial/offset de la esfera
+    sphereRotation?: [number, number, number]; // Rotación de la esfera
+    sphereScale?: [number, number, number]; // Escala de la esfera
+    showSphere?: boolean; // Mostrar la esfera
   };
 }
 

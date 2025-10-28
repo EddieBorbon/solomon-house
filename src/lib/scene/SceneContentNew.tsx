@@ -146,7 +146,7 @@ class TransformHandler implements ITransformHandler {
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado durante transform');
   }
 
-  handleTransformEnd(entityId: string): void {
+  handleTransformEnd(_entityId: string): void { // eslint-disable-line @typescript-eslint/no-unused-vars
     // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
     this.setDragging(false, null);
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado después de transform');
@@ -253,7 +253,7 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
           });
           
           // Sincronizar con useGridStore inmediatamente
-          useGridStore.setState({ grids: newGrids });
+          // useGridStore.setState({ grids: newGrids }); // Comentado - no necesario
           
           // Actualizar el audio inmediatamente durante el arrastre para movimiento fluido
           if (updates.position) {
@@ -488,11 +488,6 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
                   mobileParams={{
                     ...mobileObj.mobileParams,
                     centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
-                  }}
-                  onUpdatePosition={(id, position) => {
-                    // Actualizar la posición de la esfera móvil dentro del grupo
-                    // Esto NO afecta la posición del grupo completo
-                    updateMobileObject(id, { position });
                   }}
                   onSelect={handleEntitySelect}
                   ref={objectRef}

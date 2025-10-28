@@ -70,6 +70,7 @@ export interface MobileObject {
     spherePosition?: [number, number, number]; // Posición inicial/offset de la esfera
     sphereRotation?: [number, number, number]; // Rotación de la esfera
     sphereScale?: [number, number, number]; // Escala de la esfera
+    showSphere?: boolean; // Mostrar la esfera
   };
 }
 
@@ -199,6 +200,7 @@ export interface WorldActions {
   // Acciones para sincronización global
   setGlobalStateFromFirestore: (state: GlobalWorldDoc) => void;
   setIsUpdatingFromFirestore: (isUpdating: boolean) => void;
+  setGlobalWorldConnected: (connected: boolean) => void;
   
   // Acciones para gestión de mundos
   createWorld: (name: string) => void;
@@ -1184,6 +1186,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
    */
   setIsUpdatingFromFirestore: (isUpdating: boolean) => {
     set({ isUpdatingFromFirestore: isUpdating });
+  },
+
+  /**
+   * Establece el estado de conexión al mundo global
+   */
+  setGlobalWorldConnected: (connected: boolean) => {
+    set({ globalWorldConnected: connected });
   },
 
   // ========== ACCIONES GLOBALES PARA OBJETOS SONOROS ==========

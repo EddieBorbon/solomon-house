@@ -107,26 +107,26 @@ export function PersistencePanel() {
     }
   };
 
-  const handleDeleteProject = async (projectId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
-      return;
-    }
+  // const handleDeleteProject = async (projectId: string) => {
+  //   if (!confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+  //     return;
+  //   }
 
-    try {
-      setIsLoading(true);
-      await persistenceService.deleteProject(projectId);
-      await loadProjects(); // Recargar la lista de proyectos
+  //   try {
+  //     setIsLoading(true);
+  //     await persistenceService.deleteProject(projectId);
+  //     await loadProjects(); // Recargar la lista de proyectos
       
-      if (currentProjectId === projectId) {
-        setCurrentProjectId(null);
-      }
+  //     if (currentProjectId === projectId) {
+  //       setCurrentProjectId(null);
+  //     }
       
-    } catch {
-      alert('Error al eliminar el proyecto. Inténtalo de nuevo.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   } catch {
+  //     alert('Error al eliminar el proyecto. Inténtalo de nuevo.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleCreateNewProject = async () => {
     if (!projectName.trim()) {

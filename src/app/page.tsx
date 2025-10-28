@@ -10,24 +10,31 @@ import { TutorialOverlay } from '../components/tutorial/TutorialOverlay';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useTutorialStore } from '../stores/useTutorialStore';
 import { useWorldStore } from '../state/useWorldStore';
-import { persistenceService } from '../lib/persistenceService';
-import { firebaseService } from '../lib/firebaseService';
 
 export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   const { startTutorial, isActive } = useTutorialStore();
-  const { createGrid, setCurrentProjectId, setGlobalWorldConnected } = useWorldStore();
+  const { createGrid, setGlobalWorldConnected, deleteGrid } = useWorldStore();
   
   // Hook para atajos de teclado
   useKeyboardShortcuts();
 
   const handleStartTutorial = async () => {
     try {
+      // Primero desactivar la conexión global para evitar que se cargue contenido
+      setGlobalWorldConnected(false);
+      
+      // Limpiar todas las cuadrículas existentes
+      const { grids } = useWorldStore.getState();
+      grids.forEach((_, gridId) => {
+        deleteGrid(gridId);
+      });
+      
+      // Esperar un momento para que se complete la limpieza
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Crear un mundo vacío para el tutorial
       createGrid([0, 0, 0], 20);
-      
-      // No conectar con el mundo global durante el tutorial
-      setGlobalWorldConnected(false);
       
       setShowWelcome(false);
       // Iniciar el tutorial
@@ -81,10 +88,8 @@ export default function Home() {
       )}
 
       {/* Tutorial Overlay */}
-      {!showWelcome && isActive ? (
+      {!showWelcome && isActive && (
         <TutorialOverlay />
-      ) : (
-        !showWelcome && console.log('🔴 Tutorial no activo:', { isActive, showWelcome })
       )}
 
     </div>

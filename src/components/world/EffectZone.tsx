@@ -1,7 +1,6 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import * as THREE from 'three';
 

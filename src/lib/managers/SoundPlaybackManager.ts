@@ -649,7 +649,7 @@ export class SoundPlaybackManager {
     const baseNoteIndex = notes.indexOf(baseNoteName);
     const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, '')) || 4;
     
-    const chordFrequencies = chord.map((note, index) => {
+    const chordFrequencies = chord.map((note) => {
       const noteName = note.replace(/[0-9]/g, '');
       const noteIndex = notes.indexOf(noteName);
       

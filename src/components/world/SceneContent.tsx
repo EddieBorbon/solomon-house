@@ -2,10 +2,8 @@
 
 import React, { useMemo, useCallback, useEffect, useRef } from 'react';
 import { TransformControls } from '@react-three/drei';
-import { Group, Mesh } from 'three';
-import { useFrame } from '@react-three/fiber';
+import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
-import { useTutorialStore } from '../../stores/useTutorialStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
 import { SoundCube } from '../sound-objects/SoundCube';
 import { SoundSphere } from '../sound-objects/SoundSphere';
@@ -24,7 +22,6 @@ import { GridRenderer } from './GridRenderer';
 import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 import { audioManager } from '../../lib/AudioManager';
-import { useGridStore } from '../../stores/useGridStore';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<{
@@ -42,7 +39,7 @@ interface SoundObjectContainerProps {
 
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
-    const { triggerObjectNote, toggleObjectAudio } = useWorldStore();
+    const { triggerObjectNote } = useWorldStore();
     
     const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
@@ -70,7 +67,7 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         // Para otros objetos, solo disparar la nota
         triggerObjectNote(object.id);
       }
-    }, [object.id, onSelect, triggerObjectNote, toggleObjectAudio, object.type]);
+    }, [object.id, onSelect, triggerObjectNote, object.type]);
 
     return (
       <group
@@ -276,15 +273,15 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Crear refs auxiliares para los gizmos de objetos móviles
   // Estos grupos vacíos estarán siempre en el centro del objeto móvil (esfera grande de wireframe)
-  const mobileGizmoRefs = useMemo(() => {
-    const refs = new Map<string, React.RefObject<Group | null>>();
-    
-    allObjects.mobileObjects.forEach(obj => {
-      refs.set(obj.id, React.createRef<Group | null>());
-    });
-    
-    return refs;
-  }, [allObjects.mobileObjects]);
+  // const mobileGizmoRefs = useMemo(() => {
+  //   const refs = new Map<string, React.RefObject<Group | null>>();
+  //   
+  //   allObjects.mobileObjects.forEach(obj => {
+  //     refs.set(obj.id, React.createRef<Group | null>());
+  //   });
+  //   
+  //   return refs;
+  // }, [allObjects.mobileObjects]);
 
   // Refs para rastrear el estado de arrastre de objetos móviles
   const mobileDragRefs = useRef(new Map<string, React.MutableRefObject<boolean>>());
@@ -609,11 +606,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                   ...mobileObj.mobileParams,
                   centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
                 }}
-                onUpdatePosition={(id, position) => {
-                  // Actualizar la posición de la esfera móvil dentro del grupo
-                  // Esto NO afecta la posición del grupo completo
-                  updateMobileObject(id, { position });
-                }}
                 onSelect={handleEntitySelect}
                 isBeingDragged={isBeingDragged}
                 ref={objectRef}
@@ -705,7 +697,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                 setDraggingEntityId(selectedEntityId);
               }}
             onMouseUp={() => {
-              const wasDraggingEffectZone = isDragging && draggingEntityId === selectedEntityId && allObjects.effectZones.some(zone => zone.id === selectedEntityId);
               const wasDragging = isDragging && draggingEntityId === selectedEntityId;
               
               setIsDragging(false);

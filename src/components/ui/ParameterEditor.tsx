@@ -627,7 +627,6 @@ export function ParameterEditor() {
           code={getSoundObject()?.customShapeCode || ''}
           onSave={handleSaveShapeCode}
           onClose={() => setShowShapeCodeEditor(false)}
-          example=""
           language="webgl"
         />
       )}
@@ -638,7 +637,6 @@ export function ParameterEditor() {
           code={getSoundObject()?.customSynthesisCode || ''}
           onSave={handleSaveSynthesisCode}
           onClose={() => setShowSynthesisCodeEditor(false)}
-          example=""
           language="javascript"
         />
       )}

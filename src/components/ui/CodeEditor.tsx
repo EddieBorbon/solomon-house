@@ -10,7 +10,6 @@ interface CodeEditorProps {
   code: string;
   onSave: (code: string) => void;
   onClose: () => void;
-  example: string;
   language: 'javascript' | 'webgl';
 }
 
@@ -831,7 +830,7 @@ return synth;`
   }
 ];
 
-export function CodeEditor({ title, code, onSave, onClose, example, language }: CodeEditorProps) {
+export function CodeEditor({ title, code, onSave, onClose, language }: CodeEditorProps) {
   const { t } = useLanguage();
   const [editedCode, setEditedCode] = useState(code);
   const [showExamplesPanel, setShowExamplesPanel] = useState(false);

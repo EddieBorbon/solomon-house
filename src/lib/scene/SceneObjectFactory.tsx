@@ -238,6 +238,12 @@ export class SceneObjectFactory implements ISceneObjectRenderer {
         description: 'Spiral-shaped sound object',
         category: 'special' as const,
         audioBehavior: 'percussive' as const
+      },
+      custom: {
+        name: 'Custom',
+        description: 'Custom sound object',
+        category: 'advanced' as const,
+        audioBehavior: 'continuous' as const
       }
     };
 

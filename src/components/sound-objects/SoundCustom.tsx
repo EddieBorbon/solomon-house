@@ -1,8 +1,7 @@
 'use client';
 
-import React, { forwardRef, useRef, useState, useMemo, useCallback } from 'react';
+import React, { forwardRef, useRef, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
-import { Box } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -21,7 +20,6 @@ interface SoundCustomProps {
 export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams, customShapeCode }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
-    const [hovered, setHovered] = useState(false);
     const { triggerObjectNote, toggleObjectAudio, grids } = useWorldStore();
 
     // Obtener el código personalizado del objeto
@@ -87,19 +85,17 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
       }
     };
 
-    const handlePointerDown = (event: React.MouseEvent) => {
-      event.stopPropagation();
-      setHovered(true);
-    };
+  const handlePointerDown = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
 
-    const handlePointerUp = (event: React.MouseEvent) => {
-      event.stopPropagation();
-      setHovered(false);
-    };
+  const handlePointerUp = (event: React.MouseEvent) => {
+    event.stopPropagation();
+  };
 
-    const handlePointerLeave = () => {
-      setHovered(false);
-    };
+  const handlePointerLeave = () => {
+    // No action needed
+  };
 
     const wireframeColor = isSelected ? '#fbbf24' : '#8b5cf6';
     const lineWidth = isSelected ? 3 : 2;

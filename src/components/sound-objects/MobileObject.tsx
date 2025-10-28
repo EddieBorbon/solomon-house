@@ -31,6 +31,10 @@ export interface MobileObjectParams {
   heightSpeed: number; // Velocidad del movimiento vertical
   showRadiusIndicator?: boolean; // Para mostrar indicador de radio
   showProximityIndicator?: boolean; // Para mostrar indicador de proximidad
+  spherePosition?: [number, number, number]; // Posición inicial/offset de la esfera
+  sphereRotation?: [number, number, number]; // Rotación de la esfera
+  sphereScale?: [number, number, number]; // Escala de la esfera
+  showSphere?: boolean; // Mostrar la esfera
 }
 
 interface MobileObjectProps {
@@ -40,7 +44,6 @@ interface MobileObjectProps {
   scale: [number, number, number];
   isSelected: boolean;
   mobileParams: MobileObjectParams;
-  onUpdatePosition: (id: string, position: [number, number, number]) => void;
   onSelect?: (id: string) => void;
   isBeingDragged?: boolean; // Nueva prop para pausar la animación durante el arrastre
 }
@@ -52,7 +55,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   scale,
   isSelected,
   mobileParams,
-  onUpdatePosition,
   onSelect,
   isBeingDragged = false,
 }, ref) => {

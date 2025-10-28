@@ -37,7 +37,8 @@ export type SoundObjectType =
   | 'plane' 
   | 'torus' 
   | 'dodecahedronRing' 
-  | 'spiral';
+  | 'spiral'
+  | 'custom';
 
 // Tipos de efectos soportados
 export type EffectType = 
