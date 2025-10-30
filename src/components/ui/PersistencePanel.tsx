@@ -49,7 +49,7 @@ export function PersistencePanel() {
 
   const handleSaveProject = async () => {
     if (!projectName.trim()) {
-      alert('Por favor ingresa un nombre para el proyecto');
+      alert(t('persistence.noProjectName'));
       return;
     }
 
@@ -67,7 +67,7 @@ export function PersistencePanel() {
       await loadProjects(); // Recargar la lista de proyectos
       
     } catch {
-      alert('Error al guardar el proyecto. Inténtalo de nuevo.');
+      alert(t('persistence.errorSaving'));
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +81,7 @@ export function PersistencePanel() {
       setShowLoadDialog(false);
       
     } catch {
-      alert('Error al cargar el proyecto. Inténtalo de nuevo.');
+      alert(t('persistence.errorLoading'));
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +101,7 @@ export function PersistencePanel() {
       await loadProjects(); // Recargar la lista de proyectos
       
     } catch {
-      alert('Error al actualizar el proyecto. Inténtalo de nuevo.');
+      alert(t('persistence.errorUpdating'));
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +130,7 @@ export function PersistencePanel() {
 
   const handleCreateNewProject = async () => {
     if (!projectName.trim()) {
-      alert('Por favor ingresa un nombre para el proyecto');
+      alert(t('persistence.noProjectName'));
       return;
     }
 
@@ -152,7 +152,7 @@ export function PersistencePanel() {
       await persistenceService.loadProject(projectId);
       
     } catch {
-      alert('Error al crear el proyecto. Inténtalo de nuevo.');
+      alert(t('persistence.errorCreating'));
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +188,7 @@ export function PersistencePanel() {
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-            title={isExpanded ? "Ocultar menú" : "Mostrar menú"}
+            title={isExpanded ? t('persistence.hideMenu') : t('persistence.showMenu')}
           >
             <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
             <span className="relative text-xs font-mono tracking-wider">
@@ -210,7 +210,7 @@ export function PersistencePanel() {
                     isConnected ? 'bg-white animate-pulse' : 'bg-gray-500'
                   }`} />
                   <span className="text-xs font-mono tracking-wider">
-                    {isConnected ? 'SYNC_ACTIVE' : 'NO_SYNC'}
+                    {isConnected ? t('persistence.syncActive') : t('persistence.noSync')}
                   </span>
                 </div>
               )}
@@ -227,7 +227,7 @@ export function PersistencePanel() {
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
                 <span>➕</span>
-                <span>NUEVO</span>
+                <span>{t('persistence.new')}</span>
               </span>
             </button>
 
@@ -265,7 +265,7 @@ export function PersistencePanel() {
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
                 <span>🔄</span>
-                <span>UPDATE_PROJECT</span>
+                <span>{t('persistence.update')}</span>
               </span>
             </button>
           )}
@@ -284,7 +284,7 @@ export function PersistencePanel() {
                 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">PROJECT_NAME</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.projectName')}</label>
                     <input
                       type="text"
                       value={projectName}
@@ -295,7 +295,7 @@ export function PersistencePanel() {
                   </div>
                   
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">DESCRIPTION</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.description')}</label>
                     <textarea
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
@@ -322,7 +322,7 @@ export function PersistencePanel() {
                     className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                    <span className="relative text-xs font-mono tracking-wider">CANCEL</span>
+                    <span className="relative text-xs font-mono tracking-wider">{t('persistence.cancel')}</span>
                   </button>
                 </div>
               </div>
@@ -339,7 +339,7 @@ export function PersistencePanel() {
                 <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
-                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">LOAD_PROJECT</h3>
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">{t('persistence.loadProject')}</h3>
                 
                 {isLoading ? (
                   <div className="text-center text-gray-400 font-mono tracking-wider">{t('controls.loadingProjects')}</div>
@@ -359,7 +359,7 @@ export function PersistencePanel() {
                               <div className="text-xs text-gray-400 font-mono">{project.description}</div>
                             )}
                             <div className="text-xs text-gray-500 font-mono">
-                              {project.grids.length} GRIDS
+                              {project.grids.length} {t('persistence.grids')}
                             </div>
                           </div>
                           <div className="flex space-x-1">
@@ -383,7 +383,7 @@ export function PersistencePanel() {
                     className="relative border border-white px-4 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                    <span className="relative text-xs font-mono tracking-wider">CLOSE</span>
+                    <span className="relative text-xs font-mono tracking-wider">{t('persistence.close')}</span>
                   </button>
                 </div>
               </div>
@@ -400,11 +400,11 @@ export function PersistencePanel() {
                 <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
-                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">CREAR_NUEVO_PROYECTO</h3>
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">{t('persistence.createNew')}</h3>
                 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">PROJECT_NAME</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.projectName')}</label>
                     <input
                       type="text"
                       value={projectName}
@@ -416,7 +416,7 @@ export function PersistencePanel() {
                   </div>
                   
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">DESCRIPTION</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.description')}</label>
                     <textarea
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
@@ -435,7 +435,7 @@ export function PersistencePanel() {
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
                     <span className="relative text-xs font-mono tracking-wider">
-                      {isLoading ? 'CREATING...' : 'CREAR'}
+                      {isLoading ? t('persistence.creating') : t('persistence.create')}
                     </span>
                   </button>
                   <button
@@ -443,7 +443,7 @@ export function PersistencePanel() {
                     className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                   >
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                    <span className="relative text-xs font-mono tracking-wider">CANCEL</span>
+                    <span className="relative text-xs font-mono tracking-wider">{t('persistence.cancel')}</span>
                   </button>
                 </div>
               </div>

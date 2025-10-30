@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { tutorialSteps } from '../../lib/tutorial/tutorialSteps';
 import { useTutorialStore } from '../../stores/useTutorialStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function TutorialOverlay() {
   const { isActive, currentStep, nextStep, previousStep, stopTutorial } = useTutorialStore();
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,6 +32,20 @@ export function TutorialOverlay() {
 
   const step = tutorialSteps[currentStep];
   if (!step) return null;
+
+  // Get translations for current step
+  const stepKey = `step${currentStep + 1}`;
+  const title = t(`tutorial.${stepKey}.title`) || step.title;
+  const description = t(`tutorial.${stepKey}.description`) || step.description;
+  const hints: string[] = [];
+  for (let i = 1; i <= 9; i++) {
+    const hint = t(`tutorial.${stepKey}.hint${i}`);
+    if (hint && hint !== `tutorial.${stepKey}.hint${i}`) {
+      hints.push(hint);
+    } else {
+      break;
+    }
+  }
 
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === tutorialSteps.length - 1;
@@ -95,18 +111,18 @@ export function TutorialOverlay() {
           <div className="relative z-10">
             {/* Título */}
             <h3 className="text-lg font-mono font-bold text-white mb-2">
-              {step.title}
+              {title}
             </h3>
             
             {/* Descripción */}
             <p className="text-sm font-mono text-gray-300 mb-4">
-              {step.description}
+              {description}
             </p>
 
             {/* Hints */}
-            {step.hints && (
+            {(hints.length > 0 || step.hints) && (
               <div className="space-y-1 text-xs font-mono mb-4">
-                {step.hints.map((hint, i) => {
+                {(hints.length > 0 ? hints : step.hints || []).map((hint, i) => {
                   const isWarning = hint.includes('⚠️');
                   return (
                     <div 
@@ -128,7 +144,7 @@ export function TutorialOverlay() {
                     onClick={handlePrevious}
                     className="px-4 py-2 border border-white text-white hover:bg-white hover:text-black transition-all duration-300 font-mono text-xs"
                   >
-                    ← Anterior
+                    ← {t('tutorial.previous')}
                   </button>
                 )}
               </div>
@@ -148,7 +164,7 @@ export function TutorialOverlay() {
                       : 'bg-black/50 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {isLastStep ? 'Finalizar Tutorial' : 'Siguiente →'}
+                  {isLastStep ? t('tutorial.finish') : `${t('tutorial.next')} →`}
                 </button>
               </div>
             </div>
@@ -160,13 +176,13 @@ export function TutorialOverlay() {
       <div className="fixed top-4 right-4 z-[100] pointer-events-auto">
         <button
           onClick={() => {
-            if (confirm('¿Cerrar el tutorial? Podrás continuarlo más tarde.')) {
+            if (confirm(t('tutorial.closeConfirm'))) {
               stopTutorial();
             }
           }}
           className="px-4 py-2 border border-gray-500 text-gray-400 hover:border-white hover:text-white transition-all duration-300 font-mono text-xs"
         >
-          Cerrar
+          {t('tutorial.close')}
         </button>
       </div>
     </>

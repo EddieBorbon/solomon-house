@@ -71,17 +71,11 @@ export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { currentProjectId } = useWorldStore();
   
-  // Inicializar sincronización del mundo global
-  const {
-    isConnected,
-    error,
-    isInitializing,
-    reconnect,
-    clearError
-  } = useGlobalWorldSync();
-  
   // Estado para mostrar advertencia de cuota
   const [showQuotaWarning, setShowQuotaWarning] = React.useState(false);
+  
+  // Inicializar sincronización del mundo global solo para detectar errores de cuota
+  const { error } = useGlobalWorldSync();
   
   // Detectar errores de cuota
   React.useEffect(() => {
@@ -97,7 +91,6 @@ export function Experience() {
       // Aquí podrías implementar la limpieza
       console.log('Limpiando datos de Firestore...');
       setShowQuotaWarning(false);
-      clearError();
       // Recargar la página para reconectar
       window.location.reload();
     } catch (error) {
@@ -116,40 +109,6 @@ export function Experience() {
       
       {/* Estado de sincronización en tiempo real */}
       <RealtimeSyncStatus projectId={currentProjectId} />
-      
-      {/* Estado de conexión del mundo global */}
-      <div className="absolute top-4 right-4 z-10">
-        <div className="bg-black/80 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
-            <span>
-              {isInitializing ? 'Inicializando...' : 
-               isConnected ? 'Mundo Global Conectado' : 
-               'Mundo Global Desconectado'}
-            </span>
-          </div>
-          
-          {error && (
-            <div className="mt-2 text-red-300 text-xs">
-              <div className="flex items-center gap-2">
-                <span>Error: {error}</span>
-                <button 
-                  onClick={clearError}
-                  className="text-red-400 hover:text-red-300"
-                >
-                  ✕
-                </button>
-              </div>
-              <button 
-                onClick={reconnect}
-                className="mt-1 text-blue-300 hover:text-blue-200 underline"
-              >
-                Reintentar conexión
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
       
       <Canvas
         camera={{

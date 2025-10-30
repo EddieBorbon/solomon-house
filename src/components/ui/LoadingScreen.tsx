@@ -132,7 +132,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                 >
                   <div className="absolute -inset-1 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative font-mono text-xs sm:text-sm tracking-wider">
-                    Iniciar Tutorial
+                    {t('loading.startTutorial')}
                   </span>
                 </button>
                 
@@ -142,7 +142,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                 >
                   <div className="absolute -inset-1 border border-gray-700 group-hover:border-gray-500 transition-colors duration-300"></div>
                   <span className="relative font-mono text-xs sm:text-sm tracking-wider">
-                    Iniciar Experiencia
+                    {t('loading.startExperience')}
                   </span>
                 </button>
               </div>

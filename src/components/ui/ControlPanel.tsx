@@ -5,6 +5,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import { PersistencePanel } from './PersistencePanel';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTutorialStore } from '../../stores/useTutorialStore';
+import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
 import { 
   Cog6ToothIcon, 
   MusicalNoteIcon, 
@@ -71,6 +72,21 @@ export function ControlPanel() {
       setIsAddMenuExpanded(true);
     }
   }, [isTutorialActive, currentStep]);
+  
+  // Colapsar la sección de zonas de efectos en el paso 11 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 10) {
+      setIsEffectsExpanded(false);
+    }
+  }, [isTutorialActive, currentStep]);
+  
+  // Colapsar objetos sonoros y zonas de efectos en el paso 12 del tutorial
+  useEffect(() => {
+    if (isTutorialActive && currentStep === 11) {
+      setIsAddMenuExpanded(false);
+      setIsEffectsExpanded(false);
+    }
+  }, [isTutorialActive, currentStep]);
   const [isControlsExpanded, setIsControlsExpanded] = useState(false);
   const [isEffectsExpanded, setIsEffectsExpanded] = useState(false);
   const [isMobileObjectExpanded, setIsMobileObjectExpanded] = useState(false);
@@ -80,6 +96,15 @@ export function ControlPanel() {
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
   const { t } = useLanguage();
+  
+  // Estado de conexión del mundo global
+  const {
+    isConnected: isGlobalWorldConnected,
+    error: globalWorldError,
+    isInitializing: isGlobalWorldInitializing,
+    reconnect: reconnectGlobalWorld,
+    clearError: clearGlobalWorldError
+  } = useGlobalWorldSync();
   
   // Obtener información de la cuadrícula activa
   const activeGrid = activeGridId ? grids.get(activeGridId) : null;
@@ -502,7 +527,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Zonas de Efectos */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -607,7 +632,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Objeto Móvil */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -650,7 +675,7 @@ export function ControlPanel() {
       </div>
 
       {/* Sección de Cuadrículas */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
+      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -813,6 +838,59 @@ export function ControlPanel() {
       {/* Panel de Persistencia */}
       <div className={isTutorialActive && currentStep !== 11 ? 'opacity-30 pointer-events-none' : ''}>
         <PersistencePanel />
+      </div>
+
+      {/* Estado del Mundo Global */}
+      <div className="mb-4 relative">
+        <div className="relative border border-white p-3">
+          {/* Decoraciones de esquina */}
+          <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+          
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
+              <span>🌐</span>
+              {t('globalWorld.title')}
+            </h3>
+          </div>
+          
+          <div className="space-y-2">
+            {/* Estado de conexión */}
+            <div className="flex items-center gap-2 text-xs">
+              <div className={`w-2 h-2 rounded-full ${isGlobalWorldConnected ? 'bg-green-400' : 'bg-red-400'}`} />
+              <span className="text-white font-mono">
+                {isGlobalWorldInitializing 
+                  ? t('globalWorld.initializing') 
+                  : isGlobalWorldConnected 
+                    ? t('globalWorld.connected') 
+                    : t('globalWorld.disconnected')}
+              </span>
+            </div>
+            
+            {/* Error si existe */}
+            {globalWorldError && (
+              <div className="space-y-1 text-xs">
+                <div className="flex items-center justify-between text-red-300 bg-red-900/20 px-2 py-1 border border-red-500/30">
+                  <span className="font-mono">{t('globalWorld.error')} {globalWorldError}</span>
+                  <button 
+                    onClick={clearGlobalWorldError}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <button 
+                  onClick={reconnectGlobalWorld}
+                  className="text-blue-300 hover:text-blue-200 underline font-mono"
+                >
+                  {t('globalWorld.retryConnection')}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
             </>

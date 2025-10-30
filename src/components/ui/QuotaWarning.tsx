@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface QuotaWarningProps {
   isVisible: boolean;
@@ -7,6 +8,7 @@ interface QuotaWarningProps {
 }
 
 export function QuotaWarning({ isVisible, onDismiss, onCleanup }: QuotaWarningProps) {
+  const { t } = useLanguage();
   if (!isVisible) return null;
 
   return (
@@ -15,11 +17,10 @@ export function QuotaWarning({ isVisible, onDismiss, onCleanup }: QuotaWarningPr
         <div className="text-yellow-400 text-xl">⚠️</div>
         <div className="flex-1">
           <h3 className="font-semibold text-yellow-200 mb-2">
-            Cuota de Firestore Excedida
+            {t('quotaWarning.title')}
           </h3>
           <p className="text-sm text-yellow-100 mb-3">
-            Has alcanzado los límites del plan gratuito de Firebase. 
-            La aplicación funcionará en modo local hasta que resuelvas esto.
+            {t('quotaWarning.message')}
           </p>
           
           <div className="flex flex-wrap gap-2 mb-3">
@@ -27,29 +28,29 @@ export function QuotaWarning({ isVisible, onDismiss, onCleanup }: QuotaWarningPr
               onClick={onCleanup}
               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm transition-colors"
             >
-              🧹 Limpiar Datos
+              {t('quotaWarning.cleanData')}
             </button>
             <button
               onClick={() => window.open('https://console.firebase.google.com/', '_blank')}
               className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm transition-colors"
             >
-              🔧 Ir a Firebase Console
+              {t('quotaWarning.goToFirebase')}
             </button>
             <button
               onClick={() => window.open('https://firebase.google.com/pricing', '_blank')}
               className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm transition-colors"
             >
-              💳 Ver Planes
+              {t('quotaWarning.viewPlans')}
             </button>
           </div>
           
           <div className="text-xs text-yellow-200">
-            <strong>Soluciones:</strong>
+            <strong>{t('quotaWarning.solutions')}</strong>
             <ul className="list-disc list-inside mt-1 space-y-1">
-              <li>Limpiar datos existentes en Firestore</li>
-              <li>Actualizar al plan Blaze (pay-as-you-go)</li>
-              <li>Optimizar las consultas para reducir uso</li>
-              <li>Usar modo local temporalmente</li>
+              <li>{t('quotaWarning.solution1')}</li>
+              <li>{t('quotaWarning.solution2')}</li>
+              <li>{t('quotaWarning.solution3')}</li>
+              <li>{t('quotaWarning.solution4')}</li>
             </ul>
           </div>
         </div>
