@@ -23,6 +23,25 @@ interface Example {
 const THREE_JS_EXAMPLES: Example[] = [
   // BÁSICO
   {
+    name: '00 - Ejemplo de Prompt para IA',
+    description: 'Prompt de ejemplo para generar código con IA',
+    category: 'básico',
+    code: `// Ejemplo de prompt que puedes usar en una IA:
+// "Crea código para un objeto 3D usando Three.js. NO incluyas imports.
+// Usa THREE directamente (ya está disponible). Crea una esfera roja 
+// brillante con material emisivo, radio 1.5 y 32 segmentos. Devuelve el mesh."
+
+// NOTA: THREE está disponible globalmente, NO necesitas imports
+const geometry = new THREE.SphereGeometry(1.5, 32, 32);
+const material = new THREE.MeshStandardMaterial({ 
+  color: 0xff0000,
+  emissive: 0xff0000,
+  emissiveIntensity: 0.5
+});
+const mesh = new THREE.Mesh(geometry, material);
+return mesh;`
+  },
+  {
     name: '01 - Cubo Simple',
     description: 'Un cubo básico',
     category: 'básico',
@@ -460,6 +479,28 @@ return mesh;`
 const TONE_JS_EXAMPLES: Example[] = [
   // BÁSICO
   {
+    name: '00 - Ejemplo de Prompt para IA',
+    description: 'Prompt de ejemplo para generar código con IA',
+    category: 'básico',
+    code: `// Ejemplo de prompt que puedes usar en una IA:
+// "Crea código para un sintetizador usando Tone.js. NO incluyas imports.
+// Usa Tone directamente (ya está disponible). Crea un synth con sonido 
+// suave y cálido, oscilador 'sine', ataque lento (0.3s), sustain medio 
+// y release largo (1.2s). Conecta a destino y devuelve el synth."
+
+// NOTA: Tone está disponible globalmente, NO necesitas imports
+const synth = new Tone.Synth({
+  oscillator: { type: "sine" },
+  envelope: {
+    attack: 0.3,
+    decay: 0.2,
+    sustain: 0.5,
+    release: 1.2
+  }
+}).toDestination();
+return synth;`
+  },
+  {
     name: '01 - Synth Simple',
     description: 'Sintetizador básico simple',
     category: 'básico',
@@ -838,6 +879,9 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
 
   // Seleccionar ejemplos según el lenguaje
   const examples = language === 'javascript' ? TONE_JS_EXAMPLES : THREE_JS_EXAMPLES;
+  
+  // Colores según el tipo de editor (síntesis = verde neón, forma = morado)
+  const isSynthesis = language === 'javascript';
 
   useEffect(() => {
     setMounted(true);
@@ -855,12 +899,13 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
   };
 
   const editorContent = (
-    <div className="fixed inset-0 z-[9999] flex bg-black/95 backdrop-blur-md">
-      {/* Panel de Ejemplos */}
-      {showExamplesPanel && (
-        <div className="w-80 bg-black border-r border-purple-500 flex flex-col">
-          <div className="p-4 border-b border-purple-500 flex items-center gap-2">
-            <BookOpenIcon className="w-5 h-5 text-purple-400" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-8 bg-black/30 backdrop-blur-sm">
+      <div className={`flex w-full max-w-[90vw] h-[85vh] max-h-[800px] bg-black/90 backdrop-blur-md border-2 shadow-2xl ${isSynthesis ? 'border-green-500/50 shadow-green-500/20' : 'border-purple-500/50 shadow-purple-500/20'}`}>
+        {/* Panel de Ejemplos */}
+        {showExamplesPanel && (
+          <div className={`w-80 bg-black/95 flex flex-col ${isSynthesis ? 'border-r border-green-500' : 'border-r border-purple-500'}`}>
+          <div className={`p-4 flex items-center gap-2 ${isSynthesis ? 'border-b border-green-500' : 'border-b border-purple-500'}`}>
+            <BookOpenIcon className={`w-5 h-5 ${isSynthesis ? 'text-green-400' : 'text-purple-400'}`} />
             <h3 className="text-sm font-mono font-bold text-white tracking-wider">{t('codeEditor.examplesTitle')}</h3>
           </div>
           
@@ -875,9 +920,9 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
                 <button
                   key={idx}
                   onClick={() => handleLoadExample(ex.code)}
-                  className="w-full text-left p-2 mb-1 border border-gray-700 hover:border-purple-500 transition-colors group"
+                  className={`w-full text-left p-2 mb-1 border border-gray-700 transition-colors group ${isSynthesis ? 'hover:border-green-500' : 'hover:border-purple-500'}`}
                 >
-                  <div className="text-xs font-mono text-white group-hover:text-purple-400">
+                  <div className={`text-xs font-mono text-white ${isSynthesis ? 'group-hover:text-green-400' : 'group-hover:text-purple-400'}`}>
                     {ex.name}
                   </div>
                   <div className="text-xs text-gray-400 text-[10px]">
@@ -897,9 +942,9 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
                 <button
                   key={idx}
                   onClick={() => handleLoadExample(ex.code)}
-                  className="w-full text-left p-2 mb-1 border border-gray-700 hover:border-purple-500 transition-colors group"
+                  className={`w-full text-left p-2 mb-1 border border-gray-700 transition-colors group ${isSynthesis ? 'hover:border-green-500' : 'hover:border-purple-500'}`}
                 >
-                  <div className="text-xs font-mono text-white group-hover:text-purple-400">
+                  <div className={`text-xs font-mono text-white ${isSynthesis ? 'group-hover:text-green-400' : 'group-hover:text-purple-400'}`}>
                     {ex.name}
                   </div>
                   <div className="text-xs text-gray-400 text-[10px]">
@@ -919,9 +964,9 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
                 <button
                   key={idx}
                   onClick={() => handleLoadExample(ex.code)}
-                  className="w-full text-left p-2 mb-1 border border-gray-700 hover:border-purple-500 transition-colors group"
+                  className={`w-full text-left p-2 mb-1 border border-gray-700 transition-colors group ${isSynthesis ? 'hover:border-green-500' : 'hover:border-purple-500'}`}
                 >
-                  <div className="text-xs font-mono text-white group-hover:text-purple-400">
+                  <div className={`text-xs font-mono text-white ${isSynthesis ? 'group-hover:text-green-400' : 'group-hover:text-purple-400'}`}>
                     {ex.name}
                   </div>
                   <div className="text-xs text-gray-400 text-[10px]">
@@ -939,15 +984,15 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white flex-shrink-0">
           <div className="flex items-center gap-3">
-            <CommandLineIcon className="w-5 h-5 text-purple-500" />
+            <CommandLineIcon className={`w-5 h-5 ${isSynthesis ? 'text-green-500' : 'text-purple-500'}`} />
             <h2 className="text-lg font-mono font-bold text-white tracking-wider">{title}</h2>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowExamplesPanel(!showExamplesPanel)}
-              className="relative border border-purple-500 px-3 py-1 text-purple-400 hover:bg-purple-500 hover:text-white transition-all duration-300 group text-sm font-mono"
+              className={`relative border px-3 py-1 hover:text-white transition-all duration-300 group text-sm font-mono ${isSynthesis ? 'border-green-500 text-green-400 hover:bg-green-500' : 'border-purple-500 text-purple-400 hover:bg-purple-500'}`}
             >
-              <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
+              <div className={`absolute -inset-0.5 border transition-colors duration-300 ${isSynthesis ? 'border-green-600 group-hover:border-green-400' : 'border-purple-600 group-hover:border-purple-400'}`}></div>
               <span className="relative flex items-center gap-2">
                 <BookOpenIcon className="w-4 h-4" />
                 {t('codeEditor.examples')}
@@ -976,7 +1021,7 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
             <textarea
               value={editedCode}
               onChange={(e) => setEditedCode(e.target.value)}
-              className="w-full h-full bg-black text-green-400 font-mono text-sm p-2 pl-16 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 border-0"
+              className={`w-full h-full bg-black text-green-400 font-mono text-sm p-2 pl-16 resize-none focus:outline-none focus:ring-2 border-0 ${isSynthesis ? 'focus:ring-green-500' : 'focus:ring-purple-500'}`}
               spellCheck={false}
               placeholder={language === 'javascript' ? t('codeEditor.tonePlaceholder') : t('codeEditor.threePlaceholder')}
               style={{ minHeight: '100%' }}
@@ -1005,6 +1050,7 @@ export function CodeEditor({ title, code, onSave, onClose, language }: CodeEdito
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

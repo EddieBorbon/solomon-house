@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface FreeverbParamsProps {
   zone: EffectZone;
@@ -9,6 +11,7 @@ interface FreeverbParamsProps {
 }
 
 export function FreeverbParams({ zone, onEffectParamChange }: FreeverbParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'freeverb') return null;
 
   return (
@@ -20,13 +23,14 @@ export function FreeverbParams({ zone, onEffectParamChange }: FreeverbParamsProp
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        FREEVERB_PARAMETERS
+        {t('effects.freeverbParameters')}
       </h4>
 
       {/* Room Size */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          ROOM_SIZE
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.roomSize')}
+          <InfoTooltip content={t('effects.tooltips.roomSize')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -51,8 +55,9 @@ export function FreeverbParams({ zone, onEffectParamChange }: FreeverbParamsProp
 
       {/* Dampening */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          DAMPENING
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.dampening')}
+          <InfoTooltip content={t('effects.tooltips.dampening')} />
         </label>
         <div className="flex items-center gap-3">
           <input

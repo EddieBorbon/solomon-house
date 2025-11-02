@@ -193,9 +193,12 @@ export function useTransformHandler() {
    * Utilidad para redondear valores decimales
    * @param value - Valor a redondear
    * @param decimals - Número de decimales (por defecto 2)
-   * @returns Valor redondeado
+   * @returns Valor redondeado (0 si el valor es NaN o inválido)
    */
   const roundToDecimals = useCallback((value: number, decimals: number = 2): number => {
+    if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+      return 0;
+    }
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   }, []);
 

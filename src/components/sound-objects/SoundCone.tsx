@@ -163,15 +163,6 @@ export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
           </mesh>
         )}
 
-        {/* Indicador de instrumento percusivo */}
-        <mesh position={[0, 0.9, 0]}>
-          <sphereGeometry args={[0.08, 8, 8]} />
-          <meshStandardMaterial 
-            color="#ff8c42" 
-            emissive="#ff8c42"
-            emissiveIntensity={0.3}
-          />
-        </mesh>
       </group>
     );
   }

@@ -34,8 +34,10 @@ import { useParameterHandlers } from '../../hooks/useParameterHandlers';
 import { CodeEditor } from './CodeEditor';
 import { CommandLineIcon } from '@heroicons/react/24/outline';
 import { useTutorialStore } from '../../stores/useTutorialStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function ParameterEditor() {
+  const { t } = useLanguage();
   const { isActive: isTutorialActive, currentStep } = useTutorialStore();
   const [isPanelExpanded, setIsPanelExpanded] = React.useState(false);
   
@@ -325,6 +327,7 @@ export function ParameterEditor() {
             zone={zone}
             onRemove={removeEffectZone}
             onToggleLock={toggleLockEffectZone}
+            onUpdateZone={updateEffectZone}
           />
 
 
@@ -506,7 +509,7 @@ export function ParameterEditor() {
     <div className="fixed right-0 top-0 h-full z-50 flex">
       {/* Panel principal futurista */}
       <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-        isPanelExpanded ? 'w-96' : 'w-0'
+        isPanelExpanded ? 'w-[480px]' : 'w-0'
       }`}>
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-10">
@@ -547,7 +550,7 @@ export function ParameterEditor() {
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-xs font-mono font-bold text-purple-400 tracking-wider flex items-center gap-2">
                 <CommandLineIcon className="w-4 h-4" />
-                PROGRAMACIÓN PERSONALIZADA
+                {t('codeEditor.programmingCustom')}
               </h3>
             </div>
             
@@ -559,7 +562,7 @@ export function ParameterEditor() {
                 <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
                 <span className="relative text-sm font-mono tracking-wider flex items-center gap-2">
                   <CommandLineIcon className="w-4 h-4" />
-                  PROGRAMAR FORMA (Three.js)
+                  {t('codeEditor.programShape')}
                 </span>
               </button>
               
@@ -570,7 +573,7 @@ export function ParameterEditor() {
                 <div className="absolute -inset-0.5 border border-purple-600 group-hover:border-purple-400 transition-colors duration-300"></div>
                 <span className="relative text-sm font-mono tracking-wider flex items-center gap-2">
                   <CommandLineIcon className="w-4 h-4" />
-                  PROGRAMAR SÍNTESIS (Tone.js)
+                  {t('codeEditor.programSynthesis')}
                 </span>
               </button>
             </div>
@@ -601,7 +604,7 @@ export function ParameterEditor() {
         className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
           isTutorialActive ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
         }`}
-        title={isTutorialActive ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+        title={isTutorialActive ? t('effects.panelLockedDuringTutorial') : (isPanelExpanded ? t('effects.collapsePanel') : t('effects.expandPanel'))}
         disabled={isTutorialActive}
       >
         {/* Decoraciones de esquina */}
@@ -623,7 +626,7 @@ export function ParameterEditor() {
       {/* Editores de código para objetos personalizados */}
       {showShapeCodeEditor && isSoundObject && (
         <CodeEditor
-          title="EDITOR DE FORMA - Three.js"
+          title={t('codeEditor.editorFormaTitle')}
           code={getSoundObject()?.customShapeCode || ''}
           onSave={handleSaveShapeCode}
           onClose={() => setShowShapeCodeEditor(false)}
@@ -633,7 +636,7 @@ export function ParameterEditor() {
 
       {showSynthesisCodeEditor && isSoundObject && (
         <CodeEditor
-          title="EDITOR DE SÍNTESIS - Tone.js"
+          title={t('codeEditor.editorSintesisTitle')}
           code={getSoundObject()?.customSynthesisCode || ''}
           onSave={handleSaveSynthesisCode}
           onClose={() => setShowSynthesisCodeEditor(false)}

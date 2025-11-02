@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type EffectZone } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface EffectParametersSectionProps {
   zone: EffectZone;
@@ -14,6 +15,8 @@ export function EffectParametersSection({
   isUpdatingParams, 
   onEffectParamChange 
 }: EffectParametersSectionProps) {
+  const { t } = useLanguage();
+  
   // No renderizar para efectos que tienen sus propios componentes específicos
   const excludedTypes = ['phaser', 'autoFilter', 'autoWah', 'chebyshev', 'chorus', 'distortion', 'feedbackDelay', 'freeverb', 'frequencyShifter', 'jcReverb', 'pingPongDelay', 'pitchShift', 'reverb', 'stereoWidener', 'tremolo', 'vibrato'];
   if (excludedTypes.includes(zone?.type || '')) return null;
@@ -53,7 +56,7 @@ export function EffectParametersSection({
           {/* Bits parameter */}
           <div className="relative">
             <label className="futuristic-label block mb-3 text-white text-xs font-mono tracking-wider">
-              BITS
+              {t('effects.bits')}
             </label>
             <div className="flex items-center gap-4">
               <input
@@ -80,7 +83,7 @@ export function EffectParametersSection({
           {/* Normalized Frequency parameter */}
           <div className="relative">
             <label className="futuristic-label block mb-3 text-white text-xs font-mono tracking-wider">
-              FRECUENCIA_NORMALIZADA
+              {t('effects.frecuenciaNormalizada')}
             </label>
             <div className="flex items-center gap-4">
               <input

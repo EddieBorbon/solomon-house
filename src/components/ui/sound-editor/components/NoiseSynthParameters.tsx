@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface NoiseSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function NoiseSynthParameters({
   selectedObject,
   onParamChange
 }: NoiseSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function NoiseSynthParameters({
 
       {/* Noise Type */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           NOISE_TYPE
+          <InfoTooltip content={t('parameterEditor.tooltips.noiseType')} />
         </label>
         <select
           value={selectedObject.audioParams.noiseType || 'white'}
@@ -48,8 +52,9 @@ export function NoiseSynthParameters({
 
       {/* Attack */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           ATTACK
+          <InfoTooltip content={t('parameterEditor.tooltips.attack')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -73,8 +78,9 @@ export function NoiseSynthParameters({
 
       {/* Decay */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           DECAY
+          <InfoTooltip content={t('parameterEditor.tooltips.decay')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -98,8 +104,9 @@ export function NoiseSynthParameters({
 
       {/* Sustain */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           SUSTAIN
+          <InfoTooltip content={t('parameterEditor.tooltips.sustain')} />
         </label>
         <div className="flex items-center gap-3">
           <input

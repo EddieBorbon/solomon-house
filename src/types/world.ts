@@ -2,7 +2,7 @@ import { type AudioParams } from '../lib/AudioManager';
 
 // Tipos base para el mundo 3D
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral';
-export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
+export type MovementType = 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
 export type EffectType = 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato';
 
 // Interfaces base para entidades

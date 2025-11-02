@@ -212,17 +212,6 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
           </mesh>
         )}
 
-        {/* Indicador de audio activo */}
-        {audioEnabled && (
-          <mesh position={[0, 1.2, 0]}>
-            <sphereGeometry args={[0.1, 8, 8]} />
-            <meshStandardMaterial 
-              color="#10b981" 
-              emissive="#10b981"
-              emissiveIntensity={0.5}
-            />
-          </mesh>
-        )}
       </group>
     );
   }

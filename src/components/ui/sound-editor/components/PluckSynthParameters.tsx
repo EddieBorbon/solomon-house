@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface PluckSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function PluckSynthParameters({
   selectedObject,
   onParamChange
 }: PluckSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function PluckSynthParameters({
 
       {/* Attack Noise */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           ATTACK_NOISE
+          <InfoTooltip content={t('parameterEditor.tooltips.attackNoise')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -57,8 +61,9 @@ export function PluckSynthParameters({
 
       {/* Dampening */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           DAMPENING
+          <InfoTooltip content={t('parameterEditor.tooltips.dampening')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -82,8 +87,9 @@ export function PluckSynthParameters({
 
       {/* Resonance */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           RESONANCE
+          <InfoTooltip content={t('parameterEditor.tooltips.resonance')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -107,8 +113,9 @@ export function PluckSynthParameters({
 
       {/* Release */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           RELEASE
+          <InfoTooltip content={t('parameterEditor.tooltips.release')} />
         </label>
         <div className="flex items-center gap-3">
           <input

@@ -19,12 +19,16 @@ export function MobileObjectEditor({ mobileObject, onRemove }: MobileObjectEdito
   const { updateTransform, resetTransform, roundToDecimals } = useTransformHandler();
 
   const handleParamChange = (param: string, value: unknown) => {
+    // Asegurar que mobileParams existe antes de actualizar
+    const currentMobileParams = mobileObject.mobileParams || {};
     updateMobileObject(mobileObject.id, {
       mobileParams: {
-        ...mobileObject.mobileParams,
+        ...currentMobileParams,
         [param]: value,
       },
     });
+    // Forzar re-renderizado del componente MobileObject
+    console.log(`🔄 Actualizado ${param}:`, value);
   };
 
   const handleTransformChange = (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => {

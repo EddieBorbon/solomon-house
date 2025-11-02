@@ -171,20 +171,6 @@ export function TutorialOverlay() {
           </div>
         </div>
       </div>
-
-      {/* Botón de cancelar en esquina superior derecha */}
-      <div className="fixed top-4 right-4 z-[100] pointer-events-auto">
-        <button
-          onClick={() => {
-            if (confirm(t('tutorial.closeConfirm'))) {
-              stopTutorial();
-            }
-          }}
-          className="px-4 py-2 border border-gray-500 text-gray-400 hover:border-white hover:text-white transition-all duration-300 font-mono text-xs"
-        >
-          {t('tutorial.close')}
-        </button>
-      </div>
     </>
   );
 }

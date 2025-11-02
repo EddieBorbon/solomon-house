@@ -4,6 +4,7 @@ import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface MetalSynthParametersProps {
   selectedObject: SoundObject;
@@ -14,6 +15,7 @@ export function MetalSynthParameters({
   selectedObject,
   onParamChange
 }: MetalSynthParametersProps) {
+  const { t } = useLanguage();
   if (selectedObject.type !== 'icosahedron') return null;
 
   return (
@@ -21,13 +23,13 @@ export function MetalSynthParameters({
       {/* Sección: Parámetros del MetalSynth */}
       <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
         <h4 className="text-sm font-semibold text-indigo-400 mb-3 flex items-center gap-2">
-          🔶 Parámetros del MetalSynth
+          🔶 {t('effects.metalSynthParameters')}
         </h4>
         
         {/* Harmonicity */}
         <div className="mb-6">
           <FuturisticSlider
-            label="HARMONICITY"
+            label={t('effects.harmonicity')}
             value={selectedObject.audioParams.harmonicity || 5.1}
             min={0.1}
             max={10}
@@ -40,7 +42,7 @@ export function MetalSynthParameters({
         {/* Modulation Index */}
         <div className="mb-6">
           <FuturisticSlider
-            label="MODULATION_INDEX"
+            label={t('effects.modulationIndex')}
             value={selectedObject.audioParams.modulationIndex || 32}
             min={1}
             max={100}
@@ -53,7 +55,7 @@ export function MetalSynthParameters({
         {/* Modulation Envelope */}
         <div className="mb-6">
         <FuturisticSlider
-          label="MODULATION_ENVELOPE"
+          label={t('effects.modulationEnvelope')}
           value={selectedObject.audioParams.modulationEnvelope || 0.01}
           min={0.01}
           max={2}
@@ -67,7 +69,7 @@ export function MetalSynthParameters({
         {/* Resonance */}
         <div className="mb-6">
           <FuturisticSlider
-            label="RESONANCE"
+            label={t('effects.resonance')}
             value={selectedObject.audioParams.resonance || 4000}
             min={0.1}
             max={20}
@@ -81,7 +83,7 @@ export function MetalSynthParameters({
         {/* Octaves */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Octaves
+            {t('effects.octaves')}
           </label>
           <div className="flex items-center gap-3">
             <input

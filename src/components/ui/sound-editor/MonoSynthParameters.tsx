@@ -4,6 +4,7 @@ import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface MonoSynthParametersProps {
   selectedObject: SoundObject;
@@ -14,6 +15,7 @@ export function MonoSynthParameters({
   selectedObject,
   onParamChange
 }: MonoSynthParametersProps) {
+  const { t } = useLanguage();
   if (selectedObject.type !== 'pyramid') return null;
 
   return (
@@ -21,13 +23,13 @@ export function MonoSynthParameters({
       {/* Sección: Envolvente de Amplitud */}
       <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
         <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
-          🔺 Envolvente de Amplitud
+          🔺 {t('effects.amplitudeEnvelope')}
         </h4>
         
         {/* Amp Attack */}
         <div className="mb-6">
           <FuturisticSlider
-            label="ATTACK"
+            label={t('parameterEditor.attack')}
             value={selectedObject.audioParams.ampAttack || 0.01}
             min={0.001}
             max={2}
@@ -35,13 +37,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('ampAttack', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.ampAttack || 0.01).toFixed(3)}
+            tooltip={t('parameterEditor.tooltips.attack')}
           />
         </div>
 
         {/* Amp Decay */}
         <div className="mb-6">
           <FuturisticSlider
-            label="DECAY"
+            label={t('parameterEditor.decay')}
             value={selectedObject.audioParams.ampDecay || 0.2}
             min={0.01}
             max={2}
@@ -49,13 +52,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('ampDecay', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.ampDecay || 0.2).toFixed(2)}
+            tooltip={t('parameterEditor.tooltips.decay')}
           />
         </div>
 
         {/* Amp Sustain */}
         <div className="mb-6">
           <FuturisticSlider
-            label="SUSTAIN"
+            label={t('parameterEditor.sustain')}
             value={selectedObject.audioParams.ampSustain || 0.1}
             min={0}
             max={1}
@@ -63,13 +67,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('ampSustain', value)}
             unit="%"
             displayValue={Math.round((selectedObject.audioParams.ampSustain || 0.1) * 100)}
+            tooltip={t('parameterEditor.tooltips.sustain')}
           />
         </div>
 
         {/* Amp Release */}
         <div className="mb-6">
           <FuturisticSlider
-            label="RELEASE"
+            label={t('parameterEditor.release')}
             value={selectedObject.audioParams.ampRelease || 0.5}
             min={0.01}
             max={4}
@@ -77,6 +82,7 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('ampRelease', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.ampRelease || 0.5).toFixed(2)}
+            tooltip={t('parameterEditor.tooltips.release')}
           />
         </div>
       </div>
@@ -84,13 +90,13 @@ export function MonoSynthParameters({
       {/* Sección: Envolvente de Filtro */}
       <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
         <h4 className="text-sm font-semibold text-green-400 mb-3 flex items-center gap-2">
-          🎛️ Envolvente de Filtro
+          🎛️ {t('effects.filterEnvelope')}
         </h4>
         
         {/* Filter Attack */}
         <div className="mb-6">
           <FuturisticSlider
-            label="FILTER_ATTACK"
+            label={t('effects.filterAttack')}
             value={selectedObject.audioParams.filterAttack || 0.005}
             min={0.001}
             max={1}
@@ -98,13 +104,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('filterAttack', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.filterAttack || 0.005).toFixed(3)}
+            tooltip={t('parameterEditor.tooltips.attack')}
           />
         </div>
 
         {/* Filter Decay */}
         <div className="mb-6">
           <FuturisticSlider
-            label="FILTER_DECAY"
+            label={t('effects.filterDecay')}
             value={selectedObject.audioParams.filterDecay || 0.1}
             min={0.01}
             max={2}
@@ -112,13 +119,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('filterDecay', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.filterDecay || 0.1).toFixed(2)}
+            tooltip={t('parameterEditor.tooltips.decay')}
           />
         </div>
 
         {/* Filter Sustain */}
         <div className="mb-6">
           <FuturisticSlider
-            label="FILTER_SUSTAIN"
+            label={t('effects.filterSustain')}
             value={selectedObject.audioParams.filterSustain || 0.05}
             min={0}
             max={1}
@@ -126,13 +134,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('filterSustain', value)}
             unit="%"
             displayValue={Math.round((selectedObject.audioParams.filterSustain || 0.05) * 100)}
+            tooltip={t('parameterEditor.tooltips.sustain')}
           />
         </div>
 
         {/* Filter Release */}
         <div className="mb-6">
           <FuturisticSlider
-            label="FILTER_RELEASE"
+            label={t('effects.filterRelease')}
             value={selectedObject.audioParams.filterRelease || 0.2}
             min={0.01}
             max={2}
@@ -140,13 +149,14 @@ export function MonoSynthParameters({
             onChange={(value) => onParamChange('filterRelease', value)}
             unit="s"
             displayValue={(selectedObject.audioParams.filterRelease || 0.2).toFixed(2)}
+            tooltip={t('parameterEditor.tooltips.release')}
           />
         </div>
 
         {/* Filter Base Frequency */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Frec. Base del Filtro
+            {t('effects.filterBaseFrequency')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -171,7 +181,7 @@ export function MonoSynthParameters({
         {/* Filter Octaves */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Octavas del Filtro
+            {t('effects.filterOctaves')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -196,7 +206,7 @@ export function MonoSynthParameters({
         {/* Filter Q (Resonancia) */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Resonancia (Q)
+            {t('effects.resonanceQ')}
           </label>
           <div className="flex items-center gap-3">
             <input

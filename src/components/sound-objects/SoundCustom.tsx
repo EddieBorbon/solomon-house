@@ -125,17 +125,6 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
             </mesh>
           )}
 
-          {/* Indicador de audio activo */}
-          {audioEnabled && (
-            <mesh position={[0, 1.3, 0]}>
-              <sphereGeometry args={[0.2, 8, 6]} />
-              <meshStandardMaterial
-                color="#8b5cf6"
-                emissive="#8b5cf6"
-                emissiveIntensity={0.8}
-              />
-            </mesh>
-          )}
         </group>
       );
     }
@@ -179,17 +168,6 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
           </mesh>
         )}
 
-        {/* Indicador de audio activo */}
-        {audioEnabled && (
-          <mesh position={[0, 1.3, 0]}>
-            <sphereGeometry args={[0.2, 8, 6]} />
-            <meshStandardMaterial
-              color="#8b5cf6"
-              emissive="#8b5cf6"
-              emissiveIntensity={0.8}
-            />
-          </mesh>
-        )}
       </group>
     );
   }

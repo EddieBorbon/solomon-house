@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface PingPongDelayParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface PingPongDelayParamsProps {
 }
 
 export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelayParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'pingPongDelay') return null;
 
   return (
@@ -21,13 +24,13 @@ export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelay
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        PING_PONG_DELAY_PARAMETERS
+        {t('effects.pingPongDelayParameters')}
       </h4>
 
       {/* Delay Time */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DELAY_TIME"
+          label={t('effects.delayTime')}
           value={Number(zone?.effectParams.pingPongDelayTime) || 0.3}
           min={0.1}
           max={1}
@@ -36,13 +39,14 @@ export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelay
           disabled={zone?.isLocked}
           unit="S"
           displayValue={Number(zone?.effectParams.pingPongDelayTime ?? 0.3).toFixed(2)}
+          tooltip={t('effects.tooltips.delayTime')}
         />
       </div>
 
       {/* Feedback */}
       <div className="mb-6">
         <FuturisticSlider
-          label="FEEDBACK"
+          label={t('effects.feedback')}
           value={Number(zone?.effectParams.pingPongFeedback) || 0.2}
           min={0}
           max={1}
@@ -51,13 +55,14 @@ export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelay
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.pingPongFeedback ?? 0.2) * 100)}
+          tooltip={t('effects.tooltips.feedback')}
         />
       </div>
 
       {/* Max Delay */}
       <div className="mb-6">
         <FuturisticSlider
-          label="MAX_DELAY"
+          label={t('effects.maxDelay')}
           value={Number(zone?.effectParams.maxDelay) || 1}
           min={0.1}
           max={1}
@@ -66,13 +71,15 @@ export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelay
           disabled={zone?.isLocked}
           unit="S"
           displayValue={Number(zone?.effectParams.maxDelay ?? 1).toFixed(2)}
+          tooltip={t('effects.tooltips.maxDelay')}
         />
       </div>
 
       {/* Wet Mix */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WET_MIX
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.wetMix')}
+          <InfoTooltip content={t('effects.tooltips.wetMix')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -80,7 +87,7 @@ export function PingPongDelayParams({ zone, onEffectParamChange }: PingPongDelay
             min="0"
             max="1"
             step="0.01"
-            value={zone?.effectParams.wet ?? 0.3}
+            value={(typeof zone?.effectParams.wet === 'number' && !isNaN(zone?.effectParams.wet)) ? zone.effectParams.wet : 0.3}
             onChange={(e) => onEffectParamChange('wet', Number(e.target.value))}
             className="futuristic-slider flex-1"
             disabled={zone?.isLocked}

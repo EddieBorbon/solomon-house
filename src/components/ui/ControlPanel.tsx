@@ -94,7 +94,7 @@ export function ControlPanel() {
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize } = useWorldStore();
+  const { addObject, addEffectZone, addMobileObject, activeGridId, grids, createGrid, currentGridCoordinates, gridSize, showGrid, setShowGrid } = useWorldStore();
   const { t } = useLanguage();
   
   // Estado de conexión del mundo global
@@ -674,8 +674,8 @@ export function ControlPanel() {
         </div>
       </div>
 
-      {/* Sección de Cuadrículas */}
-      <div className={`mb-4 relative ${isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11) ? 'opacity-30 pointer-events-none' : ''}`}>
+      {/* Sección de Cuadrículas - DESACTIVADA EN DESARROLLO */}
+      <div className={`mb-4 relative ${(process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_ENABLE_GRIDS !== 'true') || (isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11)) ? 'opacity-30 pointer-events-none' : ''}`}>
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}
@@ -710,6 +710,28 @@ export function ControlPanel() {
               )}
             </div>
           </div>
+
+          {/* Control de visibilidad de cuadrícula - Solo visible cuando hay una cuadrícula activa */}
+          {activeGrid && (
+            <div className="mb-2 p-2 border border-gray-600">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-white tracking-wider">{t('controls.showGrid')}</span>
+                <button
+                  onClick={() => setShowGrid(!showGrid)}
+                  className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                    showGrid ? 'bg-cyan-500' : 'bg-gray-600'
+                  }`}
+                  title={showGrid ? t('controls.hideGrid') : t('controls.showGrid')}
+                >
+                  <div
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
+                      showGrid ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
 
         {isGridsExpanded && (
           <div className="space-y-2">

@@ -9,11 +9,16 @@ interface GridRendererProps {
 }
 
 export function GridRenderer({ position = [0, 0, 0] }: GridRendererProps) {
-  const { grids, selectGrid } = useWorldStore();
+  const { grids, selectGrid, showGrid } = useWorldStore();
 
   const handleGridSelect = (gridId: string) => {
     selectGrid(gridId);
   };
+
+  // Si la cuadrícula está oculta, no renderizar nada
+  if (!showGrid) {
+    return null;
+  }
 
   return (
     <group position={position}>

@@ -4,6 +4,7 @@ import { useEffectStore } from '../stores/useEffectStore';
 import { WorldStoreFacade } from './facades/WorldStoreFacade';
 import { type AudioParams, audioManager } from '../lib/AudioManager';
 import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
+import { persistenceService } from '../lib/persistenceService';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
@@ -26,7 +27,7 @@ export interface Grid {
 }
 
 // Tipos de movimiento para objetos móviles
-export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
+export type MovementType = 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
 
 // Interfaz para un objeto de sonido
 export interface SoundObject {
@@ -84,6 +85,8 @@ export interface EffectZone {
   scale: [number, number, number];
   isSelected: boolean;
   isLocked: boolean;
+  showWireframe?: boolean; // Control individual para mostrar/ocultar wireframe (por defecto true)
+  showColor?: boolean; // Control individual para mostrar/ocultar color (por defecto true)
   // Parámetros específicos del efecto
   effectParams: {
     // Parámetros del Phaser
@@ -178,6 +181,16 @@ export interface WorldState {
   // World management (placeholder implementation)
   worlds: Array<{ id: string; name: string }>;
   currentWorldId: string | null;
+  
+  // Configuración visual
+  showGrid: boolean; // Control para mostrar/ocultar la cuadrícula
+  showEffectZoneWireframe: boolean; // Control para mostrar/ocultar wireframe de zonas de efectos
+  showEffectZoneColor: boolean; // Control para mostrar/ocultar color/visualización de zonas de efectos
+  showHiddenZones: boolean; // Control para mostrar zonas ocultas (con wireframe y color desactivados)
+  
+  // Sistema de bloqueo de edición con admin (solo para proyectos guardados)
+  isEditingLocked: boolean; // Si la edición está bloqueada
+  isAdminAuthenticated: boolean; // Si el admin está autenticado
 }
 
 // Acciones disponibles en el store
@@ -247,6 +260,18 @@ export interface WorldActions {
   updateGlobalEffectZone: (zoneId: string, updates: Partial<Omit<EffectZone, 'id'>>) => void;
   removeGlobalEffectZone: (zoneId: string) => void;
   
+  // Acciones para configuración visual
+  setShowGrid: (show: boolean) => void;
+  setShowEffectZoneWireframe: (show: boolean) => void;
+  setShowEffectZoneColor: (show: boolean) => void;
+  setShowHiddenZones: (show: boolean) => void;
+  
+  // Acciones para bloqueo de edición con admin
+  canEdit: () => boolean; // Verificar si la edición está permitida
+  lockEditing: () => void;
+  unlockEditing: (password: string) => boolean; // Retorna true si la contraseña es correcta
+  authenticateAdmin: (password: string) => boolean; // Retorna true si la contraseña es correcta
+  
   // Acciones para objetos móviles
   addMobileObject: (position: [number, number, number]) => void;
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => void;
@@ -305,10 +330,42 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // World management state
     worlds: [{ id: 'default', name: 'Default World' }],
     currentWorldId: 'default',
+    
+    // Configuración visual
+    showGrid: true, // Por defecto visible
+    showEffectZoneWireframe: true, // Por defecto visible
+    showEffectZoneColor: true, // Por defecto visible
+    showHiddenZones: false, // Por defecto ocultas
+    
+    // Sistema de bloqueo de edición con admin
+    isEditingLocked: false, // Por defecto desbloqueado
+    isAdminAuthenticated: false, // Por defecto no autenticado
+
+  // Helper para verificar si la edición está permitida (solo para proyectos guardados, no global)
+  canEdit: () => {
+    const state = get();
+    // Si está conectado al mundo global, siempre permitir edición
+    if (state.globalWorldConnected) {
+      return true;
+    }
+    // Si hay un proyecto guardado y la edición está bloqueada, verificar autenticación
+    if (state.currentProjectId && state.isEditingLocked) {
+      return state.isAdminAuthenticated;
+    }
+    // Permitir edición en todos los demás casos
+    return true;
+  },
 
   // Acción para añadir un nuevo objeto - Delegada al WorldStoreFacade
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
     const state = get();
+    
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     const activeGridId = state.activeGridId;
     
     if (!activeGridId) {
@@ -318,12 +375,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Crear objeto usando el facade
     const newObject = worldStoreFacade.createObject(type, position, activeGridId);
     
-    // REACTIVADO - La cuota se ha liberado
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    // Si hay un currentProjectId, los cambios deben ser solo locales y sincronizarse con useRealtimeSync
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().addGlobalSoundObject(newObject);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     const activeGrid = state.grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
@@ -346,12 +403,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   removeObject: (id: string) => {
     const state = get();
     
-    // REACTIVADO - La cuota se ha liberado
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().removeGlobalSoundObject(id);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -416,7 +478,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return {
         grids: newGrids,
         selectedEntityId: id,
-        transformMode: id === null ? 'translate' : state.transformMode,
+        // Siempre resetear a 'translate' cuando se selecciona una entidad para que aparezca el gizmo de mover por defecto
+        transformMode: 'translate',
       };
     });
   },
@@ -425,12 +488,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>) => {
     const state = get();
     
-    // REACTIVADO - La cuota se ha liberado
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().updateGlobalSoundObject(id, updates);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -449,6 +517,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
             ...grid,
             objects: updatedObjects
           });
+          
+          // Si hay un proyecto cargado, sincronizar cambios con Firebase
+          if (state.currentProjectId) {
+            persistenceService.syncProjectChanges(state.currentProjectId);
+          }
+          
           break;
         }
       }
@@ -539,6 +613,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
 
   // Acción para limpiar todos los objetos - Delegada al WorldStoreFacade
   clearAllObjects: () => {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     // Limpiar objetos usando el facade
     worldStoreFacade.clearAllObjects();
     
@@ -571,6 +651,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   // Nuevas acciones para zonas de efectos - Delegadas al WorldStoreFacade
   addEffectZone: (type: 'phaser' | 'autoFilter' | 'autoWah' | 'bitCrusher' | 'chebyshev' | 'chorus' | 'distortion' | 'feedbackDelay' | 'freeverb' | 'frequencyShifter' | 'jcReverb' | 'pingPongDelay' | 'pitchShift' | 'reverb' | 'stereoWidener' | 'tremolo' | 'vibrato', position: [number, number, number], shape: 'sphere' | 'cube' = 'sphere') => {
     const state = get();
+    
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     const activeGridId = state.activeGridId;
     
     if (!activeGridId) {
@@ -580,11 +667,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Crear zona de efecto usando el facade
     const newEffectZone = worldStoreFacade.createEffectZone(type, position, shape, activeGridId);
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().addGlobalEffectZone(newEffectZone);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     const activeGrid = state.grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
@@ -606,11 +693,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   updateEffectZone: (id: string, updates: Partial<Omit<EffectZone, 'id'>>) => {
     const state = get();
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().updateGlobalEffectZone(id, updates);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -628,6 +721,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
             ...grid,
             effectZones: updatedZones
           });
+          
+          // Si hay un proyecto cargado, sincronizar cambios con Firebase
+          if (state.currentProjectId) {
+            persistenceService.syncProjectChanges(state.currentProjectId);
+          }
+          
           break;
         }
       }
@@ -640,11 +739,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   removeEffectZone: (id: string) => {
     const state = get();
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().removeGlobalEffectZone(id);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -718,6 +823,51 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     useEffectStore.getState().setEditingEffectZone(isEditing);
     set({ isEditingEffectZone: isEditing });
   },
+  
+  // Acción para mostrar/ocultar la cuadrícula
+  setShowGrid: (show: boolean) => {
+    set({ showGrid: show });
+  },
+  
+  // Acción para mostrar/ocultar wireframe de zonas de efectos
+  setShowEffectZoneWireframe: (show: boolean) => {
+    set({ showEffectZoneWireframe: show });
+  },
+  
+  // Acción para mostrar/ocultar color de zonas de efectos
+  setShowEffectZoneColor: (show: boolean) => {
+    set({ showEffectZoneColor: show });
+  },
+  
+  // Acción para mostrar/ocultar zonas ocultas
+  setShowHiddenZones: (show: boolean) => {
+    set({ showHiddenZones: show });
+  },
+  
+  // Acción para bloquear la edición
+  lockEditing: () => {
+    set({ isEditingLocked: true, isAdminAuthenticated: false });
+  },
+  
+  // Acción para desbloquear la edición con contraseña
+  unlockEditing: (password: string) => {
+    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
+    if (password === ADMIN_PASSWORD) {
+      set({ isEditingLocked: false, isAdminAuthenticated: true });
+      return true;
+    }
+    return false;
+  },
+  
+  // Acción para autenticar como admin con contraseña
+  authenticateAdmin: (password: string) => {
+    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
+    if (password === ADMIN_PASSWORD) {
+      set({ isAdminAuthenticated: true });
+      return true;
+    }
+    return false;
+  },
 
   refreshAllEffects: () => {
     useEffectStore.getState().refreshAllEffects();
@@ -730,6 +880,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   // Acciones para objetos móviles - Delegadas al WorldStoreFacade
   addMobileObject: (position: [number, number, number]) => {
     const state = get();
+    
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     const activeGridId = state.activeGridId;
     
     if (!activeGridId) {
@@ -739,11 +896,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Crear objeto móvil usando el facade
     const newMobileObject = worldStoreFacade.createMobileObject(position);
 
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().addGlobalMobileObject(newMobileObject);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     const activeGrid = state.grids.get(activeGridId);
     if (activeGrid) {
       const updatedGrid = {
@@ -763,11 +920,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
     const state = get();
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    console.log('🔄 updateMobileObject called', { id, updates, hasMobileParams: !!updates.mobileParams, movementType: updates.mobileParams?.movementType });
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().updateGlobalMobileObject(id, updates);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -783,13 +948,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
           
           // Si hay mobileParams, hacer merge profundo para mantener todos los parámetros
           if (updates.mobileParams && currentObject.mobileParams) {
+            const mergedParams = {
+              ...currentObject.mobileParams,
+              ...updates.mobileParams,
+            };
+            console.log('✅ Merging mobileParams', { 
+              currentMovementType: currentObject.mobileParams.movementType, 
+              newMovementType: updates.mobileParams.movementType,
+              mergedMovementType: mergedParams.movementType 
+            });
             updatedObjects[objectIndex] = { 
               ...currentObject, 
               ...updates,
-              mobileParams: {
-                ...currentObject.mobileParams,
-                ...updates.mobileParams,
-              }
+              mobileParams: mergedParams,
             };
           } else {
             updatedObjects[objectIndex] = { ...currentObject, ...updates };
@@ -799,6 +970,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
             ...grid,
             mobileObjects: updatedObjects
           });
+          
+          // Sincronizar con useGridStore
+          useGridStore.setState({ grids: newGrids });
+          
+          // Si hay un proyecto cargado, sincronizar cambios con Firebase
+          if (state.currentProjectId) {
+            persistenceService.syncProjectChanges(state.currentProjectId);
+          }
+          
           break;
         }
       }
@@ -811,11 +991,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   removeMobileObject: (id: string) => {
     const state = get();
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().removeGlobalMobileObject(id);
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -847,11 +1033,11 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   updateMobileObjectPosition: (id: string, position: [number, number, number]) => {
     const state = get();
     
-    // Usar la acción global para sincronizar con Firestore
-    if (state.globalWorldConnected) {
+    // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
+    if (state.globalWorldConnected && !state.currentProjectId) {
       get().updateGlobalMobileObject(id, { position });
     } else {
-      // Fallback local si no hay conexión global
+      // Cambios locales (para proyectos guardados o modo local)
     set((state) => {
       const newGrids = new Map(state.grids);
       
@@ -919,6 +1105,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
 
   // Acciones para manipulación de cuadrículas - Delegadas al useGridStore
   createGrid: (position: [number, number, number], size: number = 20) => {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     useGridStore.getState().createGrid(position, size);
     
     // Sincronizar el estado local con el useGridStore
@@ -968,6 +1160,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   },
 
   deleteGrid: (gridId: string) => {
+    // Verificar si la edición está permitida
+    if (!get().canEdit()) {
+      alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
+      return;
+    }
+    
     useGridStore.getState().deleteGrid(gridId);
   },
 
@@ -981,7 +1179,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
 
   // Acción para establecer el proyecto actual
   setCurrentProjectId: (projectId: string | null) => {
-    set({ currentProjectId: projectId });
+    set({ 
+      currentProjectId: projectId,
+      // Resetear el estado de bloqueo cuando se cambia de proyecto
+      isEditingLocked: false,
+      isAdminAuthenticated: false
+    });
   },
 
   rotateGrid: (gridId: string, rotation: [number, number, number]) => {
@@ -1162,14 +1365,8 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         });
         
         // También inicializar objetos móviles (sin audio por ahora)
-        grid.mobileObjects.forEach(mobileObject => {
-          try {
-            console.log(`🎵 Objeto móvil ${mobileObject.id} detectado - sin inicialización de audio`);
-            // Los objetos móviles no tienen audio por ahora
-          } catch (error) {
-            console.error(`❌ Error procesando objeto móvil ${mobileObject.id}:`, error);
-          }
-        });
+        // Los objetos móviles no requieren inicialización de audio
+        // Log silenciado - no hay necesidad de loggear cada objeto móvil procesado
       });
       
       // Log silenciado - audio inicializado
@@ -1322,53 +1519,83 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       objectId, 
       updates, 
       isUpdatingFromFirestore: state.isUpdatingFromFirestore,
-      globalWorldConnected: state.globalWorldConnected
+      globalWorldConnected: state.globalWorldConnected,
+      hasAudioParams: !!updates.audioParams
     });
     
-    // IMPORTANTE: NO actualizar si viene de Firestore
-    // setGlobalStateFromFirestore ya actualiza el estado desde Firestore
-    if (state.isUpdatingFromFirestore) {
-      console.log('ℹ️ Ignorando updateGlobalSoundObject - update ya viene de Firestore');
+    // IMPORTANTE: Si viene de Firestore pero hay cambios en audioParams,
+    // necesitamos actualizar el AudioManager aunque NO actualicemos el estado local
+    // (porque setGlobalStateFromFirestore ya actualizó el estado)
+    // Solo skip si viene de Firestore Y NO hay audioParams para actualizar
+    const isFromFirestore = state.isUpdatingFromFirestore;
+    const hasAudioParamsUpdate = !!updates.audioParams;
+    
+    if (isFromFirestore && !hasAudioParamsUpdate) {
+      console.log('ℹ️ Ignorando updateGlobalSoundObject - update viene de Firestore y no hay audioParams');
       return;
     }
     
-    // Throttle para prevenir actualizaciones excesivas
-    const now = Date.now();
-    const lastUpdateTime = lastUpdateTimes.get(objectId) || 0;
-    if (now - lastUpdateTime < UPDATE_THROTTLE) {
-      console.log('⏸️ updateGlobalSoundObject throttled - demasiado frecuente');
-      return;
+    // Si viene de Firestore pero hay audioParams, continuar para actualizar el AudioManager
+    if (isFromFirestore && hasAudioParamsUpdate) {
+      console.log('🎵 Update viene de Firestore con audioParams - actualizando AudioManager pero no estado local');
     }
-    lastUpdateTimes.set(objectId, now);
     
-    // Actualizar el estado local inmediatamente
-    const newGrids = new Map(state.grids);
+    // Throttle para prevenir actualizaciones excesivas (solo si NO viene de Firestore con audioParams)
+    // Si viene de Firestore con audioParams, necesitamos actualizar el AudioManager sin throttling
+    if (!isFromFirestore || !hasAudioParamsUpdate) {
+      const now = Date.now();
+      const lastUpdateTime = lastUpdateTimes.get(objectId) || 0;
+      if (now - lastUpdateTime < UPDATE_THROTTLE) {
+        console.log('⏸️ updateGlobalSoundObject throttled - demasiado frecuente');
+        return;
+      }
+      lastUpdateTimes.set(objectId, now);
+    }
+    
     let updatedObject: SoundObject | null = null;
     let gridId: string | null = null;
     
-    // Buscar y actualizar el objeto en todas las cuadrículas
-    for (const [gId, grid] of newGrids) {
-      const objectIndex = grid.objects.findIndex(obj => obj.id === objectId);
-      if (objectIndex !== -1) {
-        const updatedObjects = [...grid.objects];
-        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
-        updatedObject = updatedObjects[objectIndex];
-        gridId = gId;
-        
-        newGrids.set(gId, {
-          ...grid,
-          objects: updatedObjects
-        });
-        break;
+    // Si viene de Firestore, obtener el objeto del estado actual (ya actualizado por setGlobalStateFromFirestore)
+    // Si NO viene de Firestore, actualizar el estado local
+    if (isFromFirestore && hasAudioParamsUpdate) {
+      // Obtener el objeto actualizado del estado (ya fue actualizado por setGlobalStateFromFirestore)
+      for (const [gId, grid] of state.grids) {
+        const object = grid.objects.find(obj => obj.id === objectId);
+        if (object) {
+          updatedObject = object;
+          gridId = gId;
+          console.log('📡 Obteniendo objeto desde estado (ya actualizado por Firestore)', { objectId, gridId });
+          break;
+        }
       }
+    } else {
+      // Actualizar el estado local inmediatamente
+      const newGrids = new Map(state.grids);
+      
+      // Buscar y actualizar el objeto en todas las cuadrículas
+      for (const [gId, grid] of newGrids) {
+        const objectIndex = grid.objects.findIndex(obj => obj.id === objectId);
+        if (objectIndex !== -1) {
+          const updatedObjects = [...grid.objects];
+          updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], ...updates };
+          updatedObject = updatedObjects[objectIndex];
+          gridId = gId;
+          
+          newGrids.set(gId, {
+            ...grid,
+            objects: updatedObjects
+          });
+          break;
+        }
+      }
+      
+      set({ grids: newGrids });
+      
+      // Sincronizar con useGridStore
+      useGridStore.setState({ grids: newGrids });
+      
+      console.log('✅ useWorldStore: Local state updated');
     }
-    
-    set({ grids: newGrids });
-    
-    // Sincronizar con useGridStore
-    useGridStore.setState({ grids: newGrids });
-    
-    console.log('✅ useWorldStore: Local state updated');
     
     // SIEMPRE actualizar el objeto de audio, tanto si viene de Firestore como si es local
     if (updatedObject && gridId) {
@@ -1380,9 +1607,17 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         console.log('🔧 useWorldStore: Updating position', updatedObject.position);
         audioManager.updateSoundPosition(objectId, updatedObject.position);
       }
-      if (updates.audioParams) {
-        console.log('🔧 useWorldStore: Updating audio params', updatedObject.audioParams);
-        audioManager.updateSoundParams(objectId, updatedObject.audioParams);
+      if (updates.audioParams || (isFromFirestore && hasAudioParamsUpdate)) {
+        // Si viene de Firestore, usar los audioParams completos del objeto actualizado
+        // (que ya incluye todos los parámetros actualizados desde Firestore)
+        // Si es una actualización local, usar los audioParams del objeto actualizado también
+        const audioParamsToUpdate = updatedObject.audioParams;
+        console.log('🔧 useWorldStore: Updating audio params', { 
+          audioParams: audioParamsToUpdate,
+          source: isFromFirestore ? 'Firestore' : 'Local',
+          objectId 
+        });
+        audioManager.updateSoundParams(objectId, audioParamsToUpdate);
         console.log('✅ useWorldStore: audioManager.updateSoundParams called');
       }
       
@@ -1869,13 +2104,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
         
         // Si hay mobileParams, hacer merge profundo para mantener todos los parámetros
         if (updates.mobileParams && currentObject.mobileParams) {
+          const mergedParams = {
+            ...currentObject.mobileParams,
+            ...updates.mobileParams,
+          };
+          console.log('✅ Global: Merging mobileParams', { 
+            currentMovementType: currentObject.mobileParams.movementType, 
+            newMovementType: updates.mobileParams.movementType,
+            mergedMovementType: mergedParams.movementType 
+          });
           updatedObjects[objectIndex] = { 
             ...currentObject, 
             ...updates,
-            mobileParams: {
-              ...currentObject.mobileParams,
-              ...updates.mobileParams,
-            }
+            mobileParams: mergedParams,
           };
         } else {
           updatedObjects[objectIndex] = { ...currentObject, ...updates };

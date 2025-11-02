@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface FMSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function FMSynthParameters({
   selectedObject,
   onParamChange
 }: FMSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function FMSynthParameters({
 
       {/* Harmonicity */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           HARMONICITY
+          <InfoTooltip content={t('parameterEditor.tooltips.harmonicity')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -57,8 +61,9 @@ export function FMSynthParameters({
 
       {/* Modulation Index */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           MODULATION_INDEX
+          <InfoTooltip content={t('parameterEditor.tooltips.modulationIndex')} />
         </label>
         <div className="flex items-center gap-3">
           <input

@@ -6,7 +6,7 @@ import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, Line
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
 
 // Tipos de movimiento disponibles
-export type MovementType = 'linear' | 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
+export type MovementType = 'circular' | 'polar' | 'random' | 'figure8' | 'spiral';
 
 // Interface para refs de líneas en React Three Fiber
 interface LineRef {
@@ -123,7 +123,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       movementType, 
       radius = 2, 
       speed = 1, 
-      direction = [1, 0, 0], 
       amplitude = 0.5, 
       frequency = 1, 
       randomSeed = 0, 
@@ -136,16 +135,6 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     const origin = spherePosition as [number, number, number];
     
     switch (movementType) {
-      case 'linear': {
-        const normalizedDirection = new Vector3(...direction).normalize();
-        const offset = normalizedDirection.multiplyScalar(time * speed);
-        return [
-          origin[0] + offset.x,
-          origin[1] + offset.y,
-          origin[2] + offset.z
-        ];
-      }
-      
       case 'circular': {
         const angle = time * speed;
         const cos = Math.cos(angle);
@@ -485,7 +474,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       )}
 
       {/* Indicador del radio de desplazamiento */}
-      {mobileParams.showRadiusIndicator && (
+      {mobileParams?.showRadiusIndicator === true && (
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
           <ringGeometry args={[mobileParams.radius * 0.8, mobileParams.radius * 1.2, 64]} />
           <meshBasicMaterial
@@ -498,7 +487,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       )}
 
       {/* Indicador del umbral de proximidad */}
-      {mobileParams.showProximityIndicator && (
+      {(mobileParams?.showProximityIndicator ?? true) === true && (
         <mesh>
           <sphereGeometry args={[mobileParams.proximityThreshold, 16, 16]} />
           <meshBasicMaterial

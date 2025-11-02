@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { type SoundObject, useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface AudioControlSectionProps {
   selectedObject: SoundObject;
 }
 
 export function AudioControlSection({ selectedObject }: AudioControlSectionProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="mb-6 relative">
       {/* Contenedor con borde complejo */}
@@ -46,16 +49,16 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
             </span>
           </div>
           <span className="text-xs font-mono text-white tracking-wider">
-            {selectedObject.type === 'cone' ? 'MEMBRANE_SYNTH' :
-             selectedObject.type === 'cube' ? 'AM_SYNTHESIS' :
-             selectedObject.type === 'sphere' ? 'FM_SYNTHESIS' :
-             selectedObject.type === 'cylinder' ? 'DUO_SYNTH' :
-             selectedObject.type === 'pyramid' ? 'MONO_SYNTH' :
-             selectedObject.type === 'icosahedron' ? 'METAL_SYNTH' :
-             selectedObject.type === 'plane' ? 'NOISE_SYNTH' :
-             selectedObject.type === 'torus' ? 'PLUCK_SYNTH' : 
-             selectedObject.type === 'dodecahedronRing' ? 'POLY_SYNTH' :
-             selectedObject.type === 'spiral' ? 'SAMPLER' : 'SOUND_OBJECT'}
+            {selectedObject.type === 'cone' ? t('parameterEditor.membraneSynth') :
+             selectedObject.type === 'cube' ? t('parameterEditor.amSynthesis') :
+             selectedObject.type === 'sphere' ? t('parameterEditor.fmSynthesis') :
+             selectedObject.type === 'cylinder' ? t('parameterEditor.duoSynth') :
+             selectedObject.type === 'pyramid' ? t('parameterEditor.monoSynth') :
+             selectedObject.type === 'icosahedron' ? t('parameterEditor.metalSynth') :
+             selectedObject.type === 'plane' ? t('parameterEditor.noiseSynth') :
+             selectedObject.type === 'torus' ? t('parameterEditor.pluckSynth') : 
+             selectedObject.type === 'dodecahedronRing' ? t('parameterEditor.polySynth') :
+             selectedObject.type === 'spiral' ? t('parameterEditor.sampler') : t('parameterEditor.soundObject')}
           </span>
         
         {/* Texto informativo específico para cada tipo */}
@@ -63,63 +66,63 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
               {selectedObject.audioParams.duration === Infinity 
-                ? 'CLICK_TO_TOGGLE_CONTINUOUS_AUDIO'
-                : 'HOLD_CLICK_ON_OBJECT_FOR_GATE_CONTROL'
+                ? t('parameterEditor.clickToToggleContinuousAudio')
+                : t('parameterEditor.holdClickOnObjectForGateControl')
               }
             </p>
           </div>
         ) : selectedObject.type === 'icosahedron' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_OBJECT_TO_PLAY
+              {t('parameterEditor.clickObjectToPlay')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              METALLIC_PERCUSSIVE_SOUND
+              {t('parameterEditor.metallicPercussiveSound')}
             </p>
           </div>
         ) : selectedObject.type === 'plane' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_OBJECT_TO_PLAY
+              {t('parameterEditor.clickObjectToPlay')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              PERCUSSIVE_NOISE_GENERATOR
+              {t('parameterEditor.percussiveNoiseGenerator')}
             </p>
           </div>
         ) : selectedObject.type === 'torus' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_OBJECT_TO_PLAY
+              {t('parameterEditor.clickObjectToPlay')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              PERCUSSIVE_STRING_INSTRUMENT
+              {t('parameterEditor.percussiveStringInstrument')}
             </p>
           </div>
         ) : selectedObject.type === 'dodecahedronRing' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_TO_TOGGLE_CONTINUOUS_CHORD
+              {t('parameterEditor.clickToToggleContinuousChord')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              POLYPHONIC_CHORD_INSTRUMENT
+              {t('parameterEditor.polyphonicChordInstrument')}
             </p>
           </div>
         ) : selectedObject.type === 'spiral' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_OBJECT_TO_PLAY
+              {t('parameterEditor.clickObjectToPlay')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              POLYPHONIC_PERCUSSIVE_SAMPLER
+              {t('parameterEditor.polyphonicPercussiveSampler')}
             </p>
           </div>
         ) : selectedObject.type === 'cone' ? (
           <div className="mt-2">
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              CLICK_OBJECT_TO_PLAY
+              {t('parameterEditor.clickObjectToPlay')}
             </p>
             <p className="text-xs font-mono text-white tracking-wider mt-1">
-              PERCUSSIVE_DRUM_SYNTHESIZER
+              {t('parameterEditor.percussiveDrumSynthesizer')}
             </p>
           </div>
         ) : (selectedObject.type as string) === 'icosahedron' ? (
@@ -141,12 +144,12 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
             </p>
           </div>
         ) : (
-         <div className="mt-2">
+           <div className="mt-2">
            <p className="text-xs font-mono text-white tracking-wider mt-1">
-             CONTINUOUS_AUDIO_CONTROL
+             {t('parameterEditor.continuousAudioControl')}
            </p>
            <p className="text-xs font-mono text-white tracking-wider mt-1">
-             DURATION: {(selectedObject.audioParams.duration || 1.0).toFixed(1)}S
+             {t('parameterEditor.duration')} {(selectedObject.audioParams.duration || 1.0).toFixed(1)}S
            </p>
          </div>
         )}
@@ -168,7 +171,7 @@ export function AudioControlSection({ selectedObject }: AudioControlSectionProps
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
-                {selectedObject.audioEnabled ? 'DEACTIVATE_CONTINUOUS_AUDIO' : 'ACTIVATE_CONTINUOUS_AUDIO'}
+                {selectedObject.audioEnabled ? t('parameterEditor.deactivateContinuousAudio') : t('parameterEditor.activateContinuousAudio')}
               </span>
             </button>
           </div>

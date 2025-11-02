@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface BitCrusherParamsProps {
   zone: EffectZone;
@@ -9,16 +11,26 @@ interface BitCrusherParamsProps {
 }
 
 export function BitCrusherParams({ zone, onEffectParamChange }: BitCrusherParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'bitCrusher') return null;
 
   return (
-    <div className="futuristic-param-container">
-      <h4 className="futuristic-label mb-3">BIT_CRUSHER_PARAMETERS</h4>
+    <div className="relative border border-white p-4 mb-8">
+      {/* Esquinas cortadas */}
+      <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
+      <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
+      <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
+      <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
+      
+      <h4 className="futuristic-label mb-3 text-white text-center">
+        {t('effects.bitCrusherParameters')}
+      </h4>
       
       {/* Bits */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          BITS
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.bits')}
+          <InfoTooltip content={t('effects.tooltips.bits')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -43,8 +55,9 @@ export function BitCrusherParams({ zone, onEffectParamChange }: BitCrusherParams
 
       {/* NormFreq */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          NORM_FREQUENCY
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.frecuenciaNormalizada')}
+          <InfoTooltip content={t('effects.tooltips.frecuenciaNormalizada')} />
         </label>
         <div className="flex items-center gap-3">
           <input

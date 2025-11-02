@@ -3,6 +3,7 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ReverbParamsProps {
   zone: EffectZone;
@@ -10,6 +11,7 @@ interface ReverbParamsProps {
 }
 
 export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'reverb') return null;
 
   return (
@@ -21,13 +23,13 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        REVERB_PARAMETERS
+        {t('effects.reverbParameters')}
       </h4>
 
       {/* Decay */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DECAY"
+          label={t('effects.decay')}
           value={zone?.effectParams.decay ?? 1.5}
           min={0}
           max={20}
@@ -36,13 +38,14 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
           disabled={zone?.isLocked}
           unit="S"
           displayValue={Number(zone?.effectParams.decay ?? 1.5).toFixed(1)}
+          tooltip={t('effects.tooltips.decay')}
         />
       </div>
 
       {/* Pre Delay */}
       <div className="mb-6">
         <FuturisticSlider
-          label="PRE_DELAY"
+          label={t('effects.preDelay')}
           value={zone?.effectParams.preDelay ?? 0.01}
           min={0}
           max={1}
@@ -51,6 +54,7 @@ export function ReverbParams({ zone, onEffectParamChange }: ReverbParamsProps) {
           disabled={zone?.isLocked}
           unit="S"
           displayValue={Number(zone?.effectParams.preDelay ?? 0.01).toFixed(2)}
+          tooltip={t('effects.tooltips.preDelay')}
         />
       </div>
     </div>

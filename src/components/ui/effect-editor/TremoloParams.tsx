@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface TremoloParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface TremoloParamsProps {
 }
 
 export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'tremolo') return null;
 
   return (
@@ -21,13 +24,13 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        TREMOLO_PARAMETERS
+        {t('effects.tremoloParameters')}
       </h4>
 
       {/* Frequency */}
       <div className="mb-6">
         <FuturisticSlider
-          label="FREQUENCY"
+          label={t('effects.frequency')}
           value={Number(zone?.effectParams.tremoloFrequency) || 4}
           min={0.1}
           max={20}
@@ -36,13 +39,14 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
           disabled={zone?.isLocked}
           unit="HZ"
           displayValue={Number(zone?.effectParams.tremoloFrequency ?? 4).toFixed(1)}
+          tooltip={t('effects.tooltips.frequency')}
         />
       </div>
 
       {/* Depth */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DEPTH"
+          label={t('effects.depth')}
           value={Number(zone?.effectParams.tremoloDepth) || 0.5}
           min={0}
           max={1}
@@ -51,13 +55,14 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.tremoloDepth ?? 0.5) * 100)}
+          tooltip={t('effects.tooltips.depth')}
         />
       </div>
 
       {/* Spread */}
       <div className="mb-6">
         <FuturisticSlider
-          label="SPREAD"
+          label={t('effects.spread')}
           value={Number(zone?.effectParams.tremoloSpread) || 0}
           min={0}
           max={180}
@@ -66,13 +71,15 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
           disabled={zone?.isLocked}
           unit="°"
           displayValue={zone?.effectParams.tremoloSpread ?? 0}
+          tooltip={t('effects.tooltips.spread')}
         />
       </div>
 
       {/* Wave Type */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WAVE_TYPE
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.waveType')}
+          <InfoTooltip content={t('effects.tooltips.waveType')} />
         </label>
         <div className="grid grid-cols-2 gap-2">
           {['sine', 'square', 'triangle', 'sawtooth'].map((type) => (
@@ -86,7 +93,7 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
                   : 'bg-black text-white border border-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              <span className="uppercase">{type}</span>
+              <span className="uppercase">{t(`effects.${type}`)}</span>
             </button>
           ))}
         </div>
@@ -94,8 +101,9 @@ export function TremoloParams({ zone, onEffectParamChange }: TremoloParamsProps)
 
       {/* Wet Mix */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WET_MIX
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.wetMix')}
+          <InfoTooltip content={t('effects.tooltips.wetMix')} />
         </label>
         <div className="flex items-center gap-3">
           <input

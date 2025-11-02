@@ -19,7 +19,7 @@ export function MobileObjectEditorWrapper({
     <div className="fixed right-0 top-0 h-full z-50 flex">
       {/* Panel principal futurista */}
       <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-        isPanelExpanded ? 'w-96' : 'w-0'
+        isPanelExpanded ? 'w-[480px]' : 'w-0'
       }`}>
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-10">

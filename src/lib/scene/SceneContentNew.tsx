@@ -548,6 +548,18 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
         if (isMobileObject) {
           const gizmoRef = mobileGizmoRefs.get(selectedEntityId);
           
+          // Verificar que el gizmo esté en el scene graph antes de adjuntar TransformControls
+          if (gizmoRef?.current) {
+            const gizmoObject = gizmoRef.current;
+            // Verificar que el objeto esté en el scene graph
+            if (!gizmoObject.uuid || !gizmoObject.type) {
+              return null;
+            }
+          } else {
+            // El gizmo aún no está montado
+            return null;
+          }
+          
           return (
             <>
               {/* Grupo auxiliar vacío en el centro del objeto móvil */}
@@ -578,10 +590,36 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
           );
         }
         
+        // Verificar que el objeto esté en el scene graph antes de adjuntar TransformControls
+        const entityRef = entityRefs.get(selectedEntityId);
+        if (!entityRef?.current) {
+          return null;
+        }
+        
+        const object = entityRef.current;
+        // Verificar que el objeto esté completamente inicializado
+        if (!object.uuid || !object.type) {
+          return null;
+        }
+        
+        // Verificar que el objeto esté en el scene graph:
+        // - Si tiene parent, verificar que el parent también esté inicializado
+        // - Si no tiene parent, debe ser la escena raíz (lo cual es válido en algunos casos)
+        const objectWithScene = object as { type?: string; isScene?: boolean; parent: typeof object.parent };
+        if (objectWithScene.parent === null && objectWithScene.type !== 'Scene' && !objectWithScene.isScene) {
+          // El objeto no tiene parent y no es la escena, probablemente no está en el scene graph aún
+          return null;
+        }
+        
+        // Si tiene parent, verificar que el parent también esté inicializado
+        if (object.parent && (!object.parent.uuid || !object.parent.type)) {
+          return null;
+        }
+        
         return (
           <TransformControls
             key={`${selectedEntityId}-${transformMode}`}
-            object={entityRefs.get(selectedEntityId)?.current || undefined}
+            object={entityRef.current}
             mode={transformMode}
             position={worldPosition}
             rotation={[0, 0, 0]}

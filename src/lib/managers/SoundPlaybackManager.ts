@@ -579,6 +579,9 @@ export class SoundPlaybackManager {
    * Helper para obtener un tiempo único para el triggerAttack de sonidos continuos
    */
   private getUniqueStartTime(): number {
+    if (typeof window === 'undefined') {
+      return 0;
+    }
     return Tone.now() + this.config.uniqueTimeOffset;
   }
 
@@ -588,6 +591,12 @@ export class SoundPlaybackManager {
   private parseDuration(duration: string | number): number {
     if (typeof duration === 'number') {
       return duration;
+    }
+
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined' || !Tone || !Tone.Transport) {
+      // Valor por defecto en caso de SSR
+      return 1;
     }
     
     // Convertir notación musical a segundos

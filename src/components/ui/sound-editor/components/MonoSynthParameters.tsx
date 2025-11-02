@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface MonoSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function MonoSynthParameters({
   selectedObject,
   onParamChange
 }: MonoSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function MonoSynthParameters({
 
       {/* Filter Base Frequency */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           FILTER_BASE_FREQ
+          <InfoTooltip content={t('parameterEditor.tooltips.filterBaseFreq')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -57,8 +61,9 @@ export function MonoSynthParameters({
 
       {/* Filter Octaves */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           FILTER_OCTAVES
+          <InfoTooltip content={t('parameterEditor.tooltips.filterOctaves')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -82,8 +87,9 @@ export function MonoSynthParameters({
 
       {/* Filter Q */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           FILTER_Q
+          <InfoTooltip content={t('parameterEditor.tooltips.filterQ')} />
         </label>
         <div className="flex items-center gap-3">
           <input

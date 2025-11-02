@@ -3,6 +3,7 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface FeedbackDelayParamsProps {
   zone: EffectZone;
@@ -10,6 +11,7 @@ interface FeedbackDelayParamsProps {
 }
 
 export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelayParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'feedbackDelay') return null;
 
   return (
@@ -21,13 +23,13 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        FEEDBACK_DELAY_PARAMETERS
+        {t('effects.feedbackDelayParameters')}
       </h4>
 
       {/* Delay Time */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DELAY_TIME"
+          label={t('effects.delayTime')}
           value={Number(zone?.effectParams.delayTime) ?? 0.3}
           min={0.1}
           max={1}
@@ -36,13 +38,14 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
           disabled={zone?.isLocked}
           unit="S"
           displayValue={(Number(zone?.effectParams.delayTime) || 0.3).toFixed(2)}
+          tooltip={t('effects.tooltips.delayTime')}
         />
       </div>
 
       {/* Feedback */}
       <div className="mb-6">
         <FuturisticSlider
-          label="FEEDBACK"
+          label={t('effects.feedback')}
           value={zone?.effectParams.feedback ?? 0.2}
           min={0}
           max={1}
@@ -51,6 +54,7 @@ export function FeedbackDelayParams({ zone, onEffectParamChange }: FeedbackDelay
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.feedback ?? 0.2) * 100)}
+          tooltip={t('effects.tooltips.feedback')}
         />
       </div>
     </div>

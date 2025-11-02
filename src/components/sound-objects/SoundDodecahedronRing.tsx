@@ -202,21 +202,6 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
           </group>
         )}
 
-        {/* Indicador de audio activo */}
-        {audioEnabled && (
-          <group>
-            {/* Anillo interior de audio activo */}
-            <mesh>
-              <ringGeometry args={[1.0, 1.2, 32]} />
-              <meshBasicMaterial
-                color="#10b981"
-                transparent
-                opacity={0.5}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          </group>
-        )}
       </group>
     );
   }

@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ChebyshevParamsProps {
   zone: EffectZone;
@@ -9,6 +11,7 @@ interface ChebyshevParamsProps {
 }
 
 export function ChebyshevParams({ zone, onEffectParamChange }: ChebyshevParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'chebyshev') return null;
 
   return (
@@ -20,13 +23,14 @@ export function ChebyshevParams({ zone, onEffectParamChange }: ChebyshevParamsPr
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        CHEBYSHEV_PARAMETERS
+        {t('effects.chebyshevParameters')}
       </h4>
 
       {/* Order */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          POLYNOMIAL_ORDER
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.polynomialOrder')}
+          <InfoTooltip content={t('effects.tooltips.polynomialOrder')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -51,11 +55,12 @@ export function ChebyshevParams({ zone, onEffectParamChange }: ChebyshevParamsPr
 
       {/* Oversample */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          OVERSAMPLING
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.oversampling')}
+          <InfoTooltip content={t('effects.tooltips.oversampling')} />
         </label>
         <div className="grid grid-cols-3 gap-2">
-          {['none', '2x', '4x'].map((type) => (
+          {(['none', '2x', '4x'] as const).map((type) => (
             <button
               key={type}
               onClick={() => onEffectParamChange('oversample', type)}
@@ -66,7 +71,7 @@ export function ChebyshevParams({ zone, onEffectParamChange }: ChebyshevParamsPr
                   : 'bg-black text-white border border-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              <span className="uppercase">{type}</span>
+              <span className="uppercase">{t(`effects.${type}`)}</span>
             </button>
           ))}
         </div>

@@ -182,18 +182,6 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
             />
           </mesh>
         )}
-
-        {/* Indicador de audio activo sin wireframe */}
-        {audioEnabled && (
-          <mesh>
-            <sphereGeometry args={[0.8, 8, 8]} />
-            <meshBasicMaterial
-              color="#10b981"
-              transparent
-              opacity={0.4}
-            />
-          </mesh>
-        )}
       </group>
     );
   }

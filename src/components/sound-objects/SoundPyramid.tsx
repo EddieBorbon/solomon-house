@@ -185,13 +185,6 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
           </mesh>
         )}
 
-        {/* Indicador de sonido activo (basado en isSoundPlaying, no en audioEnabled) */}
-        {isSoundPlaying && (
-          <mesh position={[0, -1.5, 0]}>
-            <ringGeometry args={[0.3, 0.4, 8]} />
-            <meshBasicMaterial color="#22c55e" />
-          </mesh>
-        )}
       </group>
     );
   }

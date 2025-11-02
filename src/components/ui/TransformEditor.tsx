@@ -138,7 +138,42 @@ export function TransformEditor() {
   };
 
   const roundToDecimals = (value: number, decimals: number = 2) => {
+    if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+      return 0;
+    }
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  };
+
+  // Helper para renderizar inputs de escala
+  const renderScaleInputs = () => {
+    const scaleInputs = [
+      { axis: 'X', color: 'bg-red-500', value: transformValues.scale[0] },
+      { axis: 'Y', color: 'bg-green-500', value: transformValues.scale[1] },
+      { axis: 'Z', color: 'bg-blue-500', value: transformValues.scale[2] }
+    ];
+    return scaleInputs.map(({ axis, color, value }, index) => {
+      const safeValue = (typeof value === 'number' && !isNaN(value)) ? value : 1;
+      const roundedValue = roundToDecimals(safeValue);
+      return (
+        <div key={axis} className="flex flex-col">
+          <div className="flex items-center gap-1 mb-1">
+            <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+            <span className="text-xs text-gray-400">{axis}</span>
+          </div>
+          <input
+            type="number"
+            step="0.1"
+            min="0.1"
+            value={isNaN(roundedValue) ? 1 : roundedValue}
+            onChange={(e) => {
+              const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
+              handleTransformChange('scale', index as 0 | 1 | 2, newValue);
+            }}
+            className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+          />
+        </div>
+      );
+    });
   };
 
   return (
@@ -175,24 +210,28 @@ export function TransformEditor() {
                   { axis: 'X', color: 'bg-red-500', value: transformValues.position[0] },
                   { axis: 'Y', color: 'bg-green-500', value: transformValues.position[1] },
                   { axis: 'Z', color: 'bg-blue-500', value: transformValues.position[2] }
-                ].map(({ axis, color, value }, index) => (
-                  <div key={axis} className="flex flex-col">
-                    <div className="flex items-center gap-1 mb-1">
-                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                      <span className="text-xs text-gray-400">{axis}</span>
+                ].map(({ axis, color, value }, index) => {
+                  const safeValue = (typeof value === 'number' && !isNaN(value)) ? value : 0;
+                  const roundedValue = roundToDecimals(safeValue);
+                  return (
+                    <div key={axis} className="flex flex-col">
+                      <div className="flex items-center gap-1 mb-1">
+                        <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                        <span className="text-xs text-gray-400">{axis}</span>
+                      </div>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={isNaN(roundedValue) ? 0 : roundedValue}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value) || 0;
+                          handleTransformChange('position', index as 0 | 1 | 2, newValue);
+                        }}
+                        className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      />
                     </div>
-                    <input
-                      type="number"
-                      step="0.1"
-                      value={roundToDecimals(value)}
-                      onChange={(e) => {
-                        const newValue = parseFloat(e.target.value) || 0;
-                        handleTransformChange('position', index as 0 | 1 | 2, newValue);
-                      }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -207,24 +246,28 @@ export function TransformEditor() {
                   { axis: 'X', color: 'bg-red-500', value: transformValues.rotation[0] },
                   { axis: 'Y', color: 'bg-green-500', value: transformValues.rotation[1] },
                   { axis: 'Z', color: 'bg-blue-500', value: transformValues.rotation[2] }
-                ].map(({ axis, color, value }, index) => (
-                  <div key={axis} className="flex flex-col">
-                    <div className="flex items-center gap-1 mb-1">
-                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                      <span className="text-xs text-gray-400">{axis}</span>
+                ].map(({ axis, color, value }, index) => {
+                  const safeValue = (typeof value === 'number' && !isNaN(value)) ? value : 0;
+                  const roundedValue = roundToDecimals(safeValue);
+                  return (
+                    <div key={axis} className="flex flex-col">
+                      <div className="flex items-center gap-1 mb-1">
+                        <div className={`w-2 h-2 ${color} rounded-sm`}></div>
+                        <span className="text-xs text-gray-400">{axis}</span>
+                      </div>
+                      <input
+                        type="number"
+                        step="1"
+                        value={isNaN(roundedValue) ? 0 : roundedValue}
+                        onChange={(e) => {
+                          const newValue = parseFloat(e.target.value) || 0;
+                          handleTransformChange('rotation', index as 0 | 1 | 2, newValue);
+                        }}
+                        className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
+                      />
                     </div>
-                    <input
-                      type="number"
-                      step="1"
-                      value={roundToDecimals(value)}
-                      onChange={(e) => {
-                        const newValue = parseFloat(e.target.value) || 0;
-                        handleTransformChange('rotation', index as 0 | 1 | 2, newValue);
-                      }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -235,29 +278,7 @@ export function TransformEditor() {
                 {t('transformEditor.scale')}
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {[
-                  { axis: 'X', color: 'bg-red-500', value: transformValues.scale[0] },
-                  { axis: 'Y', color: 'bg-green-500', value: transformValues.scale[1] },
-                  { axis: 'Z', color: 'bg-blue-500', value: transformValues.scale[2] }
-                ].map(({ axis, color, value }, index) => (
-                  <div key={axis} className="flex flex-col">
-                    <div className="flex items-center gap-1 mb-1">
-                      <div className={`w-2 h-2 ${color} rounded-sm`}></div>
-                      <span className="text-xs text-gray-400">{axis}</span>
-                    </div>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0.1"
-                      value={roundToDecimals(value)}
-                      onChange={(e) => {
-                        const newValue = Math.max(0.1, parseFloat(e.target.value) || 1);
-                        handleTransformChange('scale', index as 0 | 1 | 2, newValue);
-                      }}
-                      className="w-full px-2 py-1 text-xs bg-gray-800 border border-gray-600 rounded text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/20"
-                    />
-                  </div>
-                ))}
+                {renderScaleInputs()}
               </div>
             </div>
 

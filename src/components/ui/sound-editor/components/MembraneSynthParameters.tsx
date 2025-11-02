@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface MembraneSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function MembraneSynthParameters({
   selectedObject,
   onParamChange
 }: MembraneSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function MembraneSynthParameters({
 
       {/* Pitch Decay */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           PITCH_DECAY
+          <InfoTooltip content={t('parameterEditor.tooltips.pitchDecay')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -57,8 +61,9 @@ export function MembraneSynthParameters({
 
       {/* Octaves */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           OCTAVES
+          <InfoTooltip content={t('parameterEditor.tooltips.octaves')} />
         </label>
         <div className="flex items-center gap-3">
           <input

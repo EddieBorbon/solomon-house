@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface PitchShiftParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface PitchShiftParamsProps {
 }
 
 export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'pitchShift') return null;
 
   return (
@@ -21,13 +24,13 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        PITCH_SHIFT_PARAMETERS
+        {t('effects.pitchShiftParameters')}
       </h4>
 
       {/* Pitch Shift */}
       <div className="mb-6">
         <FuturisticSlider
-          label="PITCH_SHIFT"
+          label={t('effects.pitchShift')}
           value={Number(zone?.effectParams.pitchShift) || 0}
           min={-12}
           max={12}
@@ -36,13 +39,14 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
           disabled={zone?.isLocked}
           unit="ST"
           displayValue={Number(zone?.effectParams.pitchShift ?? 0).toFixed(1)}
+          tooltip={t('effects.tooltips.pitchShift')}
         />
       </div>
 
       {/* Window Size */}
       <div className="mb-6">
         <FuturisticSlider
-          label="WINDOW_SIZE"
+          label={t('effects.windowSize')}
           value={Number(zone?.effectParams.windowSize) || 0.02}
           min={0.01}
           max={0.1}
@@ -51,13 +55,14 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
           disabled={zone?.isLocked}
           unit="S"
           displayValue={Number(zone?.effectParams.windowSize ?? 0.02).toFixed(3)}
+          tooltip={t('effects.tooltips.windowSize')}
         />
       </div>
 
       {/* Delay Time */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DELAY_TIME"
+          label={t('effects.delayTime')}
           value={Number(zone?.effectParams.delayTime) || 0}
           min={0}
           max={0.1}
@@ -66,13 +71,15 @@ export function PitchShiftParams({ zone, onEffectParamChange }: PitchShiftParams
           disabled={zone?.isLocked}
           unit="S"
           displayValue={(Number(zone?.effectParams.delayTime) || 0).toFixed(3)}
+          tooltip={t('effects.tooltips.delayTime')}
         />
       </div>
 
       {/* Feedback */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FEEDBACK
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.feedback')}
+          <InfoTooltip content={t('effects.tooltips.feedback')} />
         </label>
         <div className="flex items-center gap-3">
           <input

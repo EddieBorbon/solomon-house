@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type MobileObject } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { InfoTooltip } from '../InfoTooltip';
 
 interface MobileMovementControlsProps {
   mobileObject: MobileObject;
@@ -12,6 +14,7 @@ export function MobileMovementControls({
   mobileObject,
   onParamChange
 }: MobileMovementControlsProps) {
+  const { t } = useLanguage();
   const { mobileParams } = mobileObject;
   
   // Valores por defecto para evitar errores de undefined
@@ -43,11 +46,14 @@ export function MobileMovementControls({
         <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
         
         <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-          002_CONTROL_ACTIVACION
+          {t('mobileObject.controlActivacion')}
         </h4>
         
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono text-gray-400">ACTIVO:</span>
+          <span className="text-xs font-mono text-gray-400 flex items-center">
+            {t('mobileObject.activo')}
+            <InfoTooltip content={t('mobileObject.tooltips.isActive')} />
+          </span>
           <button
             onClick={() => onParamChange('isActive', !safeParams.isActive)}
             className={`relative border border-white px-3 py-1 text-xs font-mono transition-all duration-300 ${
@@ -56,7 +62,7 @@ export function MobileMovementControls({
                 : 'text-white hover:bg-white hover:text-black'
             }`}
           >
-            {safeParams.isActive ? 'ON' : 'OFF'}
+            {safeParams.isActive ? t('mobileObject.on') : t('mobileObject.off')}
           </button>
         </div>
       </div>
@@ -69,12 +75,13 @@ export function MobileMovementControls({
         <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
         <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
         
-        <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-          003_TIPO_MOVIMIENTO
+        <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider flex items-center">
+          {t('mobileObject.tipoMovimiento')}
+          <InfoTooltip content={t('mobileObject.tooltips.movementType')} />
         </h4>
         
         <div className="space-y-2">
-          {(['linear', 'circular', 'polar', 'random', 'figure8', 'spiral'] as const).map((type) => (
+          {(['circular', 'polar', 'random', 'figure8', 'spiral'] as const).map((type) => (
             <button
               key={type}
               onClick={() => onParamChange('movementType', type)}
@@ -84,7 +91,7 @@ export function MobileMovementControls({
                   : 'border-white text-white hover:bg-white hover:text-black'
               }`}
             >
-              {type.toUpperCase()}
+              {t(`mobileObject.${type}`)}
             </button>
           ))}
         </div>
@@ -99,13 +106,16 @@ export function MobileMovementControls({
         <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
         
         <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-          004_PARAMETROS_BASICOS
+          {t('mobileObject.parametrosBasicos')}
         </h4>
         
         <div className="space-y-3">
           {/* Radio */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">RADIO:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.radio')}
+              <InfoTooltip content={t('mobileObject.tooltips.radius')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -124,7 +134,10 @@ export function MobileMovementControls({
 
           {/* Velocidad */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">VELOCIDAD:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.velocidad')}
+              <InfoTooltip content={t('mobileObject.tooltips.speed')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -143,7 +156,10 @@ export function MobileMovementControls({
 
           {/* Umbral de proximidad */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">PROXIMIDAD:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.proximidad')}
+              <InfoTooltip content={t('mobileObject.tooltips.proximityThreshold')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -162,7 +178,10 @@ export function MobileMovementControls({
 
           {/* Altura del movimiento vertical */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">ALTURA:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.altura')}
+              <InfoTooltip content={t('mobileObject.tooltips.height')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -181,7 +200,10 @@ export function MobileMovementControls({
 
           {/* Velocidad del movimiento vertical */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">VEL_ALTURA:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.velAltura')}
+              <InfoTooltip content={t('mobileObject.tooltips.heightSpeed')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -201,46 +223,6 @@ export function MobileMovementControls({
       </div>
 
       {/* Parámetros específicos según el tipo de movimiento */}
-      {safeParams.movementType === 'linear' && (
-        <div className="relative border border-white p-4">
-          {/* Decoraciones de esquina */}
-          <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-white"></div>
-          <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-white"></div>
-          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
-          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
-          
-          <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-            005_DIRECCION_LINEAL
-          </h4>
-          
-          <div className="space-y-2">
-            {(['X', 'Y', 'Z'] as const).map((axis, index) => (
-              <div key={axis} className="flex items-center justify-between">
-                <span className="text-xs font-mono text-gray-400">{axis}:</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="-1"
-                    max="1"
-                    step="0.1"
-                    value={safeParams.direction[index]}
-                    onChange={(e) => {
-                      const newDirection = [...safeParams.direction] as [number, number, number];
-                      newDirection[index] = parseFloat(e.target.value);
-                      onParamChange('direction', newDirection);
-                    }}
-                    className="w-20"
-                  />
-                  <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                    {safeParams.direction[index].toFixed(1)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {safeParams.movementType === 'polar' && (
         <div className="relative border border-white p-4">
           {/* Decoraciones de esquina */}
@@ -250,13 +232,16 @@ export function MobileMovementControls({
           <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
           
           <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-            005_PARAMETROS_POLARES
+            {t('mobileObject.parametrosPolares')}
           </h4>
           
           <div className="space-y-3">
             {/* Amplitud */}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-gray-400">AMPLITUD:</span>
+              <span className="text-xs font-mono text-gray-400 flex items-center">
+                {t('mobileObject.amplitud')}
+                <InfoTooltip content={t('mobileObject.tooltips.amplitude')} />
+              </span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -275,7 +260,10 @@ export function MobileMovementControls({
 
             {/* Frecuencia */}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-gray-400">FRECUENCIA:</span>
+              <span className="text-xs font-mono text-gray-400 flex items-center">
+                {t('mobileObject.frecuencia')}
+                <InfoTooltip content={t('mobileObject.tooltips.frequency')} />
+              </span>
               <div className="flex items-center gap-2">
                 <input
                   type="range"
@@ -304,11 +292,14 @@ export function MobileMovementControls({
           <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
           
           <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-            005_SEMILLA_ALEATORIA
+            {t('mobileObject.semillaAleatoria')}
           </h4>
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">SEMILLA:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.semilla')}
+              <InfoTooltip content={t('mobileObject.tooltips.randomSeed')} />
+            </span>
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -336,12 +327,15 @@ export function MobileMovementControls({
         <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
         
         <h4 className="text-sm font-mono font-bold text-white mb-3 tracking-wider">
-          006_INDICADORES_VISUALES
+          {t('mobileObject.indicadoresVisuales')}
         </h4>
         
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">RADIO:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.radio')}
+              <InfoTooltip content={t('mobileObject.tooltips.showRadiusIndicator')} />
+            </span>
             <button
               onClick={() => onParamChange('showRadiusIndicator', !safeParams.showRadiusIndicator)}
               className={`relative border border-white px-3 py-1 text-xs font-mono transition-all duration-300 ${
@@ -350,12 +344,15 @@ export function MobileMovementControls({
                   : 'text-white hover:bg-white hover:text-black'
               }`}
             >
-              {safeParams.showRadiusIndicator ? 'ON' : 'OFF'}
+              {safeParams.showRadiusIndicator ? t('mobileObject.on') : t('mobileObject.off')}
             </button>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">PROXIMIDAD:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.proximidad')}
+              <InfoTooltip content={t('mobileObject.tooltips.showProximityIndicator')} />
+            </span>
             <button
               onClick={() => onParamChange('showProximityIndicator', !safeParams.showProximityIndicator)}
               className={`relative border border-white px-3 py-1 text-xs font-mono transition-all duration-300 ${
@@ -364,12 +361,15 @@ export function MobileMovementControls({
                   : 'text-white hover:bg-white hover:text-black'
               }`}
             >
-              {safeParams.showProximityIndicator ? 'ON' : 'OFF'}
+              {safeParams.showProximityIndicator ? t('mobileObject.on') : t('mobileObject.off')}
             </button>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-gray-400">ESFERA:</span>
+            <span className="text-xs font-mono text-gray-400 flex items-center">
+              {t('mobileObject.esfera')}
+              <InfoTooltip content={t('mobileObject.tooltips.showSphere')} />
+            </span>
             <button
               onClick={() => onParamChange('showSphere', !safeParams.showSphere)}
               className={`relative border border-white px-3 py-1 text-xs font-mono transition-all duration-300 ${
@@ -378,7 +378,7 @@ export function MobileMovementControls({
                   : 'text-white hover:bg-white hover:text-black'
               }`}
             >
-              {safeParams.showSphere ? 'ON' : 'OFF'}
+              {safeParams.showSphere ? t('mobileObject.on') : t('mobileObject.off')}
             </button>
           </div>
         </div>

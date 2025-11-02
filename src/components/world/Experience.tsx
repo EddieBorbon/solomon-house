@@ -10,8 +10,6 @@ import { CameraControlsManager } from './CameraControlsManager';
 import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
-import { RealtimeSyncStatus } from '../ui/RealtimeSyncStatus';
-import { useWorldStore } from '../../state/useWorldStore';
 import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
 import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
@@ -69,7 +67,6 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 
 export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
-  const { currentProjectId } = useWorldStore();
   
   // Estado para mostrar advertencia de cuota
   const [showQuotaWarning, setShowQuotaWarning] = React.useState(false);
@@ -107,8 +104,6 @@ export function Experience() {
         onCleanup={handleCleanup}
       />
       
-      {/* Estado de sincronización en tiempo real */}
-      <RealtimeSyncStatus projectId={currentProjectId} />
       
       <Canvas
         camera={{

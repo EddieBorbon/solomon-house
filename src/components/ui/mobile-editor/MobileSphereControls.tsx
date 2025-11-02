@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type MobileObject } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface MobileSphereControlsProps {
   mobileObject: MobileObject;
@@ -16,6 +17,7 @@ export function MobileSphereControls({
   onResetSphereTransform,
   roundToDecimals
 }: MobileSphereControlsProps) {
+  const { t } = useLanguage();
   const spherePosition = mobileObject.mobileParams.spherePosition || [0, 0, 0];
   const sphereRotation = mobileObject.mobileParams.sphereRotation || [0, 0, 0];
   const sphereScale = mobileObject.mobileParams.sphereScale || [1, 1, 1];
@@ -30,20 +32,20 @@ export function MobileSphereControls({
       
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-mono font-bold text-white tracking-wider">
-          008_TRANSFORMACIONES_ESFERA
+          {t('mobileObject.transformacionesEsfera')}
         </h4>
         <button
           onClick={onResetSphereTransform}
           className="relative border border-white px-2 py-1 text-xs font-mono text-white hover:bg-white hover:text-black transition-all duration-300"
         >
-          RESET
+          {t('parameterEditor.reset')}
         </button>
       </div>
 
       {/* Posición de la esfera */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          POSICION ESFERA
+          {t('mobileObject.posicionEsfera')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -71,7 +73,7 @@ export function MobileSphereControls({
       {/* Rotación de la esfera */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ROTACION ESFERA
+          {t('mobileObject.rotacionEsfera')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -99,7 +101,7 @@ export function MobileSphereControls({
       {/* Escala de la esfera */}
       <div>
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ESCALA ESFERA
+          {t('mobileObject.escalaEsfera')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (

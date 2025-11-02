@@ -168,9 +168,6 @@ export class MobileObjectManager {
     const { movementType, speed, radius, centerPosition, direction, axis, amplitude, frequency } = mobileParams;
 
     switch (movementType) {
-      case 'linear':
-        return this.calculateLinearMovement(mobileObject, deltaTime, speed, direction);
-      
       case 'circular':
         return this.calculateCircularMovement(mobileObject, deltaTime, speed, radius, centerPosition);
       
@@ -189,25 +186,6 @@ export class MobileObjectManager {
       default:
         return mobileObject.position;
     }
-  }
-
-  /**
-   * Calcula movimiento lineal
-   */
-  private calculateLinearMovement(
-    mobileObject: MobileObject,
-    deltaTime: number,
-    speed: number,
-    direction: [number, number, number]
-  ): [number, number, number] {
-    const [x, y, z] = mobileObject.position;
-    const [dx, dy, dz] = direction;
-    
-    return [
-      x + dx * speed * deltaTime,
-      y + dy * speed * deltaTime,
-      z + dz * speed * deltaTime,
-    ];
   }
 
   /**

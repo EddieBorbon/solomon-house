@@ -19,8 +19,14 @@ export function PersistencePanel() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [showAdminDialog, setShowAdminDialog] = useState(false);
+  const [adminDialogAction, setAdminDialogAction] = useState<'lock' | 'unlock' | 'delete' | null>(null);
+  const [adminDialogProjectId, setAdminDialogProjectId] = useState<string | null>(null);
+  const [adminDialogPassword, setAdminDialogPassword] = useState('');
 
-  const { grids, currentProjectId, setCurrentProjectId } = useWorldStore();
+  const { grids, currentProjectId, setCurrentProjectId, isEditingLocked, isAdminAuthenticated, unlockEditing, setGlobalWorldConnected } = useWorldStore();
   const { isConnected } = useRealtimeSync(currentProjectId);
   const { t } = useLanguage();
 
@@ -55,6 +61,10 @@ export function PersistencePanel() {
 
     try {
       setIsLoading(true);
+      // Desactivar el mundo global antes de guardar el proyecto
+      const { setGlobalWorldConnected } = useWorldStore.getState();
+      setGlobalWorldConnected(false);
+      
       const projectId = await persistenceService.saveCurrentWorldAsProject(
         projectName.trim(),
         projectDescription.trim() || undefined
@@ -76,6 +86,10 @@ export function PersistencePanel() {
   const handleLoadProject = async (projectId: string) => {
     try {
       setIsLoading(true);
+      // Desactivar el mundo global antes de cargar el proyecto
+      const { setGlobalWorldConnected } = useWorldStore.getState();
+      setGlobalWorldConnected(false);
+      
       await persistenceService.loadProject(projectId);
       setCurrentProjectId(projectId);
       setShowLoadDialog(false);
@@ -136,6 +150,9 @@ export function PersistencePanel() {
 
     try {
       setIsLoading(true);
+      // Desactivar el mundo global antes de crear el proyecto
+      setGlobalWorldConnected(false);
+      
       // Crear un proyecto vacío (con una cuadrícula vacía)
       const projectId = await persistenceService.createEmptyProject(
         projectName.trim(),
@@ -158,6 +175,7 @@ export function PersistencePanel() {
     }
   };
 
+
   const getGridCount = () => {
     return grids.size;
   };
@@ -168,6 +186,51 @@ export function PersistencePanel() {
       totalObjects += grid.objects.length + grid.mobileObjects.length + grid.effectZones.length;
     }
     return totalObjects;
+  };
+  
+  const handleAdminAction = async () => {
+    if (!adminDialogProjectId || !adminDialogAction) return;
+    
+    try {
+      setIsLoading(true);
+      let success = false;
+      
+      if (adminDialogAction === 'lock') {
+        success = await persistenceService.lockProject(adminDialogProjectId, adminDialogPassword);
+      } else if (adminDialogAction === 'unlock') {
+        success = await persistenceService.unlockProject(adminDialogProjectId, adminDialogPassword);
+      } else if (adminDialogAction === 'delete') {
+        success = await persistenceService.deleteProjectWithPassword(adminDialogProjectId, adminDialogPassword);
+      }
+      
+      if (success) {
+        await loadProjects(); // Recargar la lista de proyectos
+        
+        // Si se eliminó el proyecto y era el actual, limpiar currentProjectId
+        if (adminDialogAction === 'delete' && currentProjectId === adminDialogProjectId) {
+          setCurrentProjectId(null);
+        }
+        
+        setShowAdminDialog(false);
+        setAdminDialogAction(null);
+        setAdminDialogProjectId(null);
+        setAdminDialogPassword('');
+        
+        alert(
+          adminDialogAction === 'lock' ? 'Proyecto bloqueado correctamente.' :
+          adminDialogAction === 'unlock' ? 'Proyecto desbloqueado correctamente.' :
+          'Proyecto eliminado correctamente.'
+        );
+      } else {
+        alert('Contraseña incorrecta.');
+        setAdminDialogPassword('');
+      }
+    } catch (error) {
+      alert('Error al realizar la acción. Inténtalo de nuevo.');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -257,17 +320,19 @@ export function PersistencePanel() {
           </div>
 
           {currentProjectId && (
-            <button
-              onClick={handleUpdateProject}
-              disabled={isLoading}
-              className="relative w-full border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
-            >
-              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
-              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
-                <span>🔄</span>
-                <span>{t('persistence.update')}</span>
-              </span>
-            </button>
+            <>
+              <button
+                onClick={handleUpdateProject}
+                disabled={isLoading || (isEditingLocked && !isAdminAuthenticated)}
+                className="relative w-full border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
+              >
+                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
+                <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
+                  <span>🔄</span>
+                  <span>{t('persistence.update')}</span>
+                </span>
+              </button>
+            </>
           )}
 
           {/* Diálogo de guardar */}
@@ -350,11 +415,18 @@ export function PersistencePanel() {
                     {projects.map((project) => (
                       <div
                         key={project.id}
-                        className="p-3 border border-gray-600 hover:border-white transition-colors"
+                        className={`p-3 border transition-colors ${
+                          project.isLocked ? 'border-red-600' : 'border-gray-600 hover:border-white'
+                        }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex-1">
-                            <div className="text-white font-mono text-sm tracking-wider">{project.name}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-white font-mono text-sm tracking-wider">{project.name}</div>
+                              {project.isLocked && (
+                                <span className="text-xs text-red-400 font-mono">🔒 BLOQUEADO</span>
+                              )}
+                            </div>
                             {project.description && (
                               <div className="text-xs text-gray-400 font-mono">{project.description}</div>
                             )}
@@ -362,14 +434,48 @@ export function PersistencePanel() {
                               {project.grids.length} {t('persistence.grids')}
                             </div>
                           </div>
-                          <div className="flex space-x-1">
+                          <div className="flex flex-col gap-1">
                             <button
                               onClick={() => handleLoadProject(project.id)}
-                              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
+                              disabled={project.isLocked}
+                              className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black disabled:border-gray-600 disabled:text-gray-500 transition-all duration-300 group"
                             >
-                              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
+                              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white group-disabled:border-gray-700 transition-colors duration-300"></div>
                               <span className="relative text-xs font-mono tracking-wider">{t('controls.load')}</span>
                             </button>
+                            {/* Botones de admin */}
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => {
+                                  setAdminDialogAction(project.isLocked ? 'unlock' : 'lock');
+                                  setAdminDialogProjectId(project.id);
+                                  setAdminDialogPassword('');
+                                  setShowAdminDialog(true);
+                                }}
+                                className={`relative border px-1 py-0.5 text-xs font-mono tracking-wider transition-all duration-300 group ${
+                                  project.isLocked
+                                    ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black'
+                                    : 'border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black'
+                                }`}
+                                title={project.isLocked ? 'Desbloquear proyecto (Admin)' : 'Bloquear proyecto (Admin)'}
+                              >
+                                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                                <span className="relative z-10">{project.isLocked ? '🔓' : '🔒'}</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setAdminDialogAction('delete');
+                                  setAdminDialogProjectId(project.id);
+                                  setAdminDialogPassword('');
+                                  setShowAdminDialog(true);
+                                }}
+                                className="relative border border-red-500 px-1 py-0.5 text-red-400 hover:bg-red-500 hover:text-black transition-all duration-300 group text-xs"
+                                title="Eliminar proyecto (Admin)"
+                              >
+                                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                                <span className="relative z-10">🗑️</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -445,6 +551,154 @@ export function PersistencePanel() {
                     <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                     <span className="relative text-xs font-mono tracking-wider">{t('persistence.cancel')}</span>
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Diálogo para desbloquear edición con contraseña */}
+          {showUnlockDialog && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="relative bg-black border border-white p-6 w-80">
+                {/* Decoraciones de esquina */}
+                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
+                
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">DESBLOQUEAR EDICIÓN</h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">Contraseña de Administrador</label>
+                    <input
+                      type="password"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const success = unlockEditing(adminPassword);
+                          if (success) {
+                            setShowUnlockDialog(false);
+                            setAdminPassword('');
+                            alert('Edición desbloqueada correctamente.');
+                          } else {
+                            alert('Contraseña incorrecta.');
+                            setAdminPassword('');
+                          }
+                        }
+                      }}
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="Ingresa la contraseña"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const success = unlockEditing(adminPassword);
+                        if (success) {
+                          setShowUnlockDialog(false);
+                          setAdminPassword('');
+                          alert('Edición desbloqueada correctamente.');
+                        } else {
+                          alert('Contraseña incorrecta.');
+                          setAdminPassword('');
+                        }
+                      }}
+                      className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
+                    >
+                      <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                      <span className="relative text-xs font-mono tracking-wider">DESBLOQUEAR</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowUnlockDialog(false);
+                        setAdminPassword('');
+                      }}
+                      className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group"
+                    >
+                      <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                      <span className="relative text-xs font-mono tracking-wider">CANCELAR</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Diálogo para acciones de admin (bloquear/desbloquear/eliminar proyecto) */}
+          {showAdminDialog && adminDialogAction && adminDialogProjectId && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+              <div className="relative bg-black border border-white p-6 w-80">
+                {/* Decoraciones de esquina */}
+                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
+                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
+                
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">
+                  {adminDialogAction === 'lock' && 'BLOQUEAR PROYECTO'}
+                  {adminDialogAction === 'unlock' && 'DESBLOQUEAR PROYECTO'}
+                  {adminDialogAction === 'delete' && 'ELIMINAR PROYECTO'}
+                </h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">
+                      Contraseña de Administrador
+                    </label>
+                    <input
+                      type="password"
+                      value={adminDialogPassword}
+                      onChange={(e) => setAdminDialogPassword(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAdminAction();
+                        }
+                      }}
+                      className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
+                      placeholder="Ingresa la contraseña"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  {adminDialogAction === 'delete' && (
+                    <div className="p-2 border border-red-500 bg-red-500/10">
+                      <p className="text-xs text-red-400 font-mono">
+                        ⚠️ Esta acción eliminará permanentemente el proyecto. No se puede deshacer.
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAdminAction}
+                      className={`relative flex-1 border px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group text-xs font-mono tracking-wider ${
+                        adminDialogAction === 'delete' ? 'border-red-500' : 'border-white'
+                      }`}
+                    >
+                      <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                      <span className="relative">
+                        {adminDialogAction === 'lock' && 'BLOQUEAR'}
+                        {adminDialogAction === 'unlock' && 'DESBLOQUEAR'}
+                        {adminDialogAction === 'delete' && 'ELIMINAR'}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowAdminDialog(false);
+                        setAdminDialogAction(null);
+                        setAdminDialogProjectId(null);
+                        setAdminDialogPassword('');
+                      }}
+                      className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group text-xs font-mono tracking-wider"
+                    >
+                      <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
+                      <span className="relative">CANCELAR</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

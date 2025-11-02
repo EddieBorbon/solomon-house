@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface FrequencyShifterParamsProps {
   zone: EffectZone;
@@ -9,6 +11,7 @@ interface FrequencyShifterParamsProps {
 }
 
 export function FrequencyShifterParams({ zone, onEffectParamChange }: FrequencyShifterParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'frequencyShifter') return null;
 
   return (
@@ -20,13 +23,14 @@ export function FrequencyShifterParams({ zone, onEffectParamChange }: FrequencyS
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        FREQUENCY_SHIFTER_PARAMETERS
+        {t('effects.frequencyShifterParameters')}
       </h4>
 
       {/* Frequency Shift */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FREQUENCY_SHIFT
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.frequencyShift')}
+          <InfoTooltip content={t('effects.tooltips.frequency')} />
         </label>
         <div className="flex items-center gap-3">
           <input

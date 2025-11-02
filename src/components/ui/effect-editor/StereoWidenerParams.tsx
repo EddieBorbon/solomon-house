@@ -3,6 +3,7 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface StereoWidenerParamsProps {
   zone: EffectZone;
@@ -10,6 +11,7 @@ interface StereoWidenerParamsProps {
 }
 
 export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidenerParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'stereoWidener') return null;
 
   return (
@@ -21,13 +23,13 @@ export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidener
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        STEREO_WIDENER_PARAMETERS
+        {t('effects.stereoWidenerParameters')}
       </h4>
 
       {/* Width */}
       <div className="mb-6">
         <FuturisticSlider
-          label="STEREO_WIDTH"
+          label={t('effects.stereoWidth')}
           value={Number(zone?.effectParams.width) || 1}
           min={0}
           max={2}
@@ -35,13 +37,14 @@ export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidener
           onChange={(value) => onEffectParamChange('width', value)}
           disabled={zone?.isLocked}
           displayValue={Number(zone?.effectParams.width ?? 1).toFixed(2)}
+          tooltip={t('effects.tooltips.stereoWidth')}
         />
       </div>
 
       {/* Wet Mix */}
       <div className="mb-6">
         <FuturisticSlider
-          label="WET_MIX"
+          label={t('effects.wetMix')}
           value={Number(zone?.effectParams.wet) || 0.5}
           min={0}
           max={1}
@@ -50,6 +53,7 @@ export function StereoWidenerParams({ zone, onEffectParamChange }: StereoWidener
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.wet ?? 0.5) * 100)}
+          tooltip={t('effects.tooltips.wetMix')}
         />
       </div>
     </div>

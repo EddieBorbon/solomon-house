@@ -36,11 +36,11 @@ export const useSelectionStore = create<SelectionState & SelectionActions>((set,
   // Acciones de selección
   selectEntity: (id: string | null) => {
     
-    set((state) => ({
+    set({
       selectedEntityId: id,
-      // Resetear el modo de transformación si no hay entidad seleccionada
-      transformMode: id === null ? 'translate' : state.transformMode,
-    }));
+      // Siempre resetear a 'translate' cuando se selecciona una entidad para que aparezca el gizmo de mover por defecto
+      transformMode: 'translate',
+    });
 
   },
 

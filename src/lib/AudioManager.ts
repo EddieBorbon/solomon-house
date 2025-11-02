@@ -609,6 +609,17 @@ export class AudioManager {
     playbackDebugInfo: object;
     parameterDebugInfo: object;
   } {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return {
+        contextState: 'suspended',
+        soundSourcesCount: 0,
+        soundSourceIds: [],
+        contextDebugInfo: {},
+        playbackDebugInfo: {},
+        parameterDebugInfo: {},
+      };
+    }
     return {
       contextState: Tone.context.state,
       soundSourcesCount: this.soundSources.size,

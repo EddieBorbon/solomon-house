@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface DuoSynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function DuoSynthParameters({
   selectedObject,
   onParamChange
 }: DuoSynthParametersProps) {
+  const { t } = useLanguage();
   
   return (
     <div className="relative border border-white p-4 mb-4">
@@ -32,8 +35,9 @@ export function DuoSynthParameters({
 
       {/* Harmonicity */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           HARMONICITY
+          <InfoTooltip content={t('parameterEditor.tooltips.harmonicity')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -57,8 +61,9 @@ export function DuoSynthParameters({
 
       {/* Velocidad de Vibrato */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           VIBRATO_RATE
+          <InfoTooltip content={t('parameterEditor.tooltips.vibratoRate')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -82,8 +87,9 @@ export function DuoSynthParameters({
 
       {/* Cantidad de Vibrato */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           VIBRATO_AMOUNT
+          <InfoTooltip content={t('parameterEditor.tooltips.vibratoAmount')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -107,8 +113,9 @@ export function DuoSynthParameters({
 
       {/* Attack */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           ATTACK
+          <InfoTooltip content={t('parameterEditor.tooltips.attack')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -132,8 +139,9 @@ export function DuoSynthParameters({
 
       {/* Release */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           RELEASE
+          <InfoTooltip content={t('parameterEditor.tooltips.release')} />
         </label>
         <div className="flex items-center gap-3">
           <input

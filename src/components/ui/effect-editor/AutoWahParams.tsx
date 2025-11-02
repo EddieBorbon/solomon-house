@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface AutoWahParamsProps {
   zone: EffectZone;
@@ -9,6 +11,7 @@ interface AutoWahParamsProps {
 }
 
 export function AutoWahParams({ zone, onEffectParamChange }: AutoWahParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'autoWah') return null;
 
   return (
@@ -20,13 +23,14 @@ export function AutoWahParams({ zone, onEffectParamChange }: AutoWahParamsProps)
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        AUTO_WAH_PARAMETERS
+        {t('effects.autoWahParameters')}
       </h4>
 
       {/* Sensitivity */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          SENSITIVITY
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.sensitivity')}
+          <InfoTooltip content={t('effects.tooltips.sensitivity')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -51,8 +55,9 @@ export function AutoWahParams({ zone, onEffectParamChange }: AutoWahParamsProps)
 
       {/* Base Frequency */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          BASE_FREQUENCY
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.baseFrequency')}
+          <InfoTooltip content={t('effects.tooltips.baseFrequency')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -77,8 +82,9 @@ export function AutoWahParams({ zone, onEffectParamChange }: AutoWahParamsProps)
 
       {/* Octaves */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          OCTAVES
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.octaves')}
+          <InfoTooltip content={t('effects.tooltips.octaves')} />
         </label>
         <div className="flex items-center gap-3">
           <input

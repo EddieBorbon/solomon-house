@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface VibratoParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface VibratoParamsProps {
 }
 
 export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'vibrato') return null;
 
   return (
@@ -21,13 +24,13 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        VIBRATO_PARAMETERS
+        {t('effects.vibratoParameters')}
       </h4>
 
       {/* Frequency */}
       <div className="mb-6">
         <FuturisticSlider
-          label="FREQUENCY"
+          label={t('effects.frequency')}
           value={Number(zone?.effectParams.vibratoFrequency) || 4}
           min={0.1}
           max={20}
@@ -36,13 +39,14 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
           disabled={zone?.isLocked}
           unit="HZ"
           displayValue={Number(zone?.effectParams.vibratoFrequency ?? 4).toFixed(1)}
+          tooltip={t('effects.tooltips.frequency')}
         />
       </div>
 
       {/* Depth */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DEPTH"
+          label={t('effects.depth')}
           value={Number(zone?.effectParams.vibratoDepth) || 0.5}
           min={0}
           max={1}
@@ -51,13 +55,15 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.vibratoDepth ?? 0.5) * 100)}
+          tooltip={t('effects.tooltips.depth')}
         />
       </div>
 
       {/* Wave Type */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WAVE_TYPE
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.waveType')}
+          <InfoTooltip content={t('effects.tooltips.waveType')} />
         </label>
         <div className="grid grid-cols-2 gap-2">
           {['sine', 'square', 'triangle', 'sawtooth'].map((type) => (
@@ -71,7 +77,7 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
                   : 'bg-black text-white border border-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              <span className="uppercase">{type}</span>
+              <span className="uppercase">{t(`effects.${type}`)}</span>
             </button>
           ))}
         </div>
@@ -79,8 +85,9 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
 
       {/* Max Delay */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          MAX_DELAY
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.maxDelay')}
+          <InfoTooltip content={t('effects.tooltips.maxDelay')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -105,8 +112,9 @@ export function VibratoParams({ zone, onEffectParamChange }: VibratoParamsProps)
 
       {/* Wet Mix */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          WET_MIX
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.wetMix')}
+          <InfoTooltip content={t('effects.tooltips.wetMix')} />
         </label>
         <div className="flex items-center gap-3">
           <input

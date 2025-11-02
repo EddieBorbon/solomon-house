@@ -34,6 +34,7 @@ export function EffectZoneContent({
         zone={zone}
         onRemove={onRemove}
         onToggleLock={onToggleLock}
+        onUpdateZone={onUpdateEffectZone}
       />
 
       {/* Controles de parámetros del efecto */}

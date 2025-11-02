@@ -3,6 +3,8 @@
 import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface PolySynthParametersProps {
   selectedObject: SoundObject;
@@ -17,6 +19,7 @@ export function PolySynthParameters({
   selectedObject,
   onParamChange
 }: PolySynthParametersProps) {
+  const { t } = useLanguage();
   
   // Mapa de acordes disponibles
   const chordMap: { [key: string]: string[] } = {
@@ -44,8 +47,9 @@ export function PolySynthParameters({
 
       {/* Tipo de Acorde */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           CHORD_TYPE (NOTES_TO_PLAY)
+          <InfoTooltip content={t('parameterEditor.tooltips.chord')} />
         </label>
         <select
           value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4", "B4"])}
@@ -71,8 +75,9 @@ export function PolySynthParameters({
 
       {/* Release */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           RELEASE
+          <InfoTooltip content={t('parameterEditor.tooltips.release')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -96,8 +101,9 @@ export function PolySynthParameters({
 
       {/* Curve */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           CURVE
+          <InfoTooltip content={t('parameterEditor.tooltips.curve')} />
         </label>
         <select
           value={selectedObject.audioParams.curve || 'linear'}
@@ -116,8 +122,9 @@ export function PolySynthParameters({
 
       {/* Harmonicity */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           HARMONICITY
+          <InfoTooltip content={t('parameterEditor.tooltips.harmonicity')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -141,8 +148,9 @@ export function PolySynthParameters({
 
       {/* Modulation Index */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           MODULATION_INDEX
+          <InfoTooltip content={t('parameterEditor.tooltips.modulationIndex')} />
         </label>
         <div className="flex items-center gap-3">
           <input
@@ -166,8 +174,9 @@ export function PolySynthParameters({
 
       {/* Attack */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
           ATTACK
+          <InfoTooltip content={t('parameterEditor.tooltips.attack')} />
         </label>
         <div className="flex items-center gap-3">
           <input

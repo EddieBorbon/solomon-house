@@ -40,7 +40,7 @@ export function firebaseToGrid(firebaseGrid: FirebaseGrid): Grid {
       radius: obj.mobileParams?.radius || 5,
       speed: obj.mobileParams?.speed || 1,
       centerPosition: obj.mobileParams?.centerPosition || [0, 0, 0],
-      movementType: obj.mobileParams?.movementType || 'linear'
+      movementType: obj.mobileParams?.movementType || 'circular'
     }
   }));
 
@@ -157,6 +157,58 @@ export class PersistenceService {
         throw new Error('Proyecto no encontrado');
       }
 
+      // IMPORTANTE: Detener todos los sonidos del mundo global antes de cargar el proyecto
+      // Esto previene el sonido residual del mundo global
+      console.log('🛑 Deteniendo todos los sonidos del mundo global antes de cargar proyecto');
+      try {
+        const { audioManager } = await import('../lib/AudioManager');
+        
+        // Obtener el estado actual antes de limpiar para tener los IDs
+        const currentState = useWorldStore.getState();
+        const allObjectIds: string[] = [];
+        
+        // Recolectar todos los IDs de objetos del mundo global
+        for (const grid of currentState.grids.values()) {
+          for (const object of grid.objects) {
+            allObjectIds.push(object.id);
+          }
+        }
+        
+        console.log(`🛑 Encontrados ${allObjectIds.length} objetos sonoros del mundo global para detener`);
+        
+        // Detener todos los sonidos (incluyendo sonidos continuos)
+        // stopSound detiene cualquier tipo de sonido, incluyendo continuos
+        allObjectIds.forEach(objectId => {
+          try {
+            audioManager.stopSound(objectId);
+          } catch {
+            // Ignorar errores si el sonido no existe o ya está detenido
+          }
+        });
+        
+        // Remover todas las fuentes de sonido del mundo global
+        // removeSoundSource detiene el sonido si está sonando y remueve la fuente
+        allObjectIds.forEach(objectId => {
+          try {
+            audioManager.removeSoundSource(objectId);
+          } catch {
+            // Ignorar errores si la fuente ya fue removida
+          }
+        });
+        
+        // Limpiar recursos de efectos y managers (pero sin remover las fuentes nuevas que se crearán)
+        // Solo limpiar conexiones de efectos, no todas las fuentes ya que ya las removimos
+        try {
+          audioManager.cleanup();
+        } catch {
+          // Ignorar errores en cleanup
+        }
+        
+        console.log('✅ Todos los sonidos del mundo global detenidos y removidos');
+      } catch (error) {
+        console.error('❌ Error deteniendo sonidos del mundo global:', error);
+        // Continuar de todos modos para cargar el proyecto
+      }
 
       // Convertir las cuadrículas de Firebase al formato del store
       const grids = new Map<string, Grid>();
@@ -167,14 +219,95 @@ export class PersistenceService {
       }
 
 
-      // Actualizar el store con los datos cargados
+      // IMPORTANTE: Reemplazar completamente el estado al cargar un proyecto
+      // Esto asegura que no se mezclen datos del mundo global con el proyecto
+      const currentState = useWorldStore.getState();
       useWorldStore.setState({
-        grids,
+        ...currentState,
+        grids, // Reemplazar completamente las cuadrículas
         activeGridId: project.activeGridId,
         currentGridCoordinates: project.activeGridId ? 
           grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
-          [0, 0, 0]
+          [0, 0, 0],
+        // Asegurar que el mundo global esté desactivado
+        globalWorldConnected: false,
+        // Usar el estado de bloqueo del proyecto (si está bloqueado, no se puede editar)
+        isEditingLocked: project.isLocked || false,
+        isAdminAuthenticated: false,
+        // Resetear la selección y el modo de transformación al cargar un proyecto
+        // Esto asegura que no haya selecciones inválidas de otros mundos
+        selectedEntityId: null,
+        transformMode: 'translate'
       });
+      
+      // También resetear en useSelectionStore si existe
+      try {
+        const { useSelectionStore } = await import('../stores/useSelectionStore');
+        if (useSelectionStore && useSelectionStore.getState) {
+          useSelectionStore.getState().clearSelection();
+        }
+      } catch {
+        // Si no existe useSelectionStore, ignorar el error
+      }
+
+      // Inicializar audio para los objetos del proyecto cargado
+      setTimeout(async () => {
+        console.log('🎵 Inicializando audio para objetos del proyecto cargado');
+        try {
+          const { audioManager } = await import('../lib/AudioManager');
+          
+          // Asegurar que el contexto de audio esté iniciado
+          if (!audioManager.isContextStarted()) {
+            console.log('🎵 Iniciando contexto de audio...');
+            await audioManager.startContext();
+          }
+          
+          const state = useWorldStore.getState();
+          let initializedCount = 0;
+          
+          // Crear todas las fuentes de sonido
+          for (const grid of state.grids.values()) {
+            for (const object of grid.objects) {
+              try {
+                // Crear fuente de sonido si no existe
+                if (!audioManager.getSoundSourceState(object.id)) {
+                  audioManager.createSoundSource(
+                    object.id,
+                    object.type,
+                    object.audioParams || {
+                      frequency: 440,
+                      waveform: 'sine',
+                      volume: 0.3
+                    },
+                    object.position
+                  );
+                  
+                  console.log(`✅ Fuente de sonido creada para objeto ${object.id} (tipo: ${object.type})`);
+                }
+                
+                // Iniciar sonido continuo si está habilitado
+                if (object.audioEnabled) {
+                  // Pequeño delay para asegurar que la fuente esté lista
+                  await new Promise(resolve => setTimeout(resolve, 10));
+                  audioManager.startContinuousSound(object.id, object.audioParams || {
+                    frequency: 440,
+                    waveform: 'sine',
+                    volume: 0.3
+                  });
+                  initializedCount++;
+                  console.log(`🔊 Audio iniciado para objeto ${object.id}`);
+                }
+              } catch (error) {
+                console.error(`❌ Error inicializando audio para objeto ${object.id}:`, error);
+              }
+            }
+          }
+          
+          console.log(`✅ Audio inicializado para ${initializedCount} objetos del proyecto`);
+        } catch (error) {
+          console.error('❌ Error general inicializando audio:', error);
+        }
+      }, 300); // Delay para asegurar que el estado se haya actualizado completamente
 
     } catch (error) {
       throw error;
@@ -236,6 +369,14 @@ export class PersistenceService {
     try {
       const state = useWorldStore.getState();
       
+      // IMPORTANTE: Solo actualizar si el proyecto actual coincide con el que se está actualizando
+      // Esto previene que se actualice un proyecto incorrecto si hay un cambio de contexto
+      if (state.currentProjectId !== projectId) {
+        console.warn(`⚠️ Intento de actualizar proyecto ${projectId} pero el proyecto actual es ${state.currentProjectId}`);
+        // No hacer nada si el proyecto actual no coincide
+        return;
+      }
+      
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
       
@@ -270,64 +411,283 @@ export class PersistenceService {
       throw error;
     }
   }
+  
+  // Bloquear un proyecto individual (requiere contraseña de admin)
+  async lockProject(projectId: string, password: string): Promise<boolean> {
+    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
+    if (password !== ADMIN_PASSWORD) {
+      return false;
+    }
+    
+    try {
+      await firebaseService.updateProject(projectId, { isLocked: true });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  // Desbloquear un proyecto individual (requiere contraseña de admin)
+  async unlockProject(projectId: string, password: string): Promise<boolean> {
+    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
+    if (password !== ADMIN_PASSWORD) {
+      return false;
+    }
+    
+    try {
+      await firebaseService.updateProject(projectId, { isLocked: false });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
+  // Eliminar un proyecto con contraseña de admin
+  async deleteProjectWithPassword(projectId: string, password: string): Promise<boolean> {
+    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
+    if (password !== ADMIN_PASSWORD) {
+      return false;
+    }
+    
+    try {
+      await firebaseService.deleteProject(projectId);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   // Sincronizar automáticamente los cambios con Firebase
-  startAutoSync(projectId: string): () => void {
-    
-    const unsubscribe = firebaseService.subscribeToProject(projectId, (project) => {
-      if (project) {
-        
-        // Convertir las cuadrículas de Firebase al formato del store
-        const grids = new Map<string, Grid>();
-        
-        for (const firebaseGrid of project.grids) {
-          const grid = firebaseToGrid(firebaseGrid);
-          grids.set(grid.id, grid);
-        }
+  // Variable para rastrear si estamos actualizando desde Firebase (evitar bucles)
+  private isUpdatingFromFirestore = false;
+  private updateDebounceTimers = new Map<string, NodeJS.Timeout>();
+  private readonly DEBOUNCE_DELAY = 500; // ms - Delay para sincronización
 
-        // Actualizar el store con los datos sincronizados
-        // Usar setState con una función para evitar bucles
-        useWorldStore.setState((currentState) => {
-          // Solo actualizar si realmente hay cambios
-          const currentGrids = currentState.grids;
-          let hasChanges = false;
+  startAutoSync(projectId: string): () => void {
+    const previousGridsRef = { current: null as Map<string, Grid> | null };
+    
+    const unsubscribe = firebaseService.subscribeToProject(projectId, async (project) => {
+      if (project && !this.isUpdatingFromFirestore) {
+        // Marcar que estamos actualizando desde Firebase
+        this.isUpdatingFromFirestore = true;
+        
+        try {
+          // Convertir las cuadrículas de Firebase al formato del store
+          const grids = new Map<string, Grid>();
           
-          // Verificar si hay cambios en las cuadrículas
-          if (currentGrids.size !== grids.size) {
-            hasChanges = true;
-          } else {
-            for (const [id, grid] of grids) {
-              const currentGrid = currentGrids.get(id);
-              if (!currentGrid || JSON.stringify(currentGrid) !== JSON.stringify(grid)) {
-                hasChanges = true;
-                break;
+          for (const firebaseGrid of project.grids) {
+            const grid = firebaseToGrid(firebaseGrid);
+            grids.set(grid.id, grid);
+          }
+
+          // Obtener grids anteriores para comparar
+          const previousGrids = previousGridsRef.current;
+          const currentState = useWorldStore.getState();
+          const currentGrids = currentState.grids;
+
+          // Actualizar el store con los datos sincronizados
+          // Usar setState con una función para evitar bucles
+          useWorldStore.setState((state) => {
+            // Solo actualizar si realmente hay cambios
+            let hasChanges = false;
+            
+            // Verificar si hay cambios en las cuadrículas
+            if (currentGrids.size !== grids.size) {
+              hasChanges = true;
+            } else {
+              for (const [id, grid] of grids) {
+                const currentGrid = currentGrids.get(id);
+                if (!currentGrid || JSON.stringify(currentGrid) !== JSON.stringify(grid)) {
+                  hasChanges = true;
+                  break;
+                }
               }
             }
-          }
-          
-          if (!hasChanges) {
-            return currentState;
-          }
-          
-          
-          // Marcar que estamos actualizando desde Firebase para evitar bucles
+            
+            if (!hasChanges) {
+              return state;
+            }
+            
+            // Guardar grids anteriores para la próxima comparación
+            previousGridsRef.current = new Map(grids);
+            
+            return {
+              ...state,
+              grids,
+              activeGridId: project.activeGridId,
+              currentGridCoordinates: project.activeGridId ? 
+                grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
+                [0, 0, 0]
+            };
+          });
+
+          // IMPORTANTE: Detectar cambios en audioParams y actualizar AudioManager
+          // Similar a como se hace en useGlobalWorldSync
+          // Usar setTimeout para asegurar que el estado se haya actualizado primero
           setTimeout(() => {
-            // Resetear la bandera después de un tiempo
-          }, 1000);
+            if (previousGrids) {
+              // Comparar objetos entre grids anteriores y nuevos para detectar cambios en audioParams
+              for (const [gridId, newGrid] of grids) {
+                const previousGrid = previousGrids.get(gridId);
+                
+                if (previousGrid) {
+                  // Detectar cambios en objetos sonoros
+                  for (const newObject of newGrid.objects) {
+                    const previousObject = previousGrid.objects.find(obj => obj.id === newObject.id);
+                    
+                    if (previousObject) {
+                      // Comparar audioParams de manera más robusta (similar a useGlobalWorldSync)
+                      const previousParams = JSON.stringify(previousObject.audioParams);
+                      const newParams = JSON.stringify(newObject.audioParams);
+                      
+                      // También comparar audioEnabled
+                      const audioEnabledChanged = previousObject.audioEnabled !== newObject.audioEnabled;
+                      
+                      if (previousParams !== newParams || audioEnabledChanged) {
+                        console.log(`🎵 Cambio en audioParams detectado para objeto ${newObject.id} en proyecto ${projectId}`);
+                        
+                        // Actualizar AudioManager con los nuevos parámetros
+                        // Importar AudioManager dinámicamente para evitar dependencias circulares
+                        import('../lib/AudioManager').then(({ audioManager }) => {
+                          // Verificar si la fuente de sonido existe
+                          if (audioManager.getSoundSourceState(newObject.id)) {
+                            // Actualizar parámetros de audio
+                            audioManager.updateSoundParams(newObject.id, newObject.audioParams);
+                            console.log(`✅ AudioManager actualizado para objeto ${newObject.id}`);
+                            
+                            // Si cambió audioEnabled, actualizar el estado
+                            if (audioEnabledChanged) {
+                              if (newObject.audioEnabled) {
+                                audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+                              } else {
+                                audioManager.stopSound(newObject.id);
+                              }
+                            }
+                          } else {
+                            // Si no existe, crear la fuente de sonido
+                            audioManager.createSoundSource(
+                              newObject.id,
+                              newObject.type,
+                              newObject.audioParams,
+                              newObject.position
+                            );
+                            
+                            // Si el objeto tiene audio habilitado, iniciar el sonido
+                            if (newObject.audioEnabled) {
+                              audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+                            }
+                            
+                            console.log(`✅ Fuente de sonido creada y actualizada para objeto ${newObject.id}`);
+                          }
+                        }).catch(error => {
+                          console.error(`❌ Error importando AudioManager para objeto ${newObject.id}:`, error);
+                        });
+                      }
+                    } else {
+                      // Nuevo objeto - crear fuente de sonido si no existe
+                      import('../lib/AudioManager').then(({ audioManager }) => {
+                        if (!audioManager.getSoundSourceState(newObject.id)) {
+                          audioManager.createSoundSource(
+                            newObject.id,
+                            newObject.type,
+                            newObject.audioParams,
+                            newObject.position
+                          );
+                          
+                          if (newObject.audioEnabled) {
+                            audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+                          }
+                          
+                          console.log(`✅ Nueva fuente de sonido creada para objeto ${newObject.id}`);
+                        }
+                      }).catch(error => {
+                        console.error(`❌ Error importando AudioManager para nuevo objeto ${newObject.id}:`, error);
+                      });
+                    }
+                  }
+                } else {
+                  // Nueva cuadrícula - inicializar audio para todos los objetos
+                  for (const newObject of newGrid.objects) {
+                    import('../lib/AudioManager').then(({ audioManager }) => {
+                      if (!audioManager.getSoundSourceState(newObject.id)) {
+                        audioManager.createSoundSource(
+                          newObject.id,
+                          newObject.type,
+                          newObject.audioParams,
+                          newObject.position
+                        );
+                        
+                        if (newObject.audioEnabled) {
+                          audioManager.startContinuousSound(newObject.id, newObject.audioParams);
+                        }
+                      }
+                    }).catch(error => {
+                      console.error(`❌ Error importando AudioManager para objeto ${newObject.id}:`, error);
+                    });
+                  }
+                }
+              }
+            } else {
+              // Primera carga - inicializar audio para todos los objetos
+              for (const grid of grids.values()) {
+                for (const object of grid.objects) {
+                  import('../lib/AudioManager').then(({ audioManager }) => {
+                    if (!audioManager.getSoundSourceState(object.id)) {
+                      audioManager.createSoundSource(
+                        object.id,
+                        object.type,
+                        object.audioParams,
+                        object.position
+                      );
+                      
+                      if (object.audioEnabled) {
+                        audioManager.startContinuousSound(object.id, object.audioParams);
+                      }
+                    }
+                  }).catch(error => {
+                    console.error(`❌ Error importando AudioManager para objeto ${object.id}:`, error);
+                  });
+                }
+              }
+            }
+          }, 150); // Delay para asegurar que el estado se haya actualizado
           
-          return {
-            ...currentState,
-            grids,
-            activeGridId: project.activeGridId,
-            currentGridCoordinates: project.activeGridId ? 
-              grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
-              [0, 0, 0]
-          };
-        });
+        } finally {
+          // Resetear la bandera después de un breve delay para evitar bucles
+          setTimeout(() => {
+            this.isUpdatingFromFirestore = false;
+          }, 100);
+        }
       }
     });
 
     return unsubscribe;
+  }
+
+  // Función para sincronizar cambios locales con Firebase (con debounce)
+  async syncProjectChanges(projectId: string): Promise<void> {
+    if (!projectId || this.isUpdatingFromFirestore) return;
+
+    // Cancelar sincronización previa pendiente
+    const existingTimer = this.updateDebounceTimers.get(projectId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    // Programar nueva sincronización
+    const timer = setTimeout(async () => {
+      try {
+        this.isUpdatingFromFirestore = true;
+        await this.updateProject(projectId);
+      } catch (error) {
+        console.error('Error sincronizando cambios del proyecto:', error);
+      } finally {
+        this.isUpdatingFromFirestore = false;
+        this.updateDebounceTimers.delete(projectId);
+      }
+    }, this.DEBOUNCE_DELAY);
+
+    this.updateDebounceTimers.set(projectId, timer);
   }
 
   // Detener la sincronización automática

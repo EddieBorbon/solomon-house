@@ -5,6 +5,11 @@ export function useAudioListener() {
   // Configurar la espacialización 3D inicial de Tone.js
   
   useEffect(() => {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined' || !Tone || !Tone.context) {
+      return;
+    }
+
     try {
       // Verificar que el contexto de audio esté funcionando
       if (Tone.context.state !== 'running') {

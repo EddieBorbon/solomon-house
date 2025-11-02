@@ -47,6 +47,7 @@ export interface FirebaseProject {
   description?: string;
   grids: FirebaseGrid[];
   activeGridId: string | null;
+  isLocked?: boolean; // Estado de bloqueo individual del proyecto
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

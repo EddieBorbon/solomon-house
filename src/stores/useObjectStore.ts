@@ -192,9 +192,11 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Determinar si el objeto debe tener audio habilitado por defecto
     // Los objetos percusivos (icosahedron, torus, spiral, pyramid, cone) no deberían tener audio continuo
+    // Los objetos básicos (cube, sphere, cylinder) también tienen audio desactivado por defecto
     // El plane (NoiseSynth) puede tener sonido continuo
-    const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone'].includes(type);
-    const defaultAudioEnabled = !isPercussiveObject;
+    const objectsWithoutAudio = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone', 'cube', 'sphere', 'cylinder'];
+    const isObjectWithoutAudio = objectsWithoutAudio.includes(type);
+    const defaultAudioEnabled = !isObjectWithoutAudio;
     
     // Los objetos personalizados NO deben tener audio por defecto - el usuario programará la síntesis
     const isCustomObject = type === 'custom';
@@ -222,7 +224,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
           newObject.position
         );
         
-        // Solo iniciar el sonido continuo si no es un objeto percusivo
+        // Solo iniciar el sonido continuo si el objeto tiene audio habilitado por defecto
         if (defaultAudioEnabled) {
           audioManager.startContinuousSound(newObject.id, newObject.audioParams);
         }

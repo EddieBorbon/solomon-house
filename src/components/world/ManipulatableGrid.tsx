@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Grid, Text } from '@react-three/drei';
+import { Grid } from '@react-three/drei';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
@@ -165,19 +165,6 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
             side={2}
           />
         </mesh>
-      )}
-      
-      {/* Texto de identificación en hover */}
-      {isHovered && (
-        <Text
-          position={[0, 1, 0]}
-          fontSize={0.5}
-          color="#ffaa00"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {grid.id === '0,0,0' ? 'Cuadrícula Principal' : `Cuadrícula ${grid.id.slice(0, 8)}...`}
-        </Text>
       )}
     </group>
   );

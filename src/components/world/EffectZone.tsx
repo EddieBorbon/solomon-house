@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { EffectZone as EffectZoneType } from '../../state/useWorldStore';
+import { EffectZone as EffectZoneType, useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
 interface EffectZoneProps {
@@ -14,6 +14,14 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
     const groupRef = React.useRef<THREE.Group | null>(null);
     const isDraggingRef = React.useRef(false);
     const lastControlledPositionRef = React.useRef<[number, number, number] | null>(null);
+    
+    // Obtener el estado de mostrar wireframe y color desde las propiedades individuales de la zona
+    // Si no están definidas, usar true por defecto
+    const showWireframe = zone.showWireframe !== undefined ? zone.showWireframe : true;
+    const showColor = zone.showColor !== undefined ? zone.showColor : true;
+    
+    // Obtener el estado global para mostrar zonas ocultas (ANTES de cualquier return)
+    const showHiddenZones = useWorldStore((state) => state.showHiddenZones);
     
     // Actualizar posición solo cuando NO está siendo arrastrado
     React.useEffect(() => {
@@ -98,6 +106,14 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
       onSelect(zone.id);
     };
 
+    // Verificar si la zona está oculta (tanto wireframe como color desactivados)
+    const isHidden = !showWireframe && !showColor;
+    
+    // Si la zona está oculta pero no se deben mostrar zonas ocultas, no renderizar nada
+    if (isHidden && !showHiddenZones) {
+      return null;
+    }
+
     // Colores según el tipo de efecto
     const getBaseColor = () => {
       switch (zone.type) {
@@ -148,7 +164,7 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
       const material = (
         <meshStandardMaterial
           color={zone.isLocked ? lockedColor : baseColor}
-          wireframe
+          wireframe={showWireframe}
           transparent
           opacity={0.8}
           emissive={zone.isLocked ? lockedColor : baseColor}
@@ -196,11 +212,11 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
         scale={zone.scale}
         onClick={handleClick}
       >
-        {/* Geometría principal de la zona de efecto (solo wireframe) */}
-        {renderGeometry()}
+        {/* Geometría principal de la zona de efecto - solo visible si showColor es true O si está oculta y se deben mostrar zonas ocultas */}
+        {(showColor || (isHidden && showHiddenZones)) && renderGeometry()}
 
-        {/* Campo de fuerza/jaula cuando está bloqueada */}
-        {zone.isLocked && (
+        {/* Campo de fuerza/jaula cuando está bloqueada - solo visible si showColor es true (no para zonas ocultas) */}
+        {showColor && !isHidden && zone.isLocked && (
           <mesh>
             {zone.shape === 'cube' ? (
               <boxGeometry args={[2.2, 2.2, 2.2]} />
@@ -209,7 +225,7 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
             )}
             <meshStandardMaterial
               color={lockedColor}
-              wireframe
+              wireframe={showWireframe}
               transparent
               opacity={0.8}
               emissive={lockedColor}
@@ -218,24 +234,6 @@ export const EffectZone = forwardRef<THREE.Group, EffectZoneProps>(
           </mesh>
         )}
 
-        {/* Indicador de selección */}
-        {zone.isSelected && (
-          <mesh>
-            {zone.shape === 'cube' ? (
-              <boxGeometry args={[2.4, 2.4, 2.4]} />
-            ) : (
-              <sphereGeometry args={[1.2, 32, 32]} />
-            )}
-            <meshStandardMaterial
-              color="#ffffff"
-              wireframe
-              transparent
-              opacity={0.6}
-              emissive="#ffffff"
-              emissiveIntensity={0.5}
-            />
-          </mesh>
-        )}
       </group>
     );
   }

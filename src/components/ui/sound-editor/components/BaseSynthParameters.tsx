@@ -4,6 +4,8 @@ import React from 'react';
 import { type SoundObject } from '../../../../state/useWorldStore';
 import { type AudioParams } from '../../../../lib/AudioManager';
 import { FuturisticSlider } from '../../FuturisticSlider';
+import { InfoTooltip } from '../../InfoTooltip';
+import { useLanguage } from '../../../../contexts/LanguageContext';
 
 type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
 
@@ -30,20 +32,21 @@ export function BaseSynthParameters({
   showModulation = false,
   modulationType = 'modulationWaveform'
 }: BaseSynthParametersProps) {
+  const { t } = useLanguage();
   
   // Función helper para obtener rangos de frecuencia según el tipo
   const getFrequencyRange = () => {
     switch (selectedObject.type) {
       case 'cone':
-        return { min: 20, max: 200, label: 'FREQUENCY_TONE' };
+        return { min: 20, max: 200, label: t('parameterEditor.frequencyTone') };
       case 'icosahedron':
-        return { min: 50, max: 1200, label: 'FREQUENCY_HZ' };
+        return { min: 50, max: 1200, label: t('parameterEditor.frequencyHz') };
       case 'dodecahedronRing':
-        return { min: 55, max: 880, label: 'FREQUENCY_HZ' };
+        return { min: 55, max: 880, label: t('parameterEditor.frequencyHz') };
       case 'torus':
-        return { min: 20, max: 440, label: 'FREQUENCY_HZ' };
+        return { min: 20, max: 440, label: t('parameterEditor.frequencyHz') };
       default:
-        return { min: 20, max: 2000, label: 'FREQUENCY_HZ' };
+        return { min: 20, max: 2000, label: t('parameterEditor.frequencyHz') };
     }
   };
 
@@ -73,15 +76,17 @@ export function BaseSynthParameters({
       <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-white"></div>
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
-      <h4 className="futuristic-label mb-3 text-white text-center">
-        AUDIO_PARAMETERS
+      <h4 className="futuristic-label mb-3 text-white text-center flex items-center justify-center">
+        {t('parameterEditor.audioParameters')}
       </h4>
 
       {/* Volumen - Siempre en primer lugar */}
       <div className="mb-6">
         <FuturisticSlider
-          label="VOLUME"
-          value={Math.round(selectedObject.audioParams.volume * 100)}
+          label={t('parameterEditor.volume')}
+          value={(typeof selectedObject.audioParams.volume === 'number' && !isNaN(selectedObject.audioParams.volume)) 
+            ? Math.round(selectedObject.audioParams.volume * 100) 
+            : 0}
           min={0}
           max={100}
           step={1}
@@ -90,7 +95,10 @@ export function BaseSynthParameters({
             onParamChange('volume', actualValue);
           }}
           unit="%"
-          displayValue={Math.round(selectedObject.audioParams.volume * 100)}
+          displayValue={(typeof selectedObject.audioParams.volume === 'number' && !isNaN(selectedObject.audioParams.volume))
+            ? Math.round(selectedObject.audioParams.volume * 100)
+            : 0}
+          tooltip={t('parameterEditor.tooltips.volume')}
         />
       </div>
 
@@ -99,16 +107,23 @@ export function BaseSynthParameters({
         <div className="mb-6">
           <FuturisticSlider
             label={frequencyRange.label}
-            value={selectedObject.audioParams.frequency}
+            value={(typeof selectedObject.audioParams.frequency === 'number' && !isNaN(selectedObject.audioParams.frequency))
+              ? selectedObject.audioParams.frequency
+              : frequencyRange.min}
             min={frequencyRange.min}
             max={frequencyRange.max}
             step={1}
             onChange={(value) => onParamChange('frequency', value)}
-            displayValue={selectedObject.audioParams.frequency}
+            displayValue={(typeof selectedObject.audioParams.frequency === 'number' && !isNaN(selectedObject.audioParams.frequency))
+              ? selectedObject.audioParams.frequency
+              : frequencyRange.min}
+            tooltip={selectedObject.type === 'cone' 
+              ? t('parameterEditor.tooltips.frequencyTone')
+              : t('parameterEditor.tooltips.frequencyHz')}
           />
           {selectedObject.type === 'dodecahedronRing' && (
             <p className="text-xs text-white mt-2 font-mono tracking-wider text-center">
-              FREQUENCY_BASE_TRANSPOSES_COMPLETE_CHORD
+              {t('parameterEditor.frequencyBaseTransposesChord')}
             </p>
           )}
         </div>
@@ -121,18 +136,19 @@ export function BaseSynthParameters({
             {/* WAVEFORM - No mostrar para MetalSynth (icosaedro) ya que es fijo */}
             {showWaveform && selectedObject.type !== 'icosahedron' && (
               <div className="flex-1">
-                <label className="futuristic-label block mb-1 text-white text-xs">
-                  WAVEFORM
+                <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+                  {t('parameterEditor.waveform')}
+                  <InfoTooltip content={t('parameterEditor.tooltips.waveform')} />
                 </label>
                 <select
                   value={selectedObject.audioParams.waveform}
                   onChange={(e) => onParamChange('waveform', e.target.value as OscillatorType)}
                   className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-full h-6 focus:outline-none focus:border-gray-400"
                 >
-                  <option value="sine">SINE</option>
-                  <option value="square">SQUARE</option>
-                  <option value="sawtooth">SAWTOOTH</option>
-                  <option value="triangle">TRIANGLE</option>
+                  <option value="sine">{t('parameterEditor.sine')}</option>
+                  <option value="square">{t('parameterEditor.square')}</option>
+                  <option value="sawtooth">{t('parameterEditor.sawtooth')}</option>
+                  <option value="triangle">{t('parameterEditor.triangle')}</option>
                 </select>
               </div>
             )}
@@ -140,8 +156,9 @@ export function BaseSynthParameters({
             {/* MODULATION - Para AMSynth (cubo), FMSynth (esfera) y DuoSynth (cilindro) */}
             {showModulation && (
               <div className="flex-1">
-                <label className="futuristic-label block mb-1 text-white text-xs">
-                  MODULATION
+                <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+                  {t('parameterEditor.modulation')}
+                  <InfoTooltip content={t('parameterEditor.tooltips.modulation')} />
                 </label>
                 <select
                   value={
@@ -158,10 +175,10 @@ export function BaseSynthParameters({
                   }}
                   className="bg-black border border-white text-white text-xs font-mono px-1 py-0.5 w-full h-6 focus:outline-none focus:border-gray-400"
                 >
-                  <option value="sine">SINE</option>
-                  <option value="square">SQUARE</option>
-                  <option value="sawtooth">SAWTOOTH</option>
-                  <option value="triangle">TRIANGLE</option>
+                  <option value="sine">{t('parameterEditor.sine')}</option>
+                  <option value="square">{t('parameterEditor.square')}</option>
+                  <option value="sawtooth">{t('parameterEditor.sawtooth')}</option>
+                  <option value="triangle">{t('parameterEditor.triangle')}</option>
                 </select>
               </div>
             )}
@@ -169,8 +186,9 @@ export function BaseSynthParameters({
             {/* DURATION_SECONDS */}
             {showDuration && (
               <div className="flex-1">
-                <label className="futuristic-label block mb-1 text-white text-xs">
-                  DURATION
+                <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+                  {t('parameterEditor.duration')}
+                  <InfoTooltip content={t('parameterEditor.tooltips.duration')} />
                 </label>
                 <input
                   type="number"

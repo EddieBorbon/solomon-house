@@ -77,7 +77,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
     updateDelay: 1000,
     enableValidation: true,
     enableTransformControls: true,
-    panelWidth: 384,
+    panelWidth: 480,
     animationDuration: 300,
     frequencyRange: {
       min: 20,
@@ -247,7 +247,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
       <div className="fixed right-0 top-0 h-full z-50 flex">
         {/* Panel principal */}
         <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-${defaultConfig.animationDuration} overflow-hidden ${
-          isPanelExpanded ? `w-${defaultConfig.panelWidth / 4}` : 'w-0'
+          isPanelExpanded ? 'w-[480px]' : 'w-0'
         }`}>
           <div className="p-4 h-full overflow-y-auto">
             {isPanelExpanded && (
@@ -302,7 +302,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
       <div className="fixed right-0 top-0 h-full z-50 flex">
         {/* Panel principal */}
         <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-${defaultConfig.animationDuration} overflow-hidden ${
-          isPanelExpanded ? `w-${defaultConfig.panelWidth / 4}` : 'w-0'
+          isPanelExpanded ? 'w-[480px]' : 'w-0'
         }`}>
           {/* Efecto de brillo interior */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none"></div>
@@ -315,6 +315,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                   zone={zone}
                   onRemove={removeEffectZone}
                   onToggleLock={toggleLockEffectZone}
+                  onUpdateZone={handleUpdateEffectZone}
                 />
 
                 {/* Controles de parámetros del efecto */}
@@ -383,7 +384,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
       <div className="fixed right-0 top-0 h-full z-50 flex">
         {/* Panel principal */}
         <div className={`bg-black/80 backdrop-blur-xl border-l border-white/10 shadow-2xl transition-all duration-${defaultConfig.animationDuration} overflow-hidden ${
-          isPanelExpanded ? `w-${defaultConfig.panelWidth / 4}` : 'w-0'
+          isPanelExpanded ? 'w-[480px]' : 'w-0'
         }`}>
           {/* Efecto de brillo interior */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 pointer-events-none"></div>

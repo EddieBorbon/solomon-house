@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 /**
  * Componente que muestra un mensaje cuando no hay entidad seleccionada
  * Responsabilidad única: Mostrar estado de "no selección"
  */
 export function NoSelectionMessage() {
+  const { t } = useLanguage();
   return (
     <div className="fixed top-4 right-4 z-50">
       <div className="bg-black/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-4 max-w-xs max-h-[75vh] overflow-y-auto">
@@ -18,10 +20,10 @@ export function NoSelectionMessage() {
             <span className="text-lg">🎯</span>
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">
-            No hay entidad seleccionada
+            {t('effects.noEntitySelected')}
           </h3>
           <p className="text-cyan-300 text-sm">
-            Haz clic en un objeto sonoro o zona de efecto en el mundo 3D para seleccionarlo y editar sus parámetros.
+            {t('effects.clickObjectOrZoneToEdit')}
           </p>
         </div>
       </div>

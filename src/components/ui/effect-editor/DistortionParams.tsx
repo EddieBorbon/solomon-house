@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface DistortionParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface DistortionParamsProps {
 }
 
 export function DistortionParams({ zone, onEffectParamChange }: DistortionParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'distortion') return null;
 
   return (
@@ -21,13 +24,13 @@ export function DistortionParams({ zone, onEffectParamChange }: DistortionParams
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        DISTORTION_PARAMETERS
+        {t('effects.distortionParameters')}
       </h4>
 
       {/* Distortion Amount */}
       <div className="mb-6">
         <FuturisticSlider
-          label="DISTORTION_AMOUNT"
+          label={t('effects.distortionAmount')}
           value={zone?.effectParams.distortion ?? 0.4}
           min={0}
           max={1}
@@ -36,16 +39,18 @@ export function DistortionParams({ zone, onEffectParamChange }: DistortionParams
           disabled={zone?.isLocked}
           unit="%"
           displayValue={Math.round((zone?.effectParams.distortion ?? 0.4) * 100)}
+          tooltip={t('effects.tooltips.distortionAmount')}
         />
       </div>
 
       {/* Oversampling */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          OVERSAMPLING
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.oversampling')}
+          <InfoTooltip content={t('effects.tooltips.oversampling')} />
         </label>
         <div className="grid grid-cols-3 gap-2">
-          {['none', '2x', '4x'].map((type) => (
+          {(['none', '2x', '4x'] as const).map((type) => (
             <button
               key={type}
               onClick={() => onEffectParamChange('distortionOversample', type)}
@@ -56,7 +61,7 @@ export function DistortionParams({ zone, onEffectParamChange }: DistortionParams
                   : 'bg-black text-white border border-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              <span className="uppercase">{type}</span>
+              <span className="uppercase">{t(`effects.${type}`)}</span>
             </button>
           ))}
         </div>

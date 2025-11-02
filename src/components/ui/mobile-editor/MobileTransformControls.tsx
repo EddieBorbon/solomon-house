@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type MobileObject } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface MobileTransformControlsProps {
   mobileObject: MobileObject;
@@ -16,6 +17,8 @@ export function MobileTransformControls({
   onResetTransform,
   roundToDecimals
 }: MobileTransformControlsProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="relative border border-white p-4">
       {/* Decoraciones de esquina */}
@@ -26,20 +29,20 @@ export function MobileTransformControls({
       
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-mono font-bold text-white tracking-wider">
-          007_TRANSFORMACIONES_GRUPO
+          {t('mobileObject.transformacionesGrupo')}
         </h4>
         <button
           onClick={onResetTransform}
           className="relative border border-white px-2 py-1 text-xs font-mono text-white hover:bg-white hover:text-black transition-all duration-300"
         >
-          RESET
+          {t('parameterEditor.reset')}
         </button>
       </div>
 
       {/* Posición */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          POSICION
+          {t('mobileObject.posicion')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -51,12 +54,12 @@ export function MobileTransformControls({
                   min="-10"
                   max="10"
                   step="0.1"
-                  value={mobileObject.position[index]}
+                  value={(typeof mobileObject.position[index] === 'number' && !isNaN(mobileObject.position[index])) ? mobileObject.position[index] : 0}
                   onChange={(e) => onTransformChange('position', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.position[index])}
+                  {roundToDecimals((typeof mobileObject.position[index] === 'number' && !isNaN(mobileObject.position[index])) ? mobileObject.position[index] : 0)}
                 </span>
               </div>
             </div>
@@ -67,7 +70,7 @@ export function MobileTransformControls({
       {/* Rotación */}
       <div className="mb-4">
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ROTACION
+          {t('mobileObject.rotacion')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -79,12 +82,12 @@ export function MobileTransformControls({
                   min="-3.14"
                   max="3.14"
                   step="0.1"
-                  value={mobileObject.rotation[index]}
+                  value={(typeof mobileObject.rotation[index] === 'number' && !isNaN(mobileObject.rotation[index])) ? mobileObject.rotation[index] : 0}
                   onChange={(e) => onTransformChange('rotation', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.rotation[index])}
+                  {roundToDecimals((typeof mobileObject.rotation[index] === 'number' && !isNaN(mobileObject.rotation[index])) ? mobileObject.rotation[index] : 0)}
                 </span>
               </div>
             </div>
@@ -95,7 +98,7 @@ export function MobileTransformControls({
       {/* Escala */}
       <div>
         <h5 className="text-xs font-mono font-bold text-gray-400 mb-2 tracking-wider">
-          ESCALA
+          {t('mobileObject.escala')}
         </h5>
         <div className="space-y-2">
           {(['X', 'Y', 'Z'] as const).map((axis, index) => (
@@ -107,12 +110,12 @@ export function MobileTransformControls({
                   min="0.1"
                   max="3"
                   step="0.1"
-                  value={mobileObject.scale[index]}
+                  value={(typeof mobileObject.scale[index] === 'number' && !isNaN(mobileObject.scale[index])) ? mobileObject.scale[index] : 1}
                   onChange={(e) => onTransformChange('scale', index as 0 | 1 | 2, parseFloat(e.target.value))}
                   className="w-20"
                 />
                 <span className="text-xs font-mono text-cyan-400 w-12 text-right">
-                  {roundToDecimals(mobileObject.scale[index])}
+                  {roundToDecimals((typeof mobileObject.scale[index] === 'number' && !isNaN(mobileObject.scale[index])) ? mobileObject.scale[index] : 1)}
                 </span>
               </div>
             </div>

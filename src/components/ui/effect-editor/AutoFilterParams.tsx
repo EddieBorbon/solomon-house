@@ -3,6 +3,8 @@
 import React from 'react';
 import { type EffectZone } from '../../../state/useWorldStore';
 import { FuturisticSlider } from '../FuturisticSlider';
+import { InfoTooltip } from '../InfoTooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface AutoFilterParamsProps {
   zone: EffectZone;
@@ -10,6 +12,7 @@ interface AutoFilterParamsProps {
 }
 
 export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParamsProps) {
+  const { t } = useLanguage();
   if (zone?.type !== 'autoFilter') return null;
 
   return (
@@ -21,13 +24,13 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
       <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-white"></div>
       
       <h4 className="futuristic-label mb-3 text-white text-center">
-        AUTO_FILTER_PARAMETERS
+        {t('effects.autoFilterParameters')}
       </h4>
       
       {/* Depth */}
       <div className="mb-6">
         <FuturisticSlider
-          label="MODULATION_DEPTH"
+          label={t('effects.modulationDepth')}
           value={zone?.effectParams.depth ?? 0.5}
           min={0}
           max={1}
@@ -36,13 +39,15 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
           disabled={zone?.isLocked}
           unit="%"
           displayValue={((zone?.effectParams.depth ?? 0.5) * 100).toFixed(0)}
+          tooltip={t('effects.tooltips.modulationDepth')}
         />
       </div>
 
       {/* Filter Type */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          FILTER_TYPE
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.filterType')}
+          <InfoTooltip content={t('effects.tooltips.filterType')} />
         </label>
         <div className="grid grid-cols-2 gap-2">
           {(['lowpass', 'highpass', 'bandpass', 'notch'] as const).map((filterType) => (
@@ -56,7 +61,7 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
                   : 'bg-black text-white border border-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              {filterType.toUpperCase()}
+              {t(`effects.${filterType}`)}
             </button>
           ))}
         </div>
@@ -65,7 +70,7 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
       {/* Filter Q */}
       <div className="mb-6">
         <FuturisticSlider
-          label="RESONANCE_Q"
+          label={t('effects.resonanceQ')}
           value={zone?.effectParams.filterQ ?? 1}
           min={0.1}
           max={10}
@@ -73,13 +78,15 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
           onChange={(value) => onEffectParamChange('filterQ', value)}
           disabled={zone?.isLocked}
           displayValue={(zone?.effectParams.filterQ ?? 1).toFixed(1)}
+          tooltip={t('effects.tooltips.resonanceQ')}
         />
       </div>
 
       {/* LFO Type */}
       <div className="mb-4">
-        <label className="futuristic-label block mb-1 text-white text-xs">
-          LFO_TYPE
+        <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
+          {t('effects.lfoType')}
+          <InfoTooltip content={t('effects.tooltips.lfoType')} />
         </label>
         <div className="grid grid-cols-2 gap-2">
           {(['sine', 'square', 'triangle', 'sawtooth'] as const).map((lfoType) => (
@@ -93,7 +100,7 @@ export function AutoFilterParams({ zone, onEffectParamChange }: AutoFilterParams
                   : 'bg-black text-white border border-white hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
-              {lfoType.toUpperCase()}
+              {t(`effects.${lfoType}`)}
             </button>
           ))}
         </div>

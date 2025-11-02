@@ -15,6 +15,8 @@ export interface EffectZone {
   scale: [number, number, number];
   isSelected: boolean;
   isLocked: boolean;
+  showWireframe?: boolean; // Control individual para mostrar/ocultar wireframe (por defecto true)
+  showColor?: boolean; // Control individual para mostrar/ocultar color (por defecto true)
   // Parámetros específicos del efecto
   effectParams: {
     // Parámetros del Phaser
@@ -263,6 +265,8 @@ export const useEffectStore = create<EffectState & EffectActions>((set, get) => 
       scale: [5, 5, 5], // Tamaño por defecto 10x10x10 (5 de radio por eje)
       isSelected: false,
       isLocked: false,
+      showWireframe: true, // Por defecto visible
+      showColor: true, // Por defecto visible
       effectParams: defaultParams,
     };
 

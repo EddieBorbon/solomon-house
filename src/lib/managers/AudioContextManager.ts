@@ -33,6 +33,11 @@ export class AudioContextManager {
    * Inicializa el contexto de audio con la configuración especificada
    */
   private initializeContext(): void {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     try {
       // Configurar el contexto con los parámetros especificados
       // Nota: sampleRate no se puede cambiar después de la creación del contexto
@@ -64,7 +69,18 @@ export class AudioContextManager {
    * Configura el contexto de audio para mantenerlo activo
    */
   private configureContextForPersistence(): void {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     try {
+      // Verificar que Tone está disponible antes de usarlo
+      if (!Tone || !Tone.context || !Tone.Transport) {
+        console.warn('🎵 AudioContextManager: Tone.js no está disponible');
+        return;
+      }
+
       // Configurar el contexto para que no se suspenda automáticamente
       if (Tone.context.state === 'suspended') {
         console.log('🎵 AudioContextManager: Contexto suspendido, intentando reanudar...');
@@ -91,6 +107,11 @@ export class AudioContextManager {
    * Configura los event listeners para cambios de estado del contexto
    */
   private setupStateChangeListeners(): void {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     try {
       Tone.context.on('statechange', (newState) => {
         
@@ -132,7 +153,7 @@ export class AudioContextManager {
         // Event listener para cuando la página vuelva a tener foco (sin limpieza)
         window.addEventListener('focus', () => {
           // Opcional: podríamos reanudar el contexto si está suspendido
-          if (Tone.context.state === 'suspended') {
+          if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'suspended') {
             console.log('🎵 AudioContextManager: Página recuperó el foco, reanudando contexto de audio');
             this.resumeContext();
           }
@@ -146,7 +167,7 @@ export class AudioContextManager {
           } else {
             // Página visible de nuevo
             console.log('🎵 AudioContextManager: Página visible de nuevo');
-            if (Tone.context.state === 'suspended') {
+            if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'suspended') {
               this.resumeContext();
             }
           }
@@ -186,6 +207,11 @@ export class AudioContextManager {
    * Inicia el contexto de audio de Tone.js
    */
   public async startContext(): Promise<boolean> {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     try {
       if (Tone.context.state !== 'running') {
         
@@ -205,6 +231,11 @@ export class AudioContextManager {
    * Suspende el contexto de audio
    */
   public async suspendContext(): Promise<boolean> {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     try {
       if (Tone.context.state === 'running') {
         
@@ -224,6 +255,11 @@ export class AudioContextManager {
    * Reanuda el contexto de audio
    */
   public async resumeContext(): Promise<boolean> {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     try {
       if (Tone.context.state === 'suspended') {
         
@@ -259,6 +295,9 @@ export class AudioContextManager {
    * Verifica si el contexto está ejecutándose
    */
   public isContextRunning(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
     return Tone.context.state === 'running';
   }
 
@@ -280,6 +319,14 @@ export class AudioContextManager {
    * Obtiene el estado actual del contexto
    */
   public getContextState(): AudioContextState {
+    if (typeof window === 'undefined') {
+      return {
+        isRunning: false,
+        state: 'suspended',
+        sampleRate: 44100,
+        latencyHint: 'interactive'
+      };
+    }
     return {
       isRunning: this.isContextRunning(),
       state: Tone.context.state,
@@ -297,6 +344,14 @@ export class AudioContextManager {
     sampleRate: number;
     latencyHint: string;
   } {
+    if (typeof window === 'undefined') {
+      return {
+        contextState: 'suspended',
+        isContextStarted: false,
+        sampleRate: 44100,
+        latencyHint: 'interactive'
+      };
+    }
     return {
       contextState: Tone.context.state,
       isContextStarted: this.isContextStarted,
@@ -358,6 +413,9 @@ export class AudioContextManager {
    * Verifica si el contexto está en un estado válido para operaciones de audio
    */
   public isContextValid(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
     return Tone.context.state === 'running' && this.isContextStarted;
   }
 
