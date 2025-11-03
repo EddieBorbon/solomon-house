@@ -71,9 +71,22 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-sm z-50 p-4 sm:p-6 lg:p-8">
+      {/* Background image */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="relative w-full h-full">
+          <Image 
+            src="/backgrounds/Minculturas_Patrones-02.png" 
+            alt="Background Pattern" 
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      </div>
+      
       {/* Main content container with border */}
       <div className="relative w-full h-full border border-white flex flex-col items-center justify-center">
-        {/* Grid pattern background */}
+        {/* Grid pattern background overlay */}
         <div className="absolute inset-0 opacity-5">
           <div className="w-full h-full" style={{
             backgroundImage: `
@@ -198,33 +211,110 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     {t('loading.tutorName')}
                   </p>
                 </div>
+
+                {/* Co-Tutores */}
+                <div className="mt-2 sm:mt-3">
+                  <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
+                    {t('loading.cotutors')}
+                  </p>
+                  <p className="text-xs sm:text-sm font-mono text-white tracking-wider">
+                    {t('loading.cotutorsNames')}
+                  </p>
+                </div>
               </div>
 
-              {/* Logos */}
-              <div className="flex justify-center items-center gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
-                {/* UNAM Logo */}
-                <div className="text-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-2 flex items-center justify-center logo-container">
-                    <Image 
-                      src="/Picture1-removebg-preview.png" 
-                      alt="UNAM Logo" 
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-contain filter brightness-0 invert opacity-90"
-                    />
+              {/* Logos - Todos en una sola fila horizontal */}
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
+                <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 lg:gap-6">
+                  {/* Logo Principal */}
+                  <div className="text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/logo.png" 
+                        alt="Solomon House Logo" 
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                    </div>
                   </div>
-                </div>
-                
-                {/* FaM Logo */}
-                <div className="text-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-2 flex items-center justify-center logo-container">
-                    <Image 
-                      src="/Picture2-removebg-preview.png" 
-                      alt="FaM Logo" 
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-contain filter brightness-0 invert opacity-90"
-                    />
+
+                  {/* Mincultura Distintivos */}
+                  <div className="text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/Mincultura_Distintivos-03.png" 
+                        alt="Mincultura Distintivos" 
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Mincultura Objetivos Estratégicos */}
+                  <div className="text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/Mincultura_ObjetivosEstrategicos-04.png" 
+                        alt="Mincultura Objetivos Estratégicos" 
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                    </div>
+                  </div>
+
+                  {/* UNAM Logo */}
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/Picture1-removebg-preview.png" 
+                        alt="UNAM Logo" 
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-contain filter brightness-0 invert opacity-90"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* FaM Logo */}
+                  <div className="text-center">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/Picture2-removebg-preview.png" 
+                        alt="FaM Logo" 
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-contain filter brightness-0 invert opacity-90"
+                      />
+                    </div>
+                  </div>
+
+                  {/* CEAM Logo */}
+                  <div className="text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/ceam.png" 
+                        alt="CEAM Logo" 
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nanjing Logo */}
+                  <div className="text-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
+                      <Image 
+                        src="/logos/logoNanjing.svg" 
+                        alt="Nanjing Logo" 
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -232,6 +322,27 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
               {/* Language Selector - Centered below logos */}
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
                 <LanguageSelector variant="loading-no-flag" className="language-selector" />
+              </div>
+
+              {/* Mención del Apoyo del Ministerio de las Culturas, las Artes y los Saberes */}
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
+                <div className="text-center space-y-2">
+                  <p className="text-xs font-mono text-gray-400 tracking-wider">
+                    {t('loading.ministrySupport')}
+                  </p>
+                  <p className="text-xs font-mono text-white tracking-wider">
+                    {t('loading.ministryName')}
+                  </p>
+                  <p className="text-xs font-mono text-gray-300 tracking-wider">
+                    {t('loading.ministryDirection')}
+                  </p>
+                  <p className="text-xs font-mono text-gray-300 tracking-wider">
+                    {t('loading.ministryCall')}
+                  </p>
+                  <p className="text-xs font-mono text-gray-300 tracking-wider mt-2">
+                    {t('loading.ministrySupportDescription')}
+                  </p>
+                </div>
               </div>
             </div>
 

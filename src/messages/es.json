@@ -21,7 +21,14 @@
     "prepareAudio": "PREPARING_AUDIO_ENGINE",
     "loadWebAudio": "LOADING_WEB_AUDIO_API",
     "prepareSynths": "PREPARING_SYNTHESIZERS",
-    "configSpatial": "CONFIGURING_SPATIAL_AUDIO"
+    "configSpatial": "CONFIGURING_SPATIAL_AUDIO",
+    "ministrySupport": "ESTE_PROYECTO_HA_SIDO_REALIZADO_CON_EL_APOYO_DEL",
+    "cotutors": "CO-TUTORES:",
+    "cotutorsNames": "PHD_HUGO_SOLIS_GARCIA_Y_PHD_ROBERTO_MORALES_MANZANARES",
+    "ministryName": "Ministerio de las Culturas, las Artes y los Saberes",
+    "ministryDirection": "Dirección de Artes - Grupo de Cooperación y Asuntos Internacionales",
+    "ministryCall": "Convocatoria Portafolio Cultural Internacional - Colombia en el Mundo, Línea 2",
+    "ministrySupportDescription": "Apoyo para la circulación y fortalecimiento de proyectos y procesos artísticos y culturales liderados por gestores culturales o artistas colombianos de la diáspora."
   },
   "ui": {
     "move": "Mover",

@@ -13,8 +13,8 @@ const config: Config = {
         foreground: 'var(--foreground)',
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-        mono: ['var(--font-geist-mono)'],
+        sans: ['var(--font-nunito-sans)', 'sans-serif'],
+        mono: ['var(--font-nunito-sans)', 'monospace'],
       },
     },
   },

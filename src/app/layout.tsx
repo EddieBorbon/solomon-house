@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./tailwind.css";
 import "./neon-sliders.css";
 import "./glassmorphism.css";
@@ -8,14 +8,10 @@ import "./responsive.css";
 import { StoreProvider } from "../components/StoreProvider";
 import { LanguageProvider } from "../contexts/LanguageContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const nunitoSans = localFont({
+  src: "../../public/fuentes/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf",
+  variable: "--font-nunito-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -43,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full m-0 p-0 bg-black overflow-hidden`}
+        className={`${nunitoSans.variable} font-sans antialiased h-full m-0 p-0 bg-black overflow-hidden`}
       >
         <LanguageProvider>
           <StoreProvider>
