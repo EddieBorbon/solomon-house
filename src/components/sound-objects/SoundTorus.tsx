@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import * as THREE from 'three';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundTorusProps {
   id: string;
@@ -19,6 +20,9 @@ interface SoundTorusProps {
 export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);

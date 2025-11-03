@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundDodecahedronRingProps {
   id: string;
@@ -20,6 +21,9 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
     const energyRef = useRef(0); // Para la animación de clic
     const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Obtener la polifonía del objeto (número de dodecaedros) basado en la longitud del chord
     const polyphony = audioParams?.chord?.length || 4;

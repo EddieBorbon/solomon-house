@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundPlaneProps {
   id: string;
@@ -21,6 +22,9 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
     const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Estado para la animación de ondulación
     const [isAnimating, setIsAnimating] = useState(false);

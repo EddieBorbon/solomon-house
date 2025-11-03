@@ -64,6 +64,14 @@ export interface AudioParams {
   curve?: 'linear' | 'exponential';
   baseUrl?: string;
   notes?: string | string[];
+  // Parámetros de auto-activación
+  autoTrigger?: boolean; // Activar/desactivar auto-activación
+  autoTriggerMode?: 'fixed' | 'random' | 'pattern'; // Modo de auto-activación: fijo, aleatorio, o patrón rítmico
+  autoTriggerInterval?: number; // Intervalo fijo en segundos (para modo 'fixed')
+  autoTriggerMin?: number; // Mínimo intervalo en segundos (para modo 'random')
+  autoTriggerMax?: number; // Máximo intervalo en segundos (para modo 'random')
+  autoTriggerPattern?: number[]; // Patrón rítmico: array de tiempos relativos en segundos (para modo 'pattern')
+  autoTriggerPatternLoop?: boolean; // Si el patrón debe repetirse en loop (para modo 'pattern')
 }
 
 // Tipos para las fuentes de sonido

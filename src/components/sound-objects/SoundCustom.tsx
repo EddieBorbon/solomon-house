@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundCustomProps {
   id: string;
@@ -21,6 +22,9 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams, customShapeCode }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const { triggerObjectNote, toggleObjectAudio, grids } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
 
     // Obtener el código personalizado del objeto
     const customCode = useMemo(() => {

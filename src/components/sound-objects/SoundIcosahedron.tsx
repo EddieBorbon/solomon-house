@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundIcosahedronProps {
   id: string;
@@ -19,6 +20,9 @@ interface SoundIcosahedronProps {
 export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);

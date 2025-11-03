@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundCylinderProps {
   id: string;
@@ -22,6 +23,9 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
     const { selectEntity, triggerObjectNote } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Crear geometría de cilindro con más detalle
 

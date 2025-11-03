@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, AdditiveBlending, SubtractiveBlending, MultiplyBlending, NormalBlending } from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundCubeProps {
   id: string;
@@ -34,6 +35,9 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
     startObjectGate, 
     stopObjectGate 
   } = useWorldStore();
+
+  // Auto-activación
+  useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
 
   // Manejador para clic corto (trigger)
   const handleClick = (event: React.MouseEvent) => {

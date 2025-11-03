@@ -13,12 +13,16 @@ import { audioManager } from '../../lib/AudioManager';
 import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
 import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
+import { useEntitySelector } from '../../hooks/useEntitySelector';
+import { useWorldStore } from '../../state/useWorldStore';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
   const { } = useThree();
   const { updateCameraPosition } = useCameraControls();
   const { isActive, currentStep, addCameraPosition } = useTutorialStore();
+  const { selectedEntity, selectedEntityId } = useEntitySelector();
+  const { grids, activeGridId, currentGridCoordinates, gridSize } = useWorldStore();
   
   // Inicializar la espacialización de audio
   useAudioListener();
@@ -26,9 +30,61 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
   // Vector para almacenar la dirección de la cámara (evitar recrearlo en cada frame)
   const forwardVector = useRef(new THREE.Vector3());
   const lastCameraPosition = useRef<THREE.Vector3 | null>(null);
+  const targetVector = useRef(new THREE.Vector3());
 
   useFrame(({ camera }) => {
     if (orbitControlsRef.current) {
+      // Actualizar el target de OrbitControls según la selección
+      let targetPosition: THREE.Vector3;
+      
+      if (selectedEntity && selectedEntityId) {
+        // Si hay un objeto seleccionado, usar su posición mundial
+        const entityData = selectedEntity.data;
+        
+        // Encontrar la cuadrícula que contiene este objeto
+        let worldPosition: [number, number, number] = entityData.position;
+        for (const grid of grids.values()) {
+          if (grid.objects.some(obj => obj.id === selectedEntityId) ||
+              grid.mobileObjects.some(obj => obj.id === selectedEntityId) ||
+              grid.effectZones.some(zone => zone.id === selectedEntityId)) {
+            // Calcular posición mundial: posición local + posición de la cuadrícula
+            worldPosition = [
+              grid.position[0] + entityData.position[0],
+              grid.position[1] + entityData.position[1],
+              grid.position[2] + entityData.position[2]
+            ];
+            break;
+          }
+        }
+        
+        targetVector.current.set(worldPosition[0], worldPosition[1], worldPosition[2]);
+        targetPosition = targetVector.current;
+      } else {
+        // Si no hay objeto seleccionado, usar el centro de la cuadrícula activa
+        let centerPosition: [number, number, number];
+        
+        if (activeGridId && grids.has(activeGridId)) {
+          const activeGrid = grids.get(activeGridId)!;
+          // Usar la posición de la cuadrícula activa como centro
+          centerPosition = activeGrid.position;
+        } else {
+          // Fallback: usar el centro de la cuadrícula actual basado en coordenadas
+          const [x, y, z] = currentGridCoordinates;
+          centerPosition = [
+            x * gridSize,
+            y * gridSize,
+            z * gridSize
+          ];
+        }
+        
+        targetVector.current.set(centerPosition[0], centerPosition[1], centerPosition[2]);
+        targetPosition = targetVector.current;
+      }
+      
+      // Actualizar el target de OrbitControls suavemente
+      orbitControlsRef.current.target.lerp(targetPosition, 0.1);
+      orbitControlsRef.current.update();
+      
       updateCameraPosition(camera, orbitControlsRef.current);
       
       // FORZAR OrbitControls SIEMPRE HABILITADO en cada frame

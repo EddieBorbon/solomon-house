@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundSphereProps {
   id: string;
@@ -25,6 +26,9 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
       startObjectGate, 
       stopObjectGate 
     } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
     
     // Crear geometría de esfera con más detalle
     const sphereGeometry = useMemo(() => {

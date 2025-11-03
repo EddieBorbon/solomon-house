@@ -674,8 +674,8 @@ export function ControlPanel() {
         </div>
       </div>
 
-      {/* Sección de Cuadrículas - DESACTIVADA EN DESARROLLO */}
-      <div className={`mb-4 relative ${(process.env.NODE_ENV !== 'production' && process.env.NEXT_PUBLIC_ENABLE_GRIDS !== 'true') || (isTutorialActive && (currentStep === 4 || currentStep === 5 || currentStep === 9 || currentStep === 10 || currentStep === 11)) ? 'opacity-30 pointer-events-none' : ''}`}>
+      {/* Sección de Cuadrículas - DESACTIVADA */}
+      <div className="mb-4 relative opacity-30 pointer-events-none">
         {/* Contenedor con borde complejo */}
         <div className="relative border border-white p-3">
           {/* Decoraciones de esquina */}

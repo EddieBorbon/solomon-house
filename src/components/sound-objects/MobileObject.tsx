@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useState, useMemo, useEffect } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
@@ -72,14 +72,15 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   
   const { grids, triggerObjectAttackRelease } = useWorldStore();
   
-  // Obtener todos los objetos de todas las cuadrículas
-  const allObjects = useMemo(() => {
-    const objects: SoundObject[] = [];
-    grids.forEach((grid) => {
-      objects.push(...grid.objects);
-    });
-    return objects;
-  }, [grids]);
+  // Función helper para obtener los objetos del mismo grid que este objeto móvil
+  const getObjectsInSameGrid = (): SoundObject[] => {
+    for (const grid of grids.values()) {
+      if (grid.mobileObjects && grid.mobileObjects.some(obj => obj.id === id)) {
+        return grid.objects || [];
+      }
+    }
+    return [];
+  };
 
   // Crear geometría para la línea de activación
   const lineGeometry = new BufferGeometry().setFromPoints([
@@ -195,31 +196,43 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   const detectNearbyObjects = (relativePos: [number, number, number]): string | null => {
     const { proximityThreshold } = mobileParams;
     
+    // Obtener objetos del mismo grid
+    const allObjects = getObjectsInSameGrid();
+    
+    // Si no hay objetos en el grid, no hay nada que detectar
+    if (allObjects.length === 0) {
+      return null;
+    }
+    
     // Los objetos están en el espacio local del grid, así que usamos directamente relativePos
     // position ya es [0, 0, 0] porque está dentro de un grupo con posición grid.position
     const absolutePos = relativePos;
     
-    // Debug: Log de objetos disponibles
-    if (allObjects.length > 0) {
-    }
+    let closestObjectId: string | null = null;
+    let closestDistance = Infinity;
     
     for (const obj of allObjects) {
+      // Evitar detectarse a sí mismo si por alguna razón está en la lista de objetos
+      if (obj.id === id) continue;
+      
       const distance = Math.sqrt(
         Math.pow(absolutePos[0] - obj.position[0], 2) +
         Math.pow(absolutePos[1] - obj.position[1], 2) +
         Math.pow(absolutePos[2] - obj.position[2], 2)
       );
       
-      // Debug: Log de distancias
-      if (distance <= proximityThreshold * 2) { // Log si está cerca del doble del umbral
-      }
-      
-      if (distance <= proximityThreshold) {
-        return obj.id;
+      // Encontrar el objeto más cercano dentro del umbral
+      if (distance <= proximityThreshold && distance < closestDistance) {
+        closestDistance = distance;
+        closestObjectId = obj.id;
       }
     }
     
-    return null;
+    if (closestObjectId) {
+      console.log(`📍 Objeto móvil ${id} detectó objeto cercano: ${closestObjectId} (distancia: ${closestDistance.toFixed(2)}, umbral: ${proximityThreshold})`);
+    }
+    
+    return closestObjectId;
   };
 
   // Función para actualizar la línea de activación
@@ -272,7 +285,10 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
   // Animación del objeto móvil
   useFrame((state, delta) => {
-    if (!meshRef.current || !materialRef.current || !mobileParams.isActive) return;
+    if (!meshRef.current || !materialRef.current) return;
+    
+    // Verificar si el objeto móvil está activo
+    if (!mobileParams.isActive) return;
     
     // Pausar la animación si el objeto está siendo arrastrado manualmente
     if (isBeingDragged) return;
@@ -313,6 +329,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     
     if (nearbyObjectId && nearbyObjectId !== activatedObjectId) {
       // Activar objeto sonoro
+      console.log('🎵 Objeto móvil activando objeto sonoro:', nearbyObjectId);
       triggerObjectAttackRelease(nearbyObjectId);
       setActivatedObjectId(nearbyObjectId);
       setTouchedObjectId(nearbyObjectId);
@@ -321,6 +338,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       energyRef.current = 1;
       
       // Actualizar línea de activación
+      const allObjects = getObjectsInSameGrid();
       const targetObj = allObjects.find(obj => obj.id === nearbyObjectId);
       if (targetObj) {
         updateActivationLine(targetObj.position);
@@ -335,6 +353,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
 
     // Actualizar línea de toque si hay un objeto tocado
     if (touchedObjectId) {
+      const allObjects = getObjectsInSameGrid();
       const targetObj = allObjects.find(obj => obj.id === touchedObjectId);
       if (targetObj) {
         updateTouchLine(targetObj.position);

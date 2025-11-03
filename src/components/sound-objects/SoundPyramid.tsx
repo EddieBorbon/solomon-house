@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundPyramidProps {
   id: string;
@@ -23,6 +24,9 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const wireframeRef = useRef<THREE.Mesh>(null);
     const timeRef = useRef(0);
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams: audioParams || {}, enabled: !audioEnabled && !!audioParams });
     
     // Estado local para controlar la animación basada en la interacción del usuario
     const [isSoundPlaying, setIsSoundPlaying] = useState(false);

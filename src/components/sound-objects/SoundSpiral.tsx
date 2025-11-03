@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import * as THREE from 'three';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundSpiralProps {
   id: string;
@@ -21,6 +22,9 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
     const { selectEntity, triggerObjectNote } = useWorldStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
 
     // Generar cajas para la espiral basadas en el número de samples disponibles
     const sampleCount = useMemo(() => {

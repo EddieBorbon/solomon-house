@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
+import { useAutoTrigger } from '../../hooks/useAutoTrigger';
 
 interface SoundConeProps {
   id: string;
@@ -27,6 +28,9 @@ export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
     const energyRef = useRef(0); // Para la animación de golpe percusivo
     
     const { triggerObjectNote, selectEntity, triggerObjectAttackRelease } = useWorldStore();
+
+    // Auto-activación
+    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
 
     // Animación del golpe percusivo
     useFrame((state, delta) => {

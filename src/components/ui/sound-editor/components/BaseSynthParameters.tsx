@@ -6,6 +6,7 @@ import { type AudioParams } from '../../../../lib/AudioManager';
 import { FuturisticSlider } from '../../FuturisticSlider';
 import { InfoTooltip } from '../../InfoTooltip';
 import { useLanguage } from '../../../../contexts/LanguageContext';
+import { AutoTriggerParameters } from './AutoTriggerParameters';
 
 type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
 
@@ -212,6 +213,12 @@ export function BaseSynthParameters({
           </div>
         </div>
       )}
+
+      {/* Auto-activación - Sección separada */}
+      <AutoTriggerParameters
+        selectedObject={selectedObject}
+        onParamChange={onParamChange}
+      />
     </div>
   );
 }
