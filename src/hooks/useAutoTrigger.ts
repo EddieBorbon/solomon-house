@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useWorldStore } from '../state/useWorldStore';
 import { type AudioParams } from '../lib/factories/SoundSourceFactory';
 
@@ -8,6 +8,7 @@ interface UseAutoTriggerParams {
   objectId: string;
   audioParams: AudioParams;
   enabled?: boolean; // Permitir desactivar desde fuera si es necesario
+  onTrigger?: () => void; // Callback cuando se activa el trigger
 }
 
 /**
@@ -20,7 +21,8 @@ interface UseAutoTriggerParams {
 export function useAutoTrigger({ 
   objectId, 
   audioParams, 
-  enabled = true 
+  enabled = true,
+  onTrigger
 }: UseAutoTriggerParams) {
   const { triggerObjectAttackRelease } = useWorldStore();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,6 +92,10 @@ export function useAutoTrigger({
     
     timeoutRef.current = setTimeout(() => {
       triggerObjectAttackRelease(objectId);
+      // Activar callback si existe (para animaciones)
+      if (onTrigger) {
+        onTrigger();
+      }
       scheduleNextTrigger(); // Programar la siguiente activación
     }, delay);
   }, [objectId, getNextTriggerTime, triggerObjectAttackRelease]);
@@ -133,6 +139,7 @@ export function useAutoTrigger({
     scheduleNextTrigger
   ]);
 
-  return null; // Este hook no retorna nada, solo maneja efectos secundarios
+  // No retornar nada para mantener compatibilidad con componentes existentes
+  // El callback onTrigger se ejecuta automáticamente cuando se dispara el trigger
 }
 

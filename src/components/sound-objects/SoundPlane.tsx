@@ -23,8 +23,17 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
     const groupRef = useRef<THREE.Group>(null);
     const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
 
-    // Auto-activación
-    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
+    // Auto-activación con callback para activar animaciones
+    useAutoTrigger({ 
+      objectId: id, 
+      audioParams, 
+      enabled: !audioEnabled,
+      onTrigger: () => {
+        // Activar animación de ondulación cuando se dispara el auto-trigger
+        setIsAnimating(true);
+        setAnimationTime(0);
+      }
+    });
     
     // Estado para la animación de ondulación
     const [isAnimating, setIsAnimating] = useState(false);

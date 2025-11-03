@@ -23,8 +23,24 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
 
-    // Auto-activación
-    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
+    // Auto-activación con callback para activar animaciones
+    useAutoTrigger({ 
+      objectId: id, 
+      audioParams, 
+      enabled: !audioEnabled,
+      onTrigger: () => {
+        // Activar animación cuando se dispara el auto-trigger
+        setIsPlaying(true);
+        setPulseTime(0);
+        // Desactivar después de la duración del sonido
+        const duration = audioParams?.duration || 1.0;
+        if (duration !== Infinity) {
+          setTimeout(() => {
+            setIsPlaying(false);
+          }, duration * 1000);
+        }
+      }
+    });
 
     // Generar cajas para la espiral basadas en el número de samples disponibles
     const sampleCount = useMemo(() => {

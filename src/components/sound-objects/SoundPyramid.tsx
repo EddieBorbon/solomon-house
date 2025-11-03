@@ -25,8 +25,23 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
     const wireframeRef = useRef<THREE.Mesh>(null);
     const timeRef = useRef(0);
 
-    // Auto-activación
-    useAutoTrigger({ objectId: id, audioParams: audioParams || {}, enabled: !audioEnabled && !!audioParams });
+    // Auto-activación con callback para activar animaciones
+    useAutoTrigger({ 
+      objectId: id, 
+      audioParams: audioParams || {}, 
+      enabled: !audioEnabled && !!audioParams,
+      onTrigger: () => {
+        // Activar animación cuando se dispara el auto-trigger
+        setIsSoundPlaying(true);
+        // Desactivar después de la duración del sonido
+        const duration = audioParams?.duration || 1.0;
+        if (duration !== Infinity) {
+          setTimeout(() => {
+            setIsSoundPlaying(false);
+          }, duration * 1000);
+        }
+      }
+    });
     
     // Estado local para controlar la animación basada en la interacción del usuario
     const [isSoundPlaying, setIsSoundPlaying] = useState(false);

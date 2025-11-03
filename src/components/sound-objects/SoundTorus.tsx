@@ -21,8 +21,16 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
 
-    // Auto-activación
-    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
+    // Auto-activación con callback para activar animaciones
+    useAutoTrigger({ 
+      objectId: id, 
+      audioParams, 
+      enabled: !audioEnabled,
+      onTrigger: () => {
+        // Activar animaciones cuando se dispara el auto-trigger
+        energyRef.current = 1;
+      }
+    });
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);
@@ -88,8 +96,11 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
           }
         }
         
-        // Solo ejecutar animaciones cuando el audio está activo o hay energía de clic
-        if (audioEnabled || energyRef.current > 0) {
+        // Determinar si las animaciones deben estar activas
+        const shouldAnimate = audioEnabled || energyRef.current > 0;
+
+        // Solo ejecutar animaciones cuando corresponde
+        if (shouldAnimate) {
           // Rotación automática
           if (audioParams.autoRotate) {
             const rotationSpeed = audioParams.rotationSpeed || 1.0;
@@ -97,14 +108,18 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
           }
           
           // Efecto de pulsación basado en pulseSpeed y pulseIntensity
-          if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0) {
+          // Solo aplicar si no estamos en medio de un pulso de clic (para evitar conflictos)
+          if (audioParams.pulseSpeed && audioParams.pulseSpeed > 0 && energyRef.current < 0.3) {
             const pulseSpeed = audioParams.pulseSpeed || 2.0;
             const pulseIntensity = audioParams.pulseIntensity || 0.3;
             const pulseScale = 1 + Math.sin(time * pulseSpeed) * pulseIntensity * 0.2;
-            meshRef.current.scale.setScalar(pulseScale);
+            // Aplicar el pulso sobre la escala base, pero respetar el pulso del trigger si es fuerte
+            if (energyRef.current < 0.5) {
+              meshRef.current.scale.setScalar(pulseScale);
+            }
           }
         } else {
-          // Resetear escala cuando no hay audio
+          // Resetear escala cuando no hay audio ni triggers
           meshRef.current.scale.setScalar(1);
         }
         

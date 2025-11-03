@@ -21,8 +21,17 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
 
-    // Auto-activación
-    useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
+    // Auto-activación con callback para activar animaciones
+    useAutoTrigger({ 
+      objectId: id, 
+      audioParams, 
+      enabled: !audioEnabled,
+      onTrigger: () => {
+        // Activar animaciones cuando se dispara el auto-trigger
+        animationRef.current.energy = 1.0;
+        animationRef.current.lastHit = Date.now();
+      }
+    });
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);
