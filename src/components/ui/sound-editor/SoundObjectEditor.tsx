@@ -13,7 +13,7 @@ import { SoundObjectMovementControls } from './components/SoundObjectMovementCon
 
 interface SoundObjectEditorProps {
   selectedObject: SoundObject;
-  onParamChange: (param: string | number | symbol, value: string | number | string[] | Record<string, string>) => void;
+  onParamChange: (param: string | number | symbol, value: string | number | string[] | number[] | Record<string, string> | boolean) => void;
   onTransformChange: (property: "position" | "rotation" | "scale", axis: 0 | 1 | 2, value: number) => void;
   onResetTransform: () => void;
   roundToDecimals: (value: number) => number;

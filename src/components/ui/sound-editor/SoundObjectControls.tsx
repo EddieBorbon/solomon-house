@@ -12,7 +12,7 @@ import { ColorSection } from './ColorSection';
 
 interface SoundObjectControlsProps {
   selectedObject: SoundObject;
-  onParamChange: (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => void;
+  onParamChange: (param: keyof AudioParams, value: number | string | string[] | number[] | Record<string, string> | boolean) => void;
   onTransformChange: (property: 'position' | 'rotation' | 'scale', axis: 0 | 1 | 2, value: number) => void;
   onResetTransform: () => void;
   roundToDecimals: (value: number) => number;

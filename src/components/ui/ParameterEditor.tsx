@@ -104,7 +104,7 @@ export function ParameterEditor() {
   }, [selectedEntity?.type, setEditingEffectZone]);
 
   // Función para actualizar un parámetro específico de objeto sonoro
-  const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
+  const handleParamChange = (param: keyof AudioParams, value: number | string | string[] | number[] | Record<string, string> | boolean) => {
     if (!isSoundObject) return;
 
     const soundObject = getSoundObject();

@@ -153,7 +153,7 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
   // TODO: Implementar suscripción cuando esté disponible en ParameterManagerFacade
 
   // Función para actualizar parámetros de objeto sonoro
-  const handleParamChange = useCallback((param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => {
+  const handleParamChange = useCallback((param: keyof AudioParams, value: number | string | string[] | number[] | Record<string, string> | boolean) => {
     console.log('🎛️ ParameterEditorNew: handleParamChange llamado', { param, value });
     
     if (!isSoundObject) return;
