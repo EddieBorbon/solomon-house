@@ -12,7 +12,7 @@ type OscillatorType = 'sine' | 'square' | 'triangle' | 'sawtooth';
 
 interface BaseSynthParametersProps {
   selectedObject: SoundObject;
-  onParamChange: (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => void;
+  onParamChange: (param: keyof AudioParams, value: number | string | string[] | number[] | Record<string, string> | boolean) => void;
   showFrequency?: boolean;
   showWaveform?: boolean;
   showDuration?: boolean;
@@ -222,3 +222,4 @@ export function BaseSynthParameters({
     </div>
   );
 }
+

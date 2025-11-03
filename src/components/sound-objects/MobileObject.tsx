@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useState, useEffect, useCallback } from 'react';
+import React, { forwardRef, useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Group, MeshStandardMaterial, Color, Vector3, BufferGeometry, LineBasicMaterial } from 'three';
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';

@@ -26,6 +26,7 @@ import { SoundObjectHeader } from '../../components/ui/sound-editor/SoundObjectH
 import { SynthSpecificParameters } from '../../components/ui/sound-editor/SynthSpecificParameters';
 import { SoundTransformSection } from '../../components/ui/sound-editor/SoundTransformSection';
 import { SoundObjectControls } from '../../components/ui/sound-editor/SoundObjectControls';
+import { SoundObjectMovementControls } from '../../components/ui/sound-editor/components/SoundObjectMovementControls';
 import { SoundObjectFooter } from '../../components/ui/sound-editor/SoundObjectFooter';
 import { NoSelectionMessage } from '../../components/ui/NoSelectionMessage';
 import { MobileObjectEditorWrapper } from '../../components/ui/MobileObjectEditorWrapper';
@@ -429,6 +430,11 @@ export function ParameterEditorNew({ config = {} }: ParameterEditorProps) {
                     onResetTransform={handleResetSoundTransform}
                     roundToDecimals={roundToDecimals}
                     onRemove={removeObject}
+                  />
+                  {/* Controles de movimiento */}
+                  <SoundObjectMovementControls
+                    selectedObject={soundObject}
+                    onParamChange={handleParamChange}
                   />
                 </div>
 

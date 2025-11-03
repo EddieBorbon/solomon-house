@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundConeProps {
   id: string;
@@ -38,6 +39,14 @@ export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
         // Activar animaciones cuando se dispara el auto-trigger
         energyRef.current = 1;
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<SoundConeRef>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
 
     // Animación del golpe percusivo

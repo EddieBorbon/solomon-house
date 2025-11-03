@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useWorldStore } from '../state/useWorldStore';
 import { type AudioParams } from '../lib/factories/SoundSourceFactory';
 
@@ -74,7 +74,7 @@ export function useAutoTrigger({
       default:
         return 1000; // Fallback
     }
-  }, [audioParams.autoTriggerMode, audioParams.autoTriggerInterval, audioParams.autoTriggerMin, audioParams.autoTriggerMax, audioParams.autoTriggerPattern, audioParams.autoTriggerPatternLoop]);
+  }, [audioParams]);
 
   // Programar la próxima activación
   const scheduleNextTrigger = useCallback(() => {
@@ -98,7 +98,7 @@ export function useAutoTrigger({
       }
       scheduleNextTrigger(); // Programar la siguiente activación
     }, delay);
-  }, [objectId, getNextTriggerTime, triggerObjectAttackRelease]);
+  }, [objectId, getNextTriggerTime, triggerObjectAttackRelease, onTrigger]);
 
   // Efecto principal que controla la auto-activación
   useEffect(() => {

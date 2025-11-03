@@ -6,6 +6,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundPlaneProps {
   id: string;
@@ -21,7 +22,7 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const meshRef = useRef<THREE.Mesh>(null);
     const groupRef = useRef<THREE.Group>(null);
-    const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
+    const { selectEntity, triggerObjectAttackRelease, updateObject } = useWorldStore();
 
     // Auto-activación con callback para activar animaciones
     useAutoTrigger({ 
@@ -32,6 +33,20 @@ export const SoundPlane = forwardRef<THREE.Group, SoundPlaneProps>(
         // Activar animación de ondulación cuando se dispara el auto-trigger
         setIsAnimating(true);
         setAnimationTime(0);
+      }
+    });
+
+    // Movimiento automático del objeto - usar groupRef como fallback si ref es null
+    const movementRef = (ref as React.RefObject<THREE.Group>) || groupRef;
+    useSoundObjectMovement({
+      groupRef: movementRef,
+      audioParams,
+      initialPosition: position,
+      enabled: true,
+      objectId: id,
+      onPositionUpdate: (newPosition) => {
+        // Actualizar el store periódicamente (con throttling para evitar demasiadas actualizaciones)
+        updateObject(id, { position: newPosition });
       }
     });
     

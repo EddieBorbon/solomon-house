@@ -15,7 +15,7 @@ import { NoiseSynthParameters } from './NoiseSynthParameters';
 
 interface SynthParametersFacadeProps {
   selectedObject: SoundObject;
-  onParamChange: (param: keyof AudioParams, value: number | string | string[] | Record<string, string>) => void;
+  onParamChange: (param: keyof AudioParams, value: number | string | string[] | number[] | Record<string, string> | boolean) => void;
 }
 
 /**

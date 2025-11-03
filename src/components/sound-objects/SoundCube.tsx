@@ -6,6 +6,7 @@ import { Mesh, Group, MeshStandardMaterial, Color, AdditiveBlending, Subtractive
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundCubeProps {
   id: string;
@@ -45,6 +46,14 @@ export const SoundCube = forwardRef<Group, SoundCubeProps>(({
       // Activar animaciones cuando se dispara el auto-trigger
       energyRef.current = 1;
     }
+  });
+
+  // Movimiento automático del objeto
+  useSoundObjectMovement({
+    groupRef: ref as React.RefObject<Group>,
+    audioParams,
+    initialPosition: position,
+    enabled: true
   });
 
   // Manejador para clic corto (trigger)

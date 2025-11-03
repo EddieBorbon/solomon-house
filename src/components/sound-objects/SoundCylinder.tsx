@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundCylinderProps {
   id: string;
@@ -33,6 +34,14 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
         // Activar animaciones cuando se dispara el auto-trigger
         energyRef.current = 1;
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
     
     // Crear geometría de cilindro con más detalle

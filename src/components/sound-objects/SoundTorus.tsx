@@ -6,6 +6,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import * as THREE from 'three';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundTorusProps {
   id: string;
@@ -30,6 +31,14 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
         // Activar animaciones cuando se dispara el auto-trigger
         energyRef.current = 1;
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
     
     // Referencias para la animación

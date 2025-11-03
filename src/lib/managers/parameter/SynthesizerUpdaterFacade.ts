@@ -214,6 +214,7 @@ export class SynthesizerUpdaterFacade {
   private isSpecificSynthesizer(synth: SynthesizerType): boolean {
     return synth instanceof Tone.PolySynth || 
            synth instanceof Tone.PluckSynth ||
+           synth instanceof Tone.NoiseSynth ||
            ('voice0' in synth && 'voice1' in synth) ||
            ('pitchDecay' in synth && 'octaves' in synth);
   }

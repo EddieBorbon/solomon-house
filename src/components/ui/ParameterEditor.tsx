@@ -28,6 +28,7 @@ import { EffectInfoSection } from './effect-editor/EffectInfoSection';
 import { EffectTransformSection } from './effect-editor/EffectTransformSection';
 import { SoundObjectHeader } from './sound-editor/SoundObjectHeader';
 import { SoundObjectControls } from './sound-editor/SoundObjectControls';
+import { SoundObjectMovementControls } from './sound-editor/components/SoundObjectMovementControls';
 import { NoSelectionMessage } from './NoSelectionMessage';
 import { MobileObjectEditorWrapper } from './MobileObjectEditorWrapper';
 import { useParameterHandlers } from '../../hooks/useParameterHandlers';
@@ -587,6 +588,12 @@ export function ParameterEditor() {
           onResetTransform={resetTransform}
           roundToDecimals={roundToDecimals}
           onRemove={removeObject}
+        />
+
+        {/* Controles de movimiento */}
+        <SoundObjectMovementControls
+          selectedObject={selectedObject}
+          onParamChange={handleParamChange}
         />
 
             </>

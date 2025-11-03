@@ -9,7 +9,7 @@ import { useLanguage } from '../../../../contexts/LanguageContext';
 
 interface AutoTriggerParametersProps {
   selectedObject: SoundObject;
-  onParamChange: (param: keyof AudioParams, value: number | string | string[] | boolean) => void;
+  onParamChange: (param: keyof AudioParams, value: number | string | string[] | number[] | boolean) => void;
 }
 
 /**

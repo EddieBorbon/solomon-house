@@ -9,6 +9,7 @@ import { AdvancedSynthParameters } from './AdvancedSynthParameters';
 import { SoundObjectSynthParams } from './SoundObjectSynthParams';
 import { SoundTransformSection } from './SoundTransformSection';
 import { SoundObjectFooter } from './SoundObjectFooter';
+import { SoundObjectMovementControls } from './components/SoundObjectMovementControls';
 
 interface SoundObjectEditorProps {
   selectedObject: SoundObject;
@@ -60,6 +61,12 @@ export function SoundObjectEditor({
 
       {/* Parámetros específicos de sintetizadores */}
       <SoundObjectSynthParams
+        selectedObject={selectedObject}
+        onParamChange={onParamChange}
+      />
+
+      {/* Controles de movimiento */}
+      <SoundObjectMovementControls
         selectedObject={selectedObject}
         onParamChange={onParamChange}
       />

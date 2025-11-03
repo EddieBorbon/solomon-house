@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundIcosahedronProps {
   id: string;
@@ -21,6 +22,13 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
 
+    // Referencias para la animación (declarar antes de usar en hooks)
+    const meshRef = useRef<THREE.Mesh>(null);
+    const animationRef = useRef<{ energy: number; lastHit: number }>({
+      energy: 0,
+      lastHit: 0,
+    });
+
     // Auto-activación con callback para activar animaciones
     useAutoTrigger({ 
       objectId: id, 
@@ -32,12 +40,13 @@ export const SoundIcosahedron = forwardRef<THREE.Group, SoundIcosahedronProps>(
         animationRef.current.lastHit = Date.now();
       }
     });
-    
-    // Referencias para la animación
-    const meshRef = useRef<THREE.Mesh>(null);
-    const animationRef = useRef<{ energy: number; lastHit: number }>({
-      energy: 0,
-      lastHit: 0,
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
 
     // Escala de selección

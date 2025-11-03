@@ -72,6 +72,16 @@ export interface AudioParams {
   autoTriggerMax?: number; // Máximo intervalo en segundos (para modo 'random')
   autoTriggerPattern?: number[]; // Patrón rítmico: array de tiempos relativos en segundos (para modo 'pattern')
   autoTriggerPatternLoop?: boolean; // Si el patrón debe repetirse en loop (para modo 'pattern')
+  // Parámetros de movimiento
+  movementEnabled?: boolean; // Activar/desactivar movimiento automático
+  movementType?: 'circular' | 'polar' | 'random' | 'figure8' | 'spiral'; // Tipo de movimiento
+  movementRadius?: number; // Radio del movimiento (para circular, polar, figure8, spiral)
+  movementSpeed?: number; // Velocidad del movimiento
+  movementAmplitude?: number; // Amplitud (para movimiento polar)
+  movementFrequency?: number; // Frecuencia (para movimiento polar)
+  movementRandomSeed?: number; // Semilla aleatoria (para movimiento random)
+  movementHeight?: number; // Altura del movimiento vertical
+  movementHeightSpeed?: number; // Velocidad del movimiento vertical
 }
 
 // Tipos para las fuentes de sonido
@@ -139,8 +149,7 @@ export class SoundSourceFactory {
       case 'icosahedron':
         return this.createMetalSynth(params);
       case 'plane':
-        // Cambiar a Synth percusivo en lugar de NoiseSynth
-        return this.createSimpleSynth(params);
+        return this.createNoiseSynth(params);
       case 'torus':
         return this.createPluckSynth(params);
       case 'dodecahedronRing':
@@ -227,11 +236,10 @@ export class SoundSourceFactory {
       const pluckSynth = synth as { toFrequency: (freq: number) => void };
       pluckSynth.toFrequency(safeFrequency);
     }
-    // Para 'plane' (usa Synth)
-    else if (type === 'plane') {
-      const synthWithOsc = synth as { oscillator: { frequency: { setValueAtTime: (value: number, time: number) => void } } };
-      synthWithOsc.oscillator.frequency.setValueAtTime(safeFrequency, Tone.now());
-    }
+    // Para 'plane' (usa NoiseSynth, no tiene frecuencia configurable en oscilador)
+    // else if (type === 'plane') {
+    //   NoiseSynth no tiene frecuencia de oscilador, solo ruido
+    // }
     // Para 'dodecahedronRing' y 'spiral' no se configura frecuencia inicial
   }
 
@@ -352,7 +360,7 @@ export class SoundSourceFactory {
         attack: params.attack || 0.001, 
         decay: params.decay || 0.1, 
         sustain: params.sustain || 0, 
-        release: 0.1 
+        release: params.release || 0.1 
       },
     });
   }

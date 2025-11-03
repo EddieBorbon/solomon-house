@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundSphereProps {
   id: string;
@@ -36,6 +37,14 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
         // Activar animaciones cuando se dispara el auto-trigger
         energyRef.current = 1;
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
     
     // Crear geometría de esfera con más detalle

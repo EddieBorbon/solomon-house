@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundDodecahedronRingProps {
   id: string;
@@ -31,6 +32,14 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
         // Activar animaciones cuando se dispara el auto-trigger
         energyRef.current = 1;
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
     });
     
     // Obtener la polifonía del objeto (número de dodecaedros) basado en la longitud del chord

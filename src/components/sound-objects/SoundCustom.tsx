@@ -6,6 +6,7 @@ import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundCustomProps {
   id: string;
@@ -25,6 +26,14 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
 
     // Auto-activación
     useAutoTrigger({ objectId: id, audioParams, enabled: !audioEnabled });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams,
+      initialPosition: position,
+      enabled: true
+    });
 
     // Obtener el código personalizado del objeto
     const customCode = useMemo(() => {

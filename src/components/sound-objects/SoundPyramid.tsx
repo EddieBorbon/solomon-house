@@ -6,6 +6,7 @@ import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
 import { useAutoTrigger } from '../../hooks/useAutoTrigger';
+import { useSoundObjectMovement } from '../../hooks/useSoundObjectMovement';
 
 interface SoundPyramidProps {
   id: string;
@@ -28,7 +29,7 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
     // Auto-activación con callback para activar animaciones
     useAutoTrigger({ 
       objectId: id, 
-      audioParams: audioParams || {}, 
+      audioParams: audioParams || { frequency: 440, waveform: 'sine', volume: 0.5 }, 
       enabled: !audioEnabled && !!audioParams,
       onTrigger: () => {
         // Activar animación cuando se dispara el auto-trigger
@@ -41,6 +42,14 @@ export const SoundPyramid = forwardRef<THREE.Group, SoundPyramidProps>(
           }, duration * 1000);
         }
       }
+    });
+
+    // Movimiento automático del objeto
+    useSoundObjectMovement({
+      groupRef: ref as React.RefObject<THREE.Group>,
+      audioParams: audioParams || { frequency: 440, waveform: 'sine', volume: 0.5 },
+      initialPosition: position,
+      enabled: !!audioParams
     });
     
     // Estado local para controlar la animación basada en la interacción del usuario
