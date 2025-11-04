@@ -326,20 +326,20 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
 
               {/* Mención del Apoyo del Ministerio de las Culturas, las Artes y los Saberes */}
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
-                <div className="text-center space-y-2">
-                  <p className="text-xs font-mono text-gray-400 tracking-wider">
+                <div className="text-center space-y-2 px-2 sm:px-4">
+                  <p className="text-xs font-mono text-gray-400 tracking-wider break-words overflow-wrap-anywhere">
                     {t('loading.ministrySupport')}
                   </p>
-                  <p className="text-xs font-mono text-white tracking-wider">
+                  <p className="text-xs font-mono text-white tracking-wider break-words overflow-wrap-anywhere">
                     {t('loading.ministryName')}
                   </p>
-                  <p className="text-xs font-mono text-gray-300 tracking-wider">
+                  <p className="text-xs font-mono text-gray-300 tracking-wider break-words overflow-wrap-anywhere">
                     {t('loading.ministryDirection')}
                   </p>
-                  <p className="text-xs font-mono text-gray-300 tracking-wider">
+                  <p className="text-xs font-mono text-gray-300 tracking-wider break-words overflow-wrap-anywhere">
                     {t('loading.ministryCall')}
                   </p>
-                  <p className="text-xs font-mono text-gray-300 tracking-wider mt-2">
+                  <p className="text-xs font-mono text-gray-300 tracking-wider mt-2 break-words overflow-wrap-anywhere">
                     {t('loading.ministrySupportDescription')}
                   </p>
                 </div>
