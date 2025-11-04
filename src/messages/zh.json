@@ -21,7 +21,14 @@
     "prepareAudio": "正在准备音频引擎",
     "loadWebAudio": "正在加载Web Audio API",
     "prepareSynths": "正在准备合成器",
-    "configSpatial": "正在配置空间音频"
+    "configSpatial": "正在配置空间音频",
+    "ministrySupport": "本项目已获得以下机构的支持",
+    "cotutors": "共同导师：",
+    "cotutorsNames": "雨果·索利斯·加西亚博士和罗伯托·莫拉莱斯·曼萨纳雷斯博士",
+    "ministryName": "文化、艺术与知识部",
+    "ministryDirection": "艺术局 - 合作与国际事务组",
+    "ministryCall": "国际文化组合征集 - 哥伦比亚在世界，第2线",
+    "ministrySupportDescription": "支持由文化管理者或哥伦比亚侨民艺术家领导的艺术和文化项目和过程的流通与加强。"
   },
   "ui": {
     "move": "移动",

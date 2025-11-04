@@ -217,16 +217,16 @@ export function PersistencePanel() {
         setAdminDialogPassword('');
         
         alert(
-          adminDialogAction === 'lock' ? 'Proyecto bloqueado correctamente.' :
-          adminDialogAction === 'unlock' ? 'Proyecto desbloqueado correctamente.' :
-          'Proyecto eliminado correctamente.'
+          adminDialogAction === 'lock' ? t('persistence.projectLockedSuccessfully') :
+          adminDialogAction === 'unlock' ? t('persistence.projectUnlockedSuccessfully') :
+          t('persistence.projectDeletedSuccessfully')
         );
       } else {
-        alert('Contraseña incorrecta.');
+        alert(t('persistence.wrongPassword'));
         setAdminDialogPassword('');
       }
     } catch (error) {
-      alert('Error al realizar la acción. Inténtalo de nuevo.');
+      alert(t('persistence.errorPerformingAction'));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -581,9 +581,9 @@ export function PersistencePanel() {
                           if (success) {
                             setShowUnlockDialog(false);
                             setAdminPassword('');
-                            alert('Edición desbloqueada correctamente.');
+                            alert(t('persistence.unlockSuccess'));
                           } else {
-                            alert('Contraseña incorrecta.');
+                            alert(t('persistence.wrongPassword'));
                             setAdminPassword('');
                           }
                         }
@@ -601,9 +601,9 @@ export function PersistencePanel() {
                         if (success) {
                           setShowUnlockDialog(false);
                           setAdminPassword('');
-                          alert('Edición desbloqueada correctamente.');
+                          alert(t('persistence.unlockSuccess'));
                         } else {
-                          alert('Contraseña incorrecta.');
+                          alert(t('persistence.wrongPassword'));
                           setAdminPassword('');
                         }
                       }}

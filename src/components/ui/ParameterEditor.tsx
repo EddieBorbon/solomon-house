@@ -246,7 +246,7 @@ export function ParameterEditor() {
           className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
             isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
           }`}
-          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? t('effects.panelLockedDuringTutorial') : (isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel'))}
           disabled={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10}
         >
           {/* Decoraciones de esquina */}
@@ -471,7 +471,7 @@ export function ParameterEditor() {
           className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
             isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
           }`}
-          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? "Contraer panel" : "Expandir panel")}
+          title={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10 ? t('effects.panelLockedDuringTutorial') : (isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel'))}
           disabled={isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10}
         >
           {/* Decoraciones de esquina */}

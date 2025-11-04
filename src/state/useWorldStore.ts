@@ -362,6 +362,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -405,6 +406,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -490,6 +492,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -615,6 +618,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   clearAllObjects: () => {
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -654,6 +658,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -695,6 +700,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -741,6 +747,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -883,6 +890,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -922,6 +930,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -993,6 +1002,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -1107,6 +1117,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   createGrid: (position: [number, number, number], size: number = 20) => {
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
@@ -1162,6 +1173,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   deleteGrid: (gridId: string) => {
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
+      // Traducción debe manejarse en el componente que llama a esta función
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }

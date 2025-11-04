@@ -15,6 +15,7 @@ import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
@@ -123,6 +124,7 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 
 export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
+  const { t } = useLanguage();
   
   // Estado para mostrar advertencia de cuota
   const [showQuotaWarning, setShowQuotaWarning] = React.useState(false);
@@ -132,22 +134,22 @@ export function Experience() {
   
   // Detectar errores de cuota
   React.useEffect(() => {
-    if (error?.includes('Cuota de Firestore excedida')) {
+    if (error?.includes(t('quotaWarning.quotaExceeded'))) {
       setShowQuotaWarning(true);
     }
-  }, [error]);
+  }, [error, t]);
   
 
   // Función para limpiar datos de Firestore
   const handleCleanup = async () => {
     try {
       // Aquí podrías implementar la limpieza
-      console.log('Limpiando datos de Firestore...');
+      console.log(t('quotaWarning.cleaningData'));
       setShowQuotaWarning(false);
       // Recargar la página para reconectar
       window.location.reload();
     } catch (error) {
-      console.error('Error durante la limpieza:', error);
+      console.error(t('quotaWarning.errorCleaning'), error);
     }
   };
 

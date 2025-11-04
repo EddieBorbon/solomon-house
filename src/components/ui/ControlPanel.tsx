@@ -288,7 +288,7 @@ export function ControlPanel() {
         className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
           (isTutorialActive && currentStep !== 4 && currentStep !== 5) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:text-black'
         }`}
-        title={(isTutorialActive && currentStep !== 4 && currentStep !== 5) ? 'Panel bloqueado durante el tutorial' : (isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel'))}
+        title={(isTutorialActive && currentStep !== 4 && currentStep !== 5) ? t('effects.panelLockedDuringTutorial') : (isPanelExpanded ? t('ui.collapsePanel') : t('ui.expandPanel'))}
         disabled={isTutorialActive && currentStep !== 4 && currentStep !== 5}
       >
         {/* Decoraciones de esquina */}
@@ -358,7 +358,7 @@ export function ControlPanel() {
             <button
               onClick={() => setIsControlsExpanded(!isControlsExpanded)}
               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={isControlsExpanded ? "Ocultar controles" : "Mostrar controles"}
+              title={isControlsExpanded ? t('effects.hideControls') : t('effects.showControls')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
@@ -388,7 +388,7 @@ export function ControlPanel() {
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${isCameraEnabled ? 'bg-green-500' : 'bg-red-500'}`} />
                     <span className="text-white">
-                      {isCameraEnabled ? 'Cámara Activa' : 'Cámara Bloqueada'}
+                      {isCameraEnabled ? t('effects.cameraActive') : t('effects.cameraLocked')}
                     </span>
                   </div>
 
@@ -402,7 +402,7 @@ export function ControlPanel() {
                           : 'border-green-500 text-green-500 hover:bg-green-500 hover:text-white'
                       }`}
                     >
-                      {isCameraEnabled ? 'Bloquear' : 'Activar'}
+                      {isCameraEnabled ? t('effects.lock') : t('effects.activate')}
                     </button>
 
                     <button
@@ -463,7 +463,7 @@ export function ControlPanel() {
             <button
               onClick={() => setIsAddMenuExpanded(!isAddMenuExpanded)}
               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={isAddMenuExpanded ? "Ocultar menú" : "Mostrar menú"}
+              title={isAddMenuExpanded ? t('effects.hideMenu') : t('effects.showMenu')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
@@ -544,7 +544,7 @@ export function ControlPanel() {
             <button
               onClick={() => setIsEffectsExpanded(!isEffectsExpanded)}
               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={isEffectsExpanded ? "Ocultar menú" : "Mostrar menú"}
+              title={isEffectsExpanded ? t('effects.hideMenu') : t('effects.showMenu')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
@@ -649,7 +649,7 @@ export function ControlPanel() {
             <button
               onClick={() => setIsMobileObjectExpanded(!isMobileObjectExpanded)}
               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={isMobileObjectExpanded ? "Ocultar menú" : "Mostrar menú"}
+              title={isMobileObjectExpanded ? t('effects.hideMenu') : t('effects.showMenu')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
@@ -692,7 +692,7 @@ export function ControlPanel() {
             <button
               onClick={() => setIsGridsExpanded(!isGridsExpanded)}
               className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={isGridsExpanded ? "Ocultar cuadrículas" : "Mostrar cuadrículas"}
+              title={isGridsExpanded ? t('effects.hideGrids') : t('effects.showGrids')}
             >
               <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
               <span className="relative text-xs font-mono tracking-wider">
@@ -743,7 +743,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('west')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Oeste"
+                  title={t('effects.west')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.west')}</span>
@@ -751,7 +751,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('east')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Este"
+                  title={t('effects.east')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.east')}</span>
@@ -759,7 +759,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('south')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Sur"
+                  title={t('effects.south')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.south')}</span>
@@ -767,7 +767,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('north')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Norte"
+                  title={t('effects.north')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.north')}</span>
@@ -775,7 +775,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('down')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Abajo"
+                  title={t('effects.down')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.down')}</span>
@@ -783,7 +783,7 @@ export function ControlPanel() {
                 <button
                   onClick={() => createGridAtPosition('up')}
                   className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                  title="Arriba"
+                  title={t('effects.up')}
                 >
                   <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                   <span className="relative text-xs font-mono tracking-wider">{t('controls.up')}</span>
@@ -843,7 +843,7 @@ export function ControlPanel() {
               <button
                 onClick={createGridAtCustomPosition}
                 className="relative w-full border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title="Crear cuadrícula en la posición especificada"
+                title={t('effects.createGridAtPosition')}
               >
                 <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
                 <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">

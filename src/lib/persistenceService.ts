@@ -154,7 +154,7 @@ export class PersistenceService {
       const project = await firebaseService.loadProject(projectId);
       
       if (!project) {
-        throw new Error('Proyecto no encontrado');
+        throw new Error('Project not found'); // Error message - translation handled in UI
       }
 
       // IMPORTANTE: Detener todos los sonidos del mundo global antes de cargar el proyecto
@@ -331,7 +331,7 @@ export class PersistenceService {
       const grid = state.grids.get(gridId);
       
       if (!grid) {
-        throw new Error('Cuadrícula no encontrada');
+        throw new Error('Grid not found'); // Error message - translation handled in UI
       }
 
       const firebaseGrid = gridToFirebase(grid);
@@ -349,7 +349,7 @@ export class PersistenceService {
       const firebaseGrid = await firebaseService.loadGrid(gridId);
       
       if (!firebaseGrid) {
-        throw new Error('Cuadrícula no encontrada');
+        throw new Error('Grid not found'); // Error message - translation handled in UI
       }
 
       const grid = firebaseToGrid(firebaseGrid);

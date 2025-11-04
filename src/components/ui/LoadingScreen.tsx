@@ -26,7 +26,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
         };
       case 'scene':
         return {
-          systemCode: '003_SCENE_LOADING',
+          systemCode: t('loading.sceneLoadingCode'),
           title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
@@ -41,7 +41,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
         };
       case 'audio':
         return {
-          systemCode: '004_AUDIO_INIT',
+          systemCode: t('loading.audioInitCode'),
           title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
@@ -56,7 +56,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
         };
       default:
         return {
-          systemCode: '002_SYSTEM',
+          systemCode: t('loading.systemCode'),
           title: `♪ ${t('loading.systemCode')}`,
           welcomeMessage: '',
           description: '',
@@ -76,7 +76,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
         <div className="relative w-full h-full">
           <Image 
             src="/backgrounds/Minculturas_Patrones-02.png" 
-            alt="Background Pattern" 
+            alt={t('loading.backgroundPattern')} 
             fill
             className="object-cover"
             priority
@@ -100,7 +100,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
        
 
         {/* Complex border container */}
-        <div className="relative border border-white p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full loading-screen-content">
+        <div className="relative border border-white p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full loading-screen-content overflow-hidden">
           {/* Corner decorations */}
           <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
           <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-white"></div>
@@ -108,7 +108,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
           <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
           
           {/* Inner content */}
-          <div className="text-center">
+          <div className="text-center px-2 sm:px-4">
 
             {/* Title */}
             <div className="mb-4 sm:mb-6">
@@ -213,11 +213,11 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                 </div>
 
                 {/* Co-Tutores */}
-                <div className="mt-2 sm:mt-3">
+                <div className="mt-2 sm:mt-3 px-2 sm:px-4">
                   <p className="text-xs font-mono text-gray-400 tracking-wider mb-1">
                     {t('loading.cotutors')}
                   </p>
-                  <p className="text-xs sm:text-sm font-mono text-white tracking-wider">
+                  <p className="text-xs sm:text-sm font-mono text-white tracking-wider break-words overflow-wrap-anywhere">
                     {t('loading.cotutorsNames')}
                   </p>
                 </div>
@@ -231,7 +231,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/logo.png" 
-                        alt="Solomon House Logo" 
+                        alt={t('loading.solomonHouseLogo')} 
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
@@ -244,7 +244,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/Mincultura_Distintivos-03.png" 
-                        alt="Mincultura Distintivos" 
+                        alt={t('loading.minculturaDistintivos')} 
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
@@ -257,7 +257,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/Mincultura_ObjetivosEstrategicos-04.png" 
-                        alt="Mincultura Objetivos Estratégicos" 
+                        alt={t('loading.minculturaObjetivosEstrategicos')} 
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
@@ -270,7 +270,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/Picture1-removebg-preview.png" 
-                        alt="UNAM Logo" 
+                        alt={t('loading.unamLogo')} 
                         width={96}
                         height={96}
                         className="w-full h-full object-contain filter brightness-0 invert opacity-90"
@@ -283,7 +283,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/Picture2-removebg-preview.png" 
-                        alt="FaM Logo" 
+                        alt={t('loading.famLogo')} 
                         width={96}
                         height={96}
                         className="w-full h-full object-contain filter brightness-0 invert opacity-90"
@@ -296,7 +296,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/ceam.png" 
-                        alt="CEAM Logo" 
+                        alt={t('loading.ceamLogo')} 
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
@@ -309,7 +309,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/logoNanjing.svg" 
-                        alt="Nanjing Logo" 
+                        alt={t('loading.nanjingLogo')} 
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
