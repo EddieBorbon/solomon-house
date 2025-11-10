@@ -1,3 +1,5 @@
+'use client';
+
 import ProjectCard from './ProjectCard';
 import { useLanguage } from '../../contexts/LanguageContext';
 
