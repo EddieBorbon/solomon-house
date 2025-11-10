@@ -14,7 +14,7 @@ export function LanguageSelector({ variant = 'loading', className = '' }: Langua
     return null;
   }
 
-  const languages: SupportedLocale[] = ['es', 'en', 'ru', 'zh', 'th', 'fr'];
+  const languages: SupportedLocale[] = ['es', 'en', 'ru', 'zh', 'th', 'fr', 'my'];
 
   if (variant === 'compact') {
     return (

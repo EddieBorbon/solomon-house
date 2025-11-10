@@ -1,191 +1,191 @@
 {
   "loading": {
-    "systemCode": "SOLOMON'S_HOUSE",
-    "welcome": "WELCOME",
-    "description": "AN_INTERACTIVE_3D_SONIC_EXPERIENCE_WHERE_YOU_CAN_CREATE_AND_MANIPULATE_SONIC_OBJECTS_IN_REAL_TIME.",
-    "startButton": "START_SONIC_EXPERIENCE",
-    "startTutorial": "Start Tutorial",
-    "startExperience": "Start Experience",
-    "project": "DOCTORAL_THESIS_PROJECT",
-    "degree": "DOCTORATE_IN_MUSICAL_COMPOSITION",
-    "author": "AUTHOR:",
-    "authorName": "EDDIE_JONATHAN_GARCÍA_BORBÓN",
-    "tutor": "TUTOR:",
-    "tutorName": "PHD._MANUEL_ROCHA_ITURBIDE",
-    "loading3D": "Loading Solomon's House...",
-    "initializing3D": "Initializing the 3D musical world",
-    "sceneLoading": "LOADING_3D_WORLD...",
-    "audioInit": "INITIALIZING_AUDIO_SYSTEM...",
+    "systemCode": "ဆော်လမွန်၏အိမ်",
+    "welcome": "ကြိုဆိုပါသည်",
+    "description": "သင်သည် အချိန်နှင့်တပြေးညီ ဗိုင်းဘာရှာနစ်အရာဝတ္ထုများကို ဖန်တီးပြီး ထိန်းချုပ်နိုင်သော အပြန်အလှန်သုံး 3D အသံအ прежpန့်",
+    "startButton": "အသံအတွေ့အကြုံ စတင်ရန်",
+    "startTutorial": "လမ်းညွှန်မှု စတင်ရန်",
+    "startExperience": "အတွေ့အကြုံစတင်ရန်",
+    "project": "ဒေါက်တာဘွဲ့ စတုဒီယိုလေ့လာမှု",
+    "degree": "ဂီတဖွဲ့စည်းရေး ဒေါက်တာဘွဲ့",
+    "author": "ရေးသားသူ:",
+    "authorName": "EDDIE JONATHAN GARCÍA BORBÓN",
+    "tutor": "အပ်ရှင်း:",
+    "tutorName": "ဒေါက်တာ မန်ဝယ် ရိုချာ အီတူဘီဒေ",
+    "loading3D": "ဆော်လမွန်၏အိမ်ကို ဖွင့်နေပါသည်...",
+    "initializing3D": "3D ဗီဇယ်အသံကမ္ဘာကို စတင်နေပါသည်",
+    "sceneLoading": "3D ကမ္ဘာကို မောင်းနှင်နေပါသည်...",
+    "audioInit": "အသံစနစ်ကို စတင်နေပါသည်...",
     "sceneLoadingCode": "003_SCENE_LOADING",
     "audioInitCode": "004_AUDIO_INIT",
-    "initRenderer": "INITIALIZING_RENDERER",
-    "loadModels": "LOADING_3D_MODELS",
-    "prepareAudio": "PREPARING_AUDIO_ENGINE",
-    "loadWebAudio": "LOADING_WEB_AUDIO_API",
-    "prepareSynths": "PREPARING_SYNTHESIZERS",
-    "configSpatial": "CONFIGURING_SPATIAL_AUDIO",
-    "ministrySupport": "THIS_PROJECT_HAS_BEEN_REALIZED_WITH_THE_SUPPORT_OF",
-    "cotutors": "CO-TUTORS:",
-    "cotutorsNames": "PHD_HUGO_SOLIS_GARCIA_AND_PHD_ROBERTO_MORALES_MANZANARES",
-    "ministryName": "Ministry of Cultures, Arts and Knowledge",
-    "ministryDirection": "Arts Directorate - Cooperation and International Affairs Group",
-    "ministryCall": "International Cultural Portfolio Call - Colombia in the World, Line 2",
-    "ministrySupportDescription": "Support for the circulation and strengthening of artistic and cultural projects and processes led by cultural managers or Colombian artists from the diaspora.",
-    "backgroundPattern": "Background Pattern",
-    "solomonHouseLogo": "Solomon House Logo",
-    "minculturaDistintivos": "Mincultura Distintivos",
-    "minculturaObjetivosEstrategicos": "Mincultura Strategic Objectives",
-    "unamLogo": "UNAM Logo",
-    "famLogo": "FaM Logo",
-    "ceamLogo": "CEAM Logo",
-    "nanjingLogo": "Nanjing Logo"
+    "initRenderer": "ပုံဖော်စက်ကို စတင်နေပါသည်",
+    "loadModels": "3D မော်ဒယ်များကို ဖွင့်နေပါသည်",
+    "prepareAudio": "အသံအင်ဂျင်ကို ပြင်ဆင်နေသည်",
+    "loadWebAudio": "Web Audio API ကို ဖွင့်နေသည်",
+    "prepareSynths": "Synthesizer များကို ပြင်ဆင်နေသည်",
+    "configSpatial": "အသံပိုင်းဆိုင်ရာ တည်နေရာပြုခြင်း ပြင်ဆင်နေသည်",
+    "ministrySupport": "ဤပရောဂျက်ကို ထောက်ပံ့ပေးသူများ:",
+    "cotutors": "အကြံပေးများ:",
+    "cotutorsNames": "ဒေါက်တာ ဧည့်ှုဂို ဆိုးလစ်စ် ဂါစီရီးယား နှင့် ဒေါက်တာ ရိုဘတ်တို မိုရာလက်စ်",
+    "ministryName": "ယဉ်ကျေးမှု၊ ကလာသမူထင်ရှားမှုနှင့် သိပ္ပံ ဝန်ကြီးဌာန",
+    "ministryDirection": "အနုပညာဌာန - ပြည်တွင်းပြည်ပ ပူးပေါင်းဆောင်ရွက်ရေးကဏ္ဍ",
+    "ministryCall": "အပြည်ပြည်ဆိုင်ရာ ယဉ်ကျေးမှု စီမံကိန်း - ကမ္ဘာပေါ်ရှိ ကိုလံဘီယာ",
+    "ministrySupportDescription": "ပြည်ပနေထိုင် ကိုလံဘီယာအနုပညာရှင်များ၏ သာယာယဉ်ကျေးမှု ထုတ်လုပ်မှုများကို ကူညီထောက်ပံ့သည်။",
+    "backgroundPattern": "နောက်ခံပုံစံ",
+    "solomonHouseLogo": "ဆော်လမွန်၏အိမ် သင်္ကရိုက်",
+    "minculturaDistintivos": "Mincultura အမှတ်တံဆိပ်များ",
+    "minculturaObjetivosEstrategicos": "Mincultura မဟာဗျူဟာဆိုင်ရာ ရည်မှန်းချက်များ",
+    "unamLogo": "UNAM လိုဂို",
+    "famLogo": "FaM လိုဂို",
+    "ceamLogo": "CEAM လိုဂို",
+    "nanjingLogo": "နန်ချင်း လိုဂို"
   },
   "ui": {
-    "move": "Move",
-    "rotate": "Rotate",
-    "scale": "Scale",
-    "delete": "Delete",
-    "collapsePanel": "Collapse panel",
-    "expandPanel": "Expand panel",
-    "noSelection": "No object selected",
-    "selectObject": "Select an object to edit it"
+    "move": "ရွှေ့ပြောင်းရန်",
+    "rotate": "လှည့်ရန်",
+    "scale": "အရွယ်အစားပြောင်းရန်",
+    "delete": "ဖျက်ရန်",
+    "collapsePanel": "ဘောင်အကန့် အကျုံးသို့",
+    "expandPanel": "ဘောင်ကျယ်ထွားစေ",
+    "noSelection": "ရွေးချယ်ထားသော အရာဝတ္ထု မရှိပါ",
+    "selectObject": "ပြင်ဆင်လိုသော အရာဝတ္ထုကို ရွေးပါ"
   },
   "transformToolbar": {
-    "exit": "Exit",
+    "exit": "ထွက်ရန်",
     "exitShortcut": "(ESC)",
-    "exitTooltip": "Exit edit mode (ESC)",
-    "delete": "Delete",
+    "exitTooltip": "တည်းဖြတ်မှုမုဒ်မှ ထွက်ရန် (ESC)",
+    "delete": "ဖျက်ရန်",
     "deleteShortcut": "(DEL)",
-    "deleteTooltip": "Delete selected entity (DEL)"
+    "deleteTooltip": "ရွေးထားသော အရာဝတ္ထုကို ဖယ်ရှားရန် (DEL)"
   },
   "cameraToggle": {
-    "title": "Camera Control",
-    "statusAlwaysOn": "Camera always active",
-    "alwaysOnButton": "Camera Always Active",
-    "forceOn": "Force ON",
-    "disabled": "Disabled",
-    "debug": "Debug",
-    "alwaysEnabledNotice": "The camera is always enabled and cannot be locked",
-    "controlsTitle": "Controls:",
-    "rotateInstruction": "• Right-click + drag: Rotate",
-    "zoomInstruction": "• Mouse wheel: Zoom",
-    "panInstruction": "• Middle button + drag: Pan",
-    "emergencyTitle": "Emergency Keys:",
-    "emergencyForce": "• Key F: Force immediate enable",
-    "emergencyResetQuick": "• Key C: Quick camera reset",
-    "emergencyResetFull": "• Key R: Full camera reset"
+    "title": "ကင်မရာထိန်းချုပ်မှု",
+    "statusAlwaysOn": "ကင်မရာ အမြဲဖွင့်ထားသည်",
+    "alwaysOnButton": "ကင်မရာကို အမြဲဖွင့်ထားမည်",
+    "forceOn": "အချက်ပေးဖွင့်မည်",
+    "disabled": "ပိတ်ထားသည်",
+    "debug": "မှားယွင်းချက် စစ်ဆေးခြင်း",
+    "alwaysEnabledNotice": "ကင်မရာကို အမြဲဖွင့်ထားရပြီး လော့ခ်မလုပ်နိုင်ပါ",
+    "controlsTitle": "ထိန်းချုပ်မှုများ:",
+    "rotateInstruction": "• ညာဘက်မောက်စ်ခလုတ်နှိပ်ပြီး လဲ: လှည့်ရန်",
+    "zoomInstruction": "• မောက်စ်လှိမ်ပြတိုက်: အချင်းချိုင့်/ကြီး",
+    "panInstruction": "• မောက်စ်အလယ်ခလုတ်နှိပ်ပြီး ဆွဲ: ရွှေ့ရန်",
+    "emergencyTitle": "အရေးပေါ်ခလုတ်များ:",
+    "emergencyForce": "• F ခလုတ်: ချက်ချင်းဖွင့်",
+    "emergencyResetQuick": "• C ခလုတ်: ကင်မရာကို မြန်မြန်ပြန်သတ်မှတ်",
+    "emergencyResetFull": "• R ခလုတ်: ကင်မရာကို အပြည့်အဝပြန်လည်သတ်မှတ်"
   },
   "cameraControls": {
-    "toggleTooltip": "Show camera controls",
-    "title": "Camera Controls",
-    "forward": "Forward",
-    "backward": "Backward",
-    "left": "Left",
-    "right": "Right",
-    "down": "Down",
-    "up": "Up",
-    "fast": "Fast",
-    "mouse": "Mouse: Rotate, Zoom, Pan"
+    "toggleTooltip": "ကင်မရာထိန်းချုပ်မှုများ ပြသရန်",
+    "title": "ကင်မရာထိန်းချုပ်မှုများ",
+    "forward": "ရှေ့",
+    "backward": "နောက်",
+    "left": "ဘယ်",
+    "right": "ညာ",
+    "down": "အောက်",
+    "up": "အပေါ်",
+    "fast": "လျင်မြန်",
+    "mouse": "မောက်စ်: လှည့်/လျှော့ချ/ရွှေ့"
   },
   "audioEffects": {
-    "title": "Audio Effects",
-    "subtitle": "Complete collection of Tone.js effects for 3D spatial audio",
-    "activeBadge": "Active",
-    "availableParameters": "Available parameters:",
-    "connected": "Connected",
-    "disconnected": "Disconnected",
+    "title": "အသံအဖြစ်အပျက်များ",
+    "subtitle": "3D အသံတည်နေရာအတွက် Tone.js အကျုံးပြည့်ဖုံးအုပ်စု",
+    "activeBadge": "အသုံးပြုနေသည်",
+    "availableParameters": "လက်ရှိတန်ဖိုးများ:",
+    "connected": "ချိတ်ဆက်ထားသည်",
+    "disconnected": "ချိတ်ဆက်မထားပါ",
     "parametersLabel": "parameters",
     "cards": {
       "stereoWidener": {
-        "title": "Stereo Widener",
-        "description": "Applies mid/side width. 0 keeps everything in the center, 1 pushes everything to the sides."
+        "title": "stereo Widener",
+        "description": "အသံကို ဗဟိုမှ ပိုကျယ်ဝန်းစေသည်။ သုညတွင် ဗဟိုတွင်တည်နေပြီး တစ်တွင် အစွန်းများသို့ တွန်းပို့သည်။"
       },
       "tremolo": {
         "title": "Tremolo",
-        "description": "Modulates amplitude with an LFO. Stereo effect with inverted phase per channel."
+        "description": "အသံအရွယ်အစားကို LFO ဖြင့် အသံဖြတ်နိုင်ရေး ချိန်ညှိတတ်သည်။ ချန်နယ်တစ်ခုစီတွင် အဆင့်ညှိကွာခြားသည့် stereo အကျိုးသက်ရောက်မှု"
       },
       "vibrato": {
         "title": "Vibrato",
-        "description": "Combines a delay and LFO to bend pitch as the delay time is modulated."
+        "description": "Delay နှင့် LFOကို ပေါင်းစပ်၍ Delay အချိန်မတည့်ခြင်းကြောင့် တီးအော်အမူအရာ ပြောင်းလဲတတ်သည်။"
       },
       "phaser": {
         "title": "Phaser",
-        "description": "Phase modulation sweeps the spectrum to create a classic swirling tone."
+        "description": "Phase ချိန်ညှိမှုသည် အသံခွဲအကွာများကို တည်ပြောင်းစေ၍ အမျိုးအစား သာယာသော အသံဖြစ်စေသည်။"
       },
       "autoFilter": {
         "title": "Auto Filter",
-        "description": "Resonant filter driven by an LFO that automatically sweeps the cutoff frequency."
+        "description": "LFO ဖြင့်ထိန်းချုပ်သော Resonance Filter သည် cutoff frequency ကို အလိုအလျောက် လှည့်ပတ်ကြည့်ရှုသည်။"
       },
       "autoWah": {
         "title": "Auto Wah",
-        "description": "Auto wah that reacts to input amplitude to open and close the filter dynamically."
+        "description": "ဝါဝါ အကျိုးသက်ရောက်မှုသည် input amplitude အပေါ်မူတည်၍ filter ကို ဖွင့်၍ပိတ်တတ်သည်။"
       },
       "bitCrusher": {
         "title": "Bit Crusher",
-        "description": "Reduces bit depth and sample rate to produce raw lo-fi textures."
+        "description": "bit depth နှင့် sample rate ကို လျော့ချ၍ lo-fi အသံများကို ထုတ်ပေးသည်။"
       },
       "chebyshev": {
         "title": "Chebyshev",
-        "description": "Generates musical distortion harmonics using Chebyshev polynomials."
+        "description": "Chebyshev ပေါင်းစုံကို အသုံးပြုပြီး အသံအပြစ်ဆိပ်ဖြစ်အောင် Harmonic များကို ဖန်တီးသည်။"
       },
       "chorus": {
         "title": "Chorus",
-        "description": "Duplicates the source with pitch and delay modulation for a wider sound."
+        "description": "အသံရင်းမြစ်ကို ပြန်လည်ထပ်တူဖန်တီးခြင်းနှင့် pitch ၊ delay ကို ချိန်ညှိထားခြင်းကြောင့် အသံကျယ်ဝန်းစေသည်။"
       },
       "distortion": {
         "title": "Distortion",
-        "description": "Applies nonlinear saturation to add aggressive harmonic content."
+        "description": "မတည့်သော saturation ကို အသုံးပြုပြီး ကြမ်းတမ်းသော harmonic များထပ်တိုးစေသည်။"
       },
       "feedbackDelay": {
         "title": "Feedback Delay",
-        "description": "Delay line with feedback that creates resonant repeating echoes."
+        "description": "Feedback ပါသော Delay line သည် ကိုယ်ပိုင် သံတိုးမြှင့်ပေးသော ဗလာများကို ဖန်တီးသည်။"
       },
       "freeverb": {
         "title": "Freeverb",
-        "description": "Algorithmic reverb inspired by the classic Freeverb implementation."
+        "description": "Freeverb အီမ့်ပလီမန့်များမှ တိုးတက်လာသော Algorithmic Reverb"
       },
       "frequencyShifter": {
         "title": "Frequency Shifter",
-        "description": "Shifts every frequency by a fixed amount for metallic, spatial timbres."
+        "description": "အသံနှုန်းအစွန်းကို တိကျသတ်မှတ်ထားသော အရာဖြင့် ရွှေ့ပြောင်းပေးပြီး သံလိုက္ခဏာများဖြစ်ပေါ်စေသည်။"
       },
       "jcReverb": {
         "title": "JC Reverb",
-        "description": "Reverb based on John Chowning's algorithm for lush ambience."
+        "description": "John Chowning ၏ ယဉ်ကျေးသော ambience များအတွက် Algorithm အပေါ်အခြေခံထားသည့် Reverb"
       },
       "pingPong": {
         "title": "Ping Pong Delay",
-        "description": "Stereo delay that bounces repeats between the left and right channels."
+        "description": "stereo delay သည် ဘယ်နှင့် ညာချန်နယ်များအကြား တုံ့ပြန်အသံလှည့်ပတ်စေသည်။"
       },
       "pitchShift": {
         "title": "Pitch Shift",
-        "description": "Changes pitch without affecting playback speed."
+        "description": "အသံတီးကို ပြောင်းလဲစေသော်လည်း ပြန်ဖျော့ချနှုန်းကို မပြောင်းပါ။"
       },
       "reverb": {
         "title": "Reverb",
-        "description": "Simulates acoustic spaces with natural-sounding reverberation."
+        "description": "တည်နေရာအသံများနှင့် သဘာဝပုံမှန် အသံပြန်လည်တိုးများကို အတုယူဖန်တီးသည်။"
       }
     }
   },
   "audioTest": {
-    "title": "Audio Test Panel",
+    "title": "အသံစမ်းသပ် ပန်းနယ်",
     "audioContext": {
       "label": "AudioContext:",
-      "active": "Active",
-      "inactive": "Inactive",
-      "start": "Start Audio"
+      "active": "ဖွင့်ထားသည်",
+      "inactive": "ပိတ်ထားသည်",
+      "start": "အသံစတင်ရန်"
     },
     "controls": {
-      "title": "Test Controls",
-      "play": "Play",
-      "stop": "Stop",
-      "status": "Status",
-      "playing": "🔊 Playing",
-      "silent": "🔇 Silent"
+      "title": "စမ်းသပ်ထိန်းချုပ်မှုများ",
+      "play": "ဖွင့်",
+      "stop": "ရပ်",
+      "status": "အခြေအနေ",
+      "playing": "🔊 ဖွင့်နေသည်",
+      "silent": "🔇 အသံမရှိပါ"
     },
     "parameters": {
-      "title": "Audio Parameters",
+      "title": "အသံ parameter များ",
       "frequency": "Frequency (Hz)",
-      "volume": "Volume",
+      "volume": "အသံအထွက်",
       "reverb": "Reverb",
       "delay": "Delay",
       "waveform": "Waveform",
@@ -198,8 +198,8 @@
     }
   },
   "dashboard": {
-    "headerTitle": "Solomon House Dashboard",
-    "headerSubtitle": "3D spatial audio system with advanced effects",
+    "headerTitle": "Solomon's House Dashboard",
+    "headerSubtitle": "အဆင့်မြင့် အကျိုးသက်ရောက်မှုများပါဝင်သည့် 3D အသံတည်နေရာစနစ်",
     "cards": {
       "controlPanel": {
         "title": "Control Panel",
@@ -248,21 +248,21 @@
     }
   },
   "controls": {
-    "createGrid": "Create Grid",
-    "createObject": "Create Object",
-    "createEffectZone": "Create Effect Zone",
-    "settings": "Settings",
-    "audio": "Audio",
-    "effects": "Effects",
-    "objects": "Objects",
+    "createGrid": "ဇယားတစ်ခုဖန်တီးရန်",
+    "createObject": "အရာဝတ္ထုဖန်တီးရန်",
+    "createEffectZone": "Effect Zone ဖန်တီးရန်",
+    "settings": "ဆက်တင်များ",
+    "audio": "အသံ",
+    "effects": "အကျိုးသက်ရောက်မှုများ",
+    "objects": "အရာဝတ္ထုများ",
     "controls": "001_CONTROLS",
     "soundObjects": "002_SOUND_OBJECTS",
-    "effectZones": "003_EFFECT_ZONES",
+    "effectZones": "003_EFFECT_Zones",
     "mobileObjects": "004_MOBILE_OBJECTS",
     "grids": "005_GRIDS",
     "persistence": "006_PROJECTS",
-    "show": "SHOW",
-    "hide": "HIDE",
+    "show": "ပြရန်",
+    "hide": "ဖျက်ရန်",
     "camera": "CAMERA:",
     "clickRotateScrollZoom": "CLICK_ROTATE_SCROLL_ZOOM",
     "wasd": "WASD:",
@@ -290,7 +290,7 @@
     "bitCrusher": "BIT_CRUSHER",
     "chebyshev": "CHEBYSHEV",
     "chorus": "CHORUS",
-    "distortion": "DISTORTION",
+    "distortion": "DISTortion",
     "feedbackDelay": "FEEDBACK_DELAY",
     "freeverb": "FREEVERB",
     "freqShifter": "FREQ_SHIFTER",
@@ -380,7 +380,7 @@
     "polyphonicChordInstrument": "POLYPHONIC_CHORD_INSTRUMENT",
     "polyphonicPercussiveSampler": "POLYPHONIC_PERCUSSIVE_SAMPLER",
     "percussiveDrumSynthesizer": "PERCUSSIVE_DRUM_SYNTHESIZER",
-    "percussiveMetalSynthesizer": "PERCUSSIVE_METAL_SYNTHESIZER",
+    "percussiveMetalSynthesizer": "PERCUSSIVE_METAL_SYNthesizer",
     "percussivePluckSynthesizer": "PERCUSSIVE_PLUCK_SYNTHESIZER",
     "deactivateContinuousAudio": "DEACTIVATE_CONTINUOUS_AUDIO",
     "visualAppearance": "VISUAL_APPEARANCE",
@@ -459,7 +459,7 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文",
-    "thai": "Thai",
+    "thai": "ไทย",
     "french": "Français",
     "burmese": "မြန်မာ"
   },
@@ -895,3 +895,4 @@
     "createGridAtPosition": "Create grid at specified position"
   }
 }
+

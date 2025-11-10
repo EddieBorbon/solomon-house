@@ -449,7 +449,9 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文",
-    "thai": "Тайский"
+    "thai": "Тайский",
+    "french": "Французский",
+    "burmese": "Бирманский"
   },
   "codeEditor": {
     "examples": "ПРИМЕРЫ",

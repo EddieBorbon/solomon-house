@@ -530,7 +530,9 @@
     "english": "English",
     "russian": "Русский",
     "chinese": "中文",
-    "thai": "Tailandés"
+    "thai": "Tailandés",
+    "french": "Francés",
+    "burmese": "Birmano"
   },
   "codeEditor": {
     "examples": "EJEMPLOS",

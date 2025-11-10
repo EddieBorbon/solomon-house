@@ -15,7 +15,7 @@ const nunitoSans = localFont({
 });
 
 const siteUrl = "https://casasolomon.vercel.app";
-const ogImage = "/logos/logo.png";
+const ogImage = "/opengraph-image";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
