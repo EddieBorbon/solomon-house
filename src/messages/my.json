@@ -721,19 +721,19 @@
     "retryConnection": "ချိတ်ဆက်မှုကို ထပ်မံပြုလုပ်ရန်"
   },
   "quotaWarning": {
-    "title": "Firestore Quota Exceeded",
-    "message": "You have reached the limits of the Firebase free plan. The application will work in local mode until you resolve this.",
-    "quotaExceeded": "Firestore quota exceeded",
-    "cleaningData": "Cleaning Firestore data...",
-    "errorCleaning": "Error during cleanup:",
-    "cleanData": "🧹 Clean Data",
-    "goToFirebase": "🔧 Go to Firebase Console",
-    "viewPlans": "💳 View Plans",
-    "solutions": "Solutions:",
-    "solution1": "Clean existing data in Firestore",
-    "solution2": "Upgrade to Blaze plan (pay-as-you-go)",
-    "solution3": "Optimize queries to reduce usage",
-    "solution4": "Use local mode temporarily"
+    "title": "Firestore ကွိုတာအကန့်သတ် ကျော်လွန်ခြင်း",
+    "message": "Firebase အခမဲ့အစီအစဉ်၏ ကန့်သတ်ချက်ကို ရောက်ရှိထားပါသည်။ ဒီပြဿနာကို ဖြေရှင်းမချင်း အပ်ပလီကေးရှင်းကို Local Mode ဖြင့်သာ လုပ်ဆောင်ပါလိမ့်မည်။",
+    "quotaExceeded": "Firestore ကွိုတာကျော်လွန်နေပါသည်",
+    "cleaningData": "Firestore ဒေတာများကို ရှင်းလင်းနေသည်...",
+    "errorCleaning": "ဒေတာရှင်းလင်းစဉ် အမှား:",
+    "cleanData": "🧹 ဒေတာ ရှင်းလင်းရန်",
+    "goToFirebase": "🔧 Firebase Console သို့ သွားရန်",
+    "viewPlans": "💳 ပလန်များကို ကြည့်ရှုရန်",
+    "solutions": "ဖြေရှင်းနည်းများ:",
+    "solution1": "Firestore ထဲမှ ရှိပြီးသား ဒေတာများကို ရှင်းလင်းပါ",
+    "solution2": "Blaze ပလန် (အသုံးခံပမာဏအလိုက် ပေးချေမှု) သို့ အဆင့်မြှင့်ပါ",
+    "solution3": "အသုံးစရိတ် လျှော့ချရန် Query များကို ကောင်းစွာ ချိန်ညှိပါ",
+    "solution4": "အချိန်ပိုင်း Local Mode ဖြင့် အသုံးပြုပါ"
   },
   "spatializationDebug": {
     "title": "Spatialization Debug",
