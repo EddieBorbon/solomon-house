@@ -18,7 +18,6 @@
     "audioInit": "INITIALIZING_AUDIO_SYSTEM...",
     "sceneLoadingCode": "003_SCENE_LOADING",
     "audioInitCode": "004_AUDIO_INIT",
-    "systemCode": "002_SYSTEM",
     "initRenderer": "INITIALIZING_RENDERER",
     "loadModels": "LOADING_3D_MODELS",
     "prepareAudio": "PREPARING_AUDIO_ENGINE",
@@ -50,6 +49,203 @@
     "expandPanel": "Expandir panel",
     "noSelection": "Ningún objeto seleccionado",
     "selectObject": "Selecciona un objeto para editarlo"
+  },
+  "transformToolbar": {
+    "exit": "Salir",
+    "exitShortcut": "(ESC)",
+    "exitTooltip": "Salir del modo edición (ESC)",
+    "delete": "Eliminar",
+    "deleteShortcut": "(SUPR)",
+    "deleteTooltip": "Eliminar entidad seleccionada (SUPR)"
+  },
+  "cameraToggle": {
+    "title": "Control de Cámara",
+    "statusAlwaysOn": "Cámara SIEMPRE Activa",
+    "alwaysOnButton": "Cámara Siempre Activa",
+    "forceOn": "Forzar ON",
+    "disabled": "Deshabilitado",
+    "debug": "Debug",
+    "alwaysEnabledNotice": "La cámara está SIEMPRE habilitada y no se puede bloquear",
+    "controlsTitle": "Controles:",
+    "rotateInstruction": "• Clic derecho + arrastrar: Rotar",
+    "zoomInstruction": "• Rueda del mouse: Zoom",
+    "panInstruction": "• Botón medio + arrastrar: Panear",
+    "emergencyTitle": "Teclas de Emergencia:",
+    "emergencyForce": "• Tecla F: Forzar habilitación inmediata",
+    "emergencyResetQuick": "• Tecla C: Reset rápido de cámara",
+    "emergencyResetFull": "• Tecla R: Reset completo de cámara"
+  },
+  "cameraControls": {
+    "toggleTooltip": "Mostrar controles de cámara",
+    "title": "Controles de Cámara",
+    "forward": "Adelante",
+    "backward": "Atrás",
+    "left": "Izquierda",
+    "right": "Derecha",
+    "down": "Abajo",
+    "up": "Arriba",
+    "fast": "Rápido",
+    "mouse": "Mouse: Rotar, Zoom, Panear"
+  },
+  "audioEffects": {
+    "title": "Efectos de Audio",
+    "subtitle": "Colección completa de efectos Tone.js para audio espacial 3D",
+    "activeBadge": "Activo",
+    "availableParameters": "Parámetros disponibles:",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "parametersLabel": "parámetros",
+    "cards": {
+      "stereoWidener": {
+        "title": "StereoWidener",
+        "description": "Aplica un factor de ancho a la separación mid/side. 0 es todo mid y 1 es todo side."
+      },
+      "tremolo": {
+        "title": "Tremolo",
+        "description": "Modula la amplitud de la señal usando un LFO. Efecto estéreo donde la fase se invierte en cada canal."
+      },
+      "vibrato": {
+        "title": "Vibrato",
+        "description": "Efecto de vibrato compuesto por un Delay y un LFO que modula el delayTime para subir y bajar el pitch."
+      },
+      "phaser": {
+        "title": "Phaser",
+        "description": "Efecto de modulación de fase que crea un sonido de barrido característico."
+      },
+      "autoFilter": {
+        "title": "AutoFilter",
+        "description": "Filtro resonante controlado por un LFO que barre automáticamente el espectro de frecuencias."
+      },
+      "autoWah": {
+        "title": "AutoWah",
+        "description": "Efecto de wah automático que modula un filtro según la amplitud de la señal."
+      },
+      "bitCrusher": {
+        "title": "BitCrusher",
+        "description": "Reduce la resolución de bits y la frecuencia de muestreo para crear distorsión digital lo-fi."
+      },
+      "chebyshev": {
+        "title": "Chebyshev",
+        "description": "Genera armónicos usando polinomios de Chebyshev para obtener distorsión musical."
+      },
+      "chorus": {
+        "title": "Chorus",
+        "description": "Duplica la señal original con modulación de pitch y delay para un sonido más grueso."
+      },
+      "distortion": {
+        "title": "Distortion",
+        "description": "Aplica distorsión no lineal a la señal de audio para crear saturación."
+      },
+      "feedbackDelay": {
+        "title": "FeedbackDelay",
+        "description": "Delay con retroalimentación que genera ecos repetitivos y resonantes."
+      },
+      "freeverb": {
+        "title": "Freeverb",
+        "description": "Algoritmo de reverberación libre inspirado en el Freeverb de Jezar."
+      },
+      "frequencyShifter": {
+        "title": "FrequencyShifter",
+        "description": "Desplaza todo el espectro de frecuencias por una cantidad fija."
+      },
+      "jcReverb": {
+        "title": "JCReverb",
+        "description": "Reverberación basada en el algoritmo de John Chowning."
+      },
+      "pingPong": {
+        "title": "PingPongDelay",
+        "description": "Delay estéreo que alterna los rebotes entre los canales izquierdo y derecho."
+      },
+      "pitchShift": {
+        "title": "PitchShift",
+        "description": "Cambia el pitch de la señal sin afectar la velocidad de reproducción."
+      },
+      "reverb": {
+        "title": "Reverb",
+        "description": "Reverberación espacial que simula el sonido en diferentes ambientes."
+      }
+    }
+  },
+  "audioTest": {
+    "title": "Panel de Prueba de Audio",
+    "audioContext": {
+      "label": "AudioContext:",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "start": "Iniciar Audio"
+    },
+    "controls": {
+      "title": "Controles de Prueba",
+      "play": "Reproducir",
+      "stop": "Detener",
+      "status": "Estado",
+      "playing": "🔊 Reproduciendo",
+      "silent": "🔇 Silencio"
+    },
+    "parameters": {
+      "title": "Parámetros de Audio",
+      "frequency": "Frecuencia (Hz)",
+      "volume": "Volumen",
+      "reverb": "Reverb",
+      "delay": "Delay",
+      "waveform": "Forma de Onda",
+      "waveforms": {
+        "sine": "Seno",
+        "square": "Cuadrada",
+        "sawtooth": "Sierra",
+        "triangle": "Triangular"
+      }
+    }
+  },
+  "dashboard": {
+    "headerTitle": "Dashboard Solomon House",
+    "headerSubtitle": "Sistema de audio espacial 3D con efectos avanzados",
+    "cards": {
+      "controlPanel": {
+        "title": "Panel de Control",
+        "lastUpdated": "Activo"
+      },
+      "audioEffects": {
+        "title": "Efectos de Audio",
+        "lastUpdated": "15 efectos"
+      },
+      "world3D": {
+        "title": "Mundo 3D",
+        "lastUpdated": "12 objetos"
+      },
+      "parameterEditor": {
+        "title": "Editor de Parámetros",
+        "lastUpdated": "En tiempo real"
+      },
+      "stereoWidener": {
+        "title": "StereoWidener",
+        "lastUpdated": "Nuevo efecto"
+      },
+      "phaser": {
+        "title": "Phaser",
+        "lastUpdated": "Efecto activo"
+      },
+      "autoFilter": {
+        "title": "AutoFilter",
+        "lastUpdated": "Filtro dinámico"
+      },
+      "reverb": {
+        "title": "Reverb",
+        "lastUpdated": "Espacialización"
+      },
+      "systemStats": {
+        "title": "Estadísticas del Sistema",
+        "lastUpdated": "Tiempo real"
+      },
+      "settings": {
+        "title": "Configuración",
+        "lastUpdated": "Personalizable"
+      },
+      "help": {
+        "title": "Ayuda y Documentación",
+        "lastUpdated": "Actualizada"
+      }
+    }
   },
   "controls": {
     "createGrid": "Crear Grid",
@@ -218,7 +414,43 @@
     "autoTriggerMax": "INTERVALO_MÁXIMO",
     "autoTriggerPatternValues": "VALORES_DEL_PATRÓN",
     "autoTriggerPatternLoop": "REPETIR_PATRÓN",
+    "autoTriggerEnabledTooltip": "Activa la auto-activación del objeto sonoro. El objeto se activará automáticamente según el modo configurado.",
+    "autoTriggerModeTooltip": "Selecciona el modo de auto-activación: Fijo (cada X segundos), Aleatorio (entre mínimo y máximo), o Patrón (secuencia rítmica).",
+    "autoTriggerIntervalTooltip": "Intervalo fijo en segundos entre activaciones",
+    "autoTriggerMinTooltip": "Intervalo mínimo en segundos para activaciones aleatorias",
+    "autoTriggerMaxTooltip": "Intervalo máximo en segundos para activaciones aleatorias",
+    "autoTriggerPatternTooltip": "Ingresa una secuencia de tiempos en segundos separados por comas (ej: 0.5, 1.0, 0.25, 1.5). El objeto se activará según este patrón rítmico.",
+    "autoTriggerPatternPlaceholder": "0.5, 1.0, 0.25, 1.5",
+    "autoTriggerPatternLoopTooltip": "Si está activado, el patrón se repetirá infinitamente. Si está desactivado, el patrón solo se reproducirá una vez.",
     "seconds": "SEGUNDOS",
+    "none": "NINGUNO",
+    "curve": "Curva de Envolvente",
+    "curveLinear": "Lineal",
+    "curveExponential": "Exponencial",
+    "curveSine": "Seno",
+    "curveCosine": "Coseno",
+    "curveBounce": "Rebote",
+    "curveRipple": "Ondulación",
+    "curveStep": "Escalón",
+    "polySynthParametersTitle": "Parámetros del PolySynth",
+    "polyphony": "Polifonía (número de voces)",
+    "chordType": "Tipo de acorde",
+    "chords": {
+      "major": "Do Mayor (C-E-G)",
+      "minor": "Do Menor (C-Eb-G)",
+      "major7": "Do Mayor 7 (C-E-G-B)",
+      "minor7": "Do Menor 7 (C-Eb-G-Bb)",
+      "major9": "Do Mayor 9 (C-E-G-B-D)",
+      "minor9": "Do Menor 9 (C-Eb-G-Bb-D)",
+      "major7Sharp5": "Do Mayor 7 (#5) (C-E-G#-B)",
+      "minor9b5": "Do Menor 9 (b5) (C-Eb-G-Bb-Db)"
+    },
+    "noiseSynthParametersTitle": "Parámetros del NoiseSynth",
+    "noiseType": "Tipo de Ruido",
+    "noiseWhite": "Blanco (Ruido completo)",
+    "noisePink": "Rosa (Ruido suave)",
+    "noiseBrown": "Marrón (Ruido bajo)",
+    "noiseHitDuration": "Duración del Golpe (segundos)",
     "movementProperties": "PROPIEDADES_DE_MOVIMIENTO",
     "movementEnabled": "ACTIVAR_MOVIMIENTO",
     "movementType": "TIPO_DE_MOVIMIENTO",
@@ -297,7 +529,8 @@
     "spanish": "Español",
     "english": "English",
     "russian": "Русский",
-    "chinese": "中文"
+    "chinese": "中文",
+    "thai": "Tailandés"
   },
   "codeEditor": {
     "examples": "EJEMPLOS",
@@ -511,6 +744,23 @@
     "creating": "CREANDO...",
     "create": "CREAR",
     "grids": "CUADRÍCULAS",
+    "projectNamePlaceholder": "MI_PROYECTO",
+    "projectDescriptionPlaceholder": "DESCRIPCIÓN_DEL_PROYECTO...",
+    "unlockSuccess": "Edición desbloqueada correctamente.",
+    "unlockEditingTitle": "DESBLOQUEAR EDICIÓN",
+    "adminPassword": "Contraseña de Administrador",
+    "passwordPlaceholder": "Ingresa la contraseña",
+    "unlock": "DESBLOQUEAR",
+    "lock": "BLOQUEAR",
+    "lockProjectTitle": "BLOQUEAR PROYECTO",
+    "unlockProjectTitle": "DESBLOQUEAR PROYECTO",
+    "deleteProjectTitle": "ELIMINAR PROYECTO",
+    "locked": "BLOQUEADO",
+    "lockProjectTooltip": "Bloquear proyecto (Admin)",
+    "unlockProjectTooltip": "Desbloquear proyecto (Admin)",
+    "deleteProjectTooltip": "Eliminar proyecto (Admin)",
+    "deleteWarning": "⚠️ Esta acción eliminará permanentemente el proyecto. No se puede deshacer.",
+    "delete": "ELIMINAR",
     "noProjectName": "Por favor ingresa un nombre para el proyecto",
     "errorSaving": "Error al guardar el proyecto. Por favor intenta de nuevo.",
     "errorLoading": "Error al cargar el proyecto. Por favor intenta de nuevo.",
@@ -622,6 +872,12 @@
       "showProximityIndicator": "Muestra u oculta el indicador visual del umbral de proximidad. Ayuda a visualizar cuándo se activarán los objetos sonoros.",
       "showSphere": "Muestra u oculta la esfera visual del objeto móvil en el espacio 3D."
     }
+  },
+  "mobileObjectHeader": {
+    "deleteTooltip": "Eliminar objeto móvil",
+    "mobileType": "MÓVIL",
+    "status": "ESTADO:",
+    "movement": "MOVIMIENTO:"
   },
   "effects": {
     "parameters": "PARÁMETROS",

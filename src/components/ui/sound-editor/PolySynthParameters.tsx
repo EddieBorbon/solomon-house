@@ -3,6 +3,7 @@
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface PolySynthParametersProps {
   selectedObject: SoundObject;
@@ -13,6 +14,8 @@ export function PolySynthParameters({
   selectedObject,
   onParamChange
 }: PolySynthParametersProps) {
+  const { t } = useLanguage();
+
   if (selectedObject.type !== 'dodecahedronRing') return null;
 
   return (
@@ -20,13 +23,13 @@ export function PolySynthParameters({
       {/* Sección: Parámetros del PolySynth */}
       <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
         <h4 className="text-sm font-semibold text-pink-400 mb-3 flex items-center gap-2">
-          🔷 Parámetros del PolySynth
+          🔷 {t('parameterEditor.polySynthParametersTitle')}
         </h4>
         
         {/* Polifonía */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Polifonía (Número de Voces)
+            {t('parameterEditor.polyphony')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -51,41 +54,41 @@ export function PolySynthParameters({
         {/* Tipo de Acorde */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Tipo de Acorde
+            {t('parameterEditor.chordType')}
           </label>
           <select
             value={JSON.stringify(selectedObject.audioParams.chord || ["C4", "E4", "G4"])}
             onChange={(e) => {
               const chordMap: { [key: string]: string[] } = {
-                '["C4","E4","G4"]': ["C4", "E4", "G4"], // Mayor
-                '["C4","Eb4","G4"]': ["C4", "Eb4", "G4"], // Menor
-                '["C4","E4","G4","B4"]': ["C4", "E4", "G4", "B4"], // Mayor 7
-                '["C4","Eb4","G4","Bb4"]': ["C4", "Eb4", "G4", "Bb4"], // Menor 7
-                '["C4","E4","G4","B4","D5"]': ["C4", "E4", "G4", "B4", "D5"], // Mayor 9
-                '["C4","Eb4","G4","Bb4","D5"]': ["C4", "Eb4", "G4", "Bb4", "D5"], // Menor 9
-                '["C4","E4","G#4","B4"]': ["C4", "E4", "G#4", "B4"], // Mayor 7 (#5)
-                '["C4","Eb4","G4","Bb4","Db5"]': ["C4", "Eb4", "G4", "Bb4", "Db5"], // Menor 9 (b5)
+                '["C4","E4","G4"]': ["C4", "E4", "G4"],
+                '["C4","Eb4","G4"]': ["C4", "Eb4", "G4"],
+                '["C4","E4","G4","B4"]': ["C4", "E4", "G4", "B4"],
+                '["C4","Eb4","G4","Bb4"]': ["C4", "Eb4", "G4", "Bb4"],
+                '["C4","E4","G4","B4","D5"]': ["C4", "E4", "G4", "B4", "D5"],
+                '["C4","Eb4","G4","Bb4","D5"]': ["C4", "Eb4", "G4", "Bb4", "D5"],
+                '["C4","E4","G#4","B4"]': ["C4", "E4", "G#4", "B4"],
+                '["C4","Eb4","G4","Bb4","Db5"]': ["C4", "Eb4", "G4", "Bb4", "Db5"],
               };
               const chord = chordMap[e.target.value] || ["C4", "E4", "G4"];
               onParamChange('chord', chord);
             }}
             className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-pink-500 focus:outline-none transition-colors"
           >
-            <option value='["C4","E4","G4"]'>Do Mayor (C-E-G)</option>
-            <option value='["C4","Eb4","G4"]'>Do Menor (C-Eb-G)</option>
-            <option value='["C4","E4","G4","B4"]'>Do Mayor 7 (C-E-G-B)</option>
-            <option value='["C4","Eb4","G4","Bb4"]'>Do Menor 7 (C-Eb-G-Bb)</option>
-            <option value='["C4","E4","G4","B4","D5"]'>Do Mayor 9 (C-E-G-B-D)</option>
-            <option value='["C4","Eb4","G4","Bb4","D5"]'>Do Menor 9 (C-Eb-G-Bb-D)</option>
-            <option value='["C4","E4","G#4","B4"]'>Do Mayor 7 (#5) (C-E-G#-B)</option>
-            <option value='["C4","Eb4","G4","Bb4","Db5"]'>Do Menor 9 (b5) (C-Eb-G-Bb-Db)</option>
+            <option value='["C4","E4","G4"]'>{t('parameterEditor.chords.major')}</option>
+            <option value='["C4","Eb4","G4"]'>{t('parameterEditor.chords.minor')}</option>
+            <option value='["C4","E4","G4","B4"]'>{t('parameterEditor.chords.major7')}</option>
+            <option value='["C4","Eb4","G4","Bb4"]'>{t('parameterEditor.chords.minor7')}</option>
+            <option value='["C4","E4","G4","B4","D5"]'>{t('parameterEditor.chords.major9')}</option>
+            <option value='["C4","Eb4","G4","Bb4","D5"]'>{t('parameterEditor.chords.minor9')}</option>
+            <option value='["C4","E4","G#4","B4"]'>{t('parameterEditor.chords.major7Sharp5')}</option>
+            <option value='["C4","Eb4","G4","Bb4","Db5"]'>{t('parameterEditor.chords.minor9b5')}</option>
           </select>
         </div>
 
         {/* Release */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Release (Liberación)
+            {t('parameterEditor.release')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -110,20 +113,20 @@ export function PolySynthParameters({
         {/* Curve */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Curve (Curva de Envolvente)
+            {t('parameterEditor.curve')}
           </label>
           <select
             value={selectedObject.audioParams.curve || 'linear'}
             onChange={(e) => onParamChange('curve', e.target.value)}
             className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-pink-500 focus:outline-none transition-colors"
           >
-            <option value="linear">Linear (Lineal)</option>
-            <option value="exponential">Exponential (Exponencial)</option>
-            <option value="sine">Sine (Seno)</option>
-            <option value="cosine">Cosine (Coseno)</option>
-            <option value="bounce">Bounce (Rebote)</option>
-            <option value="ripple">Ripple (Ondulación)</option>
-            <option value="step">Step (Escalón)</option>
+            <option value="linear">{t('parameterEditor.curveLinear')}</option>
+            <option value="exponential">{t('parameterEditor.curveExponential')}</option>
+            <option value="sine">{t('parameterEditor.curveSine')}</option>
+            <option value="cosine">{t('parameterEditor.curveCosine')}</option>
+            <option value="bounce">{t('parameterEditor.curveBounce')}</option>
+            <option value="ripple">{t('parameterEditor.curveRipple')}</option>
+            <option value="step">{t('parameterEditor.curveStep')}</option>
           </select>
         </div>
       </div>

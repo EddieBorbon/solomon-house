@@ -15,8 +15,8 @@ const nunitoSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Casa de Salomon - Creación Musical 3D Colaborativa",
-  description: "Aplicación de creación musical 3D colaborativa usando Next.js, Three.js y Zustand",
+  title: "Solomon's House - Collaborative 3D Musical Creation",
+  description: "Collaborative 3D musical creation application built with Next.js, Three.js, and Zustand",
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',

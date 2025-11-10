@@ -81,9 +81,9 @@ const getDefaultAudioParams = (type: SoundObjectType): AudioParams => {
       };
     case 'cone':
       return {
-        frequency: 50,
+        frequency: 100,
         volume: 0.6,
-        waveform: 'sine',
+        waveform: 'square',
         pitchDecay: 0.05,
         octaves: 10,
         duration: 0.5,

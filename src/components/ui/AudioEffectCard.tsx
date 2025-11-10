@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 type AudioEffectCardProps = {
   title: string;
@@ -21,6 +22,8 @@ export default function AudioEffectCard({
   className = "h-48",
   onClick
 }: AudioEffectCardProps) {
+  const { t } = useLanguage();
+
   return (
     <div 
       className={`relative overflow-hidden rounded-2xl p-6 ${className} flex flex-col justify-between border border-white/20 bg-white/5 backdrop-blur-xl hover:bg-white/10 transition-all duration-500 cursor-pointer group shadow-2xl hover:shadow-3xl ${isActive ? 'ring-2 ring-cyan-400/50 shadow-cyan-500/20' : ''}`}
@@ -62,7 +65,7 @@ export default function AudioEffectCard({
             {isActive && (
               <div className="mt-2">
                 <span className="text-xs bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 px-3 py-1 rounded-full border border-green-400/30 backdrop-blur-sm">
-                  ✨ Activo
+                  ✨ {t('audioEffects.activeBadge')}
                 </span>
               </div>
             )}
@@ -76,7 +79,7 @@ export default function AudioEffectCard({
         {/* Parámetros con efecto glass */}
         {parameters.length > 0 && (
           <div className="mb-4">
-            <p className="text-xs text-gray-400 mb-3 font-medium">Parámetros disponibles:</p>
+            <p className="text-xs text-gray-400 mb-3 font-medium">{t('audioEffects.availableParameters')}</p>
             <div className="flex flex-wrap gap-2">
               {parameters.map((param, index) => (
                 <span
@@ -98,12 +101,12 @@ export default function AudioEffectCard({
           <div className="flex items-center gap-3">
             <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-400 shadow-green-400/50' : 'bg-gray-500'} shadow-lg`} />
             <span className="text-xs text-gray-300 font-medium">
-              {isActive ? 'Conectado' : 'Desconectado'}
+              {isActive ? t('audioEffects.connected') : t('audioEffects.disconnected')}
             </span>
           </div>
           <div className="bg-white/5 rounded-lg px-3 py-1 border border-white/10 backdrop-blur-sm">
             <span className="text-xs text-gray-400 font-medium">
-              {parameters.length} parámetros
+              {`${parameters.length} ${t('audioEffects.parametersLabel')}`}
             </span>
           </div>
         </div>

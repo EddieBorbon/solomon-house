@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { type MobileObject } from '../../../state/useWorldStore';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface MobileObjectHeaderProps {
   mobileObject: MobileObject;
@@ -12,6 +13,7 @@ export function MobileObjectHeader({
   mobileObject,
   onRemove
 }: MobileObjectHeaderProps) {
+  const { t } = useLanguage();
   return (
     <div className="mb-6 relative">
       {/* Contenedor con borde complejo */}
@@ -31,14 +33,14 @@ export function MobileObjectHeader({
           </div>
           <button
             onClick={() => {
-              if (confirm('¿Estás seguro de que quieres eliminar este objeto móvil?')) {
+              if (confirm(t('confirmations.deleteMobileObject'))) {
                 onRemove(mobileObject.id);
               }
             }}
             className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-            title="Eliminar objeto móvil"
+            title={t('mobileObjectHeader.deleteTooltip')}
           >
-            <span className="text-xs font-mono">DELETE</span>
+            <span className="text-xs font-mono">{t('ui.delete')}</span>
             <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
         </div>
@@ -46,22 +48,22 @@ export function MobileObjectHeader({
         {/* Información del objeto */}
         <div className="space-y-2 text-xs font-mono text-white">
           <div className="flex justify-between">
-            <span className="text-gray-400">ID:</span>
+            <span className="text-gray-400">{t('parameterEditor.id')}</span>
             <span className="text-cyan-400">{mobileObject.id.slice(0, 8)}...</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">TIPO:</span>
-            <span className="text-cyan-400">MOBILE</span>
+            <span className="text-gray-400">{t('parameterEditor.type')}</span>
+            <span className="text-cyan-400">{t('mobileObjectHeader.mobileType')}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">ESTADO:</span>
+            <span className="text-gray-400">{t('mobileObjectHeader.status')}</span>
             <span className={`${mobileObject.mobileParams.isActive ? 'text-green-400' : 'text-red-400'}`}>
-              {mobileObject.mobileParams.isActive ? 'ACTIVO' : 'INACTIVO'}
+              {mobileObject.mobileParams.isActive ? t('transformEditor.active') : t('transformEditor.inactive')}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">MOVIMIENTO:</span>
-            <span className="text-cyan-400 uppercase">{mobileObject.mobileParams.movementType}</span>
+            <span className="text-gray-400">{t('mobileObjectHeader.movement')}</span>
+            <span className="text-cyan-400 uppercase">{t(`mobileObject.${mobileObject.mobileParams.movementType}`)}</span>
           </div>
         </div>
       </div>

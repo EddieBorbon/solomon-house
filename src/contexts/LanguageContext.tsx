@@ -2,19 +2,23 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type SupportedLocale = 'es' | 'en' | 'ru' | 'zh';
+export type SupportedLocale = 'es' | 'en' | 'ru' | 'zh' | 'th' | 'fr';
 
 // Importar las traducciones
 import esMessages from '../messages/es.json';
 import enMessages from '../messages/en.json';
 import ruMessages from '../messages/ru.json';
 import zhMessages from '../messages/zh.json';
+import thMessages from '../messages/th.json';
+import frMessages from '../messages/fr.json';
 
 const messages = {
   es: esMessages,
   en: enMessages,
   ru: ruMessages,
-  zh: zhMessages
+  zh: zhMessages,
+  th: thMessages,
+  fr: frMessages
 };
 
 interface LanguageContextType {
@@ -36,7 +40,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setIsClient(true);
     // Cargar idioma guardado del localStorage
     const savedLocale = localStorage.getItem('preferred-language') as SupportedLocale;
-    if (savedLocale && ['es', 'en', 'ru', 'zh'].includes(savedLocale)) {
+    if (savedLocale && ['es', 'en', 'ru', 'zh', 'th', 'fr'].includes(savedLocale)) {
       setLocale(savedLocale);
     }
   }, []);
@@ -53,7 +57,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       es: '🇪🇸',
       en: '🇺🇸',
       ru: '🇷🇺',
-      zh: '🇨🇳'
+      zh: '🇨🇳',
+      th: '🇹🇭',
+      fr: '🇫🇷'
     };
     return flags[lang];
   };
@@ -63,7 +69,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       es: 'Español',
       en: 'English',
       ru: 'Русский',
-      zh: '中文'
+      zh: '中文',
+      th: 'ไทย',
+      fr: 'Français'
     };
     return names[lang];
   };

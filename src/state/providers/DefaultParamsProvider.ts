@@ -119,9 +119,9 @@ export class DefaultParamsProvider {
    */
   private static getConeParams(): AudioParams {
     return {
-      frequency: 50,
+      frequency: 100,
       volume: 0.6,
-      waveform: 'sine',
+      waveform: 'square',
       color: '#000000',
       metalness: 0.3,
       roughness: 0.35,

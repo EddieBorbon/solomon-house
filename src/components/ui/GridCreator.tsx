@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function GridCreator() {
   const { createGrid, currentGridCoordinates, gridSize, activeGridId, grids } = useWorldStore();
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
@@ -196,9 +198,9 @@ export function GridCreator() {
               <button
                 onClick={createGridAtCustomPosition}
                 className="w-full px-2 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-xs transition-colors"
-                title="Crear cuadrícula en la posición especificada"
+                title={t('effects.createGridAtPosition')}
               >
-                🎯 Crear
+                🎯 {t('controls.createGridButton')}
               </button>
             </div>
           </div>

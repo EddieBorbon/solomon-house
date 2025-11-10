@@ -40,6 +40,203 @@
     "noSelection": "未选择对象",
     "selectObject": "选择一个对象进行编辑"
   },
+  "transformToolbar": {
+    "exit": "退出",
+    "exitShortcut": "(ESC)",
+    "exitTooltip": "退出编辑模式 (ESC)",
+    "delete": "删除",
+    "deleteShortcut": "(DEL)",
+    "deleteTooltip": "删除已选实体 (DEL)"
+  },
+  "cameraToggle": {
+    "title": "相机控制",
+    "statusAlwaysOn": "相机始终启用",
+    "alwaysOnButton": "相机始终启用",
+    "forceOn": "强制开启",
+    "disabled": "已禁用",
+    "debug": "调试",
+    "alwaysEnabledNotice": "相机始终启用，无法锁定",
+    "controlsTitle": "控制：",
+    "rotateInstruction": "• 右键拖动：旋转",
+    "zoomInstruction": "• 鼠标滚轮：缩放",
+    "panInstruction": "• 中键拖动：平移",
+    "emergencyTitle": "紧急按键：",
+    "emergencyForce": "• 按键 F：立即强制启用",
+    "emergencyResetQuick": "• 按键 C：快速重置相机",
+    "emergencyResetFull": "• 按键 R：完全重置相机"
+  },
+  "cameraControls": {
+    "toggleTooltip": "显示相机控制",
+    "title": "相机控制",
+    "forward": "前进",
+    "backward": "后退",
+    "left": "左移",
+    "right": "右移",
+    "down": "下移",
+    "up": "上移",
+    "fast": "加速",
+    "mouse": "鼠标：旋转、缩放、平移"
+  },
+  "audioEffects": {
+    "title": "音频效果",
+    "subtitle": "Tone.js 立体 3D 空间音频效果合集",
+    "activeBadge": "已启用",
+    "availableParameters": "可用参数：",
+    "connected": "已连接",
+    "disconnected": "未连接",
+    "parametersLabel": "个参数",
+    "cards": {
+      "stereoWidener": {
+        "title": "Stereo Widener",
+        "description": "调整中/侧声道宽度。0 保持在中心，1 完全推向两侧。"
+      },
+      "tremolo": {
+        "title": "Tremolo",
+        "description": "使用 LFO 调制音量，在左右声道间产生相位反转的立体效果。"
+      },
+      "vibrato": {
+        "title": "Vibrato",
+        "description": "结合延迟与 LFO，通过调制延迟时间使音高上下摆动。"
+      },
+      "phaser": {
+        "title": "Phaser",
+        "description": "相位调制扫过频谱，营造经典的旋转声。"
+      },
+      "autoFilter": {
+        "title": "Auto Filter",
+        "description": "由 LFO 驱动的共振滤波器，自动扫动截止频率。"
+      },
+      "autoWah": {
+        "title": "Auto Wah",
+        "description": "根据输入电平开合滤波的自动 wah 效果。"
+      },
+      "bitCrusher": {
+        "title": "Bit Crusher",
+        "description": "降低位深与采样率，产生粗糙的 lo-fi 质感。"
+      },
+      "chebyshev": {
+        "title": "Chebyshev",
+        "description": "利用切比雪夫多项式生成带音乐性的失真谐波。"
+      },
+      "chorus": {
+        "title": "Chorus",
+        "description": "复制原始信号并调制音高与延迟，让声音更厚、更宽。"
+      },
+      "distortion": {
+        "title": "Distortion",
+        "description": "施加非线性饱和，添加有力的谐波。"
+      },
+      "feedbackDelay": {
+        "title": "Feedback Delay",
+        "description": "带反馈的延迟，产生共振的重复回声。"
+      },
+      "freeverb": {
+        "title": "Freeverb",
+        "description": "基于经典 Freeverb 的算法混响。"
+      },
+      "frequencyShifter": {
+        "title": "Frequency Shifter",
+        "description": "将所有频率按固定值平移，得到金属感空间音色。"
+      },
+      "jcReverb": {
+        "title": "JC Reverb",
+        "description": "基于 John Chowning 算法的混响。"
+      },
+      "pingPong": {
+        "title": "Ping Pong Delay",
+        "description": "左右声道交替反馈的立体延迟。"
+      },
+      "pitchShift": {
+        "title": "Pitch Shift",
+        "description": "改变音高而不改变播放速度。"
+      },
+      "reverb": {
+        "title": "Reverb",
+        "description": "模拟不同空间的自然混响。"
+      }
+    }
+  },
+  "audioTest": {
+    "title": "音频测试面板",
+    "audioContext": {
+      "label": "AudioContext：",
+      "active": "已启动",
+      "inactive": "未启动",
+      "start": "启动音频"
+    },
+    "controls": {
+      "title": "测试控制",
+      "play": "播放",
+      "stop": "停止",
+      "status": "状态",
+      "playing": "🔊 播放中",
+      "silent": "🔇 静音"
+    },
+    "parameters": {
+      "title": "音频参数",
+      "frequency": "频率 (Hz)",
+      "volume": "音量",
+      "reverb": "混响",
+      "delay": "延迟",
+      "waveform": "波形",
+      "waveforms": {
+        "sine": "正弦",
+        "square": "方波",
+        "sawtooth": "锯齿",
+        "triangle": "三角"
+      }
+    }
+  },
+  "dashboard": {
+    "headerTitle": "Solomon House 控制台",
+    "headerSubtitle": "具备高级效果的 3D 空间音频系统",
+    "cards": {
+      "controlPanel": {
+        "title": "控制面板",
+        "lastUpdated": "已激活"
+      },
+      "audioEffects": {
+        "title": "音频效果",
+        "lastUpdated": "15 个效果"
+      },
+      "world3D": {
+        "title": "3D 世界",
+        "lastUpdated": "12 个对象"
+      },
+      "parameterEditor": {
+        "title": "参数编辑器",
+        "lastUpdated": "实时"
+      },
+      "stereoWidener": {
+        "title": "StereoWidener",
+        "lastUpdated": "全新效果"
+      },
+      "phaser": {
+        "title": "Phaser",
+        "lastUpdated": "效果已启用"
+      },
+      "autoFilter": {
+        "title": "AutoFilter",
+        "lastUpdated": "动态滤波"
+      },
+      "reverb": {
+        "title": "Reverb",
+        "lastUpdated": "空间化"
+      },
+      "systemStats": {
+        "title": "系统统计",
+        "lastUpdated": "实时"
+      },
+      "settings": {
+        "title": "设置",
+        "lastUpdated": "可自定义"
+      },
+      "help": {
+        "title": "帮助与文档",
+        "lastUpdated": "已更新"
+      }
+    }
+  },
   "controls": {
     "createGrid": "创建网格",
     "createObject": "创建对象",
@@ -191,6 +388,54 @@
     "additive": "叠加",
     "subtractive": "减法",
     "multiply": "相乘",
+    "autoTrigger": "自动触发",
+    "autoTriggerEnabled": "启用自动触发",
+    "autoTriggerMode": "自动触发模式",
+    "autoTriggerFixed": "固定",
+    "autoTriggerRandom": "随机",
+    "autoTriggerPattern": "节奏模式",
+    "autoTriggerInterval": "固定间隔",
+    "autoTriggerMin": "最小间隔",
+    "autoTriggerMax": "最大间隔",
+    "autoTriggerPatternValues": "模式数值",
+    "autoTriggerPatternLoop": "循环模式",
+    "autoTriggerEnabledTooltip": "为声音对象启用自动触发。对象会根据所选模式自动激活。",
+    "autoTriggerModeTooltip": "选择对象的自动触发方式：固定（每隔 X 秒）、随机（在最小与最大之间）或模式（节奏序列）。",
+    "autoTriggerIntervalTooltip": "触发之间的固定秒数间隔",
+    "autoTriggerMinTooltip": "随机触发的最小秒数间隔",
+    "autoTriggerMaxTooltip": "随机触发的最大秒数间隔",
+    "autoTriggerPatternTooltip": "输入以逗号分隔的秒数序列（例如：0.5, 1.0, 0.25, 1.5）。对象将按照该节奏触发。",
+    "autoTriggerPatternPlaceholder": "0.5, 1.0, 0.25, 1.5",
+    "autoTriggerPatternLoopTooltip": "启用时，模式会无限循环；禁用时仅播放一次。",
+    "seconds": "秒",
+    "none": "无",
+    "curve": "包络曲线",
+    "curveLinear": "线性",
+    "curveExponential": "指数",
+    "curveSine": "正弦",
+    "curveCosine": "余弦",
+    "curveBounce": "弹跳",
+    "curveRipple": "涟漪",
+    "curveStep": "阶梯",
+    "polySynthParametersTitle": "PolySynth 参数",
+    "polyphony": "复音（音色数量）",
+    "chordType": "和弦类型",
+    "chords": {
+      "major": "C 大三和弦 (C-E-G)",
+      "minor": "C 小三和弦 (C-E♭-G)",
+      "major7": "C 大七和弦 (C-E-G-B)",
+      "minor7": "C 小七和弦 (C-E♭-G-B♭)",
+      "major9": "C 大九和弦 (C-E-G-B-D)",
+      "minor9": "C 小九和弦 (C-E♭-G-B♭-D)",
+      "major7Sharp5": "C 大七增五 (C-E-G#-B)",
+      "minor9b5": "C 小九减五 (C-E♭-G-B♭-D♭)"
+    },
+    "noiseSynthParametersTitle": "NoiseSynth 参数",
+    "noiseType": "噪声类型",
+    "noiseWhite": "白噪声（全频带）",
+    "noisePink": "粉红噪声（柔和）",
+    "noiseBrown": "棕色噪声（低频）",
+    "noiseHitDuration": "敲击时长（秒）",
     "animationProperties": "动画属性",
     "pulseSpeed": "脉冲速度",
     "pulseIntensity": "脉冲强度",
@@ -203,7 +448,8 @@
     "spanish": "Español",
     "english": "English",
     "russian": "Русский",
-    "chinese": "中文"
+    "chinese": "中文",
+    "thai": "泰语"
   },
   "codeEditor": {
     "examples": "示例",
@@ -417,6 +663,23 @@
     "creating": "创建中...",
     "create": "创建",
     "grids": "网格",
+    "projectNamePlaceholder": "我的项目",
+    "projectDescriptionPlaceholder": "项目描述...",
+    "unlockSuccess": "已成功解除编辑锁定。",
+    "unlockEditingTitle": "解锁编辑",
+    "adminPassword": "管理员密码",
+    "passwordPlaceholder": "请输入密码",
+    "unlock": "解锁",
+    "lock": "锁定",
+    "lockProjectTitle": "锁定项目",
+    "unlockProjectTitle": "解锁项目",
+    "deleteProjectTitle": "删除项目",
+    "locked": "已锁定",
+    "lockProjectTooltip": "锁定项目（管理员）",
+    "unlockProjectTooltip": "解锁项目（管理员）",
+    "deleteProjectTooltip": "删除项目（管理员）",
+    "deleteWarning": "⚠️ 此操作将永久删除该项目，无法撤销。",
+    "delete": "删除",
     "noProjectName": "请输入项目名称",
     "errorSaving": "保存项目时出错。请重试。",
     "errorLoading": "加载项目时出错。请重试。",
@@ -492,6 +755,12 @@
     "posicionEsfera": "球体位置",
     "rotacionEsfera": "球体旋转",
     "escalaEsfera": "球体缩放"
+  },
+  "mobileObjectHeader": {
+    "deleteTooltip": "删除移动对象",
+    "mobileType": "移动",
+    "status": "状态：",
+    "movement": "运动："
   },
   "effects": {
     "parameters": "参数",

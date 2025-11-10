@@ -67,7 +67,7 @@ export function AutoTriggerParameters({
       <div className="mb-4">
         <label className="futuristic-label block mb-2 text-white text-xs flex items-center">
           {t('parameterEditor.autoTriggerEnabled')}
-          <InfoTooltip content="Activa la auto-activación del objeto sonoro. El objeto se activará automáticamente según el modo configurado." />
+          <InfoTooltip content={t('parameterEditor.autoTriggerEnabledTooltip')} />
         </label>
         <button
           onClick={() => onParamChange('autoTrigger', !autoTrigger)}
@@ -88,7 +88,7 @@ export function AutoTriggerParameters({
           <div className="mb-4">
             <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
               {t('parameterEditor.autoTriggerMode')}
-              <InfoTooltip content="Selecciona el modo de auto-activación: Fijo (cada X segundos), Aleatorio (entre min y max), o Patrón (secuencia rítmica)." />
+              <InfoTooltip content={t('parameterEditor.autoTriggerModeTooltip')} />
             </label>
             <select
               value={mode}
@@ -113,7 +113,7 @@ export function AutoTriggerParameters({
                 onChange={(value) => onParamChange('autoTriggerInterval', value / 1000)}
                 unit="s"
                 displayValue={interval}
-                tooltip="Intervalo fijo en segundos entre activaciones"
+                tooltip={t('parameterEditor.autoTriggerIntervalTooltip')}
               />
             </div>
           )}
@@ -130,7 +130,7 @@ export function AutoTriggerParameters({
                   onChange={(value) => onParamChange('autoTriggerMin', value / 1000)}
                   unit="s"
                   displayValue={minInterval}
-                  tooltip="Intervalo mínimo en segundos para activaciones aleatorias"
+                  tooltip={t('parameterEditor.autoTriggerMinTooltip')}
                 />
               </div>
               <div className="mb-4">
@@ -143,7 +143,7 @@ export function AutoTriggerParameters({
                   onChange={(value) => onParamChange('autoTriggerMax', value / 1000)}
                   unit="s"
                   displayValue={maxInterval}
-                  tooltip="Intervalo máximo en segundos para activaciones aleatorias"
+                  tooltip={t('parameterEditor.autoTriggerMaxTooltip')}
                 />
               </div>
             </>
@@ -154,23 +154,23 @@ export function AutoTriggerParameters({
               <div className="mb-4">
                 <label className="futuristic-label block mb-1 text-white text-xs flex items-center">
                   {t('parameterEditor.autoTriggerPatternValues')}
-                  <InfoTooltip content="Ingresa una secuencia de tiempos en segundos separados por comas (ej: 0.5, 1.0, 0.25, 1.5). El objeto se activará según este patrón rítmico." />
+                  <InfoTooltip content={t('parameterEditor.autoTriggerPatternTooltip')} />
                 </label>
                 <input
                   type="text"
                   value={patternInput}
                   onChange={(e) => handlePatternChange(e.target.value)}
-                  placeholder="0.5, 1.0, 0.25, 1.5"
+                  placeholder={t('parameterEditor.autoTriggerPatternPlaceholder')}
                   className="bg-black border border-white text-white text-xs font-mono px-2 py-1 w-full focus:outline-none focus:border-gray-400"
                 />
                 <p className="text-xs text-gray-400 mt-1 font-mono">
-                  {t('parameterEditor.seconds')}: {pattern.length > 0 ? pattern.join(', ') : 'Ninguno'}
+                  {t('parameterEditor.seconds')}: {pattern.length > 0 ? pattern.join(', ') : t('parameterEditor.none')}
                 </p>
               </div>
               <div className="mb-4">
                 <label className="futuristic-label block mb-2 text-white text-xs flex items-center">
                   {t('parameterEditor.autoTriggerPatternLoop')}
-                  <InfoTooltip content="Si está activado, el patrón se repetirá infinitamente. Si está desactivado, el patrón solo se reproducirá una vez." />
+                  <InfoTooltip content={t('parameterEditor.autoTriggerPatternLoopTooltip')} />
                 </label>
                 <button
                   onClick={() => onParamChange('autoTriggerPatternLoop', !patternLoop)}

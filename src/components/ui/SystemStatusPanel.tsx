@@ -42,7 +42,7 @@ export function SystemStatusPanel() {
         {/* Title */}
         <div className="mb-4">
           <h2 className="text-lg font-mono font-bold text-white tracking-wider mb-2">
-            002_SYSTEM
+            La Casa de Salomon
           </h2>
           <div className="w-16 h-px bg-white"></div>
           <div className="w-12 h-px bg-gray-500 mt-1"></div>

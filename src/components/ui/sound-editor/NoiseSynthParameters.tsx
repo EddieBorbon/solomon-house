@@ -3,6 +3,7 @@
 import React from 'react';
 import { type SoundObject } from '../../../state/useWorldStore';
 import { type AudioParams } from '../../../lib/AudioManager';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface NoiseSynthParametersProps {
   selectedObject: SoundObject;
@@ -13,6 +14,8 @@ export function NoiseSynthParameters({
   selectedObject,
   onParamChange
 }: NoiseSynthParametersProps) {
+  const { t } = useLanguage();
+
   if (selectedObject.type !== 'plane') return null;
 
   return (
@@ -20,29 +23,29 @@ export function NoiseSynthParameters({
       {/* Sección: Parámetros del NoiseSynth */}
       <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-600">
         <h4 className="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
-          🟦 Parámetros del NoiseSynth
+          🟦 {t('parameterEditor.noiseSynthParametersTitle')}
         </h4>
         
         {/* Tipo de Ruido */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Tipo de Ruido
+            {t('parameterEditor.noiseType')}
           </label>
           <select
             value={selectedObject.audioParams.noiseType || 'white'}
             onChange={(e) => onParamChange('noiseType', e.target.value as 'white' | 'pink' | 'brown')}
             className="w-full p-2 bg-gray-800 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
           >
-            <option value="white">Blanco (Ruido completo)</option>
-            <option value="pink">Rosa (Ruido suave)</option>
-            <option value="brown">Marrón (Ruido bajo)</option>
+            <option value="white">{t('parameterEditor.noiseWhite')}</option>
+            <option value="pink">{t('parameterEditor.noisePink')}</option>
+            <option value="brown">{t('parameterEditor.noiseBrown')}</option>
           </select>
         </div>
 
         {/* Duración del Golpe */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Duración del Golpe (segundos)
+            {t('parameterEditor.noiseHitDuration')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -67,7 +70,7 @@ export function NoiseSynthParameters({
         {/* Attack */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Attack (Ataque)
+            {t('parameterEditor.attack')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -92,7 +95,7 @@ export function NoiseSynthParameters({
         {/* Decay */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Decay (Caída)
+            {t('parameterEditor.decay')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -117,7 +120,7 @@ export function NoiseSynthParameters({
         {/* Sustain */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Sustain (Sostenido)
+            {t('parameterEditor.sustain')}
           </label>
           <div className="flex items-center gap-3">
             <input
@@ -142,7 +145,7 @@ export function NoiseSynthParameters({
         {/* Release */}
         <div className="mb-3">
           <label className="block text-xs font-medium text-gray-300 mb-1">
-            Release (Liberación)
+            {t('parameterEditor.release')}
           </label>
           <div className="flex items-center gap-3">
             <input

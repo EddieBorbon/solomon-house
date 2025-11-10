@@ -103,12 +103,12 @@ export function TransformToolbar() {
             className="relative px-3 py-2 font-mono text-xs tracking-wider transition-all duration-200
               bg-black text-white hover:bg-gray-800 border border-white
               flex items-center gap-1 min-w-[70px] justify-center"
-            title="Salir del modo edición (ESC)"
+            title={t('transformToolbar.exitTooltip')}
           >
             <X className="w-4 h-4" />
             <div className="flex flex-col items-center">
-              <span className="text-xs font-mono uppercase">Salir</span>
-              <span className="text-xs opacity-60">(ESC)</span>
+              <span className="text-xs font-mono uppercase">{t('transformToolbar.exit')}</span>
+              <span className="text-xs opacity-60">{t('transformToolbar.exitShortcut')}</span>
             </div>
           </button>
           
@@ -118,12 +118,12 @@ export function TransformToolbar() {
             className="relative px-3 py-2 font-mono text-xs tracking-wider transition-all duration-200
               bg-black text-white hover:bg-red-900 border border-red-500
               flex items-center gap-1 min-w-[70px] justify-center"
-            title="Eliminar objeto seleccionado (SUPR)"
+            title={t('transformToolbar.deleteTooltip')}
           >
             <Trash2 className="w-4 h-4" />
             <div className="flex flex-col items-center">
-              <span className="text-xs font-mono uppercase">Eliminar</span>
-              <span className="text-xs opacity-60">(SUPR)</span>
+              <span className="text-xs font-mono uppercase">{t('transformToolbar.delete')}</span>
+              <span className="text-xs opacity-60">{t('transformToolbar.deleteShortcut')}</span>
             </div>
           </button>
         </div>

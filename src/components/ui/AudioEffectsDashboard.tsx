@@ -1,13 +1,16 @@
 'use client';
 
 import AudioEffectCard from './AudioEffectCard';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function AudioEffectsDashboard() {
+  const { t } = useLanguage();
+
   const audioEffects = [
     {
       id: 'stereo-widener',
-      title: 'StereoWidener',
-      description: 'Aplica un factor de ancho a la separación mid/side. 0 es todo mid y 1 es todo side.',
+      title: t('audioEffects.cards.stereoWidener.title'),
+      description: t('audioEffects.cards.stereoWidener.description'),
       icon: <span className="text-xl">🎧</span>,
       glowColor: 'from-blue-500',
       isActive: true,
@@ -15,8 +18,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'tremolo',
-      title: 'Tremolo',
-      description: 'Modula la amplitud de la señal usando un LFO. Efecto estéreo donde la fase de modulación se invierte en cada canal.',
+      title: t('audioEffects.cards.tremolo.title'),
+      description: t('audioEffects.cards.tremolo.description'),
       icon: <span className="text-xl">🌊</span>,
       glowColor: 'from-red-500',
       isActive: false,
@@ -24,8 +27,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'vibrato',
-      title: 'Vibrato',
-      description: 'Efecto de vibrato compuesto por un Delay y un LFO. El LFO modula el delayTime del delay, causando que el pitch suba y baje.',
+      title: t('audioEffects.cards.vibrato.title'),
+      description: t('audioEffects.cards.vibrato.description'),
       icon: <span className="text-xl">🎵</span>,
       glowColor: 'from-orange-500',
       isActive: false,
@@ -33,8 +36,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'phaser',
-      title: 'Phaser',
-      description: 'Efecto de modulación de fase que crea un sonido de barrido característico.',
+      title: t('audioEffects.cards.phaser.title'),
+      description: t('audioEffects.cards.phaser.description'),
       icon: <span className="text-xl">🌀</span>,
       glowColor: 'from-purple-500',
       isActive: false,
@@ -42,8 +45,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'auto-filter',
-      title: 'AutoFilter',
-      description: 'Filtro automático que modula la frecuencia de corte basado en la entrada de audio.',
+      title: t('audioEffects.cards.autoFilter.title'),
+      description: t('audioEffects.cards.autoFilter.description'),
       icon: <span className="text-xl">🔍</span>,
       glowColor: 'from-green-500',
       isActive: false,
@@ -51,8 +54,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'auto-wah',
-      title: 'AutoWah',
-      description: 'Efecto de wah automático que modula un filtro basado en la amplitud de la señal.',
+      title: t('audioEffects.cards.autoWah.title'),
+      description: t('audioEffects.cards.autoWah.description'),
       icon: <span className="text-xl">🎛️</span>,
       glowColor: 'from-orange-500',
       isActive: false,
@@ -60,8 +63,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'bit-crusher',
-      title: 'BitCrusher',
-      description: 'Reduce la resolución de bits y la frecuencia de muestreo para crear distorsión digital.',
+      title: t('audioEffects.cards.bitCrusher.title'),
+      description: t('audioEffects.cards.bitCrusher.description'),
       icon: <span className="text-xl">🔊</span>,
       glowColor: 'from-red-500',
       isActive: false,
@@ -69,8 +72,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'chebyshev',
-      title: 'Chebyshev',
-      description: 'Genera armónicos usando polinomios de Chebyshev para crear distorsión musical.',
+      title: t('audioEffects.cards.chebyshev.title'),
+      description: t('audioEffects.cards.chebyshev.description'),
       icon: <span className="text-xl">📊</span>,
       glowColor: 'from-indigo-500',
       isActive: false,
@@ -78,8 +81,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'chorus',
-      title: 'Chorus',
-      description: 'Efecto de coro que duplica la señal con modulación de pitch y delay.',
+      title: t('audioEffects.cards.chorus.title'),
+      description: t('audioEffects.cards.chorus.description'),
       icon: <span className="text-xl">🎵</span>,
       glowColor: 'from-teal-500',
       isActive: false,
@@ -87,8 +90,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'distortion',
-      title: 'Distortion',
-      description: 'Aplica distorsión no lineal a la señal de audio para crear saturación.',
+      title: t('audioEffects.cards.distortion.title'),
+      description: t('audioEffects.cards.distortion.description'),
       icon: <span className="text-xl">⚡</span>,
       glowColor: 'from-pink-500',
       isActive: false,
@@ -96,8 +99,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'feedback-delay',
-      title: 'FeedbackDelay',
-      description: 'Delay con retroalimentación que crea ecos repetitivos y resonantes.',
+      title: t('audioEffects.cards.feedbackDelay.title'),
+      description: t('audioEffects.cards.feedbackDelay.description'),
       icon: <span className="text-xl">🔁</span>,
       glowColor: 'from-yellow-500',
       isActive: false,
@@ -105,8 +108,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'freeverb',
-      title: 'Freeverb',
-      description: 'Algoritmo de reverberación libre basado en el Freeverb de Jezar.',
+      title: t('audioEffects.cards.freeverb.title'),
+      description: t('audioEffects.cards.freeverb.description'),
       icon: <span className="text-xl">🏛️</span>,
       glowColor: 'from-cyan-500',
       isActive: false,
@@ -114,8 +117,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'frequency-shifter',
-      title: 'FrequencyShifter',
-      description: 'Desplaza todas las frecuencias de la señal por una cantidad fija.',
+      title: t('audioEffects.cards.frequencyShifter.title'),
+      description: t('audioEffects.cards.frequencyShifter.description'),
       icon: <span className="text-xl">📡</span>,
       glowColor: 'from-lime-500',
       isActive: false,
@@ -123,8 +126,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'jc-reverb',
-      title: 'JCReverb',
-      description: 'Reverberación basada en el algoritmo de John Chowning.',
+      title: t('audioEffects.cards.jcReverb.title'),
+      description: t('audioEffects.cards.jcReverb.description'),
       icon: <span className="text-xl">🌊</span>,
       glowColor: 'from-sky-500',
       isActive: false,
@@ -132,8 +135,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'ping-pong-delay',
-      title: 'PingPongDelay',
-      description: 'Delay estéreo que alterna entre canales izquierdo y derecho.',
+      title: t('audioEffects.cards.pingPong.title'),
+      description: t('audioEffects.cards.pingPong.description'),
       icon: <span className="text-xl">🏓</span>,
       glowColor: 'from-violet-500',
       isActive: false,
@@ -141,8 +144,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'pitch-shift',
-      title: 'PitchShift',
-      description: 'Cambia el pitch de la señal sin afectar la velocidad de reproducción.',
+      title: t('audioEffects.cards.pitchShift.title'),
+      description: t('audioEffects.cards.pitchShift.description'),
       icon: <span className="text-xl">🎼</span>,
       glowColor: 'from-emerald-500',
       isActive: false,
@@ -150,8 +153,8 @@ export default function AudioEffectsDashboard() {
     },
     {
       id: 'reverb',
-      title: 'Reverb',
-      description: 'Reverberación espacial que simula el sonido en diferentes ambientes.',
+      title: t('audioEffects.cards.reverb.title'),
+      description: t('audioEffects.cards.reverb.description'),
       icon: <span className="text-xl">🏛️</span>,
       glowColor: 'from-amber-500',
       isActive: false,
@@ -163,8 +166,8 @@ export default function AudioEffectsDashboard() {
     <div className="min-h-screen bg-black p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Efectos de Audio</h1>
-        <p className="text-gray-400">Colección completa de efectos Tone.js para audio espacial 3D</p>
+        <h1 className="text-4xl font-bold text-white mb-2">{t('audioEffects.title')}</h1>
+        <p className="text-gray-400">{t('audioEffects.subtitle')}</p>
       </div>
 
       {/* Grid de efectos */}

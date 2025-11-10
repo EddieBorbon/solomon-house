@@ -1,12 +1,15 @@
 import ProjectCard from './ProjectCard';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Dashboard() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-black p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Solomon House Dashboard</h1>
-        <p className="text-gray-400">Sistema de audio espacial 3D con efectos avanzados</p>
+        <h1 className="text-4xl font-bold text-white mb-2">{t('dashboard.headerTitle')}</h1>
+        <p className="text-gray-400">{t('dashboard.headerSubtitle')}</p>
       </div>
 
       {/* Bento Grid Layout */}
@@ -15,8 +18,8 @@ export default function Dashboard() {
         {/* Tarjeta principal - Ocupa 2 columnas */}
         <div className="lg:col-span-2">
           <ProjectCard
-            title="Control Panel"
-            lastUpdated="Activo"
+            title={t('dashboard.cards.controlPanel.title')}
+            lastUpdated={t('dashboard.cards.controlPanel.lastUpdated')}
             members={["🎛️"]}
             icon={<span className="text-lg">🎛️</span>}
             glowColor="from-cyan-500"
@@ -26,8 +29,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de efectos de audio */}
         <ProjectCard
-          title="Efectos de Audio"
-          lastUpdated="15 efectos"
+          title={t('dashboard.cards.audioEffects.title')}
+          lastUpdated={t('dashboard.cards.audioEffects.lastUpdated')}
           members={["🎵", "🔊"]}
           icon={<span className="text-lg">🎵</span>}
           glowColor="from-purple-500"
@@ -36,8 +39,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de información del mundo */}
         <ProjectCard
-          title="Mundo 3D"
-          lastUpdated="12 objetos"
+          title={t('dashboard.cards.world3D.title')}
+          lastUpdated={t('dashboard.cards.world3D.lastUpdated')}
           members={["🌍", "🎯"]}
           icon={<span className="text-lg">🌍</span>}
           glowColor="from-green-500"
@@ -46,8 +49,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de parámetros */}
         <ProjectCard
-          title="Editor de Parámetros"
-          lastUpdated="En tiempo real"
+          title={t('dashboard.cards.parameterEditor.title')}
+          lastUpdated={t('dashboard.cards.parameterEditor.lastUpdated')}
           members={["⚙️"]}
           icon={<span className="text-lg">⚙️</span>}
           glowColor="from-orange-500"
@@ -56,8 +59,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de StereoWidener - Nueva */}
         <ProjectCard
-          title="StereoWidener"
-          lastUpdated="Nuevo efecto"
+          title={t('dashboard.cards.stereoWidener.title')}
+          lastUpdated={t('dashboard.cards.stereoWidener.lastUpdated')}
           members={["🎧"]}
           icon={<span className="text-lg">🎧</span>}
           glowColor="from-blue-500"
@@ -66,8 +69,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de Phaser */}
         <ProjectCard
-          title="Phaser"
-          lastUpdated="Efecto activo"
+          title={t('dashboard.cards.phaser.title')}
+          lastUpdated={t('dashboard.cards.phaser.lastUpdated')}
           members={["🌀"]}
           icon={<span className="text-lg">🌀</span>}
           glowColor="from-pink-500"
@@ -76,8 +79,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de AutoFilter */}
         <ProjectCard
-          title="AutoFilter"
-          lastUpdated="Filtro dinámico"
+          title={t('dashboard.cards.autoFilter.title')}
+          lastUpdated={t('dashboard.cards.autoFilter.lastUpdated')}
           members={["🔍"]}
           icon={<span className="text-lg">🔍</span>}
           glowColor="from-teal-500"
@@ -86,8 +89,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de Reverb */}
         <ProjectCard
-          title="Reverb"
-          lastUpdated="Espacialización"
+          title={t('dashboard.cards.reverb.title')}
+          lastUpdated={t('dashboard.cards.reverb.lastUpdated')}
           members={["🏛️"]}
           icon={<span className="text-lg">🏛️</span>}
           glowColor="from-indigo-500"
@@ -97,8 +100,8 @@ export default function Dashboard() {
         {/* Tarjeta de estadísticas - Ocupa 2 columnas */}
         <div className="lg:col-span-2">
           <ProjectCard
-            title="Estadísticas del Sistema"
-            lastUpdated="Tiempo real"
+            title={t('dashboard.cards.systemStats.title')}
+            lastUpdated={t('dashboard.cards.systemStats.lastUpdated')}
             members={["📊", "📈", "📉"]}
             icon={<span className="text-lg">📊</span>}
             glowColor="from-yellow-500"
@@ -108,8 +111,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de configuración */}
         <ProjectCard
-          title="Configuración"
-          lastUpdated="Personalizable"
+          title={t('dashboard.cards.settings.title')}
+          lastUpdated={t('dashboard.cards.settings.lastUpdated')}
           members={["⚙️", "🎛️"]}
           icon={<span className="text-lg">⚙️</span>}
           glowColor="from-red-500"
@@ -118,8 +121,8 @@ export default function Dashboard() {
 
         {/* Tarjeta de ayuda */}
         <ProjectCard
-          title="Ayuda y Documentación"
-          lastUpdated="Actualizada"
+          title={t('dashboard.cards.help.title')}
+          lastUpdated={t('dashboard.cards.help.lastUpdated')}
           members={["❓", "📚"]}
           icon={<span className="text-lg">❓</span>}
           glowColor="from-gray-500"

@@ -518,6 +518,24 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [orbitControlsRef]);
 
+  const releasePointerCaptures = useCallback((element?: HTMLElement | null) => {
+    if (!element || typeof element.releasePointerCapture !== 'function') {
+      return;
+    }
+
+    const canCheckCapture = typeof element.hasPointerCapture === 'function';
+
+    for (let pointerId = 0; pointerId < 10; pointerId++) {
+      try {
+        if (!canCheckCapture || element.hasPointerCapture(pointerId)) {
+          element.releasePointerCapture(pointerId);
+        }
+      } catch {
+        // Ignorar errores si el puntero no estaba capturado o el navegador no soporta la operación
+      }
+    }
+  }, []);
+
   // Función de emergencia para desbloquear y resetear la cámara
   const handleEmergencyCameraUnlock = useCallback((event: KeyboardEvent) => {
     // Presionar 'C' para restaurar el movimiento de rotación con clic derecho
@@ -544,69 +562,13 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           // Paso 1: Obtener el elemento DOM
           const domElement = controls._domElement || controls.domElement || document.querySelector('canvas');
           
-          // Paso 2: Liberar TODOS los punteros capturados primero
-          if (domElement && domElement.releasePointerCapture) {
-          try {
-            for (let i = 0; i < 10; i++) {
-              try {
-                domElement.releasePointerCapture(i);
-              } catch {
-                // Ignorar errores si el puntero no estaba capturado
-              }
-            }
-          } catch {
-            // Ignorar errores
-          }
-          }
+          // Paso 2: Liberar cualquier puntero capturado de forma segura
+          releasePointerCaptures(domElement);
           
-          // Paso 3: Disparar eventos de liberación de botones en el canvas
-          if (domElement) {
-            // Disparar eventos para todos los botones
-            [0, 1, 2].forEach(button => {
-              try {
-                // Mouseup
-                domElement.dispatchEvent(new MouseEvent('mouseup', {
-                  bubbles: true,
-                  cancelable: true,
-                  button: button,
-                  buttons: 0,
-                  clientX: 0,
-                  clientY: 0
-                }));
-                
-                // Pointerup
-                domElement.dispatchEvent(new PointerEvent('pointerup', {
-                  bubbles: true,
-                  cancelable: true,
-                  button: button,
-                  buttons: 0,
-                  pointerId: button + 1,
-                  pointerType: 'mouse',
-                  clientX: 0,
-                  clientY: 0
-                }));
-                
-                // Pointercancel
-                domElement.dispatchEvent(new PointerEvent('pointercancel', {
-                  bubbles: true,
-                  cancelable: true,
-                  button: button,
-                  buttons: 0,
-                  pointerId: button + 1,
-                  pointerType: 'mouse',
-                  clientX: 0,
-                  clientY: 0
-                }));
-              } catch {
-                // Ignorar errores
-              }
-            });
-          }
-          
-          // Paso 4: Deshabilitar temporalmente OrbitControls (esto resetea el estado interno)
+          // Paso 3: Deshabilitar temporalmente OrbitControls (esto resetea el estado interno)
           controls.enabled = false;
           
-          // Paso 5: Resetear estado interno manualmente si es accesible
+          // Paso 4: Resetear estado interno manualmente si es accesible
           try {
             // OrbitControls v0.37+ usa un objeto _state
             if (controls._state && typeof controls._state === 'object') {
@@ -646,7 +608,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             // Ignorar errores de acceso al estado interno
           }
           
-          // Paso 6: Pequeño delay para asegurar que los eventos se procesen
+          // Paso 5: Pequeño delay para asegurar que los eventos se procesen
           setTimeout(() => {
             if (orbitControlsRef.current) {
               const controls = orbitControlsRef.current as {
@@ -737,15 +699,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           
           // Liberar todos los punteros
           const domElement = controls._domElement || controls.domElement || canvas;
-          if (domElement && domElement.releasePointerCapture) {
-            for (let i = 0; i < 10; i++) {
-              try {
-                domElement.releasePointerCapture(i);
-              } catch {
-                // Ignorar errores
-              }
-            }
-          }
+          releasePointerCaptures(domElement);
           
           // Resetear estado interno
           if (controls._state) {
@@ -766,7 +720,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     return () => {
       canvas.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [orbitControlsRef]);
+  }, [orbitControlsRef, releasePointerCaptures]);
 
   // Verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {

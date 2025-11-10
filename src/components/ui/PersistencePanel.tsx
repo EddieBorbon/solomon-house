@@ -355,7 +355,7 @@ export function PersistencePanel() {
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="MY_PROJECT"
+                      placeholder={t('persistence.projectNamePlaceholder')}
                     />
                   </div>
                   
@@ -365,7 +365,7 @@ export function PersistencePanel() {
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="PROJECT_DESCRIPTION..."
+                      placeholder={t('persistence.projectDescriptionPlaceholder')}
                       rows={2}
                     />
                   </div>
@@ -424,7 +424,7 @@ export function PersistencePanel() {
                             <div className="flex items-center gap-2">
                               <div className="text-white font-mono text-sm tracking-wider">{project.name}</div>
                               {project.isLocked && (
-                                <span className="text-xs text-red-400 font-mono">🔒 BLOQUEADO</span>
+                                <span className="text-xs text-red-400 font-mono">🔒 {t('persistence.locked')}</span>
                               )}
                             </div>
                             {project.description && (
@@ -457,7 +457,7 @@ export function PersistencePanel() {
                                     ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black'
                                     : 'border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black'
                                 }`}
-                                title={project.isLocked ? 'Desbloquear proyecto (Admin)' : 'Bloquear proyecto (Admin)'}
+                                title={project.isLocked ? t('persistence.unlockProjectTooltip') : t('persistence.lockProjectTooltip')}
                               >
                                 <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
                                 <span className="relative z-10">{project.isLocked ? '🔓' : '🔒'}</span>
@@ -470,7 +470,7 @@ export function PersistencePanel() {
                                   setShowAdminDialog(true);
                                 }}
                                 className="relative border border-red-500 px-1 py-0.5 text-red-400 hover:bg-red-500 hover:text-black transition-all duration-300 group text-xs"
-                                title="Eliminar proyecto (Admin)"
+                                title={t('persistence.deleteProjectTooltip')}
                               >
                                 <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
                                 <span className="relative z-10">🗑️</span>
@@ -516,7 +516,7 @@ export function PersistencePanel() {
                       value={projectName}
                       onChange={(e) => setProjectName(e.target.value)}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="MY_NEW_PROJECT"
+                      placeholder={t('persistence.projectNamePlaceholder')}
                       autoFocus
                     />
                   </div>
@@ -527,7 +527,7 @@ export function PersistencePanel() {
                       value={projectDescription}
                       onChange={(e) => setProjectDescription(e.target.value)}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="PROJECT_DESCRIPTION..."
+                      placeholder={t('persistence.projectDescriptionPlaceholder')}
                       rows={2}
                     />
                   </div>
@@ -566,11 +566,11 @@ export function PersistencePanel() {
                 <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-white"></div>
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
-                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">DESBLOQUEAR EDICIÓN</h3>
+                <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">{t('persistence.unlockEditingTitle')}</h3>
                 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">Contraseña de Administrador</label>
+                    <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.adminPassword')}</label>
                     <input
                       type="password"
                       value={adminPassword}
@@ -589,7 +589,7 @@ export function PersistencePanel() {
                         }
                       }}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="Ingresa la contraseña"
+                      placeholder={t('persistence.passwordPlaceholder')}
                       autoFocus
                     />
                   </div>
@@ -610,7 +610,7 @@ export function PersistencePanel() {
                       className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                     >
                       <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
-                      <span className="relative text-xs font-mono tracking-wider">DESBLOQUEAR</span>
+                      <span className="relative text-xs font-mono tracking-wider">{t('persistence.unlock')}</span>
                     </button>
                     <button
                       onClick={() => {
@@ -620,7 +620,7 @@ export function PersistencePanel() {
                       className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group"
                     >
                       <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
-                      <span className="relative text-xs font-mono tracking-wider">CANCELAR</span>
+                      <span className="relative text-xs font-mono tracking-wider">{t('persistence.cancel')}</span>
                     </button>
                   </div>
                 </div>
@@ -639,15 +639,15 @@ export function PersistencePanel() {
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
                 
                 <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">
-                  {adminDialogAction === 'lock' && 'BLOQUEAR PROYECTO'}
-                  {adminDialogAction === 'unlock' && 'DESBLOQUEAR PROYECTO'}
-                  {adminDialogAction === 'delete' && 'ELIMINAR PROYECTO'}
+                  {adminDialogAction === 'lock' && t('persistence.lockProjectTitle')}
+                  {adminDialogAction === 'unlock' && t('persistence.unlockProjectTitle')}
+                  {adminDialogAction === 'delete' && t('persistence.deleteProjectTitle')}
                 </h3>
                 
                 <div className="space-y-3">
                   <div>
                     <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">
-                      Contraseña de Administrador
+                      {t('persistence.adminPassword')}
                     </label>
                     <input
                       type="password"
@@ -659,7 +659,7 @@ export function PersistencePanel() {
                         }
                       }}
                       className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                      placeholder="Ingresa la contraseña"
+                      placeholder={t('persistence.passwordPlaceholder')}
                       autoFocus
                     />
                   </div>
@@ -667,7 +667,7 @@ export function PersistencePanel() {
                   {adminDialogAction === 'delete' && (
                     <div className="p-2 border border-red-500 bg-red-500/10">
                       <p className="text-xs text-red-400 font-mono">
-                        ⚠️ Esta acción eliminará permanentemente el proyecto. No se puede deshacer.
+                        {t('persistence.deleteWarning')}
                       </p>
                     </div>
                   )}
@@ -681,9 +681,9 @@ export function PersistencePanel() {
                     >
                       <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
                       <span className="relative">
-                        {adminDialogAction === 'lock' && 'BLOQUEAR'}
-                        {adminDialogAction === 'unlock' && 'DESBLOQUEAR'}
-                        {adminDialogAction === 'delete' && 'ELIMINAR'}
+                        {adminDialogAction === 'lock' && t('persistence.lock')}
+                        {adminDialogAction === 'unlock' && t('persistence.unlock')}
+                        {adminDialogAction === 'delete' && t('persistence.delete')}
                       </span>
                     </button>
                     <button
@@ -696,7 +696,7 @@ export function PersistencePanel() {
                       className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group text-xs font-mono tracking-wider"
                     >
                       <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>
-                      <span className="relative">CANCELAR</span>
+                      <span className="relative">{t('persistence.cancel')}</span>
                     </button>
                   </div>
                 </div>
