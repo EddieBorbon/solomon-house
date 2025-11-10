@@ -7,7 +7,7 @@ const size = {
 
 const fetchFont = async () => {
   const fontUrl = new URL(
-    "../public/fuentes/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf",
+    "../../public/fuentes/NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf",
     import.meta.url
   );
   const response = await fetch(fontUrl);
