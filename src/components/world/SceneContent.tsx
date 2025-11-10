@@ -660,7 +660,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         }
       }
     }
-  }, [orbitControlsRef]);
+  }, [orbitControlsRef, releasePointerCaptures]);
 
   // Agregar listener de teclado para desbloqueo de emergencia
   // Usar capture: true para asegurar que se ejecute antes que otros handlers
