@@ -867,16 +867,16 @@
     "color": "สี",
     "effect": "เอฟเฟ็กต์",
     "status": "สถานะ",
-    "locked": "ถูกล็อก",
-    "active": "ใช้งาน",
+    "locked": "ล็อกอยู่",
+    "active": "กำลังใช้งาน",
     "panelLockedDuringTutorial": "แผงถูกล็อกระหว่างบทเรียน",
-    "collapsePanel": "ยุบแผง",
+    "collapsePanel": "ย่อแผง",
     "expandPanel": "ขยายแผง",
-    "noEntitySelected": "ยังไม่ได้เลือกเอนทิตี",
+    "noEntitySelected": "ยังไม่ได้เลือกวัตถุ",
     "clickObjectOrZoneToEdit": "คลิกวัตถุเสียงหรือโซนเอฟเฟ็กต์ในโลก 3 มิติเพื่อเลือกและแก้ไขพารามิเตอร์",
-    "hideControls": "ซ่อนการควบคุม",
-    "showControls": "แสดงการควบคุม",
-    "cameraActive": "กล้องทำงาน",
+    "hideControls": "ซ่อนแผงควบคุม",
+    "showControls": "แสดงแผงควบคุม",
+    "cameraActive": "กล้องพร้อมใช้งาน",
     "cameraLocked": "กล้องถูกล็อก",
     "lock": "ล็อก",
     "activate": "เปิดใช้งาน",
@@ -890,6 +890,6 @@
     "north": "เหนือ",
     "down": "ลง",
     "up": "ขึ้น",
-    "createGridAtPosition": "สร้างกริดที่ตำแหน่งที่ระบุ"
+    "createGridAtPosition": "สร้างกริดที่ตำแหน่งที่กำหนด"
   }
 }

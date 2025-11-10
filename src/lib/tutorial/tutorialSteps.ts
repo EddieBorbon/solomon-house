@@ -327,6 +327,7 @@ export const tutorialSteps: TutorialStep[] = [
       '🎭 Experimenta con diferentes materiales y texturas visuales',
       '🎵 Ajusta parámetros de audio para crear atmósferas únicas',
       '✨ ¡No hay límites para tu creatividad!',
+      '📝 Cuéntanos tu experiencia completando esta encuesta: https://docs.google.com/forms/u/0/',
     ],
     estimatedTime: 600,
     skipAllowed: false,

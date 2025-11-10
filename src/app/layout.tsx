@@ -14,13 +14,42 @@ const nunitoSans = localFont({
   display: "swap",
 });
 
+const siteUrl = "https://casasolomon.vercel.app";
+const ogImage = "/logos/logo.png";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Solomon's House - Collaborative 3D Musical Creation",
-  description: "Collaborative 3D musical creation application built with Next.js, Three.js, and Zustand",
+  description:
+    "Collaborative 3D musical creation application built with Next.js, Three.js, and Zustand",
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
+  openGraph: {
+    title: "Solomon's House - Collaborative 3D Musical Creation",
+    description:
+      "Explora una plataforma colaborativa de creación musical 3D con tecnologías web inmersivas.",
+    url: siteUrl,
+    siteName: "Solomon's House",
+    images: [
+      {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: "Solomon's House - Collaborative 3D Musical Creation",
+      },
+    ],
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Solomon's House - Collaborative 3D Musical Creation",
+    description:
+      "Explora una plataforma colaborativa de creación musical 3D con tecnologías web inmersivas.",
+    images: [ogImage],
   },
 };
 
