@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Experience } from '../components/world/Experience';
 import { ControlPanel } from '../components/ui/ControlPanel';
+import { ParticleControlPanel } from '../components/ui/ParticleControlPanel';
 import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
@@ -15,7 +16,7 @@ export default function Home() {
   const [showWelcome, setShowWelcome] = useState(true);
   const { startTutorial, isActive } = useTutorialStore();
   const { createGrid, setGlobalWorldConnected, deleteGrid } = useWorldStore();
-  
+
   // Hook para atajos de teclado
   useKeyboardShortcuts();
 
@@ -23,19 +24,19 @@ export default function Home() {
     try {
       // Primero desactivar la conexión global para evitar que se cargue contenido
       setGlobalWorldConnected(false);
-      
+
       // Limpiar todas las cuadrículas existentes
       const { grids } = useWorldStore.getState();
       grids.forEach((_, gridId) => {
         deleteGrid(gridId);
       });
-      
+
       // Esperar un momento para que se complete la limpieza
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       // Crear un mundo vacío para el tutorial
       createGrid([0, 0, 0], 20);
-      
+
       setShowWelcome(false);
       // Iniciar el tutorial
       startTutorial();
@@ -50,7 +51,7 @@ export default function Home() {
     try {
       // Conectar con el mundo global existente
       setGlobalWorldConnected(true);
-      
+
       setShowWelcome(false);
       // Entrar sin tutorial
     } catch (error) {
@@ -65,23 +66,24 @@ export default function Home() {
       <div className="w-full h-full">
         {/* Barra de herramientas de transformación */}
         <TransformToolbar />
-        
+
         {/* Editor de parámetros (incluye transformación) */}
         <ParameterEditor />
-        
+
         {/* Información del mundo */}
-        
+
         {/* Panel de control */}
         <ControlPanel />
-        
+        <ParticleControlPanel />
+
         {/* Escena 3D */}
         <Experience />
       </div>
 
       {/* Modal de bienvenida - superpuesto sobre la aplicación */}
       {showWelcome && (
-        <LoadingScreen 
-          variant="initial" 
+        <LoadingScreen
+          variant="initial"
           onStart={handleStartTutorial}
           onSkipTutorial={handleSkipTutorial}
         />

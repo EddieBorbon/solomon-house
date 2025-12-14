@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { type SoundObject, type MobileObject, type EffectZone } from '../state/useWorldStore';
+import { type SoundObject, type MobileObject, type EffectZone, type ParticleSystemObject } from '../state/useWorldStore';
 
 // Tipos para cuadrículas
 export interface Grid {
@@ -11,6 +11,7 @@ export interface Grid {
   objects: SoundObject[];
   mobileObjects: MobileObject[];
   effectZones: EffectZone[];
+  particleSystems: ParticleSystemObject[];
   gridSize: number;
   gridColor: string;
   isLoaded: boolean; // Si la cuadrícula está cargada en memoria
@@ -35,7 +36,7 @@ export interface GridActions {
   unloadGrid: (coordinates: [number, number, number]) => void;
   getGridKey: (coordinates: [number, number, number]) => string;
   getAdjacentGrids: () => Array<[number, number, number]>;
-  
+
   // Acciones para manipulación de cuadrículas
   createGrid: (position: [number, number, number], size?: number) => void;
   selectGrid: (gridId: string | null) => void;
@@ -45,7 +46,7 @@ export interface GridActions {
   moveGrid: (gridId: string, position: [number, number, number]) => void;
   rotateGrid: (gridId: string, rotation: [number, number, number]) => void;
   scaleGrid: (gridId: string, scale: [number, number, number]) => void;
-  
+
   // Acciones para proyecto actual
   setActiveGrid: (gridId: string | null) => void;
 }
@@ -64,7 +65,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
   // Acciones para cuadrículas
   moveToGrid: (coordinates: [number, number, number]) => {
-    
+
     set((state) => ({
       currentGridCoordinates: coordinates,
       activeGridId: state.getGridKey(coordinates)
@@ -73,7 +74,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
     // Cargar cuadrículas adyacentes
     const { loadGrid, getAdjacentGrids } = get();
     const adjacentGrids = getAdjacentGrids();
-    
+
     // Cargar cuadrícula actual y adyacentes
     loadGrid(coordinates);
     adjacentGrids.forEach(gridCoords => {
@@ -84,14 +85,14 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
   loadGrid: (coordinates: [number, number, number]) => {
     const { getGridKey } = get();
     const gridKey = getGridKey(coordinates);
-    
+
     set((state) => {
       // Si la cuadrícula ya existe, solo marcarla como cargada
       // NO sobrescribir cuadrículas que vienen de Firestore con objetos
       if (state.grids.has(gridKey)) {
         const existingGrid = state.grids.get(gridKey)!;
         // Si la cuadrícula ya tiene objetos (viene de Firestore), NO sobrescribir
-        if (existingGrid.objects.length > 0 || existingGrid.mobileObjects.length > 0 || existingGrid.effectZones.length > 0) {
+        if (existingGrid.objects.length > 0 || existingGrid.mobileObjects.length > 0 || existingGrid.effectZones.length > 0 || (existingGrid.particleSystems && existingGrid.particleSystems.length > 0)) {
           console.log(`ℹ️ Cuadrícula ${gridKey} ya tiene objetos, no sobrescribiendo`);
           return {
             grids: new Map(state.grids.set(gridKey, {
@@ -100,7 +101,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
             }))
           };
         }
-        
+
         // Si la cuadrícula está vacía, marcarla como cargada
         return {
           grids: new Map(state.grids.set(gridKey, {
@@ -113,7 +114,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
       // Crear nueva cuadrícula SOLO si no existe en Firestore
       // Esperar a que venga de Firestore antes de crear una vacía
       console.log(`ℹ️ Cuadrícula ${gridKey} no existe, esperando sincronización de Firestore...`);
-      
+
       const newGrid: Grid = {
         id: gridKey,
         coordinates,
@@ -123,6 +124,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
         objects: [],
         mobileObjects: [],
         effectZones: [],
+        particleSystems: [],
         gridSize: state.gridSize,
         gridColor: '#ffffff',
         isLoaded: true,
@@ -139,7 +141,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
   unloadGrid: (coordinates: [number, number, number]) => {
     const { getGridKey } = get();
     const gridKey = getGridKey(coordinates);
-    
+
     set((state) => {
       if (state.grids.has(gridKey)) {
         const existingGrid = state.grids.get(gridKey)!;
@@ -205,6 +207,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
         objects: [],
         mobileObjects: [],
         effectZones: [],
+        particleSystems: [],
         gridSize: size,
         gridColor: '#ffffff',
         isLoaded: true,
@@ -237,7 +240,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
   selectGrid: (gridId: string | null) => {
     set((state) => {
       const newGrids = new Map(state.grids);
-      
+
       // Deseleccionar todas las cuadrículas
       newGrids.forEach((grid, id) => {
         newGrids.set(id, { ...grid, isSelected: false });
@@ -262,7 +265,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
       const existingGrid = state.grids.get(gridId)!;
       const updatedGrid = { ...existingGrid, ...updates };
-      
+
       return {
         grids: new Map(state.grids.set(gridId, updatedGrid))
       };
@@ -274,7 +277,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
     set((state) => {
       const newGrids = new Map(state.grids);
       newGrids.delete(gridId);
-      
+
       return {
         grids: newGrids,
         activeGridId: state.activeGridId === gridId ? null : state.activeGridId
@@ -291,7 +294,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
       const existingGrid = state.grids.get(gridId)!;
       const updatedGrid = { ...existingGrid, gridSize: newSize };
-      
+
       return {
         grids: new Map(state.grids.set(gridId, updatedGrid))
       };
@@ -307,7 +310,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
       const existingGrid = state.grids.get(gridId)!;
       const updatedGrid = { ...existingGrid, position };
-      
+
       return {
         grids: new Map(state.grids.set(gridId, updatedGrid))
       };
@@ -323,7 +326,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
       const existingGrid = state.grids.get(gridId)!;
       const updatedGrid = { ...existingGrid, rotation };
-      
+
       return {
         grids: new Map(state.grids.set(gridId, updatedGrid))
       };
@@ -339,7 +342,7 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
 
       const existingGrid = state.grids.get(gridId)!;
       const updatedGrid = { ...existingGrid, scale };
-      
+
       return {
         grids: new Map(state.grids.set(gridId, updatedGrid))
       };

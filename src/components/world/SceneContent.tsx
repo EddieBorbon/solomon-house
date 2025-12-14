@@ -22,6 +22,8 @@ import { GridRenderer } from './GridRenderer';
 import { CameraController } from './CameraController';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 import { audioManager } from '../../lib/AudioManager';
+import { ParticleSystem } from './ParticleSystem';
+import { ParticleSystemObject } from '../../state/useWorldStore';
 
 interface SceneContentProps {
   orbitControlsRef: React.RefObject<{
@@ -40,17 +42,17 @@ interface SoundObjectContainerProps {
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect }, ref) => {
     const { triggerObjectNote } = useWorldStore();
-    
+
     const handleClick = useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       onSelect(object.id);
-      
+
       // Para pirámides, solo selección (el audio se maneja con onPointerDown/onPointerUp)
       if (object.type === 'pyramid') {
         // No hacer nada de audio aquí, se maneja en el componente SoundPyramid
         return;
       }
-      
+
       // Para conos, disparar la nota (el audio se maneja con triggerObjectNote)
       if (object.type === 'cone') {
         triggerObjectNote(object.id);
@@ -195,13 +197,13 @@ SoundObjectContainer.displayName = 'SoundObjectContainer';
 
 // Componente principal de la escena
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
-  const { 
-    grids, 
-    selectedEntityId, 
-    transformMode, 
-    updateObject, 
+  const {
+    grids,
+    selectedEntityId,
+    transformMode,
+    updateObject,
     updateMobileObject,
-    updateEffectZone, 
+    updateEffectZone,
     selectEntity,
     loadGrid,
     setActiveGrid,
@@ -216,24 +218,25 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       setActiveGrid(defaultGridKey);
     }
   }, [grids.size, loadGrid, setActiveGrid, getGridKey]);
-  
+
   // Obtener objetos directamente del useObjectStore organizados por cuadrícula
   const allObjects = useMemo(() => {
     const objects: SoundObject[] = [];
     const mobileObjects: MobileObjectType[] = [];
     const effectZones: EffectZoneType[] = [];
-    
+    const particleSystems: ParticleSystemObject[] = [];
+
     // Convertir Map a Array para que useMemo detecte cambios correctamente
     const gridsArray = Array.from(grids.values());
-    
-    
+
+
     gridsArray.forEach((grid) => {
       // Usar objetos directamente de la cuadrícula (useWorldStore) en lugar del ObjectStore
       const gridObjects = grid.objects || [];
-      
+
       // Usar objetos de la cuadrícula directamente
       objects.push(...gridObjects.filter(obj => obj && obj.id));
-      
+
       // Mantener objetos móviles y zonas de efectos de la cuadrícula
       if (Array.isArray(grid.mobileObjects)) {
         mobileObjects.push(...grid.mobileObjects.filter(obj => obj && obj.id));
@@ -241,60 +244,71 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       if (Array.isArray(grid.effectZones)) {
         effectZones.push(...grid.effectZones.filter(zone => zone && zone.id));
       }
+      if (Array.isArray(grid.particleSystems)) {
+        particleSystems.push(...grid.particleSystems.filter(ps => ps && ps.id));
+      }
     });
-    
-    return { objects, mobileObjects, effectZones };
+
+    return { objects, mobileObjects, effectZones, particleSystems };
   }, [grids]);
-  
+
   // Usar el hook de detección de zonas de efectos
   useEffectZoneDetection();
-  
+
   // Crear un Map de refs para cada objeto y zona de efecto
   // Usar useRef para mantener las referencias entre renders y evitar que se pierdan
   // cuando se actualizan los objetos
   const entityRefsRef = React.useRef(new Map<string, React.RefObject<Group | null>>());
-  
+
   // Actualizar el mapa de refs cuando cambian los objetos, pero preservar las referencias existentes
   const entityRefs = useMemo(() => {
     const refs = entityRefsRef.current;
-    
+
     // Crear un Set de IDs existentes para identificar qué refs ya tenemos
     const existingIds = new Set(refs.keys());
-    
+
     // Agregar refs para objetos sonoros que no existan
     allObjects.objects.forEach(obj => {
       if (!existingIds.has(obj.id)) {
         refs.set(obj.id, React.createRef<Group | null>());
       }
     });
-    
+
     // Agregar refs para objetos móviles que no existan
     allObjects.mobileObjects.forEach(obj => {
       if (!existingIds.has(obj.id)) {
         refs.set(obj.id, React.createRef<Group | null>());
       }
     });
-    
+
     // Agregar refs para zonas de efectos que no existan
     allObjects.effectZones.forEach(zone => {
       if (!existingIds.has(zone.id)) {
         refs.set(zone.id, React.createRef<Group | null>());
       }
     });
-    
+
+    // Agregar refs para sistemas de partículas
+    allObjects.particleSystems.forEach(ps => {
+      if (!existingIds.has(ps.id)) {
+        refs.set(ps.id, React.createRef<Group | null>());
+      }
+    });
+
     // Limpiar refs de objetos que ya no existen
     const currentIds = new Set([
       ...allObjects.objects.map(obj => obj.id),
       ...allObjects.mobileObjects.map(obj => obj.id),
-      ...allObjects.effectZones.map(zone => zone.id)
+      ...allObjects.effectZones.map(zone => zone.id),
+      ...allObjects.particleSystems.map(ps => ps.id)
     ]);
-    
+
     for (const [id] of refs) {
       if (!currentIds.has(id)) {
         refs.delete(id);
       }
     }
-    
+
     return refs;
   }, [allObjects]);
 
@@ -312,10 +326,10 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Refs para rastrear el estado de arrastre de objetos móviles
   const mobileDragRefs = useRef(new Map<string, React.MutableRefObject<boolean>>());
-  
+
   // Refs para los timers de fin de arrastre de objetos móviles
   const mobileDragTimers = useRef(new Map<string, NodeJS.Timeout | null>());
-  
+
   // Inicializar refs de arrastre para objetos móviles
   useEffect(() => {
     allObjects.mobileObjects.forEach(obj => {
@@ -326,7 +340,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         mobileDragTimers.current.set(obj.id, null);
       }
     });
-    
+
     // Limpiar refs de objetos que ya no existen
     const existingIds = new Set(allObjects.mobileObjects.map(obj => obj.id));
     for (const [id] of mobileDragRefs.current) {
@@ -346,11 +360,11 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Estado para rastrear si se está arrastrando (para UI)
   const [isDragging, setIsDragging] = React.useState(false);
-  
+
   // Ref para rastrear si estamos arrastrando sin causar re-renders
   const isDraggingRef = React.useRef(false);
   const draggingEntityIdRef = React.useRef<string | null>(null);
-  
+
   // Protección: Resetear estado de arrastre si el mouse se suelta fuera del viewport
   React.useEffect(() => {
     const handleGlobalMouseUp = () => {
@@ -361,7 +375,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         draggingEntityIdRef.current = null;
       }
     };
-    
+
     const handleGlobalMouseLeave = () => {
       if (isDraggingRef.current) {
         // Log silenciado - reset global de arrastre
@@ -370,10 +384,10 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         draggingEntityIdRef.current = null;
       }
     };
-    
+
     window.addEventListener('mouseup', handleGlobalMouseUp);
     window.addEventListener('mouseleave', handleGlobalMouseLeave);
-    
+
     return () => {
       window.removeEventListener('mouseup', handleGlobalMouseUp);
       window.removeEventListener('mouseleave', handleGlobalMouseLeave);
@@ -382,7 +396,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
   // Estado para forzar re-render cuando se selecciona un objeto (para asegurar que el ref esté conectado)
   const [forceRender, setForceRender] = React.useState(0);
-  
+
   // Efecto para forzar un re-render cuando se selecciona una entidad
   // Esto ayuda a asegurar que el gizmo se renderice cuando el objeto esté montado
   React.useEffect(() => {
@@ -404,19 +418,21 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       const isSoundObject = allObjects.objects.some(obj => obj.id === entityId);
       const isMobileObject = allObjects.mobileObjects.some(obj => obj.id === entityId);
       const isEffectZone = allObjects.effectZones.some(zone => zone.id === entityId);
-      
+      const isParticleSystem = allObjects.particleSystems.some(ps => ps.id === entityId);
+
       // Usar refs para verificar si estamos arrastrando (sin causar re-renders)
       const isCurrentlyDragging = isDraggingRef.current && draggingEntityIdRef.current === entityId;
-      
+
       if (newTransform.position) {
         // Convertir posición mundial a posición local
         let localPosition = [newTransform.position.x, newTransform.position.y, newTransform.position.z];
-        
+
         // Encontrar la cuadrícula que contiene este objeto para convertir a posición local
         for (const grid of grids.values()) {
           if (grid.objects.some(obj => obj.id === entityId) ||
-              grid.mobileObjects.some(obj => obj.id === entityId) ||
-              grid.effectZones.some(zone => zone.id === entityId)) {
+            grid.mobileObjects.some(obj => obj.id === entityId) ||
+            grid.effectZones.some(zone => zone.id === entityId) ||
+            grid.particleSystems?.some(ps => ps.id === entityId)) {
             // Convertir a posición local: posición mundial - posición de la cuadrícula
             localPosition = [
               newTransform.position.x - grid.position[0],
@@ -426,14 +442,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             break;
           }
         }
-        
+
         // Durante el arrastre, actualizar directamente el grupo de Three.js sin tocar el store
         if (isCurrentlyDragging) {
           const objectRef = entityRefs.get(entityId);
           if (objectRef?.current) {
             // Actualizar directamente la posición del grupo de Three.js
             objectRef.current.position.set(localPosition[0], localPosition[1], localPosition[2]);
-            
+
             // Para zonas de efectos, actualizar audio inmediatamente
             if (isEffectZone) {
               try {
@@ -448,7 +464,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // El estado se actualizará solo cuando se suelte el mouse (onMouseUp)
         return;
       }
-      
+
       // Para rotación y escala, actualizar directamente el objeto durante el arrastre
       if (isCurrentlyDragging) {
         const objectRef = entityRefs.get(entityId);
@@ -463,19 +479,19 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // NO actualizar el store durante onObjectChange
         return;
       }
-      
+
       // Si no estamos arrastrando y hay cambios de rotación o escala, actualizar el store
       // (esto solo debería pasar en casos especiales, normalmente solo actualizamos en onMouseUp)
       const updates: Record<string, unknown> = {};
-      
+
       if (newTransform.rotation) {
         updates.rotation = [newTransform.rotation.x, newTransform.rotation.y, newTransform.rotation.z];
       }
-      
+
       if (newTransform.scale) {
         updates.scale = [newTransform.scale.x, newTransform.scale.y, newTransform.scale.z];
       }
-      
+
       // Solo actualizar el store si hay updates y NO estamos arrastrando
       if (Object.keys(updates).length > 0) {
         if (isSoundObject) {
@@ -484,6 +500,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           updateMobileObject(entityId, updates);
         } else if (isEffectZone) {
           updateEffectZone(entityId, updates);
+        } else if (isParticleSystem) {
+          useWorldStore.getState().updateParticleSystem(entityId, updates);
         }
       }
     }
@@ -500,7 +518,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     if (isDragging) {
       return;
     }
-    
+
     // Solo deseleccionar si se hace clic directamente en el fondo (no en un objeto)
     if (event.object === undefined || event.object.type === 'Mesh' && event.object.geometry?.type === 'PlaneGeometry') {
       selectEntity(null);
@@ -543,9 +561,9 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       // Prevenir que otros handlers procesen C
       event.preventDefault();
       event.stopPropagation();
-      
+
       console.log('🔑 Tecla C presionada - Restaurando controles de rotación...');
-      
+
       if (orbitControlsRef.current) {
         try {
           const controls = orbitControlsRef.current as {
@@ -555,19 +573,19 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             _state?: Record<string, number>;
             [key: string]: unknown;
           };
-          
+
           // MÉTODO MÁS EFECTIVO: Deshabilitar y volver a habilitar para forzar reset completo del estado
           // Esto resetea todo el estado interno de OrbitControls incluyendo el estado de los botones del mouse
-          
+
           // Paso 1: Obtener el elemento DOM
           const domElement = controls._domElement || controls.domElement || document.querySelector('canvas');
-          
+
           // Paso 2: Liberar cualquier puntero capturado de forma segura
           releasePointerCaptures(domElement);
-          
+
           // Paso 3: Deshabilitar temporalmente OrbitControls (esto resetea el estado interno)
           controls.enabled = false;
-          
+
           // Paso 4: Resetear estado interno manualmente si es accesible
           try {
             // OrbitControls v0.37+ usa un objeto _state
@@ -577,13 +595,13 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
               if (typeof state.MOUSEDOWN === 'number') state.MOUSEDOWN = -1;
               if (typeof state.POINTER_DOWN === 'number') state.POINTER_DOWN = -1;
               if (typeof state.TOUCH_DOWN === 'number') state.TOUCH_DOWN = -1;
-              
+
               // También resetear estados de interacción
               if (typeof state.ROTATE_START === 'number') state.ROTATE_START = -1;
               if (typeof state.PAN_START === 'number') state.PAN_START = -1;
               if (typeof state.DOLLY_START === 'number') state.DOLLY_START = -1;
             }
-            
+
             // Intentar resetear otras propiedades que puedan mantener estado
             const stateProps = ['_touchStart', '_panStart', '_rotateStart', '_dollyStart'];
             stateProps.forEach(prop => {
@@ -607,7 +625,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           } catch {
             // Ignorar errores de acceso al estado interno
           }
-          
+
           // Paso 5: Pequeño delay para asegurar que los eventos se procesen
           setTimeout(() => {
             if (orbitControlsRef.current) {
@@ -616,21 +634,21 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                 enableRotate?: boolean;
                 update: () => void;
               };
-              
+
               // Rehabilitar con todas las configuraciones correctas
               controls.enabled = true;
-              
+
               if (typeof controls.enableRotate !== 'undefined') {
                 controls.enableRotate = true;
               }
-              
+
               // Forzar actualización
               controls.update();
-              
+
               console.log('✅ SceneContent: Estado de rotación con clic derecho restaurado con tecla C');
             }
           }, 10);
-          
+
         } catch (error) {
           console.error('❌ SceneContent: Error al restaurar rotación:', error);
           // Fallback: solo habilitar
@@ -647,7 +665,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         console.warn('🚨 SceneContent: No se puede restaurar rotación - OrbitControls no disponible');
       }
     }
-    
+
     // Presionar 'F' para forzar habilitación inmediata
     if (event.key.toLowerCase() === 'f' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
       if (orbitControlsRef.current) {
@@ -668,12 +686,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     const handler = (event: KeyboardEvent) => {
       handleEmergencyCameraUnlock(event);
     };
-    
+
     // Agregar con capture para máxima prioridad
     window.addEventListener('keydown', handler, { capture: true });
-    
+
     console.log('✅ Listener de tecla C registrado para restaurar rotación');
-    
+
     return () => {
       window.removeEventListener('keydown', handler, { capture: true });
     };
@@ -682,10 +700,10 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   // Agregar listener para detectar cuando el mouse sale del canvas y liberar estado
   useEffect(() => {
     if (!orbitControlsRef.current) return;
-    
+
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
-    
+
     const handleMouseLeave = () => {
       // Cuando el mouse sale del canvas, liberar cualquier estado de botón presionado
       if (orbitControlsRef.current) {
@@ -696,27 +714,27 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             _state?: Record<string, number>;
             update: () => void;
           };
-          
+
           // Liberar todos los punteros
           const domElement = controls._domElement || controls.domElement || canvas;
           releasePointerCaptures(domElement);
-          
+
           // Resetear estado interno
           if (controls._state) {
             const state = controls._state;
             if (typeof state.MOUSEDOWN === 'number') state.MOUSEDOWN = -1;
             if (typeof state.POINTER_DOWN === 'number') state.POINTER_DOWN = -1;
           }
-          
+
           controls.update();
         } catch {
           // Ignorar errores silenciosamente
         }
       }
     };
-    
+
     canvas.addEventListener('mouseleave', handleMouseLeave);
-    
+
     return () => {
       canvas.removeEventListener('mouseleave', handleMouseLeave);
     };
@@ -730,14 +748,15 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         objects: allObjects.objects.length,
         mobileObjects: allObjects.mobileObjects.length,
         effectZones: allObjects.effectZones.length,
+        particleSystems: allObjects.particleSystems.length,
         grids: grids.size
       });
     }
-  }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
+  }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, allObjects.particleSystems.length, grids.size]);
 
   // Estado para mostrar indicador de cámara bloqueada
   const [showCameraBlockedIndicator, setShowCameraBlockedIndicator] = React.useState(false);
-  
+
   // Efecto para detectar cuando la cámara está bloqueada
   useEffect(() => {
     const interval = setInterval(() => {
@@ -747,7 +766,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         setShowCameraBlockedIndicator(false);
       }
     }, 1000); // Verificar cada segundo
-    
+
     return () => clearInterval(interval);
   }, [orbitControlsRef]);
 
@@ -755,13 +774,13 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     <>
       {/* Controlador de cámara para navegación entre cuadrículas */}
       <CameraController />
-      
+
       {/* Renderizador de cuadrículas */}
       <GridRenderer />
-      
+
       {/* Plano invisible para capturar clics en el espacio vacío */}
-      <mesh 
-        position={[0, -10, 0]} 
+      <mesh
+        position={[0, -10, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         onClick={handleBackgroundClick}
       >
@@ -772,72 +791,91 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       {/* Renderizado de cuadrículas con sus objetos */}
       {Array.from(grids.values()).map((grid) => {
         if (!grid || !grid.id) return null;
-        
+
         // Usar objetos directamente de la cuadrícula
         const gridObjects = grid.objects || [];
-        
+
         return (
           <group key={grid.id} position={grid.position}>
-          {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {gridObjects.map((obj) => {
-            if (!obj || !obj.id) return null;
-            const objectRef = entityRefs.get(obj.id);
-            if (!objectRef) return null;
-            
-            return (
-              <SoundObjectContainer 
-                key={`sound-${obj.id}`} 
-                object={obj} 
-                onSelect={handleEntitySelect}
-                ref={objectRef}
-              />
-            );
-          })}
+            {/* Renderizado de objetos sonoros de esta cuadrícula */}
+            {gridObjects.map((obj) => {
+              if (!obj || !obj.id) return null;
+              const objectRef = entityRefs.get(obj.id);
+              if (!objectRef) return null;
 
-          {/* Renderizado de objetos móviles de esta cuadrícula */}
-          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj) => {
-            if (!mobileObj || !mobileObj.id) return null;
-            const objectRef = entityRefs.get(mobileObj.id);
-            if (!objectRef) return null;
-            
-            // Verificar si este objeto móvil está siendo arrastrado
-            const isDraggingThisMobile = mobileDragRefs.current.get(mobileObj.id);
-            const isBeingDragged = isDraggingThisMobile?.current || false;
-            
-            return (
-              <MobileObject
-                key={`mobile-${mobileObj.id}`}
-                id={mobileObj.id}
-                position={mobileObj.position} // Posición del objeto móvil completo en el mundo
-                rotation={mobileObj.rotation}
-                scale={mobileObj.scale}
-                isSelected={mobileObj.isSelected}
-                mobileParams={{
-                  ...mobileObj.mobileParams,
-                  centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
-                }}
-                onSelect={handleEntitySelect}
-                isBeingDragged={isBeingDragged}
-                ref={objectRef}
-              />
-            );
-          })}
+              return (
+                <SoundObjectContainer
+                  key={`sound-${obj.id}`}
+                  object={obj}
+                  onSelect={handleEntitySelect}
+                  ref={objectRef}
+                />
+              );
+            })}
 
-          {/* Renderizado de zonas de efectos de esta cuadrícula */}
-          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone) => {
-            if (!zone || !zone.id) return null;
-            const zoneRef = entityRefs.get(zone.id);
-            if (!zoneRef) return null;
-            
-            return (
-              <EffectZone
-                key={`effect-${zone.id}`}
-                zone={zone}
-                onSelect={handleEntitySelect}
-                ref={zoneRef}
-              />
-            );
-          })}
+            {/* Renderizado de objetos móviles de esta cuadrícula */}
+            {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj) => {
+              if (!mobileObj || !mobileObj.id) return null;
+              const objectRef = entityRefs.get(mobileObj.id);
+              if (!objectRef) return null;
+
+              // Verificar si este objeto móvil está siendo arrastrado
+              const isDraggingThisMobile = mobileDragRefs.current.get(mobileObj.id);
+              const isBeingDragged = isDraggingThisMobile?.current || false;
+
+              return (
+                <MobileObject
+                  key={`mobile-${mobileObj.id}`}
+                  id={mobileObj.id}
+                  position={mobileObj.position} // Posición del objeto móvil completo en el mundo
+                  rotation={mobileObj.rotation}
+                  scale={mobileObj.scale}
+                  isSelected={mobileObj.isSelected}
+                  mobileParams={{
+                    ...mobileObj.mobileParams,
+                    centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
+                  }}
+                  onSelect={handleEntitySelect}
+                  isBeingDragged={isBeingDragged}
+                  ref={objectRef}
+                />
+              );
+            })}
+
+            {/* Renderizado de zonas de efectos de esta cuadrícula */}
+            {Array.isArray(grid.effectZones) && grid.effectZones.map((zone) => {
+              if (!zone || !zone.id) return null;
+              const zoneRef = entityRefs.get(zone.id);
+              if (!zoneRef) return null;
+
+              return (
+                <EffectZone
+                  key={`effect-${zone.id}`}
+                  zone={zone}
+                  onSelect={handleEntitySelect}
+                  ref={zoneRef}
+                />
+              );
+            })}
+
+            {/* Renderizado de sistemas de partículas */}
+            {Array.isArray(grid.particleSystems) && grid.particleSystems.map(ps => {
+              if (!ps || !ps.id) return null;
+              const objectRef = entityRefs.get(ps.id);
+              return (
+                <group
+                  key={`ps-${ps.id}`}
+                  ref={objectRef}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEntitySelect(ps.id);
+                  }}
+                >
+                  <ParticleSystem data={ps} />
+                  {/* Add TransformControls logic if needed or it handles itself via TransformEditor */}
+                </group>
+              );
+            })}
           </group>
         );
       })}
@@ -847,12 +885,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         // Buscar la entidad directamente en las cuadrículas para obtener los datos más actualizados
         let selectedEntity = null;
         let foundGrid = null;
-        
+
         for (const grid of grids.values()) {
           const soundObj = grid.objects.find(obj => obj.id === selectedEntityId);
           const mobileObj = grid.mobileObjects.find(obj => obj.id === selectedEntityId);
           const effectZone = grid.effectZones.find(zone => zone.id === selectedEntityId);
-          
+
           if (soundObj) {
             selectedEntity = soundObj;
             foundGrid = grid;
@@ -867,18 +905,18 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             break;
           }
         }
-        
+
         if (!selectedEntity || !foundGrid) return null;
-        
+
         // Obtener la referencia del objeto antes de verificar
         const objectRef = entityRefs.get(selectedEntityId);
-        
+
         // Si la referencia no existe aún, intentar esperar un frame más
         // Esto ayuda con el timing de React cuando se selecciona un objeto recién renderizado
         if (!objectRef) {
           return null;
         }
-        
+
         // Si es una zona de efecto, verificar si está oculta (wireframe y color desactivados)
         if ('type' in selectedEntity && selectedEntity.type !== 'mobile' && 'showWireframe' in selectedEntity) {
           const showWireframe = selectedEntity.showWireframe !== undefined ? selectedEntity.showWireframe : true;
@@ -895,13 +933,13 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             }
           }
         }
-        
+
         // Verificar si la zona está bloqueada
         const isLocked = 'isLocked' in selectedEntity && selectedEntity.isLocked;
-        
+
         // Determinar si es un objeto móvil
         const isMobileObject = selectedEntity.type === 'mobile';
-        
+
         // Calcular posición mundial usando la posición actual del objeto Three.js si está disponible,
         // o usar la posición del estado como fallback
         // Nota: objectRef ya fue declarado anteriormente (línea 703)
@@ -921,7 +959,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             foundGrid.position[2] + selectedEntity.position[2]
           ];
         }
-        
+
         // Verificar que el objeto exista en el grafo de escena antes de renderizar TransformControls
         // Esto es crítico porque TransformControls necesita un objeto válido de Three.js
         // Si el ref aún no está conectado, esperar un frame más antes de renderizar
@@ -933,23 +971,23 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           // incluso si el ref no está listo
           return null;
         }
-        
+
         // Verificar que el objeto esté realmente en el scene graph antes de adjuntar TransformControls
         // Esto previene el error "The attached 3D object must be a part of the scene graph"
         const object = objectRef.current;
-        
+
         // Verificar que el objeto esté completamente inicializado
         if (!object.uuid || !object.type) {
           return null;
         }
-        
+
         // Verificar que el objeto esté en el scene graph:
         // - Si tiene parent, verificar que el parent también esté inicializado
         // - Si no tiene parent, debe ser la escena raíz (lo cual es válido en algunos casos)
         // Pero en React Three Fiber, los objetos generalmente tienen parent cuando se montan
         // Una verificación simple: si el objeto tiene parent, debe estar conectado
         // Si no tiene parent pero es Scene o tiene isScene, también es válido
-        
+
         // Para objetos móviles, verificación más estricta ya que pueden re-renderizarse frecuentemente
         if (isMobileObject) {
           // Verificar que el objeto tenga parent válido (los objetos móviles siempre deben tener parent)
@@ -957,12 +995,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             // El objeto móvil aún no está completamente montado en el scene graph
             return null;
           }
-          
+
           // Verificar que el parent esté completamente inicializado
           if (!object.parent.uuid || !object.parent.type) {
             return null;
           }
-          
+
           // Verificar que el objeto esté realmente conectado: debe tener acceso a la escena
           // Buscar hacia arriba en el árbol para encontrar la escena
           // Esto es crucial porque TransformControls requiere que el objeto esté en el scene graph
@@ -979,7 +1017,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             current = current.parent;
             depth++;
           }
-          
+
           // Si no encontramos la escena, el objeto no está en el scene graph
           // Esperar un frame más para que React Three Fiber lo monte completamente
           if (!foundScene) {
@@ -992,17 +1030,17 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             // El objeto no tiene parent y no es la escena, probablemente no está en el scene graph aún
             return null;
           }
-          
+
           // Si tiene parent, verificar que el parent también esté inicializado
           if (object.parent && (!object.parent.uuid || !object.parent.type)) {
             return null;
           }
         }
-        
+
         // Nota: No verificar la posición aquí porque puede causar que el gizmo desaparezca
         // innecesariamente durante las actualizaciones. El objeto Three.js siempre tiene
         // una posición válida una vez que está montado.
-        
+
         // Para objetos móviles, usar el mismo comportamiento que objetos sonoros
         if (isMobileObject) {
           return (
@@ -1014,7 +1052,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
               rotation={[0, 0, 0]}
               scale={selectedEntity.scale}
               enabled={!isLocked}
-              onObjectChange={(e) => {
+              onObjectChange={(e: any) => {
                 const event = e as { target?: { object?: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number }; scale?: { x: number; y: number; z: number } } } };
                 if (event?.target?.object) {
                   handleTransformChange(selectedEntityId, event.target.object);
@@ -1025,116 +1063,116 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                 isDraggingRef.current = true;
                 draggingEntityIdRef.current = selectedEntityId;
               }}
-            onMouseUp={() => {
-              const wasDragging = isDraggingRef.current && draggingEntityIdRef.current === selectedEntityId;
-              
-              setIsDragging(false);
-              isDraggingRef.current = false;
-              draggingEntityIdRef.current = null;
-              
-              // Actualizar estado con los valores finales después de soltar
-              // Usar un triple requestAnimationFrame para asegurar que el gizmo se mantenga visible
-              // El primer frame permite que el TransformControls termine su actualización
-              // El segundo frame actualiza el estado después de que todo se haya renderizado
-              // El tercer frame fuerza un re-render para que el gizmo se vuelva a conectar
-              if (wasDragging) {
-                requestAnimationFrame(() => {
+              onMouseUp={() => {
+                const wasDragging = isDraggingRef.current && draggingEntityIdRef.current === selectedEntityId;
+
+                setIsDragging(false);
+                isDraggingRef.current = false;
+                draggingEntityIdRef.current = null;
+
+                // Actualizar estado con los valores finales después de soltar
+                // Usar un triple requestAnimationFrame para asegurar que el gizmo se mantenga visible
+                // El primer frame permite que el TransformControls termine su actualización
+                // El segundo frame actualiza el estado después de que todo se haya renderizado
+                // El tercer frame fuerza un re-render para que el gizmo se vuelva a conectar
+                if (wasDragging) {
                   requestAnimationFrame(() => {
-                    try {
-                      // Obtener los valores actuales del grupo de Three.js
-                      const zoneRef = entityRefs.get(selectedEntityId);
-                      if (zoneRef?.current) {
-                        const worldPos = zoneRef.current.position;
-                        const worldRot = zoneRef.current.rotation;
-                        const worldScale = zoneRef.current.scale;
-                        
-                        let finalPosition: [number, number, number] | null = null;
-                        let finalRotation: [number, number, number] | null = null;
-                        let finalScale: [number, number, number] | null = null;
-                        
-                        // Encontrar la cuadrícula para convertir a valores locales
-                        for (const grid of grids.values()) {
-                          const isSoundObject = grid.objects.some(obj => obj.id === selectedEntityId);
-                          const isMobileObject = grid.mobileObjects.some(obj => obj.id === selectedEntityId);
-                          const isEffectZone = grid.effectZones.some(zone => zone.id === selectedEntityId);
-                          
-                          if (isSoundObject || isMobileObject || isEffectZone) {
-                            finalPosition = [
-                              worldPos.x - grid.position[0],
-                              worldPos.y - grid.position[1],
-                              worldPos.z - grid.position[2]
-                            ] as [number, number, number];
-                            
-                            finalRotation = [
-                              worldRot.x,
-                              worldRot.y,
-                              worldRot.z
-                            ] as [number, number, number];
-                            
-                            finalScale = [
-                              worldScale.x,
-                              worldScale.y,
-                              worldScale.z
-                            ] as [number, number, number];
-                            
-                            // Actualizar el store según el tipo de objeto con todos los valores
-                            const updates: Record<string, unknown> = {
-                              position: finalPosition,
-                              rotation: finalRotation,
-                              scale: finalScale
-                            };
-                            
-                            if (isSoundObject) {
-                              updateObject(selectedEntityId, updates);
-                            } else if (isMobileObject) {
-                              updateMobileObject(selectedEntityId, updates);
-                            } else if (isEffectZone) {
-                              updateEffectZone(selectedEntityId, updates);
-                            }
-                            
-                            // Asegurar que el objeto permanezca seleccionado después de arrastrar
-                            // Preservar el modo de transformación actual (translate, rotate, scale)
-                            // NO llamar a selectEntity si el objeto ya está seleccionado porque eso resetea el modo
-                            const currentSelectedId = useWorldStore.getState().selectedEntityId;
-                            
-                            // Solo asegurar que el objeto esté seleccionado si no lo está
-                            // Si ya está seleccionado, no hacer nada para preservar el modo de transformación
-                            if (currentSelectedId !== selectedEntityId) {
-                              // Solo si realmente cambió la selección, entonces llamar a selectEntity
-                              // Esto reseteará el modo a 'translate', pero solo cuando es un objeto diferente
-                              useWorldStore.getState().selectEntity(selectedEntityId);
-                            }
-                            // Si currentSelectedId === selectedEntityId, no hacer nada
-                            // Esto preserva el modo de transformación actual (rotate, scale, etc.)
-                            
-                            // Forzar múltiples re-renders después de actualizar para que el gizmo se mantenga visible
-                            // El store se actualiza, lo que causa un re-render, pero necesitamos asegurar
-                            // que el gizmo se reconecte correctamente
-                            requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                      try {
+                        // Obtener los valores actuales del grupo de Three.js
+                        const zoneRef = entityRefs.get(selectedEntityId);
+                        if (zoneRef?.current) {
+                          const worldPos = zoneRef.current.position;
+                          const worldRot = zoneRef.current.rotation;
+                          const worldScale = zoneRef.current.scale;
+
+                          let finalPosition: [number, number, number] | null = null;
+                          let finalRotation: [number, number, number] | null = null;
+                          let finalScale: [number, number, number] | null = null;
+
+                          // Encontrar la cuadrícula para convertir a valores locales
+                          for (const grid of grids.values()) {
+                            const isSoundObject = grid.objects.some(obj => obj.id === selectedEntityId);
+                            const isMobileObject = grid.mobileObjects.some(obj => obj.id === selectedEntityId);
+                            const isEffectZone = grid.effectZones.some(zone => zone.id === selectedEntityId);
+
+                            if (isSoundObject || isMobileObject || isEffectZone) {
+                              finalPosition = [
+                                worldPos.x - grid.position[0],
+                                worldPos.y - grid.position[1],
+                                worldPos.z - grid.position[2]
+                              ] as [number, number, number];
+
+                              finalRotation = [
+                                worldRot.x,
+                                worldRot.y,
+                                worldRot.z
+                              ] as [number, number, number];
+
+                              finalScale = [
+                                worldScale.x,
+                                worldScale.y,
+                                worldScale.z
+                              ] as [number, number, number];
+
+                              // Actualizar el store según el tipo de objeto con todos los valores
+                              const updates: Record<string, unknown> = {
+                                position: finalPosition,
+                                rotation: finalRotation,
+                                scale: finalScale
+                              };
+
+                              if (isSoundObject) {
+                                updateObject(selectedEntityId, updates);
+                              } else if (isMobileObject) {
+                                updateMobileObject(selectedEntityId, updates);
+                              } else if (isEffectZone) {
+                                updateEffectZone(selectedEntityId, updates);
+                              }
+
+                              // Asegurar que el objeto permanezca seleccionado después de arrastrar
+                              // Preservar el modo de transformación actual (translate, rotate, scale)
+                              // NO llamar a selectEntity si el objeto ya está seleccionado porque eso resetea el modo
+                              const currentSelectedId = useWorldStore.getState().selectedEntityId;
+
+                              // Solo asegurar que el objeto esté seleccionado si no lo está
+                              // Si ya está seleccionado, no hacer nada para preservar el modo de transformación
+                              if (currentSelectedId !== selectedEntityId) {
+                                // Solo si realmente cambió la selección, entonces llamar a selectEntity
+                                // Esto reseteará el modo a 'translate', pero solo cuando es un objeto diferente
+                                useWorldStore.getState().selectEntity(selectedEntityId);
+                              }
+                              // Si currentSelectedId === selectedEntityId, no hacer nada
+                              // Esto preserva el modo de transformación actual (rotate, scale, etc.)
+
+                              // Forzar múltiples re-renders después de actualizar para que el gizmo se mantenga visible
+                              // El store se actualiza, lo que causa un re-render, pero necesitamos asegurar
+                              // que el gizmo se reconecte correctamente
                               requestAnimationFrame(() => {
-                                setForceRender(prev => prev + 1);
+                                requestAnimationFrame(() => {
+                                  setForceRender(prev => prev + 1);
+                                });
                               });
-                            });
-                            
-                            break;
+
+                              break;
+                            }
                           }
                         }
+                      } catch (error) {
+                        console.error('❌ Error actualizando transformación final:', error);
                       }
-                    } catch (error) {
-                      console.error('❌ Error actualizando transformación final:', error);
-                    }
+                    });
                   });
-                });
-              }
-              
-              // Asegurar que el objeto permanezca seleccionado después de mover
-              // No deseleccionar explícitamente aquí
-            }}
-            size={1.0}
+                }
+
+                // Asegurar que el objeto permanezca seleccionado después de mover
+                // No deseleccionar explícitamente aquí
+              }}
+              size={1.0}
             />
           );
         }
-        
+
         return (
           <TransformControls
             key={`${selectedEntityId}-${transformMode}-${forceRender}`}
@@ -1145,7 +1183,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             rotation={[0, 0, 0]} // Gizmo siempre alineado con la vista
             scale={selectedEntity.scale}
             enabled={!isLocked} // Deshabilitar si está bloqueada
-            onObjectChange={(e) => {
+            onObjectChange={(e: any) => {
               const event = e as { target?: { object?: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number }; scale?: { x: number; y: number; z: number } } } };
               if (event?.target?.object) {
                 handleTransformChange(selectedEntityId, event.target.object);
@@ -1159,12 +1197,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
             }}
             onMouseUp={() => {
               const wasDragging = isDraggingRef.current && draggingEntityIdRef.current === selectedEntityId;
-              
+
               // Siempre resetear el estado de arrastre, incluso si algo sale mal
               setIsDragging(false);
               isDraggingRef.current = false;
               draggingEntityIdRef.current = null;
-              
+
               // Actualizar estado con los valores finales después de soltar
               // Usar un triple requestAnimationFrame para asegurar que el gizmo se mantenga visible
               // El primer frame permite que el TransformControls termine su actualización
@@ -1180,43 +1218,43 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                         const worldPos = objectRef.current.position;
                         const worldRot = objectRef.current.rotation;
                         const worldScale = objectRef.current.scale;
-                        
+
                         let finalPosition: [number, number, number] | null = null;
                         let finalRotation: [number, number, number] | null = null;
                         let finalScale: [number, number, number] | null = null;
-                        
+
                         // Encontrar la cuadrícula para convertir a valores locales
                         for (const grid of grids.values()) {
                           const isSoundObject = grid.objects.some(obj => obj.id === selectedEntityId);
                           const isMobileObject = grid.mobileObjects.some(obj => obj.id === selectedEntityId);
                           const isEffectZone = grid.effectZones.some(zone => zone.id === selectedEntityId);
-                          
+
                           if (isSoundObject || isMobileObject || isEffectZone) {
                             finalPosition = [
                               worldPos.x - grid.position[0],
                               worldPos.y - grid.position[1],
                               worldPos.z - grid.position[2]
                             ] as [number, number, number];
-                            
+
                             finalRotation = [
                               worldRot.x,
                               worldRot.y,
                               worldRot.z
                             ] as [number, number, number];
-                            
+
                             finalScale = [
                               worldScale.x,
                               worldScale.y,
                               worldScale.z
                             ] as [number, number, number];
-                            
+
                             // Actualizar el store según el tipo de objeto con todos los valores
                             const updates: Record<string, unknown> = {
                               position: finalPosition,
                               rotation: finalRotation,
                               scale: finalScale
                             };
-                            
+
                             if (isSoundObject) {
                               updateObject(selectedEntityId, updates);
                             } else if (isMobileObject) {
@@ -1224,12 +1262,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                             } else if (isEffectZone) {
                               updateEffectZone(selectedEntityId, updates);
                             }
-                            
+
                             // Asegurar que el objeto permanezca seleccionado después de arrastrar
                             // Preservar el modo de transformación actual (translate, rotate, scale)
                             // NO llamar a selectEntity si el objeto ya está seleccionado porque eso resetea el modo
                             const currentSelectedId = useWorldStore.getState().selectedEntityId;
-                            
+
                             // Solo asegurar que el objeto esté seleccionado si no lo está
                             // Si ya está seleccionado, no hacer nada para preservar el modo de transformación
                             if (currentSelectedId !== selectedEntityId) {
@@ -1239,7 +1277,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                             }
                             // Si currentSelectedId === selectedEntityId, no hacer nada
                             // Esto preserva el modo de transformación actual (rotate, scale, etc.)
-                            
+
                             // Forzar múltiples re-renders después de actualizar para que el gizmo se mantenga visible
                             // El store se actualiza, lo que causa un re-render, pero necesitamos asegurar
                             // que el gizmo se reconecte correctamente
@@ -1248,7 +1286,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                                 setForceRender(prev => prev + 1);
                               });
                             });
-                            
+
                             break;
                           }
                         }
@@ -1259,7 +1297,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
                   });
                 });
               }
-              
+
               // Asegurar que el objeto permanezca seleccionado después de mover
               // No deseleccionar explícitamente aquí
             }}

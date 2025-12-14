@@ -1,12 +1,12 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
   orderBy,
   onSnapshot,
   Timestamp,
@@ -16,7 +16,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { type SoundObject, type MobileObject, type EffectZone, type Grid } from '../state/useWorldStore';
+import { type SoundObject, type MobileObject, type EffectZone, type Grid, type ParticleSystemObject } from '../state/useWorldStore';
 
 // Tipos de datos para Firebase
 export interface FirebaseGrid {
@@ -26,6 +26,7 @@ export interface FirebaseGrid {
   objects: SoundObject[];
   mobileObjects: MobileObject[];
   effectZones: EffectZone[];
+  particleSystems: ParticleSystemObject[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -74,7 +75,7 @@ export class FirebaseService {
         createdAt: now,
         updatedAt: now
       });
-      
+
       return projectRef.id;
     } catch (error) {
       throw error;
@@ -89,7 +90,7 @@ export class FirebaseService {
         ...projectData,
         updatedAt: Timestamp.now()
       });
-      
+
     } catch (error) {
       throw error;
     }
@@ -100,7 +101,7 @@ export class FirebaseService {
     try {
       const projectRef = doc(db, this.projectsCollection, projectId);
       const projectSnap = await getDoc(projectRef);
-      
+
       if (projectSnap.exists()) {
         const projectData = { id: projectSnap.id, ...projectSnap.data() } as FirebaseProject;
         return projectData;
@@ -119,14 +120,14 @@ export class FirebaseService {
         collection(db, this.projectsCollection),
         orderBy('updatedAt', 'desc')
       );
-      
+
       const querySnapshot = await getDocs(projectsQuery);
       const projects: FirebaseProject[] = [];
-      
+
       querySnapshot.forEach((doc) => {
         projects.push({ id: doc.id, ...doc.data() } as FirebaseProject);
       });
-      
+
       return projects;
     } catch (error) {
       throw error;
@@ -142,7 +143,7 @@ export class FirebaseService {
         createdAt: now,
         updatedAt: now
       });
-      
+
       return gridRef.id;
     } catch (error) {
       throw error;
@@ -157,7 +158,7 @@ export class FirebaseService {
         ...gridData,
         updatedAt: Timestamp.now()
       });
-      
+
     } catch (error) {
       throw error;
     }
@@ -168,7 +169,7 @@ export class FirebaseService {
     try {
       const gridRef = doc(db, this.gridsCollection, gridId);
       const gridSnap = await getDoc(gridRef);
-      
+
       if (gridSnap.exists()) {
         const gridData = { id: gridSnap.id, ...gridSnap.data() } as FirebaseGrid;
         return gridData;
@@ -185,7 +186,7 @@ export class FirebaseService {
     try {
       const projectRef = doc(db, this.projectsCollection, projectId);
       await deleteDoc(projectRef);
-      
+
     } catch (error) {
       throw error;
     }
@@ -196,7 +197,7 @@ export class FirebaseService {
     try {
       const gridRef = doc(db, this.gridsCollection, gridId);
       await deleteDoc(gridRef);
-      
+
     } catch (error) {
       throw error;
     }
@@ -205,7 +206,7 @@ export class FirebaseService {
   // Escuchar cambios en tiempo real de un proyecto
   subscribeToProject(projectId: string, callback: (project: FirebaseProject | null) => void): () => void {
     const projectRef = doc(db, this.projectsCollection, projectId);
-    
+
     return onSnapshot(projectRef, (doc) => {
       if (doc.exists()) {
         const projectData = { id: doc.id, ...doc.data() } as FirebaseProject;
@@ -219,7 +220,7 @@ export class FirebaseService {
   // Escuchar cambios en tiempo real de todas las cuadrículas
   subscribeToGrids(callback: (grids: FirebaseGrid[]) => void): () => void {
     const gridsQuery = query(collection(db, this.gridsCollection), orderBy('updatedAt', 'desc'));
-    
+
     return onSnapshot(gridsQuery, (querySnapshot) => {
       const grids: FirebaseGrid[] = [];
       querySnapshot.forEach((doc) => {
@@ -239,7 +240,7 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (!globalWorldSnap.exists()) {
         const defaultState: GlobalWorldDoc = {
           objects: [],
@@ -251,7 +252,7 @@ export class FirebaseService {
           version: 1,
           ...initialState
         };
-        
+
         await setDoc(globalWorldRef, defaultState);
         console.log('Global world state initialized');
       }
@@ -268,7 +269,7 @@ export class FirebaseService {
   async updateGlobalWorldState(updates: Partial<Omit<GlobalWorldDoc, 'version' | 'lastUpdated'>>): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         ...updates,
         lastUpdated: serverTimestamp(),
@@ -287,7 +288,7 @@ export class FirebaseService {
   async addGlobalSoundObject(object: SoundObject): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         objects: arrayUnion(object),
         lastUpdated: serverTimestamp(),
@@ -308,13 +309,13 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
-        const updatedObjects = currentData.objects.map(obj => 
+        const updatedObjects = currentData.objects.map(obj =>
           obj.id === objectId ? updatedObject : obj
         );
-        
+
         await updateDoc(globalWorldRef, {
           objects: updatedObjects,
           lastUpdated: serverTimestamp(),
@@ -335,11 +336,11 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
         const objectToRemove = currentData.objects.find(obj => obj.id === objectId);
-        
+
         if (objectToRemove) {
           await updateDoc(globalWorldRef, {
             objects: arrayRemove(objectToRemove),
@@ -361,7 +362,7 @@ export class FirebaseService {
   async addGlobalEffectZone(effectZone: EffectZone): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         effectZones: arrayUnion(effectZone),
         lastUpdated: serverTimestamp(),
@@ -382,13 +383,13 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
-        const updatedZones = currentData.effectZones.map(zone => 
+        const updatedZones = currentData.effectZones.map(zone =>
           zone.id === zoneId ? updatedZone : zone
         );
-        
+
         await updateDoc(globalWorldRef, {
           effectZones: updatedZones,
           lastUpdated: serverTimestamp(),
@@ -409,11 +410,11 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
         const zoneToRemove = currentData.effectZones.find(zone => zone.id === zoneId);
-        
+
         if (zoneToRemove) {
           await updateDoc(globalWorldRef, {
             effectZones: arrayRemove(zoneToRemove),
@@ -435,7 +436,7 @@ export class FirebaseService {
   async addGlobalMobileObject(mobileObject: MobileObject): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         mobileObjects: arrayUnion(mobileObject),
         lastUpdated: serverTimestamp(),
@@ -456,13 +457,13 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
-        const updatedObjects = currentData.mobileObjects.map(obj => 
+        const updatedObjects = currentData.mobileObjects.map(obj =>
           obj.id === objectId ? updatedObject : obj
         );
-        
+
         await updateDoc(globalWorldRef, {
           mobileObjects: updatedObjects,
           lastUpdated: serverTimestamp(),
@@ -483,11 +484,11 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         const currentData = globalWorldSnap.data() as GlobalWorldDoc;
         const objectToRemove = currentData.mobileObjects.find(obj => obj.id === objectId);
-        
+
         if (objectToRemove) {
           await updateDoc(globalWorldRef, {
             mobileObjects: arrayRemove(objectToRemove),
@@ -509,7 +510,7 @@ export class FirebaseService {
   async updateGlobalGrids(grids: Grid[]): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         grids: grids,
         lastUpdated: serverTimestamp(),
@@ -528,7 +529,7 @@ export class FirebaseService {
   async updateGlobalActiveGrid(activeGridId: string | null): Promise<void> {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-      
+
       await updateDoc(globalWorldRef, {
         activeGridId: activeGridId,
         lastUpdated: serverTimestamp(),
@@ -547,7 +548,7 @@ export class FirebaseService {
    */
   subscribeToGlobalWorld(callback: (state: GlobalWorldDoc | null) => void): () => void {
     const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
-    
+
     return onSnapshot(globalWorldRef, (doc) => {
       if (doc.exists()) {
         const globalWorldData = { id: doc.id, ...doc.data() } as unknown as GlobalWorldDoc;
@@ -566,7 +567,7 @@ export class FirebaseService {
     try {
       const globalWorldRef = doc(db, this.globalWorldCollection, 'main');
       const globalWorldSnap = await getDoc(globalWorldRef);
-      
+
       if (globalWorldSnap.exists()) {
         return { id: globalWorldSnap.id, ...globalWorldSnap.data() } as unknown as GlobalWorldDoc;
       } else {
