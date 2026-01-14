@@ -631,7 +631,7 @@ pnpm dev
 **La Casa de Salomón** - Materializando la utopía sónica de Francis Bacon  
 **Solomon House** - Materializing Francis Bacon's sonic utopia
 
-Desarrollado con ❤️ por Eddie Jonathan García Borbón  
-Developed with ❤️ by Eddie Jonathan García Borbón
+Desarrollado por Eddie Jonathan García Borbón  
+Developed by Eddie Jonathan García Borbón
 
 </div>
