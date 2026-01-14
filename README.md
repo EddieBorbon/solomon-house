@@ -624,11 +624,7 @@ pnpm dev
 
 </details>
 
----
 
-*[El README continúa con las demás secciones...]*
-
----
 
 <div align="center">
 
