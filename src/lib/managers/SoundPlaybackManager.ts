@@ -35,8 +35,8 @@ export class SoundPlaybackManager {
    * Inicia el sonido continuo de una fuente (completamente independiente de las interacciones de clic)
    */
   public startContinuousSound(
-    soundId: string, 
-    source: SoundSource, 
+    soundId: string,
+    source: SoundSource,
     params: AudioParams,
     updateParamsCallback: (id: string, params: AudioParams) => void
   ): void {
@@ -47,7 +47,7 @@ export class SoundPlaybackManager {
     try {
       // Aplicar TODOS los parámetros antes de iniciar
       updateParamsCallback(soundId, params);
-      
+
       // Para NoiseSynth, usar triggerAttack sin frecuencia (sonido continuo)
       if (source.synth instanceof Tone.NoiseSynth) {
         source.synth.triggerAttack(this.getUniqueStartTime());
@@ -55,15 +55,15 @@ export class SoundPlaybackManager {
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
       }
-      
+
       // Para PolySynth, usar triggerAttack con acordes (sonido continuo)
       if (source.synth instanceof Tone.PolySynth) {
         // Aplicar parámetros antes de disparar
         updateParamsCallback(soundId, params);
-        
+
         // Generar acorde basado en la frecuencia base si está disponible
         let chord: number[];
-        
+
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
           // Convertir frecuencia base a nota
@@ -76,41 +76,41 @@ export class SoundPlaybackManager {
           // Convertir acorde de notas a frecuencias
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
-        
+
         // Validar y filtrar frecuencias inválidas
         const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
-        
+
         console.log('🎵 PolySynth startContinuousSound:');
         console.log('  - Acorde original:', chord.length, 'notas');
         console.log('  - Acorde válido:', validChord.length, 'notas');
         console.log('  - Polyphony:', source.synth.maxPolyphony);
         console.log('  - Voces activas antes:', source.synth.activeVoices);
-        
+
         if (validChord.length === 0) {
           console.error('❌ PolySynth: No hay frecuencias válidas en el acorde');
           return;
         }
-        
+
         // Ajustar el polyphony automáticamente para que coincida con el número de notas del acorde
         if (validChord.length !== source.synth.maxPolyphony) {
           console.log(`🔧 PolySynth: Ajustando polyphony de ${source.synth.maxPolyphony} a ${validChord.length} voces`);
           source.synth.maxPolyphony = Math.max(validChord.length, source.synth.maxPolyphony);
         }
-        
+
         source.synth.triggerAttack(validChord, this.getUniqueStartTime());
-        
+
         // Log después del trigger
         setTimeout(() => {
           console.log('🎵 PolySynth después del trigger:');
           console.log('  - Voces activas después:', (source.synth as Tone.PolySynth).activeVoices);
           console.log('  - Polyphony después:', (source.synth as Tone.PolySynth).maxPolyphony);
         }, 100);
-        
+
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
       }
-      
+
       // Para todos los demás sintetizadores, usar triggerAttack para sonido continuo
       // NO usar triggerAttackRelease aquí, solo triggerAttack para mantener el sonido
       try {
@@ -139,8 +139,8 @@ export class SoundPlaybackManager {
    * Inicia el sonido de una fuente (para gate y sonidos temporales)
    */
   public startSound(
-    soundId: string, 
-    source: SoundSource, 
+    soundId: string,
+    source: SoundSource,
     params: AudioParams,
     updateParamsCallback: (id: string, params: AudioParams) => void
   ): void {
@@ -151,12 +151,12 @@ export class SoundPlaybackManager {
     try {
       // Aplicar TODOS los parámetros antes de iniciar
       updateParamsCallback(soundId, params);
-      
+
       // Para PolySynth, usar triggerAttack con acordes
       if (source.synth instanceof Tone.PolySynth) {
         // Generar acorde basado en la frecuencia base si está disponible
         let chord: number[];
-        
+
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
           // Convertir frecuencia base a nota
@@ -169,21 +169,21 @@ export class SoundPlaybackManager {
           // Convertir acorde de notas a frecuencias
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
-        
+
         // Validar y filtrar frecuencias inválidas
         const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
-        
+
         if (validChord.length === 0) {
           console.error('❌ PolySynth triggerNoteAttack: No hay frecuencias válidas');
           return;
         }
-        
+
         source.synth.triggerAttack(validChord, Tone.now());
         this.playingSounds.add(soundId);
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
       }
-      
+
       // Para MonoSynth y otros sintetizadores, usar triggerAttack para sonido continuo
       // El triggerRelease se llamará cuando se detenga el sonido
       try {
@@ -225,11 +225,11 @@ export class SoundPlaybackManager {
         this.removePlaybackState(soundId);
         return;
       }
-      
+
       // triggerRelease inicia la fase de 'release' de la envolvente.
       // El sintetizador se encargará de detener el oscilador cuando la envolvente llegue a cero.
       source.synth.triggerRelease(Tone.now());
-      
+
       this.playingSounds.delete(soundId);
       this.removePlaybackState(soundId);
     } catch {
@@ -243,8 +243,8 @@ export class SoundPlaybackManager {
    * Dispara una nota percusiva (especialmente para MembraneSynth y Sampler)
    */
   public triggerNoteAttack(
-    soundId: string, 
-    source: SoundSource, 
+    soundId: string,
+    source: SoundSource,
     params: AudioParams,
     updateParamsCallback: (id: string, params: AudioParams) => void
   ): void {
@@ -255,7 +255,7 @@ export class SoundPlaybackManager {
     try {
       // Aplicar parámetros antes de disparar
       updateParamsCallback(soundId, params);
-      
+
       // Para Sampler, usar triggerAttackRelease con notas y duración
       if (source.synth instanceof Tone.Sampler) {
         try {
@@ -273,12 +273,12 @@ export class SoundPlaybackManager {
           return;
         }
       }
-      
+
       // Para sintetizadores de fallback (cuando el Sampler no pudo cargar)
       if ((source.synth as { _isFallback?: boolean })._isFallback) {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || this.config.defaultDuration;
-        
+
         // Reproducir cada nota del acorde
         notes.forEach((note: string, index: number) => {
           const frequency = this.getNoteFrequency(note);
@@ -294,17 +294,17 @@ export class SoundPlaybackManager {
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration, params });
         return;
       }
-      
+
       // Para PluckSynth, usar triggerAttack sin triggerRelease ya que decae naturalmente
       if (source.synth instanceof Tone.PluckSynth) {
         source.synth.triggerAttack(params.frequency, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), params });
         return;
       }
-      
+
       // Para todos los demás sintetizadores, usar triggerAttackRelease con duración configurada o triggerAttack para duración infinita
       const duration = params.duration;
-      
+
       if (duration === Infinity) {
         // Duración infinita - usar triggerAttack para sonido continuo
         (source.synth as SynthesizerType).triggerAttack(params.frequency, Tone.now());
@@ -337,8 +337,8 @@ export class SoundPlaybackManager {
    * Este método funciona universalmente con todos los tipos de sintetizadores
    */
   public triggerAttackRelease(
-    soundId: string, 
-    source: SoundSource, 
+    soundId: string,
+    source: SoundSource,
     params: AudioParams,
     updateParamsCallback: (id: string, params: AudioParams) => void
   ): void {
@@ -349,7 +349,7 @@ export class SoundPlaybackManager {
     try {
       // Aplicar parámetros antes de disparar
       updateParamsCallback(soundId, params);
-      
+
       // Para NoiseSynth, usar triggerAttackRelease con duración
       if (source.synth instanceof Tone.NoiseSynth) {
         const duration = params.duration || '8n';
@@ -357,44 +357,44 @@ export class SoundPlaybackManager {
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
       }
-      
+
       // Para PolySynth, usar triggerAttackRelease con acordes
       if (source.synth instanceof Tone.PolySynth) {
         let chord: number[];
-        
+
         // Si hay frecuencia base, transponer el acorde
         if (params.frequency && params.frequency > 0) {
           chord = this.generateChordFrequencies(params.frequency, params.chord || ["C4", "E4", "G4", "B4"]);
         } else {
           chord = this.convertChordToFrequencies(params.chord || ["C4", "E4", "G4", "B4"]);
         }
-        
+
         // Validar y filtrar frecuencias inválidas
         const validChord = chord.filter(freq => !isNaN(freq) && freq > 0 && freq < 20000);
-        
+
         console.log('🎵 PolySynth triggerAttackRelease:');
         console.log('  - Acorde original:', chord.length, 'notas');
         console.log('  - Acorde válido:', validChord.length, 'notas');
         console.log('  - Polyphony actual:', source.synth.maxPolyphony);
         console.log('  - Primeras 5 frecuencias:', validChord.slice(0, 5));
-        
+
         if (validChord.length === 0) {
           console.error('❌ PolySynth: No hay frecuencias válidas en el acorde');
           return;
         }
-        
+
         // Ajustar el polyphony automáticamente para que coincida con el número de notas del acorde
         if (validChord.length !== source.synth.maxPolyphony) {
           console.log(`🔧 PolySynth: Ajustando polyphony de ${source.synth.maxPolyphony} a ${validChord.length} voces`);
           source.synth.maxPolyphony = Math.max(validChord.length, source.synth.maxPolyphony);
         }
-        
+
         const duration = params.duration || '8n';
         source.synth.triggerAttackRelease(validChord, duration, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
       }
-      
+
       // Para Sampler, usar triggerAttackRelease con notas
       if (source.synth instanceof Tone.Sampler) {
         const notes = params.notes || ["C4"];
@@ -403,12 +403,12 @@ export class SoundPlaybackManager {
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
       }
-      
+
       // Para sintetizadores de fallback
       if ((source.synth as { _isFallback?: boolean })._isFallback) {
         const notes = Array.isArray(params.notes) ? params.notes : [params.notes || "C4"];
         const duration = params.duration || '8n';
-        
+
         notes.forEach((note: string, index: number) => {
           const frequency = this.getNoteFrequency(note);
           const delay = index * this.config.chordDelay;
@@ -423,19 +423,19 @@ export class SoundPlaybackManager {
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
         return;
       }
-      
+
       // Para todos los demás sintetizadores, usar triggerAttackRelease universal
       if ('triggerAttackRelease' in source.synth) {
         const frequency = params.frequency;
         const duration = params.duration || '8n';
-        
+
         (source.synth as SynthesizerType).triggerAttackRelease(frequency, duration, Tone.now());
         this.updatePlaybackState(soundId, { isPlaying: true, startTime: Tone.now(), duration: this.parseDuration(duration), params });
       } else {
         // Fallback: usar triggerAttack con duración manual
         const frequency = params.frequency;
         const duration = params.duration || this.config.defaultDuration;
-        
+
         (source.synth as SynthesizerType).triggerAttack(frequency, Tone.now());
         setTimeout(() => {
           try {
@@ -455,8 +455,8 @@ export class SoundPlaybackManager {
    * Dispara un ataque de ruido (especialmente para NoiseSynth)
    */
   public triggerNoiseAttack(
-    soundId: string, 
-    source: SoundSource, 
+    soundId: string,
+    source: SoundSource,
     params: AudioParams,
     updateParamsCallback: (id: string, params: AudioParams) => void
   ): void {
@@ -467,7 +467,7 @@ export class SoundPlaybackManager {
     try {
       // Aplicar parámetros antes de disparar
       updateParamsCallback(soundId, params);
-      
+
       // Para NoiseSynth, usar triggerAttackRelease con duración
       if (source.synth instanceof Tone.NoiseSynth) {
         const duration = params.duration || 0.1; // Duración por defecto para ruido
@@ -476,6 +476,82 @@ export class SoundPlaybackManager {
       }
     } catch {
       // Manejo silencioso de errores
+    }
+  }
+
+  /**
+   * Modula temporalmente un sonido continuo para simular interacción (ej. proximidad dinámica)
+   */
+  public triggerDroneInteraction(soundId: string, source: SoundSource): void {
+    console.log(`[SoundPlaybackManager] triggerDroneInteraction llamado para ${soundId}`);
+
+    if (!source) {
+      console.log(`[SoundPlaybackManager] Error: No hay source para ${soundId}`);
+      return;
+    }
+
+    if (!this.playingSounds.has(soundId)) {
+      console.log(`[SoundPlaybackManager] Error: El sonido ${soundId} no está en playingSounds (¿Está pausado/silenciado?)`);
+      // Relaxed constraint: Intentar modular aunque no esté estrictamente en playingSounds temporalmente
+      // return; 
+    }
+
+    try {
+      const now = Tone.now();
+
+      console.log(`[SoundPlaybackManager] Synth constructor: ${source.synth?.constructor?.name}`);
+
+      // Efecto específico según el tipo de sintetizador
+      if (source.synth instanceof Tone.FMSynth || source.synth?.constructor?.name === 'FMSynth') {
+        console.log(`[SoundPlaybackManager] Modulando FMSynth Index`);
+        const fmSynth = source.synth as Tone.FMSynth;
+        // En síntesis FM, modular temporalmente el índice de modulación
+        const currentIndex = fmSynth.modulationIndex.value || 10;
+        fmSynth.modulationIndex.rampTo(currentIndex + 30, 0.1, now);
+        fmSynth.modulationIndex.rampTo(currentIndex, 1.0, now + 0.1);
+      } else if (source.synth instanceof Tone.AMSynth || source.synth?.constructor?.name === 'AMSynth') {
+        console.log(`[SoundPlaybackManager] Modulando AMSynth harmonicity`);
+        const amSynth = source.synth as Tone.AMSynth;
+        // En síntesis AM, aumentar armonicidad
+        const currentHarm = amSynth.harmonicity.value || 1;
+        amSynth.harmonicity.rampTo(currentHarm * 2, 0.1, now);
+        amSynth.harmonicity.rampTo(currentHarm, 1.0, now + 0.1);
+      } else if (source.synth instanceof Tone.MetalSynth || source.synth?.constructor?.name === 'MetalSynth') {
+        console.log(`[SoundPlaybackManager] Modulando MetalSynth harmonicity y modulationIndex`);
+        const metalSynth = source.synth as Tone.MetalSynth;
+
+        // En MetalSynth, harmonicity y modulationIndex son números, no Signals
+        // Modificar armonicidad
+        const currentHarm = metalSynth.harmonicity || 5.1;
+        metalSynth.harmonicity = Math.max(0.1, currentHarm * 0.5); // Limitar a un valor válido
+
+        // Modificar índice de modulación
+        const currentMod = metalSynth.modulationIndex || 32;
+        metalSynth.modulationIndex = currentMod + 50;
+
+        // Restaurar valores después de 150ms
+        setTimeout(() => {
+          try {
+            if (metalSynth && !metalSynth.disposed) {
+              metalSynth.harmonicity = currentHarm;
+              metalSynth.modulationIndex = currentMod;
+            }
+          } catch (e) {
+            // Ignorar errores si el synth fue destruido
+          }
+        }, 150);
+      } else {
+        console.log(`[SoundPlaybackManager] Modulando Volumen genérico / Wobble`);
+        // Para osciladores normales o genéricos, subir el volumen (Wobble) y bajar levemente
+        const synth = source.synth as any;
+        if (synth.volume) {
+          const currentVol = synth.volume.value;
+          synth.volume.rampTo(currentVol + 6, 0.1, now);
+          synth.volume.rampTo(currentVol, 1.0, now + 0.1);
+        }
+      }
+    } catch (error) {
+      console.error(`[SoundPlaybackManager] Error simulando interacción: `, error);
     }
   }
 
@@ -538,11 +614,11 @@ export class SoundPlaybackManager {
     const noteName = note.replace(/[0-9]/g, '');
     const octave = parseInt(note[note.length - 1]) || 4;
     const noteIndex = notes.indexOf(noteName);
-    
+
     if (noteIndex === -1) {
       return 261.63; // C4
     }
-    
+
     // Calcular frecuencia usando la fórmula A4 = 440Hz como referencia
     const semitonesFromA4 = (octave - 4) * 12 + (noteIndex - 9); // A es el índice 9
     return 440 * Math.pow(2, semitonesFromA4 / 12);
@@ -598,16 +674,16 @@ export class SoundPlaybackManager {
       // Valor por defecto en caso de SSR
       return 1;
     }
-    
+
     // Convertir notación musical a segundos
     const tempo = Tone.Transport.bpm.value;
     // const timeSignature = Tone.Transport.timeSignature; // Not used currently
-    
+
     // Simplificar: asumir 4/4 y convertir notación básica
     const noteValues: { [key: string]: number } = {
       '1n': 4, '2n': 2, '4n': 1, '8n': 0.5, '16n': 0.25, '32n': 0.125
     };
-    
+
     const noteValue = noteValues[duration] || 1;
     return (noteValue * 60) / tempo;
   }
@@ -657,29 +733,29 @@ export class SoundPlaybackManager {
     const baseNoteName = baseNote.replace(/[0-9]/g, '');
     const baseNoteIndex = notes.indexOf(baseNoteName);
     const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, '')) || 4;
-    
+
     const chordFrequencies = chord.map((note) => {
       const noteName = note.replace(/[0-9]/g, '');
       const noteIndex = notes.indexOf(noteName);
-      
+
       if (noteIndex === -1) {
         // Si no se encuentra la nota, usar la frecuencia base
         return baseFrequency;
       }
-      
+
       // Calcular la diferencia en semitonos
       const semitoneDiff = noteIndex - baseNoteIndex;
       // Calcular el octave correcto, considerando que puede exceder de 0-8
       const noteOctave = parseInt(note.replace(/[A-G#]/g, '')) || baseOctave;
-      
+
       // Generar la nota correcta
       const newNoteName = notes[(semitoneDiff + 12) % 12];
       const newOctave = noteOctave;
       const newNote = newNoteName + newOctave;
-      
+
       return this.noteToFrequency(newNote);
     });
-    
+
     return chordFrequencies;
   }
 
@@ -705,7 +781,7 @@ export class SoundPlaybackManager {
     const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
     const baseNoteIndex = notes.indexOf(baseNote.replace(/[0-9]/g, ''));
     const baseOctave = parseInt(baseNote.replace(/[A-G#]/g, ''));
-    
+
     const chordNotes = chord.map(note => {
       const noteName = note.replace(/[0-9]/g, '');
       const noteIndex = notes.indexOf(noteName);
@@ -714,7 +790,7 @@ export class SoundPlaybackManager {
       const newOctave = baseOctave + Math.floor((semitoneDiff + 12) / 12);
       return newNoteName + newOctave;
     });
-    
+
     return chordNotes;
   }
 

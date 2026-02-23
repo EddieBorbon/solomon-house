@@ -36,20 +36,43 @@ import { CodeEditor } from './CodeEditor';
 import { CommandLineIcon } from '@heroicons/react/24/outline';
 import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 export function ParameterEditor() {
   const { t } = useLanguage();
   const { isActive: isTutorialActive, currentStep } = useTutorialStore();
+  const isMobile = useIsMobile();
   const [isPanelExpanded, setIsPanelExpanded] = React.useState(false);
+  
+  React.useEffect(() => {
+    if (isMobile) {
+      setIsPanelExpanded(false);
+    }
+  }, [isMobile]);
   
   // Colapsar panel automáticamente cuando inicia el tutorial (excepto en pasos 8, 9, 10 y 11)
   React.useEffect(() => {
+    if (isMobile) {
+      return;
+    }
+
     if (isTutorialActive && currentStep !== 7 && currentStep !== 8 && currentStep !== 9 && currentStep !== 10) {
       setIsPanelExpanded(false);
     }
-  }, [isTutorialActive, currentStep]);
+  }, [isTutorialActive, currentStep, isMobile]);
   const [showShapeCodeEditor, setShowShapeCodeEditor] = React.useState(false);
   const [showSynthesisCodeEditor, setShowSynthesisCodeEditor] = React.useState(false);
+  const getPanelWidth = React.useCallback(
+    (desktopWidth: string, mobileWidth?: string) => {
+      const targetMobileWidth = mobileWidth ?? desktopWidth;
+      if (!isPanelExpanded) {
+        return '0px';
+      }
+
+      return isMobile ? targetMobileWidth : desktopWidth;
+    },
+    [isPanelExpanded, isMobile]
+  );
   const {
     updateObject,
     updateEffectZone,
@@ -75,10 +98,14 @@ export function ParameterEditor() {
 
   // Expandir automáticamente el panel cuando se selecciona una entidad (excepto durante el tutorial, pero permitir en pasos 8, 9, 10 y 11)
   React.useEffect(() => {
+    if (isMobile) {
+      return;
+    }
+
     if (selectedEntity && (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10)) {
       setIsPanelExpanded(true);
     }
-  }, [selectedEntity, isTutorialActive, currentStep]);
+  }, [selectedEntity, isTutorialActive, currentStep, isMobile]);
 
   // Usar el hook personalizado para transformaciones
   const {
@@ -202,9 +229,10 @@ export function ParameterEditor() {
     return (
       <div className="fixed right-0 top-0 h-full z-50 flex">
         {/* Panel principal futurista */}
-        <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-          isPanelExpanded ? 'w-96' : 'w-0'
-        }`}>
+        <div
+          className="relative bg-black border border-white transition-all duration-300 overflow-hidden"
+          style={{ width: getPanelWidth('24rem', 'min(92vw, 22rem)') }}
+        >
           {/* Grid pattern background */}
           <div className="absolute inset-0 opacity-10">
             <div className="w-full h-full" style={{
@@ -240,7 +268,7 @@ export function ParameterEditor() {
         <button
           onClick={() => {
             if (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10) {
-              setIsPanelExpanded(!isPanelExpanded);
+              setIsPanelExpanded(prev => !prev);
             }
           }}
           className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
@@ -293,9 +321,10 @@ export function ParameterEditor() {
     return (
       <div className="fixed right-0 top-0 h-full z-50 flex">
         {/* Panel principal futurista */}
-        <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-          isPanelExpanded ? 'w-96' : 'w-0'
-        }`}>
+        <div
+          className="relative bg-black border border-white transition-all duration-300 overflow-hidden"
+          style={{ width: getPanelWidth('24rem', 'min(94vw, 24rem)') }}
+        >
           {/* Grid pattern background */}
           <div className="absolute inset-0 opacity-10">
             <div className="w-full h-full" style={{
@@ -465,7 +494,7 @@ export function ParameterEditor() {
         <button
           onClick={() => {
             if (!isTutorialActive || currentStep === 7 || currentStep === 8 || currentStep === 9 || currentStep === 10) {
-              setIsPanelExpanded(!isPanelExpanded);
+              setIsPanelExpanded(prev => !prev);
             }
           }}
           className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${
@@ -509,9 +538,10 @@ export function ParameterEditor() {
   return (
     <div className="fixed right-0 top-0 h-full z-50 flex">
       {/* Panel principal futurista */}
-      <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-        isPanelExpanded ? 'w-[480px]' : 'w-0'
-      }`}>
+      <div
+        className="relative bg-black border border-white transition-all duration-300 overflow-hidden"
+        style={{ width: getPanelWidth('30rem', 'min(95vw, 26rem)') }}
+      >
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-10">
           <div className="w-full h-full" style={{
@@ -605,7 +635,7 @@ export function ParameterEditor() {
       <button
         onClick={() => {
           if (!isTutorialActive) {
-            setIsPanelExpanded(!isPanelExpanded);
+            setIsPanelExpanded(prev => !prev);
           }
         }}
         className={`relative bg-black border border-white p-3 flex items-center justify-center transition-all duration-300 group ${

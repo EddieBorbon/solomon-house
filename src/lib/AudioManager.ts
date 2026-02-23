@@ -34,7 +34,7 @@ export class AudioManager {
     this.audioContextManager = new AudioContextManager();
     this.soundPlaybackManager = new SoundPlaybackManager();
     this.parameterManager = new ParameterManager();
-    
+
     // Registrar el AudioManager como listener de limpieza del contexto
     this.audioContextManager.onCleanup(() => {
       this.cleanup();
@@ -53,19 +53,19 @@ export class AudioManager {
    */
   public createGlobalEffect(effectId: string, type: EffectType, position: [number, number, number]): void {
     this.effectManager.createGlobalEffect(effectId, type, position);
-        
-        // Crear sends para todas las fuentes de sonido existentes
+
+    // Crear sends para todas las fuentes de sonido existentes
     const effectData = this.effectManager.getGlobalEffect(effectId);
     if (effectData) {
-        this.soundSources.forEach((source, sourceId) => {
+      this.soundSources.forEach((source, sourceId) => {
         this.addEffectSendToSource(sourceId, effectId, effectData.effectNode.input.input);
-        });
+      });
     }
   }
 
-    /**
-   * Añade un send de efecto a una fuente de sonido existente
-   */
+  /**
+ * Añade un send de efecto a una fuente de sonido existente
+ */
   private addEffectSendToSource(sourceId: string, effectId: string, effectNode: AudioNode): void {
     try {
       const source = this.soundSources.get(sourceId);
@@ -76,11 +76,11 @@ export class AudioManager {
       // Crear el send de efecto
       const send = new Tone.Gain(0); // Inicialmente silenciado
       source.effectSends.set(effectId, send);
-      
+
       // Conectar synth -> send -> efecto
       source.synth.connect(send);
       send.connect(effectNode);
-      
+
     } catch {
     }
   }
@@ -112,9 +112,9 @@ export class AudioManager {
    * Elimina un efecto global
    */
   public removeGlobalEffect(effectId: string): void {
-        // Limpiar todas las conexiones a fuentes de sonido antes de eliminar
-        this.cleanupEffectSourceConnections(effectId);
-        
+    // Limpiar todas las conexiones a fuentes de sonido antes de eliminar
+    this.cleanupEffectSourceConnections(effectId);
+
     // Eliminar el efecto usando el EffectManager
     this.effectManager.removeGlobalEffect(effectId);
   }
@@ -172,8 +172,8 @@ export class AudioManager {
    */
   private isAudioContextValid(effectSend: Tone.Gain, dryGain: Tone.Gain): boolean {
     return effectSend.context && dryGain.context &&
-           effectSend.context.state === 'running' && dryGain.context.state === 'running' &&
-           !effectSend.disposed && !dryGain.disposed;
+      effectSend.context.state === 'running' && dryGain.context.state === 'running' &&
+      !effectSend.disposed && !dryGain.disposed;
   }
 
   /**
@@ -208,19 +208,19 @@ export class AudioManager {
       }
 
       if (!this.isAudioContextValid(effectSend, source.dryGain)) return;
-      
+
       // Aplicar crossfade entre señal seca y efecto
       const effectAmount = Math.max(0, Math.min(1, amount));
       const dryAmount = Math.max(0, Math.min(1, 1 - effectAmount));
-      
+
       effectSend.gain.setValueAtTime(effectAmount, Tone.now());
       source.dryGain.gain.setValueAtTime(dryAmount, Tone.now());
-      
+
       // Debug: Log cuando el amount es significativo
       if (amount > 0.1) {
         console.log(`🎛️ AudioManager: Aplicando efecto ${effectId} a ${soundSourceId} con amount: ${amount.toFixed(2)}`);
       }
-      
+
       // Registrar cambios significativos
       const currentSendAmount = Math.round(amount * 10) / 10;
       const key = `${soundSourceId}-${effectId}`;
@@ -252,17 +252,17 @@ export class AudioManager {
     try {
       // Detener todos los sonidos activos
       this.soundPlaybackManager.stopAllSounds(this.soundSources);
-      
+
       // Limpiar todas las conexiones de fuentes de sonido
       this.soundSources.forEach((source, sourceId) => {
         this.cleanupSourceEffectConnections(sourceId);
       });
-      
+
       // Limpiar todos los managers
       this.effectManager.cleanup();
       this.spatialAudioManager.cleanup();
       this.soundPlaybackManager.cleanup();
-      
+
       // Limpiar el Map de send amounts
       this.lastSendAmounts.clear();
     } catch {
@@ -280,19 +280,19 @@ export class AudioManager {
    * Crea una nueva fuente de sonido usando la factory
    */
   public createSoundSource(
-    id: string, 
-    type: SoundObjectType, 
-    params: AudioParams, 
+    id: string,
+    type: SoundObjectType,
+    params: AudioParams,
     position: [number, number, number]
   ): void {
     if (this.soundSources.has(id)) return;
 
     try {
       const soundSource = this.soundSourceFactory.createSoundSource(
-        id, 
-        type, 
-        params, 
-        position, 
+        id,
+        type,
+        params,
+        position,
         this.effectManager.getAllGlobalEffects()
       );
 
@@ -307,7 +307,7 @@ export class AudioManager {
    */
   public removeSoundSource(id: string): void {
     console.log('🎵 AudioManager: removeSoundSource called', id);
-    
+
     const source = this.soundSources.get(id);
     if (!source) {
       console.warn('⚠️ AudioManager: Sound source not found', id);
@@ -316,7 +316,7 @@ export class AudioManager {
 
     try {
       console.log('🎵 AudioManager: Found sound source, stopping audio');
-      
+
       // Detener el sonido si está sonando
       if (this.soundPlaybackManager.isSoundPlaying(id)) {
         console.log('🔧 AudioManager: Stopping sound playback');
@@ -338,7 +338,7 @@ export class AudioManager {
       source.synth.dispose();
       source.panner.dispose();
       source.dryGain.dispose();
-      
+
       // Disponer todos los sends de efectos
       source.effectSends.forEach((send) => {
         try {
@@ -352,7 +352,7 @@ export class AudioManager {
       this.soundSources.delete(id);
       this.soundPlaybackManager.removePlaybackState(id);
       console.log('✅ AudioManager: Sound source removed successfully');
-      
+
     } catch (error) {
       console.error('❌ AudioManager: Error removing sound source:', error);
     }
@@ -368,9 +368,9 @@ export class AudioManager {
     }
 
     this.soundPlaybackManager.startContinuousSound(
-      id, 
-      source, 
-      params, 
+      id,
+      source,
+      params,
       this.updateSoundParams.bind(this)
     );
   }
@@ -385,9 +385,9 @@ export class AudioManager {
     }
 
     this.soundPlaybackManager.startSound(
-      id, 
-      source, 
-      params, 
+      id,
+      source,
+      params,
       this.updateSoundParams.bind(this)
     );
   }
@@ -414,9 +414,9 @@ export class AudioManager {
     }
 
     this.soundPlaybackManager.triggerNoteAttack(
-      id, 
-      source, 
-      params, 
+      id,
+      source,
+      params,
       this.updateSoundParams.bind(this)
     );
   }
@@ -432,11 +432,24 @@ export class AudioManager {
     }
 
     this.soundPlaybackManager.triggerAttackRelease(
-      id, 
-      source, 
-      params, 
+      id,
+      source,
+      params,
       this.updateSoundParams.bind(this)
     );
+  }
+
+  /**
+   * Modula temporalmente un sonido continuo para simular una colisión o interacción
+   */
+  public triggerDroneInteraction(id: string): void {
+    const source = this.soundSources.get(id);
+    if (!source) {
+      console.log(`[AudioManager] No target source found for ${id} for drone interaction.`);
+      return;
+    }
+
+    this.soundPlaybackManager.triggerDroneInteraction(id, source);
   }
 
   /**
@@ -449,9 +462,9 @@ export class AudioManager {
     }
 
     this.soundPlaybackManager.triggerNoiseAttack(
-      id, 
-      source, 
-      params, 
+      id,
+      source,
+      params,
       this.updateSoundParams.bind(this)
     );
   }
@@ -472,9 +485,9 @@ export class AudioManager {
     return this.parameterManager.updateSoundParams(source, params);
   }
 
-    /**
-   * Obtiene la posición actual de una fuente de sonido desde su panner
-   */
+  /**
+ * Obtiene la posición actual de una fuente de sonido desde su panner
+ */
   private getSoundSourcePosition(source: SoundSource): [number, number, number] {
     return [
       source.panner.positionX.value,
@@ -511,7 +524,7 @@ export class AudioManager {
     try {
       // Actualizar la posición del panner usando el SpatialAudioManager
       this.spatialAudioManager.updatePannerPosition(source.panner, position);
-      
+
       // Actualizar la mezcla de efectos basada en la nueva posición
       this.updateSoundEffectMixing(id, position);
     } catch {
@@ -542,7 +555,7 @@ export class AudioManager {
 
     try {
       const globalEffects = this.effectManager.getAllGlobalEffects();
-      
+
       // Calcular la mezcla para cada efecto global
       globalEffects.forEach((effectData, effectId) => {
         const send = source.effectSends.get(effectId);
@@ -551,14 +564,14 @@ export class AudioManager {
         const effectPosition = effectData.position;
         const effectRadius = this.getEffectZoneRadius(effectId);
         const effectIntensity = this.spatialAudioManager.calculateEffectIntensity(
-          soundPosition, 
-          effectPosition, 
+          soundPosition,
+          effectPosition,
           effectRadius
         );
 
         // Aplicar la intensidad al send del efecto
         send.gain.setValueAtTime(effectIntensity, Tone.now());
-        
+
         // Ajustar el dry gain (seco) inversamente
         const dryIntensity = 1.0 - effectIntensity;
         source.dryGain.gain.setValueAtTime(dryIntensity, Tone.now());
@@ -586,7 +599,7 @@ export class AudioManager {
   public getSoundSourceState(id: string): boolean {
     const source = this.soundSources.get(id);
     if (!source) return false;
-    
+
     // Verificar si existe la fuente
     return true;
   }
@@ -782,7 +795,7 @@ export class AudioManager {
       return;
     }
 
-    
+
     // source.effectSends.forEach((_send, _effectId) => {
     // });
 

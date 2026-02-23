@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@react-three/fiber', '@react-three/drei', 'three'],
   },
+  transpilePackages: ['tone', 'standardized-audio-context'],
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

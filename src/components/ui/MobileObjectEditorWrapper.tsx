@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { MobileObjectEditor } from './MobileObjectEditor';
 import { type MobileObject } from '../../state/useWorldStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface MobileObjectEditorWrapperProps {
   mobileObject: MobileObject;
@@ -13,14 +14,33 @@ export function MobileObjectEditorWrapper({
   mobileObject,
   onRemove
 }: MobileObjectEditorWrapperProps) {
-  const [isPanelExpanded, setIsPanelExpanded] = useState(true);
+  const isMobile = useIsMobile();
+  const [isPanelExpanded, setIsPanelExpanded] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsPanelExpanded(false);
+      return;
+    }
+
+    setIsPanelExpanded(true);
+  }, [isMobile]);
+
+  const panelWidth = useMemo(() => {
+    if (!isPanelExpanded) {
+      return '0px';
+    }
+
+    return isMobile ? 'min(95vw, 26rem)' : '30rem';
+  }, [isPanelExpanded, isMobile]);
 
   return (
     <div className="fixed right-0 top-0 h-full z-50 flex">
       {/* Panel principal futurista */}
-      <div className={`relative bg-black border border-white transition-all duration-300 overflow-hidden ${
-        isPanelExpanded ? 'w-[480px]' : 'w-0'
-      }`}>
+      <div
+        className="relative bg-black border border-white transition-all duration-300 overflow-hidden"
+        style={{ width: panelWidth }}
+      >
         {/* Grid pattern background */}
         <div className="absolute inset-0 opacity-10">
           <div className="w-full h-full" style={{
@@ -57,7 +77,7 @@ export function MobileObjectEditorWrapper({
 
       {/* Botón de toggle futurista */}
       <button
-        onClick={() => setIsPanelExpanded(!isPanelExpanded)}
+        onClick={() => setIsPanelExpanded(prev => !prev)}
         className="relative bg-black border border-white p-3 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 group"
         title={isPanelExpanded ? "Contraer panel" : "Expandir panel"}
       >

@@ -16,6 +16,7 @@ import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAudioContext } from '../../hooks/useAudioContext';
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
@@ -125,6 +126,52 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 export function Experience() {
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const { t } = useLanguage();
+  const {
+    startAudioContext,
+    isAudioContextStarted,
+    isInitializing
+  } = useAudioContext();
+  const hasAttemptedAudioStartRef = React.useRef(false);
+  const attemptStartAudio = React.useCallback(() => {
+    if (isAudioContextStarted || isInitializing) {
+      return;
+    }
+
+    if (hasAttemptedAudioStartRef.current) {
+      return;
+    }
+
+    hasAttemptedAudioStartRef.current = true;
+
+    startAudioContext().catch(() => {
+      hasAttemptedAudioStartRef.current = false;
+    });
+  }, [isAudioContextStarted, isInitializing, startAudioContext]);
+  const handleCanvasPointerDown = React.useCallback(() => {
+    attemptStartAudio();
+  }, [attemptStartAudio]);
+
+  React.useEffect(() => {
+    if (isAudioContextStarted) {
+      hasAttemptedAudioStartRef.current = false;
+      return;
+    }
+
+    const audioStartEvents: Array<keyof WindowEventMap> = ['pointerdown', 'touchstart', 'keydown'];
+    const handleEvent: EventListener = () => {
+      attemptStartAudio();
+    };
+
+    audioStartEvents.forEach(event => {
+      window.addEventListener(event, handleEvent);
+    });
+
+    return () => {
+      audioStartEvents.forEach(event => {
+        window.removeEventListener(event, handleEvent);
+      });
+    };
+  }, [attemptStartAudio, isAudioContextStarted]);
   
   // Estado para mostrar advertencia de cuota
   const [showQuotaWarning, setShowQuotaWarning] = React.useState(false);
@@ -164,6 +211,7 @@ export function Experience() {
       
       
       <Canvas
+        onPointerDown={handleCanvasPointerDown}
         camera={{
           position: [5, 5, 5],
           fov: 75,

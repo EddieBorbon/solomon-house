@@ -87,10 +87,10 @@ export class PersistenceService {
   async saveCurrentWorldAsProject(projectName: string, description?: string): Promise<string> {
     try {
       const state = useWorldStore.getState();
-      
+
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
-      
+
       for (const [, grid] of state.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
@@ -108,7 +108,7 @@ export class PersistenceService {
       };
 
       const projectId = await firebaseService.saveProject(projectData);
-      
+
       return projectId;
     } catch (error) {
       throw error;
@@ -141,7 +141,7 @@ export class PersistenceService {
       };
 
       const projectId = await firebaseService.saveProject(projectData);
-      
+
       return projectId;
     } catch (error) {
       throw error;
@@ -152,7 +152,7 @@ export class PersistenceService {
   async loadProject(projectId: string): Promise<void> {
     try {
       const project = await firebaseService.loadProject(projectId);
-      
+
       if (!project) {
         throw new Error('Project not found'); // Error message - translation handled in UI
       }
@@ -162,20 +162,20 @@ export class PersistenceService {
       console.log('🛑 Deteniendo todos los sonidos del mundo global antes de cargar proyecto');
       try {
         const { audioManager } = await import('../lib/AudioManager');
-        
+
         // Obtener el estado actual antes de limpiar para tener los IDs
         const currentState = useWorldStore.getState();
         const allObjectIds: string[] = [];
-        
+
         // Recolectar todos los IDs de objetos del mundo global
         for (const grid of currentState.grids.values()) {
           for (const object of grid.objects) {
             allObjectIds.push(object.id);
           }
         }
-        
+
         console.log(`🛑 Encontrados ${allObjectIds.length} objetos sonoros del mundo global para detener`);
-        
+
         // Detener todos los sonidos (incluyendo sonidos continuos)
         // stopSound detiene cualquier tipo de sonido, incluyendo continuos
         allObjectIds.forEach(objectId => {
@@ -185,7 +185,7 @@ export class PersistenceService {
             // Ignorar errores si el sonido no existe o ya está detenido
           }
         });
-        
+
         // Remover todas las fuentes de sonido del mundo global
         // removeSoundSource detiene el sonido si está sonando y remueve la fuente
         allObjectIds.forEach(objectId => {
@@ -195,7 +195,7 @@ export class PersistenceService {
             // Ignorar errores si la fuente ya fue removida
           }
         });
-        
+
         // Limpiar recursos de efectos y managers (pero sin remover las fuentes nuevas que se crearán)
         // Solo limpiar conexiones de efectos, no todas las fuentes ya que ya las removimos
         try {
@@ -203,7 +203,7 @@ export class PersistenceService {
         } catch {
           // Ignorar errores en cleanup
         }
-        
+
         console.log('✅ Todos los sonidos del mundo global detenidos y removidos');
       } catch (error) {
         console.error('❌ Error deteniendo sonidos del mundo global:', error);
@@ -212,12 +212,20 @@ export class PersistenceService {
 
       // Convertir las cuadrículas de Firebase al formato del store
       const grids = new Map<string, Grid>();
-      
+
+      // Colecciones para sub-stores (arquitectura refactorizada)
+      const allObjects: any[] = [];
+      const objectsByGrid = new Map<string, any[]>();
+      const allEffectZones: any[] = [];
+
       for (const firebaseGrid of project.grids) {
         const grid = firebaseToGrid(firebaseGrid);
         grids.set(grid.id, grid);
-      }
 
+        allObjects.push(...(grid.objects || []));
+        objectsByGrid.set(grid.id, grid.objects || []);
+        allEffectZones.push(...(grid.effectZones || []));
+      }
 
       // IMPORTANTE: Reemplazar completamente el estado al cargar un proyecto
       // Esto asegura que no se mezclen datos del mundo global con el proyecto
@@ -226,8 +234,8 @@ export class PersistenceService {
         ...currentState,
         grids, // Reemplazar completamente las cuadrículas
         activeGridId: project.activeGridId,
-        currentGridCoordinates: project.activeGridId ? 
-          grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
+        currentGridCoordinates: project.activeGridId ?
+          grids.get(project.activeGridId)?.coordinates || [0, 0, 0] :
           [0, 0, 0],
         // Asegurar que el mundo global esté desactivado
         globalWorldConnected: false,
@@ -239,15 +247,44 @@ export class PersistenceService {
         selectedEntityId: null,
         transformMode: 'translate'
       });
-      
-      // También resetear en useSelectionStore si existe
+
+      // Sincronizar sub-stores de la arquitectura refactorizada
       try {
+        // Sincronizar GridStore
+        const { useGridStore } = await import('../stores/useGridStore');
+        if (useGridStore && useGridStore.setState) {
+          useGridStore.setState({
+            grids,
+            activeGridId: project.activeGridId,
+            gridSize: project.gridSize || 20,
+            renderDistance: project.renderDistance || 2
+          });
+        }
+
+        // Sincronizar ObjectStore
+        const { useObjectStore } = await import('../stores/useObjectStore');
+        if (useObjectStore && useObjectStore.setState) {
+          useObjectStore.setState({
+            objects: allObjects,
+            objectsByGrid: objectsByGrid
+          });
+        }
+
+        // Sincronizar EffectStore
+        const { useEffectStore } = await import('../stores/useEffectStore');
+        if (useEffectStore && useEffectStore.setState) {
+          useEffectStore.setState({
+            effectZones: allEffectZones
+          });
+        }
+
+        // Sincronizar SelectionStore
         const { useSelectionStore } = await import('../stores/useSelectionStore');
-        if (useSelectionStore && useSelectionStore.getState) {
+        if (useSelectionStore && useSelectionStore.setState) {
           useSelectionStore.getState().clearSelection();
         }
-      } catch {
-        // Si no existe useSelectionStore, ignorar el error
+      } catch (error) {
+        console.error('Error sincronizando sub-stores:', error);
       }
 
       // Inicializar audio para los objetos del proyecto cargado
@@ -255,16 +292,16 @@ export class PersistenceService {
         console.log('🎵 Inicializando audio para objetos del proyecto cargado');
         try {
           const { audioManager } = await import('../lib/AudioManager');
-          
+
           // Asegurar que el contexto de audio esté iniciado
           if (!audioManager.isContextStarted()) {
             console.log('🎵 Iniciando contexto de audio...');
             await audioManager.startContext();
           }
-          
+
           const state = useWorldStore.getState();
           let initializedCount = 0;
-          
+
           // Crear todas las fuentes de sonido
           for (const grid of state.grids.values()) {
             for (const object of grid.objects) {
@@ -281,10 +318,10 @@ export class PersistenceService {
                     },
                     object.position
                   );
-                  
+
                   console.log(`✅ Fuente de sonido creada para objeto ${object.id} (tipo: ${object.type})`);
                 }
-                
+
                 // Iniciar sonido continuo si está habilitado
                 if (object.audioEnabled) {
                   // Pequeño delay para asegurar que la fuente esté lista
@@ -302,7 +339,7 @@ export class PersistenceService {
               }
             }
           }
-          
+
           console.log(`✅ Audio inicializado para ${initializedCount} objetos del proyecto`);
         } catch (error) {
           console.error('❌ Error general inicializando audio:', error);
@@ -329,14 +366,14 @@ export class PersistenceService {
     try {
       const state = useWorldStore.getState();
       const grid = state.grids.get(gridId);
-      
+
       if (!grid) {
         throw new Error('Grid not found'); // Error message - translation handled in UI
       }
 
       const firebaseGrid = gridToFirebase(grid);
       const savedGridId = await firebaseService.saveGrid(firebaseGrid);
-      
+
       return savedGridId;
     } catch (error) {
       throw error;
@@ -347,13 +384,13 @@ export class PersistenceService {
   async loadGrid(gridId: string): Promise<void> {
     try {
       const firebaseGrid = await firebaseService.loadGrid(gridId);
-      
+
       if (!firebaseGrid) {
         throw new Error('Grid not found'); // Error message - translation handled in UI
       }
 
       const grid = firebaseToGrid(firebaseGrid);
-      
+
       // Actualizar el store con la cuadrícula cargada
       useWorldStore.setState((state) => ({
         grids: new Map(state.grids.set(gridId, grid))
@@ -368,7 +405,7 @@ export class PersistenceService {
   async updateProject(projectId: string, projectName?: string, description?: string): Promise<void> {
     try {
       const state = useWorldStore.getState();
-      
+
       // IMPORTANTE: Solo actualizar si el proyecto actual coincide con el que se está actualizando
       // Esto previene que se actualice un proyecto incorrecto si hay un cambio de contexto
       if (state.currentProjectId !== projectId) {
@@ -376,10 +413,10 @@ export class PersistenceService {
         // No hacer nada si el proyecto actual no coincide
         return;
       }
-      
+
       // Convertir todas las cuadrículas a formato Firebase
       const firebaseGrids: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'>[] = [];
-      
+
       for (const [, grid] of state.grids) {
         firebaseGrids.push(gridToFirebase(grid));
       }
@@ -397,7 +434,7 @@ export class PersistenceService {
       if (description !== undefined) updateData.description = description;
 
       await firebaseService.updateProject(projectId, updateData);
-      
+
     } catch (error) {
       throw error;
     }
@@ -411,14 +448,14 @@ export class PersistenceService {
       throw error;
     }
   }
-  
+
   // Bloquear un proyecto individual (requiere contraseña de admin)
   async lockProject(projectId: string, password: string): Promise<boolean> {
     const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
     if (password !== ADMIN_PASSWORD) {
       return false;
     }
-    
+
     try {
       await firebaseService.updateProject(projectId, { isLocked: true });
       return true;
@@ -426,14 +463,14 @@ export class PersistenceService {
       throw error;
     }
   }
-  
+
   // Desbloquear un proyecto individual (requiere contraseña de admin)
   async unlockProject(projectId: string, password: string): Promise<boolean> {
     const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
     if (password !== ADMIN_PASSWORD) {
       return false;
     }
-    
+
     try {
       await firebaseService.updateProject(projectId, { isLocked: false });
       return true;
@@ -441,14 +478,14 @@ export class PersistenceService {
       throw error;
     }
   }
-  
+
   // Eliminar un proyecto con contraseña de admin
   async deleteProjectWithPassword(projectId: string, password: string): Promise<boolean> {
     const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
     if (password !== ADMIN_PASSWORD) {
       return false;
     }
-    
+
     try {
       await firebaseService.deleteProject(projectId);
       return true;
@@ -465,16 +502,16 @@ export class PersistenceService {
 
   startAutoSync(projectId: string): () => void {
     const previousGridsRef = { current: null as Map<string, Grid> | null };
-    
+
     const unsubscribe = firebaseService.subscribeToProject(projectId, async (project) => {
       if (project && !this.isUpdatingFromFirestore) {
         // Marcar que estamos actualizando desde Firebase
         this.isUpdatingFromFirestore = true;
-        
+
         try {
           // Convertir las cuadrículas de Firebase al formato del store
           const grids = new Map<string, Grid>();
-          
+
           for (const firebaseGrid of project.grids) {
             const grid = firebaseToGrid(firebaseGrid);
             grids.set(grid.id, grid);
@@ -490,7 +527,7 @@ export class PersistenceService {
           useWorldStore.setState((state) => {
             // Solo actualizar si realmente hay cambios
             let hasChanges = false;
-            
+
             // Verificar si hay cambios en las cuadrículas
             if (currentGrids.size !== grids.size) {
               hasChanges = true;
@@ -503,20 +540,20 @@ export class PersistenceService {
                 }
               }
             }
-            
+
             if (!hasChanges) {
               return state;
             }
-            
+
             // Guardar grids anteriores para la próxima comparación
             previousGridsRef.current = new Map(grids);
-            
+
             return {
               ...state,
               grids,
               activeGridId: project.activeGridId,
-              currentGridCoordinates: project.activeGridId ? 
-                grids.get(project.activeGridId)?.coordinates || [0, 0, 0] : 
+              currentGridCoordinates: project.activeGridId ?
+                grids.get(project.activeGridId)?.coordinates || [0, 0, 0] :
                 [0, 0, 0]
             };
           });
@@ -529,23 +566,23 @@ export class PersistenceService {
               // Comparar objetos entre grids anteriores y nuevos para detectar cambios en audioParams
               for (const [gridId, newGrid] of grids) {
                 const previousGrid = previousGrids.get(gridId);
-                
+
                 if (previousGrid) {
                   // Detectar cambios en objetos sonoros
                   for (const newObject of newGrid.objects) {
                     const previousObject = previousGrid.objects.find(obj => obj.id === newObject.id);
-                    
+
                     if (previousObject) {
                       // Comparar audioParams de manera más robusta (similar a useGlobalWorldSync)
                       const previousParams = JSON.stringify(previousObject.audioParams);
                       const newParams = JSON.stringify(newObject.audioParams);
-                      
+
                       // También comparar audioEnabled
                       const audioEnabledChanged = previousObject.audioEnabled !== newObject.audioEnabled;
-                      
+
                       if (previousParams !== newParams || audioEnabledChanged) {
                         console.log(`🎵 Cambio en audioParams detectado para objeto ${newObject.id} en proyecto ${projectId}`);
-                        
+
                         // Actualizar AudioManager con los nuevos parámetros
                         // Importar AudioManager dinámicamente para evitar dependencias circulares
                         import('../lib/AudioManager').then(({ audioManager }) => {
@@ -554,7 +591,7 @@ export class PersistenceService {
                             // Actualizar parámetros de audio
                             audioManager.updateSoundParams(newObject.id, newObject.audioParams);
                             console.log(`✅ AudioManager actualizado para objeto ${newObject.id}`);
-                            
+
                             // Si cambió audioEnabled, actualizar el estado
                             if (audioEnabledChanged) {
                               if (newObject.audioEnabled) {
@@ -571,12 +608,12 @@ export class PersistenceService {
                               newObject.audioParams,
                               newObject.position
                             );
-                            
+
                             // Si el objeto tiene audio habilitado, iniciar el sonido
                             if (newObject.audioEnabled) {
                               audioManager.startContinuousSound(newObject.id, newObject.audioParams);
                             }
-                            
+
                             console.log(`✅ Fuente de sonido creada y actualizada para objeto ${newObject.id}`);
                           }
                         }).catch(error => {
@@ -593,11 +630,11 @@ export class PersistenceService {
                             newObject.audioParams,
                             newObject.position
                           );
-                          
+
                           if (newObject.audioEnabled) {
                             audioManager.startContinuousSound(newObject.id, newObject.audioParams);
                           }
-                          
+
                           console.log(`✅ Nueva fuente de sonido creada para objeto ${newObject.id}`);
                         }
                       }).catch(error => {
@@ -616,7 +653,7 @@ export class PersistenceService {
                           newObject.audioParams,
                           newObject.position
                         );
-                        
+
                         if (newObject.audioEnabled) {
                           audioManager.startContinuousSound(newObject.id, newObject.audioParams);
                         }
@@ -639,7 +676,7 @@ export class PersistenceService {
                         object.audioParams,
                         object.position
                       );
-                      
+
                       if (object.audioEnabled) {
                         audioManager.startContinuousSound(object.id, object.audioParams);
                       }
@@ -651,7 +688,7 @@ export class PersistenceService {
               }
             }
           }, 150); // Delay para asegurar que el estado se haya actualizado
-          
+
         } finally {
           // Resetear la bandera después de un breve delay para evitar bucles
           setTimeout(() => {

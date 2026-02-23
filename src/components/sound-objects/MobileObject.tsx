@@ -69,9 +69,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   const [activatedObjectId, setActivatedObjectId] = useState<string | null>(null);
   const [touchedObjectId, setTouchedObjectId] = useState<string | null>(null);
   const [touchStartTime, setTouchStartTime] = useState<number>(0);
-  
+
   const { grids, triggerObjectAttackRelease } = useWorldStore();
-  
+
   // Función helper para obtener los objetos del mismo grid que este objeto móvil
   const getObjectsInSameGrid = (): SoundObject[] => {
     for (const grid of grids.values()) {
@@ -87,9 +87,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
   ]);
-  const lineMaterial = new LineBasicMaterial({ 
-    color: 0x00ff88, 
-    transparent: true, 
+  const lineMaterial = new LineBasicMaterial({
+    color: 0x00ff88,
+    transparent: true,
     opacity: 0.8,
     linewidth: 3
   });
@@ -99,9 +99,9 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
   ]);
-  const connectionLineMaterial = new LineBasicMaterial({ 
-    color: 0xffffff, 
-    transparent: true, 
+  const connectionLineMaterial = new LineBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
     opacity: 0.5,
     linewidth: 2
   });
@@ -111,30 +111,30 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
   ]);
-  const touchLineMaterial = new LineBasicMaterial({ 
-    color: 0xff6b6b, 
-    transparent: true, 
+  const touchLineMaterial = new LineBasicMaterial({
+    color: 0xff6b6b,
+    transparent: true,
     opacity: 0.8,
     linewidth: 4
   });
 
   // Función para calcular la nueva posición según el tipo de movimiento
   const calculateNewPosition = (time: number): [number, number, number] => {
-    const { 
-      movementType, 
-      radius = 2, 
-      speed = 1, 
-      amplitude = 0.5, 
-      frequency = 1, 
-      randomSeed = 0, 
-      height = 1, 
+    const {
+      movementType,
+      radius = 2,
+      speed = 1,
+      amplitude = 0.5,
+      frequency = 1,
+      randomSeed = 0,
+      height = 1,
       heightSpeed = 0.5,
       spherePosition = [0, 0, 0] // Posición inicial/offset de la esfera
     } = mobileParams;
-    
+
     // El objeto se mueve desde la posición inicial de la esfera (spherePosition)
     const origin = spherePosition as [number, number, number];
-    
+
     switch (movementType) {
       case 'circular': {
         const angle = time * speed;
@@ -147,7 +147,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
           origin[2] + radius * sin
         ];
       }
-      
+
       case 'polar': {
         const angle = time * speed;
         const r = radius + amplitude * Math.sin(frequency * angle);
@@ -158,7 +158,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
           origin[2] + r * Math.sin(angle)
         ];
       }
-      
+
       case 'random': {
         // Usar semilla para movimiento pseudo-aleatorio
         const seed = randomSeed + time * 0.1;
@@ -167,7 +167,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         const y = origin[1] + (Math.sin(seed * 0.7) * height); // Movimiento vertical aleatorio
         return [x, y, z];
       }
-      
+
       case 'figure8': {
         const angle = time * speed;
         const x = origin[0] + radius * Math.sin(angle);
@@ -175,7 +175,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         const yOffset = height * Math.sin(time * heightSpeed); // Movimiento vertical oscilatorio
         return [x, origin[1] + yOffset, z];
       }
-      
+
       case 'spiral': {
         const angle = time * speed;
         const r = radius * (1 + time * 0.1); // Radio creciente
@@ -186,7 +186,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
           origin[2] + r * Math.sin(angle)
         ];
       }
-      
+
       default:
         return origin;
     }
@@ -195,43 +195,53 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   // Función para detectar objetos sonoros cercanos
   const detectNearbyObjects = (relativePos: [number, number, number]): string | null => {
     const { proximityThreshold } = mobileParams;
-    
+
     // Obtener objetos del mismo grid
     const allObjects = getObjectsInSameGrid();
-    
+
     // Si no hay objetos en el grid, no hay nada que detectar
     if (allObjects.length === 0) {
       return null;
     }
-    
-    // Los objetos están en el espacio local del grid, así que usamos directamente relativePos
-    // position ya es [0, 0, 0] porque está dentro de un grupo con posición grid.position
-    const absolutePos = relativePos;
-    
+
+    // Los objetos móviles están en un sub-espacio desplazado por su `position` en el grid.
+    const absolutePos = [
+      position[0] + relativePos[0],
+      position[1] + relativePos[1],
+      position[2] + relativePos[2]
+    ] as [number, number, number];
+
     let closestObjectId: string | null = null;
     let closestDistance = Infinity;
-    
+
+    // Controlar frecuencia de logs (aprox 1 vez por segundo = 60 frames)
+    const shouldLog = Math.random() < 0.02;
+
     for (const obj of allObjects) {
       // Evitar detectarse a sí mismo si por alguna razón está en la lista de objetos
       if (obj.id === id) continue;
-      
+
       const distance = Math.sqrt(
         Math.pow(absolutePos[0] - obj.position[0], 2) +
         Math.pow(absolutePos[1] - obj.position[1], 2) +
         Math.pow(absolutePos[2] - obj.position[2], 2)
       );
-      
+
+      if (shouldLog) {
+        console.log(`[Mobile ${id.substring(0, 4)}] vs [Obj ${obj.id.substring(0, 4)}]: MobilePos: [${absolutePos.map(p => p.toFixed(1)).join(',')}], ObjPos: [${obj.position.join(',')}], Dist: ${distance.toFixed(1)}, Umbral: ${proximityThreshold}`);
+      }
+
       // Encontrar el objeto más cercano dentro del umbral
       if (distance <= proximityThreshold && distance < closestDistance) {
         closestDistance = distance;
         closestObjectId = obj.id;
       }
     }
-    
+
     if (closestObjectId) {
-      console.log(`📍 Objeto móvil ${id} detectó objeto cercano: ${closestObjectId} (distancia: ${closestDistance.toFixed(2)}, umbral: ${proximityThreshold})`);
+      console.log(`💥 COLISIÓN: Objeto móvil ${id} tocó objeto: ${closestObjectId} (distancia: ${closestDistance.toFixed(2)})`);
     }
-    
+
     return closestObjectId;
   };
 
@@ -245,7 +255,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         meshRef.current.position.z
       );
       const target = new Vector3(...targetPos);
-      
+
       lineGeometry.setFromPoints([currentPos, target]);
       if (lineRef.current) {
         lineRef.current.geometry = lineGeometry;
@@ -263,7 +273,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         meshRef.current.position.z
       );
       const target = new Vector3(...targetPos);
-      
+
       touchLineGeometry.setFromPoints([currentPos, target]);
       if (touchLineRef.current) {
         touchLineRef.current.geometry = touchLineGeometry;
@@ -276,7 +286,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     if (meshRef.current) {
       const sphereRotation = mobileParams.sphereRotation || [0, 0, 0];
       const sphereScale = mobileParams.sphereScale || [1, 1, 1];
-      
+
       meshRef.current.rotation.set(...sphereRotation);
       meshRef.current.scale.set(...sphereScale);
       // La posición se calcula dinámicamente en useFrame basándose en spherePosition como offset
@@ -286,28 +296,28 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   // Animación del objeto móvil
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current) return;
-    
+
     // Verificar si el objeto móvil está activo
     if (!mobileParams.isActive) return;
-    
+
     // Pausar la animación si el objeto está siendo arrastrado manualmente
     if (isBeingDragged) return;
 
     timeRef.current += delta;
-    
+
     // Calcular nueva posición relativa al origen del grupo
     const newPosition = calculateNewPosition(timeRef.current);
-    
+
     // Actualizar posición de la esfera móvil dentro del grupo
     // Esto NO afecta la posición del grupo completo
     meshRef.current.position.set(...newPosition);
-    
+
     // Aplicar rotación y escala de la esfera desde los parámetros
     const sphereRotation = mobileParams.sphereRotation || [0, 0, 0];
     const sphereScale = mobileParams.sphereScale || [1, 1, 1];
     meshRef.current.rotation.set(...sphereRotation);
     meshRef.current.scale.set(...sphereScale);
-    
+
     // NO actualizar la posición del grupo completo durante el movimiento
     // La posición del grupo se controla desde los controles de transformación
     // onUpdatePosition(id, newPosition); // Comentado para evitar conflictos
@@ -323,10 +333,10 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         connectionLineRef.current.geometry = connectionLineGeometry;
       }
     }
-    
+
     // Detectar objetos cercanos
     const nearbyObjectId = detectNearbyObjects(newPosition);
-    
+
     if (nearbyObjectId && nearbyObjectId !== activatedObjectId) {
       // Activar objeto sonoro
       console.log('🎵 Objeto móvil activando objeto sonoro:', nearbyObjectId);
@@ -336,7 +346,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       setTouchStartTime(timeRef.current);
       setIsActivating(true);
       energyRef.current = 1;
-      
+
       // Actualizar línea de activación
       const allObjects = getObjectsInSameGrid();
       const targetObj = allObjects.find(obj => obj.id === nearbyObjectId);
@@ -359,11 +369,11 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         updateTouchLine(targetObj.position);
       }
     }
-    
+
     // Animación visual del objeto móvil
     if (energyRef.current > 0) {
       energyRef.current *= 0.95; // Decaimiento de la energía
-      
+
       // Escala pulsante más intensa cuando toca un objeto
       const pulseScale = 1 + energyRef.current * 0.5;
       meshRef.current.scale.set(
@@ -371,7 +381,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
         scale[1] * pulseScale,
         scale[2] * pulseScale
       );
-      
+
       // Color basado en la energía - más brillante cuando toca
       const intensity = energyRef.current;
       const color = new Color(0.8 + intensity * 0.2, 0.2 + intensity * 0.8, 0.2 + intensity * 0.8);
@@ -388,11 +398,11 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     if (touchedObjectId) {
       const touchDuration = timeRef.current - touchStartTime;
       const pulseIntensity = Math.sin(touchDuration * 10) * 0.3 + 0.7; // Pulso rápido
-      
+
       // Escala adicional para el efecto de toque
       const touchScale = 1 + pulseIntensity * 0.2;
       meshRef.current.scale.multiplyScalar(touchScale);
-      
+
       // Color más brillante durante el toque
       materialRef.current.emissiveIntensity = Math.max(materialRef.current.emissiveIntensity, pulseIntensity * 0.5);
     }
@@ -401,7 +411,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
   return (
     <group ref={ref} position={position} rotation={rotation} scale={scale}>
       {/* Área de clic invisible - solo un poco más grande que el objeto móvil */}
-      <mesh 
+      <mesh
         position={[0, 0, 0]}
         onClick={(e) => {
           e.stopPropagation();
@@ -418,7 +428,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       </mesh>
 
       {/* Punto de origen fijo - siempre visible y seleccionable */}
-      <mesh 
+      <mesh
         position={[0, 0, 0]}
         onClick={(e) => {
           e.stopPropagation();
@@ -446,7 +456,7 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
       )}
 
       {/* Objeto móvil principal */}
-      <mesh 
+      <mesh
         ref={meshRef}
         onClick={(e) => {
           e.stopPropagation();

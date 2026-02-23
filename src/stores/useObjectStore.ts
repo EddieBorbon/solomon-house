@@ -31,7 +31,7 @@ export interface ObjectActions {
   addObject: (type: SoundObjectType, position: [number, number, number], gridId: string) => SoundObject;
   removeObject: (id: string, gridId: string) => void;
   updateObject: (id: string, updates: Partial<Omit<SoundObject, 'id'>>, gridId: string) => void;
-  
+
   // Acciones de audio
   toggleObjectAudio: (id: string, forceState?: boolean, gridId?: string) => void;
   triggerObjectNote: (id: string, gridId?: string) => void;
@@ -39,7 +39,7 @@ export interface ObjectActions {
   triggerObjectAttackRelease: (id: string, gridId?: string) => void;
   startObjectGate: (id: string, gridId?: string) => void;
   stopObjectGate: (id: string, gridId?: string) => void;
-  
+
   // Acciones de gestión
   clearAllObjects: (gridId?: string) => void;
   getObjectById: (id: string, gridId?: string) => SoundObject | null;
@@ -197,7 +197,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     const objectsWithoutAudio = ['icosahedron', 'torus', 'spiral', 'pyramid', 'cone', 'cube', 'sphere', 'cylinder'];
     const isObjectWithoutAudio = objectsWithoutAudio.includes(type);
     const defaultAudioEnabled = !isObjectWithoutAudio;
-    
+
     // Los objetos personalizados NO deben tener audio por defecto - el usuario programará la síntesis
     const isCustomObject = type === 'custom';
     const shouldCreateAudio = !isCustomObject;
@@ -223,7 +223,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
           newObject.audioParams,
           newObject.position
         );
-        
+
         // Solo iniciar el sonido continuo si el objeto tiene audio habilitado por defecto
         if (defaultAudioEnabled) {
           audioManager.startContinuousSound(newObject.id, newObject.audioParams);
@@ -237,11 +237,11 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     set((state) => {
       const newObjects = [...state.objects, newObject];
       const newObjectsByGrid = new Map(state.objectsByGrid);
-      
+
       // Obtener objetos existentes de la cuadrícula o crear array vacío
       const gridObjects = newObjectsByGrid.get(gridId) || [];
       newObjectsByGrid.set(gridId, [...gridObjects, newObject]);
-      
+
       return {
         objects: newObjects,
         objectsByGrid: newObjectsByGrid
@@ -267,11 +267,11 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     set((state) => {
       const newObjects = state.objects.filter(obj => obj.id !== id);
       const newObjectsByGrid = new Map(state.objectsByGrid);
-      
+
       // Eliminar objeto de la cuadrícula específica
       const gridObjects = newObjectsByGrid.get(gridId) || [];
       newObjectsByGrid.set(gridId, gridObjects.filter(obj => obj.id !== id));
-      
+
       return {
         objects: newObjects,
         objectsByGrid: newObjectsByGrid
@@ -297,17 +297,17 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Actualizar objeto en el estado local
     set((state) => {
-      const newObjects = state.objects.map(obj => 
+      const newObjects = state.objects.map(obj =>
         obj.id === id ? updatedObject : obj
       );
       const newObjectsByGrid = new Map(state.objectsByGrid);
-      
+
       // Actualizar objeto en la cuadrícula específica
       const gridObjects = newObjectsByGrid.get(gridId) || [];
-      newObjectsByGrid.set(gridId, gridObjects.map(obj => 
+      newObjectsByGrid.set(gridId, gridObjects.map(obj =>
         obj.id === id ? updatedObject : obj
       ));
-      
+
       return {
         objects: newObjects,
         objectsByGrid: newObjectsByGrid
@@ -318,7 +318,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Comunicar cambios al AudioManager usando el objeto actualizado
     console.log('🎵 useObjectStore: Updating audio with object', updatedObject);
-    
+
     if (updates.position) {
       console.log('🔧 useObjectStore: Updating position', updatedObject.position);
       audioManager.updateSoundPosition(id, updatedObject.position);
@@ -349,7 +349,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Determinar el nuevo estado
     const newAudioEnabled = forceState !== undefined ? forceState : !currentObject.audioEnabled;
-    
+
     console.log('toggleObjectAudio: Cambiando audio de', currentObject.audioEnabled, 'a', newAudioEnabled);
 
     // Actualizar el objeto
@@ -378,16 +378,16 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // Si es un objeto personalizado con código de síntesis, ejecutarlo
     if (object.type === 'custom' && object.customSynthesisCode) {
       console.log('🎵 Ejecutando síntesis personalizada para objeto', id);
-      
+
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
           const Tone = ToneModule;
-          
+
           // Evaluar el código
           const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
-          
+
           if (synth && typeof synth.triggerAttack === 'function') {
             // Usar la frecuencia de los audioParams si existe
             const frequency = object.audioParams.frequency || 440;
@@ -403,7 +403,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar la nota
     const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
-    
+
     if (isPercussiveObject) {
       audioManager.triggerNoteAttack(id, object.audioParams);
     } else {
@@ -423,16 +423,16 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // Si es un objeto personalizado con código de síntesis, ejecutarlo
     if (object.type === 'custom' && object.customSynthesisCode) {
       console.log('🎵 Ejecutando síntesis personalizada (Percussion) para objeto', id);
-      
+
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
           const Tone = ToneModule;
-          
+
           // Evaluar el código
           const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
-          
+
           if (synth && typeof synth.triggerAttack === 'function') {
             // Usar la frecuencia de los audioParams si existe
             const frequency = object.audioParams.frequency || 440;
@@ -448,7 +448,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing), siempre disparar
     const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing'].includes(object.type);
-    
+
     if (isPercussiveObject) {
       if (object.type === 'plane') {
         audioManager.triggerNoiseAttack(id, object.audioParams);
@@ -476,16 +476,16 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
     // Si es un objeto personalizado con código de síntesis, ejecutarlo
     if (object.type === 'custom' && object.customSynthesisCode) {
       console.log('🎵 Ejecutando síntesis personalizada (AttackRelease) para objeto', id);
-      
+
       // Ejecutar el código de síntesis personalizado
       import('tone').then((ToneModule) => {
         try {
           const Tone = ToneModule;
-          
+
           // Evaluar el código
           const func = new Function('Tone', object.customSynthesisCode!);
           const synth = func(Tone);
-          
+
           if (synth && typeof synth.triggerAttack === 'function') {
             // Usar la frecuencia de los audioParams si existe
             const frequency = object.audioParams.frequency || 440;
@@ -501,7 +501,15 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
     // Para objetos percusivos (icosahedron, torus, spiral, pyramid, dodecahedronRing, plane), siempre disparar
     const isPercussiveObject = ['icosahedron', 'torus', 'spiral', 'pyramid', 'dodecahedronRing', 'plane'].includes(object.type);
-    
+
+    // Nueva lógica: si el objeto tiene audioEnabled === true, se comporta como un dron continuo.
+    // Cuando un dron es "atacado" o percutido por un objeto móvil, sufre una modulación de parámetros interactiva
+    // en lugar de interrumpir su sonido continuo con un disparador percusivo.
+    if (object.audioEnabled && !isPercussiveObject) {
+      audioManager.triggerDroneInteraction(id);
+      return;
+    }
+
     if (isPercussiveObject) {
       audioManager.triggerAttackRelease(id, object.audioParams);
     } else {
@@ -540,7 +548,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
 
   // Acciones de gestión
   clearAllObjects: (gridId?: string) => {
-    
+
     if (gridId) {
       // Limpiar solo objetos de una cuadrícula específica
       const gridObjects = get().objectsByGrid.get(gridId) || [];
@@ -555,7 +563,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         const newObjects = state.objects.filter(obj => !gridObjects.some(gridObj => gridObj.id === obj.id));
         const newObjectsByGrid = new Map(state.objectsByGrid);
         newObjectsByGrid.set(gridId, []);
-        
+
         return {
           objects: newObjects,
           objectsByGrid: newObjectsByGrid
@@ -572,7 +580,7 @@ export const useObjectStore = create<ObjectState & ObjectActions>((set, get) => 
         }
       });
 
-      set({ 
+      set({
         objects: [],
         objectsByGrid: new Map()
       });
