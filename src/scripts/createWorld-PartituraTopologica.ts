@@ -1,6 +1,13 @@
-const { initializeApp } = require('firebase/app');
-const { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } = require('firebase/firestore');
-require('dotenv').config({ path: require('path').resolve(__dirname, '../.env.local') });
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } from 'firebase/firestore';
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+// Load environment variables
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: resolve(__dirname, '../.env.local') });
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -44,7 +51,6 @@ async function clearWorld() {
 async function createPartituraTopologica() {
     console.log('Creating "La Partitura Topologica"...');
 
-    // Create world doc
     await setDoc(doc(db, 'worlds', WORLD_ID), {
         name: "3. La Partitura Topológica",
         createdAt: Date.now(),
@@ -54,7 +60,6 @@ async function createPartituraTopologica() {
     const objectsRef = collection(db, 'worlds', WORLD_ID, 'objects');
     const effectZonesRef = collection(db, 'worlds', WORLD_ID, 'effectZones');
 
-    // CONCEPTO: "La Forma-Laberinto" y el "Tiempo Espacializado". El usuario compone al caminar.
     const harmonicProgression = [
         { freq: 130.81, col: "#00a896" }, // C3
         { freq: 146.83, col: "#00b4d8" }, // D3
@@ -73,7 +78,6 @@ async function createPartituraTopologica() {
         const station = harmonicProgression[i];
         const zPos = -20 + (i * spacing);
 
-        // Left
         await addDoc(objectsRef, {
             type: 'cylinder',
             position: [-4, 2, zPos],
@@ -98,7 +102,6 @@ async function createPartituraTopologica() {
             lastModified: Date.now()
         });
 
-        // Right
         await addDoc(objectsRef, {
             type: 'cylinder',
             position: [4, 2, zPos],
@@ -123,7 +126,6 @@ async function createPartituraTopologica() {
             lastModified: Date.now()
         });
 
-        // Top Cone
         await addDoc(objectsRef, {
             type: 'cone',
             position: [0, 8, zPos],
