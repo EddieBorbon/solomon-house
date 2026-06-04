@@ -4,8 +4,8 @@ import { useEffectStore } from '../stores/useEffectStore';
 import { useObjectStore } from '../stores/useObjectStore';
 import { useMobileStore } from '../stores/useMobileStore';
 import { WorldStoreFacade } from './facades/WorldStoreFacade';
-import { type AudioParams, audioManager } from '../lib/AudioManager';
-import { firebaseService, type GlobalWorldDoc } from '../lib/firebaseService';
+import { type AudioParams } from '../lib/AudioManager';
+import { type GlobalWorldDoc } from '../lib/firebaseService';
 import { persistenceService } from '../lib/persistenceService';
 import { useWorldSettingsStore } from './useWorldSettingsStore';
 import { useSelectionStore } from '../stores/useSelectionStore';
@@ -297,12 +297,6 @@ export interface WorldActions {
 
 // Instancia del facade que coordina todos los componentes
 const worldStoreFacade = new WorldStoreFacade();
-
-// Variables para debounce/throttle
-const updateDebounceTimers = new Map<string, NodeJS.Timeout>();
-const DEBOUNCE_DELAY = 200; // ms - Aumentado para mayor estabilidad
-const lastUpdateTimes = new Map<string, number>();
-const UPDATE_THROTTLE = 50; // ms - Throttle mínimo entre actualizaciones
 
 // Creación del store de Zustand
 export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
@@ -607,7 +601,6 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   },
 
   toggleLockEffectZone: (id: string) => {
-    const state = get();
     const zone = useEffectStore.getState().getEffectZoneById(id);
     if (zone) {
       worldStoreFacade.toggleLockEffectZone(id);

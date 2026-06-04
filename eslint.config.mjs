@@ -18,14 +18,17 @@ const eslintConfig = [
       "out/**/*",
       "build/**/*",
       "dist/**/*",
-      "src/scripts/**/*"
+      "src/scripts/**/*",
+      "cleanup-firestore.js",
+      "limpiar-firestore.js",
+      "limpiar-firestore-v2.js"
     ]
   },
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-require-imports": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "react/no-unescaped-entities": "off"
     }
   }

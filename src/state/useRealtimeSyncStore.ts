@@ -523,7 +523,6 @@ export const useRealtimeSyncStore = create<RealtimeSyncState & RealtimeSyncActio
       useEffectStore.getState().updateEffectZone(zoneId, updates);
     }
     
-    const timerKey = `updateEffectZone_${zoneId}`;
     const existingTimer = updateDebounceTimers.get(zoneId);
     if (existingTimer) {
       clearTimeout(existingTimer);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { firebaseService, type FirebaseProject, type FirebaseGrid } from '../../lib/firebaseService';
+import { firebaseService, type FirebaseGrid } from '../../lib/firebaseService';
 import { Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 

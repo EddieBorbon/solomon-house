@@ -85,8 +85,9 @@ export function MobileObjectsRenderer({
 
   // Limpieza de timers al desmontar
   useEffect(() => {
+    const timers = mobileDragTimers.current;
     return () => {
-      for (const timer of mobileDragTimers.current.values()) {
+      for (const timer of timers.values()) {
         if (timer) clearTimeout(timer);
       }
     };

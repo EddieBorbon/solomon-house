@@ -146,7 +146,7 @@ class TransformHandler implements ITransformHandler {
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado durante transform');
   }
 
-  handleTransformEnd(_entityId: string): void { // eslint-disable-line @typescript-eslint/no-unused-vars
+  handleTransformEnd(_entityId: string): void {  
     // MANTENER OrbitControls SIEMPRE HABILITADO - NO BLOQUEAR LA CÁMARA
     this.setDragging(false, null);
     console.log('✅ SceneContentNew: OrbitControls mantenido habilitado después de transform');

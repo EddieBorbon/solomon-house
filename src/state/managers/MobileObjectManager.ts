@@ -36,7 +36,7 @@ export class MobileObjectManager {
   public updateMobileObject(
     id: string,
     updates: Partial<Omit<MobileObject, 'id'>>,
-    grids: Map<string, unknown>
+    _grids: Map<string, unknown>
   ): void {
     if (updates.mobileParams) {
       this.validateMobileParams(updates.mobileParams);
@@ -47,7 +47,7 @@ export class MobileObjectManager {
   /**
    * Elimina un objeto móvil
    */
-  public removeMobileObject(id: string, grids: Map<string, unknown>): void {
+  public removeMobileObject(id: string, _grids: Map<string, unknown>): void {
     useMobileStore.getState().removeMobileObject(id);
   }
 
@@ -57,7 +57,7 @@ export class MobileObjectManager {
   public updateMobileObjectPosition(
     id: string,
     position: [number, number, number],
-    grids: Map<string, unknown>
+    _grids: Map<string, unknown>
   ): void {
     useMobileStore.getState().updateMobileObjectPosition(id, position);
   }

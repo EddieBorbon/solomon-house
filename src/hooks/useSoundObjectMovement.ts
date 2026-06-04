@@ -25,7 +25,7 @@ export function useSoundObjectMovement({
   audioParams,
   initialPosition,
   enabled = true,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   objectId: _objectId,
   onPositionUpdate
 }: UseSoundObjectMovementParams) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { firebaseService, type FirebaseProject, type FirebaseGrid } from '../../lib/firebaseService';
+import { firebaseService, type FirebaseGrid } from '../../lib/firebaseService';
 import { Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -61,12 +61,11 @@ export default function SeedTotemPage() {
                         type: 'torus',
                         position: [0, 5, 0],
                         rotation: [90, 0, 0],
-                        scale: [0.5, 0.5, 0.5], // Scale might need adjustment for torus radius
+                        scale: [0.5, 0.5, 0.5],
                         audioParams: { frequency: 880, waveform: 'sine', volume: 0.3 },
                         isSelected: false,
                         audioEnabled: true
                     }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 ] as any[];
 
                 // Define the Grid

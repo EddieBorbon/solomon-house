@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { TransformControls, Html } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
-import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
 import { GridRenderer } from './GridRenderer';
 import { CameraController } from './CameraController';
 import { SoundObjectsRenderer } from './SoundObjectsRenderer';
@@ -286,11 +285,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       }
     }
   }, [updateObject, updateMobileObject, updateEffectZone, allObjects, grids, entityRefs]);
-
-  // Función para manejar la selección de entidades
-  const handleEntitySelect = useCallback((id: string) => {
-    selectEntity(id);
-  }, [selectEntity]);
 
   // Función para manejar clic en el espacio vacío
   const handleBackgroundClick = useCallback((event: { object?: { type?: string; geometry?: { type?: string } } }) => {

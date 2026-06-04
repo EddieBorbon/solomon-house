@@ -15,9 +15,9 @@ interface SoundObjectMovementControlsProps {
  * Similar a MobileMovementControls pero integrado en objetos sonoros
  */
 export function SoundObjectMovementControls({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   selectedObject: _selectedObject,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   onParamChange: _onParamChange
 }: SoundObjectMovementControlsProps) {
   const { t } = useLanguage();

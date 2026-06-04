@@ -536,7 +536,7 @@ export class SoundPlaybackManager {
               metalSynth.harmonicity = currentHarm;
               metalSynth.modulationIndex = currentMod;
             }
-          } catch (e) {
+          } catch {
             // Ignorar errores si el synth fue destruido
           }
         }, 150);

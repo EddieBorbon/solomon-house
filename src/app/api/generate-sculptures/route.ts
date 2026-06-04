@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { firebaseService } from '../../../lib/firebaseService';
 import { v4 as uuidv4 } from 'uuid';
 import { Timestamp } from 'firebase/firestore';
-import type { FirebaseProject, FirebaseGrid } from '../../../lib/firebaseService';
+import type { FirebaseGrid } from '../../../lib/firebaseService';
 import type { SoundObject, MobileObject, EffectZone } from '../../../state/useWorldStore';
 
 export async function GET() {
