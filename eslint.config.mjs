@@ -17,7 +17,8 @@ const eslintConfig = [
       "node_modules/**/*",
       "out/**/*",
       "build/**/*",
-      "dist/**/*"
+      "dist/**/*",
+      "src/scripts/**/*"
     ]
   }
 ];
