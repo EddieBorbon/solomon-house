@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useMemo, useState, useRef, useEffect } from 'react';
+import React, { forwardRef, useMemo, useState, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';

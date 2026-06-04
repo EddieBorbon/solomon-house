@@ -65,7 +65,7 @@ export default function SeedHivePage() {
                 });
 
                 // Define the Grid
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                 
                 const grid: Omit<FirebaseGrid, 'createdAt' | 'updatedAt'> = {
                     id: 'grid-hive-0-0-0',
                     coordinates: [0, 0, 0],
