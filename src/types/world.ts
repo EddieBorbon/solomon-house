@@ -116,7 +116,7 @@ export interface SoundObjectActions {
 }
 
 export interface MobileObjectActions {
-  addMobileObject: (position: [number, number, number]) => void;
+  addMobileObject: (position: [number, number, number]) => MobileObject;
   removeMobileObject: (id: string) => void;
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => void;
   selectEntity: (id: string | null) => void;

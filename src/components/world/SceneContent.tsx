@@ -1,26 +1,17 @@
 'use client';
 
 import React, { useMemo, useCallback, useEffect, useRef } from 'react';
-import { TransformControls } from '@react-three/drei';
+import { TransformControls, Html } from '@react-three/drei';
 import { Group } from 'three';
 import { useWorldStore, type SoundObject, type MobileObject as MobileObjectType, type EffectZone as EffectZoneType } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/factories/SoundSourceFactory';
-import { SoundCube } from '../sound-objects/SoundCube';
-import { SoundSphere } from '../sound-objects/SoundSphere';
-import { SoundCylinder } from '../sound-objects/SoundCylinder';
-import { SoundCone } from '../sound-objects/SoundCone';
-import { SoundPyramid } from '../sound-objects/SoundPyramid';
-import { SoundIcosahedron } from '../sound-objects/SoundIcosahedron';
-import { SoundPlane } from '../sound-objects/SoundPlane';
-import { SoundTorus } from '../sound-objects/SoundTorus';
-import { SoundDodecahedronRing } from '../sound-objects/SoundDodecahedronRing';
-import { SoundSpiral } from '../sound-objects/SoundSpiral';
-import { SoundCustom } from '../sound-objects/SoundCustom';
-import { MobileObject } from '../sound-objects/MobileObject';
-import { EffectZone } from './EffectZone';
 import { GridRenderer } from './GridRenderer';
 import { CameraController } from './CameraController';
+import { SoundObjectsRenderer } from './SoundObjectsRenderer';
+import { MobileObjectsRenderer } from './MobileObjectsRenderer';
+import { EffectZonesRenderer } from './EffectZonesRenderer';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
+import { useEmergencyCameraControls } from '../../hooks/useEmergencyCameraControls';
 import { audioManager } from '../../lib/AudioManager';
 
 interface SceneContentProps {
@@ -31,167 +22,6 @@ interface SceneContentProps {
   } | null>;
 }
 
-// Componente contenedor para cada objeto de sonido
-interface SoundObjectContainerProps {
-  object: SoundObject;
-  onSelect: (id: string) => void;
-}
-
-const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
-  ({ object, onSelect }, ref) => {
-    const { triggerObjectNote } = useWorldStore();
-    
-    const handleClick = useCallback((event: React.MouseEvent) => {
-      event.stopPropagation();
-      onSelect(object.id);
-      
-      // Para pirámides, solo selección (el audio se maneja con onPointerDown/onPointerUp)
-      if (object.type === 'pyramid') {
-        // No hacer nada de audio aquí, se maneja en el componente SoundPyramid
-        return;
-      }
-      
-      // Para conos, disparar la nota (el audio se maneja con triggerObjectNote)
-      if (object.type === 'cone') {
-        triggerObjectNote(object.id);
-      } else if (object.type === 'icosahedron' || object.type === 'plane' || object.type === 'torus') {
-        // Para icosaedros, planos y toroides, solo disparar la nota (sonido percusivo)
-        triggerObjectNote(object.id);
-      } else if (object.type === 'dodecahedronRing') {
-        // Para anillos de dodecaedros, disparar acorde (sonido percusivo)
-        triggerObjectNote(object.id);
-      } else if (object.type === 'spiral') {
-        // Para espirales, disparar la nota (sonido percusivo)
-        triggerObjectNote(object.id);
-      } else {
-        // Para otros objetos, solo disparar la nota
-        triggerObjectNote(object.id);
-      }
-    }, [object.id, onSelect, triggerObjectNote, object.type]);
-
-    return (
-      <group
-        ref={ref}
-        position={object.position}
-        rotation={object.rotation}
-        scale={object.scale}
-        onClick={object.type !== 'cone' ? handleClick : undefined}
-      >
-        {/* Renderizado según el tipo de objeto */}
-        {object.type === 'cube' ? (
-          <SoundCube
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'sphere' ? (
-          <SoundSphere
-            id={object.id}
-            position={[0, 0, 0]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'cylinder' ? (
-          <SoundCylinder
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'cone' ? (
-          <SoundCone
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'pyramid' ? (
-          <SoundPyramid
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'icosahedron' ? (
-          <SoundIcosahedron
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'plane' ? (
-          <SoundPlane
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'torus' ? (
-          <SoundTorus
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'dodecahedronRing' ? (
-          <SoundDodecahedronRing
-            id={object.id}
-            position={[0, 0, 0]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'spiral' ? (
-          <SoundSpiral
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-          />
-        ) : object.type === 'custom' ? (
-          <SoundCustom
-            id={object.id}
-            position={[0, 0, 0]}
-            rotation={[0, 0, 0]}
-            scale={[1, 1, 1]}
-            isSelected={object.isSelected}
-            audioEnabled={object.audioEnabled}
-            audioParams={object.audioParams as unknown as AudioParams}
-            customShapeCode={object.customShapeCode}
-          />
-        ) : null}
-      </group>
-    );
-  }
-);
-
-SoundObjectContainer.displayName = 'SoundObjectContainer';
 
 // Componente principal de la escena
 export function SceneContent({ orbitControlsRef }: SceneContentProps) {
@@ -310,38 +140,6 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
   //   return refs;
   // }, [allObjects.mobileObjects]);
 
-  // Refs para rastrear el estado de arrastre de objetos móviles
-  const mobileDragRefs = useRef(new Map<string, React.MutableRefObject<boolean>>());
-  
-  // Refs para los timers de fin de arrastre de objetos móviles
-  const mobileDragTimers = useRef(new Map<string, NodeJS.Timeout | null>());
-  
-  // Inicializar refs de arrastre para objetos móviles
-  useEffect(() => {
-    allObjects.mobileObjects.forEach(obj => {
-      if (!mobileDragRefs.current.has(obj.id)) {
-        mobileDragRefs.current.set(obj.id, { current: false });
-      }
-      if (!mobileDragTimers.current.has(obj.id)) {
-        mobileDragTimers.current.set(obj.id, null);
-      }
-    });
-    
-    // Limpiar refs de objetos que ya no existen
-    const existingIds = new Set(allObjects.mobileObjects.map(obj => obj.id));
-    for (const [id] of mobileDragRefs.current) {
-      if (!existingIds.has(id)) {
-        mobileDragRefs.current.delete(id);
-      }
-    }
-    for (const [id] of mobileDragTimers.current) {
-      if (!existingIds.has(id)) {
-        const timer = mobileDragTimers.current.get(id);
-        if (timer) clearTimeout(timer);
-        mobileDragTimers.current.delete(id);
-      }
-    }
-  }, [allObjects.mobileObjects]);
 
 
   // Estado para rastrear si se está arrastrando (para UI)
@@ -518,209 +316,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [orbitControlsRef]);
 
-  const releasePointerCaptures = useCallback((element?: HTMLElement | null) => {
-    if (!element || typeof element.releasePointerCapture !== 'function') {
-      return;
-    }
 
-    const canCheckCapture = typeof element.hasPointerCapture === 'function';
 
-    for (let pointerId = 0; pointerId < 10; pointerId++) {
-      try {
-        if (!canCheckCapture || element.hasPointerCapture(pointerId)) {
-          element.releasePointerCapture(pointerId);
-        }
-      } catch {
-        // Ignorar errores si el puntero no estaba capturado o el navegador no soporta la operación
-      }
-    }
-  }, []);
-
-  // Función de emergencia para desbloquear y resetear la cámara
-  const handleEmergencyCameraUnlock = useCallback((event: KeyboardEvent) => {
-    // Presionar 'C' para restaurar el movimiento de rotación con clic derecho
-    if (event.key.toLowerCase() === 'c' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
-      // Prevenir que otros handlers procesen C
-      event.preventDefault();
-      event.stopPropagation();
-      
-      console.log('🔑 Tecla C presionada - Restaurando controles de rotación...');
-      
-      if (orbitControlsRef.current) {
-        try {
-          const controls = orbitControlsRef.current as {
-            enabled: boolean;
-            _domElement?: HTMLElement;
-            domElement?: HTMLElement;
-            _state?: Record<string, number>;
-            [key: string]: unknown;
-          };
-          
-          // MÉTODO MÁS EFECTIVO: Deshabilitar y volver a habilitar para forzar reset completo del estado
-          // Esto resetea todo el estado interno de OrbitControls incluyendo el estado de los botones del mouse
-          
-          // Paso 1: Obtener el elemento DOM
-          const domElement = controls._domElement || controls.domElement || document.querySelector('canvas');
-          
-          // Paso 2: Liberar cualquier puntero capturado de forma segura
-          releasePointerCaptures(domElement);
-          
-          // Paso 3: Deshabilitar temporalmente OrbitControls (esto resetea el estado interno)
-          controls.enabled = false;
-          
-          // Paso 4: Resetear estado interno manualmente si es accesible
-          try {
-            // OrbitControls v0.37+ usa un objeto _state
-            if (controls._state && typeof controls._state === 'object') {
-              const state = controls._state;
-              // Resetear todos los estados de botones a -1 (ninguno presionado)
-              if (typeof state.MOUSEDOWN === 'number') state.MOUSEDOWN = -1;
-              if (typeof state.POINTER_DOWN === 'number') state.POINTER_DOWN = -1;
-              if (typeof state.TOUCH_DOWN === 'number') state.TOUCH_DOWN = -1;
-              
-              // También resetear estados de interacción
-              if (typeof state.ROTATE_START === 'number') state.ROTATE_START = -1;
-              if (typeof state.PAN_START === 'number') state.PAN_START = -1;
-              if (typeof state.DOLLY_START === 'number') state.DOLLY_START = -1;
-            }
-            
-            // Intentar resetear otras propiedades que puedan mantener estado
-            const stateProps = ['_touchStart', '_panStart', '_rotateStart', '_dollyStart'];
-            stateProps.forEach(prop => {
-              if (controls[prop] !== undefined) {
-                try {
-                  const propValue = controls[prop];
-                  if (typeof propValue === 'object' && propValue !== null) {
-                    // Si es un objeto, resetear sus propiedades
-                    Object.keys(propValue).forEach(key => {
-                      const keyValue = (propValue as Record<string, unknown>)[key];
-                      if (typeof keyValue === 'number') {
-                        (propValue as Record<string, number>)[key] = -1;
-                      }
-                    });
-                  }
-                } catch {
-                  // Ignorar errores
-                }
-              }
-            });
-          } catch {
-            // Ignorar errores de acceso al estado interno
-          }
-          
-          // Paso 5: Pequeño delay para asegurar que los eventos se procesen
-          setTimeout(() => {
-            if (orbitControlsRef.current) {
-              const controls = orbitControlsRef.current as {
-                enabled: boolean;
-                enableRotate?: boolean;
-                update: () => void;
-              };
-              
-              // Rehabilitar con todas las configuraciones correctas
-              controls.enabled = true;
-              
-              if (typeof controls.enableRotate !== 'undefined') {
-                controls.enableRotate = true;
-              }
-              
-              // Forzar actualización
-              controls.update();
-              
-              console.log('✅ SceneContent: Estado de rotación con clic derecho restaurado con tecla C');
-            }
-          }, 10);
-          
-        } catch (error) {
-          console.error('❌ SceneContent: Error al restaurar rotación:', error);
-          // Fallback: solo habilitar
-          if (orbitControlsRef.current) {
-            orbitControlsRef.current.enabled = true;
-            const controlsFallback = orbitControlsRef.current as { enabled: boolean; enableRotate?: boolean; update: () => void };
-            if (typeof controlsFallback.enableRotate !== 'undefined') {
-              controlsFallback.enableRotate = true;
-            }
-            orbitControlsRef.current.update();
-          }
-        }
-      } else {
-        console.warn('🚨 SceneContent: No se puede restaurar rotación - OrbitControls no disponible');
-      }
-    }
-    
-    // Presionar 'F' para forzar habilitación inmediata
-    if (event.key.toLowerCase() === 'f' && !(event.target as HTMLElement)?.tagName?.match(/INPUT|TEXTAREA/)) {
-      if (orbitControlsRef.current) {
-        try {
-          orbitControlsRef.current.enabled = true;
-          orbitControlsRef.current.update();
-          console.log('⚡ SceneContent: OrbitControls forzado como habilitado con tecla F');
-        } catch (error) {
-          console.warn('⚠️ SceneContent: Error al forzar habilitación:', error);
-        }
-      }
-    }
-  }, [orbitControlsRef, releasePointerCaptures]);
-
-  // Agregar listener de teclado para desbloqueo de emergencia
-  // Usar capture: true para asegurar que se ejecute antes que otros handlers
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      handleEmergencyCameraUnlock(event);
-    };
-    
-    // Agregar con capture para máxima prioridad
-    window.addEventListener('keydown', handler, { capture: true });
-    
-    console.log('✅ Listener de tecla C registrado para restaurar rotación');
-    
-    return () => {
-      window.removeEventListener('keydown', handler, { capture: true });
-    };
-  }, [handleEmergencyCameraUnlock]);
-
-  // Agregar listener para detectar cuando el mouse sale del canvas y liberar estado
-  useEffect(() => {
-    if (!orbitControlsRef.current) return;
-    
-    const canvas = document.querySelector('canvas');
-    if (!canvas) return;
-    
-    const handleMouseLeave = () => {
-      // Cuando el mouse sale del canvas, liberar cualquier estado de botón presionado
-      if (orbitControlsRef.current) {
-        try {
-          const controls = orbitControlsRef.current as {
-            _domElement?: HTMLElement;
-            domElement?: HTMLElement;
-            _state?: Record<string, number>;
-            update: () => void;
-          };
-          
-          // Liberar todos los punteros
-          const domElement = controls._domElement || controls.domElement || canvas;
-          releasePointerCaptures(domElement);
-          
-          // Resetear estado interno
-          if (controls._state) {
-            const state = controls._state;
-            if (typeof state.MOUSEDOWN === 'number') state.MOUSEDOWN = -1;
-            if (typeof state.POINTER_DOWN === 'number') state.POINTER_DOWN = -1;
-          }
-          
-          controls.update();
-        } catch {
-          // Ignorar errores silenciosamente
-        }
-      }
-    };
-    
-    canvas.addEventListener('mouseleave', handleMouseLeave);
-    
-    return () => {
-      canvas.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [orbitControlsRef, releasePointerCaptures]);
 
   // Verificar que está leyendo el estado correctamente (solo cuando cambie)
   useEffect(() => {
@@ -735,21 +332,8 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
     }
   }, [allObjects.objects.length, allObjects.mobileObjects.length, allObjects.effectZones.length, grids.size]);
 
-  // Estado para mostrar indicador de cámara bloqueada
-  const [showCameraBlockedIndicator, setShowCameraBlockedIndicator] = React.useState(false);
-  
-  // Efecto para detectar cuando la cámara está bloqueada
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (orbitControlsRef.current && !orbitControlsRef.current.enabled) {
-        setShowCameraBlockedIndicator(true);
-      } else {
-        setShowCameraBlockedIndicator(false);
-      }
-    }, 1000); // Verificar cada segundo
-    
-    return () => clearInterval(interval);
-  }, [orbitControlsRef]);
+  // Usar el hook de emergencia para la cámara
+  const { showCameraBlockedIndicator } = useEmergencyCameraControls(orbitControlsRef);
 
   return (
     <>
@@ -769,78 +353,14 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
-      {/* Renderizado de cuadrículas con sus objetos */}
-      {Array.from(grids.values()).map((grid) => {
-        if (!grid || !grid.id) return null;
-        
-        // Usar objetos directamente de la cuadrícula
-        const gridObjects = grid.objects || [];
-        
-        return (
-          <group key={grid.id} position={grid.position}>
-          {/* Renderizado de objetos sonoros de esta cuadrícula */}
-          {gridObjects.map((obj) => {
-            if (!obj || !obj.id) return null;
-            const objectRef = entityRefs.get(obj.id);
-            if (!objectRef) return null;
-            
-            return (
-              <SoundObjectContainer 
-                key={`sound-${obj.id}`} 
-                object={obj} 
-                onSelect={handleEntitySelect}
-                ref={objectRef}
-              />
-            );
-          })}
-
-          {/* Renderizado de objetos móviles de esta cuadrícula */}
-          {Array.isArray(grid.mobileObjects) && grid.mobileObjects.map((mobileObj) => {
-            if (!mobileObj || !mobileObj.id) return null;
-            const objectRef = entityRefs.get(mobileObj.id);
-            if (!objectRef) return null;
-            
-            // Verificar si este objeto móvil está siendo arrastrado
-            const isDraggingThisMobile = mobileDragRefs.current.get(mobileObj.id);
-            const isBeingDragged = isDraggingThisMobile?.current || false;
-            
-            return (
-              <MobileObject
-                key={`mobile-${mobileObj.id}`}
-                id={mobileObj.id}
-                position={mobileObj.position} // Posición del objeto móvil completo en el mundo
-                rotation={mobileObj.rotation}
-                scale={mobileObj.scale}
-                isSelected={mobileObj.isSelected}
-                mobileParams={{
-                  ...mobileObj.mobileParams,
-                  centerPosition: [0, 0, 0] // Centro relativo al grupo (origen del movimiento)
-                }}
-                onSelect={handleEntitySelect}
-                isBeingDragged={isBeingDragged}
-                ref={objectRef}
-              />
-            );
-          })}
-
-          {/* Renderizado de zonas de efectos de esta cuadrícula */}
-          {Array.isArray(grid.effectZones) && grid.effectZones.map((zone) => {
-            if (!zone || !zone.id) return null;
-            const zoneRef = entityRefs.get(zone.id);
-            if (!zoneRef) return null;
-            
-            return (
-              <EffectZone
-                key={`effect-${zone.id}`}
-                zone={zone}
-                onSelect={handleEntitySelect}
-                ref={zoneRef}
-              />
-            );
-          })}
-          </group>
-        );
-      })}
+      {/* Renderizado de objetos sonoros, móviles y zonas de efectos */}
+      <SoundObjectsRenderer entityRefs={entityRefs} />
+      <MobileObjectsRenderer
+        entityRefs={entityRefs}
+        isDragging={isDragging}
+        draggingEntityId={draggingEntityIdRef.current}
+      />
+      <EffectZonesRenderer entityRefs={entityRefs} />
 
       {/* TransformControls para la entidad seleccionada */}
       {selectedEntityId && (() => {
@@ -1280,14 +800,16 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
 
       {/* Indicador de cámara bloqueada */}
       {showCameraBlockedIndicator && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20">
-          <div className="bg-red-500/90 backdrop-blur-sm rounded-lg p-3 text-white text-sm font-medium shadow-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-red-300 rounded-full animate-pulse" />
-              <span>🎥 Cámara bloqueada - Presiona &apos;C&apos; para desbloquear</span>
+        <Html center style={{ pointerEvents: 'none' }}>
+          <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-20">
+            <div className="bg-red-500/90 backdrop-blur-sm rounded-lg p-3 text-white text-sm font-medium shadow-lg whitespace-nowrap">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-300 rounded-full animate-pulse" />
+                <span>🎥 Cámara bloqueada - Presiona &apos;C&apos; para desbloquear</span>
+              </div>
             </div>
           </div>
-        </div>
+        </Html>
       )}
     </>
   );

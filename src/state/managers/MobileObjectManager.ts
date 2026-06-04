@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
 import { MobileObject, MovementType } from '../useWorldStore';
+import { useMobileStore } from '../../stores/useMobileStore';
 
 interface GridData {
   mobileObjects: MobileObject[];
@@ -17,16 +17,16 @@ export class MobileObjectManager {
     position: [number, number, number],
     movementType: MovementType = 'circular'
   ): MobileObject {
-    const newMobileObject: MobileObject = {
-      id: uuidv4(),
-      type: 'mobile',
-      position,
-      rotation: [0, 0, 0],
-      scale: [1, 1, 1],
-      isSelected: false,
-      mobileParams: this.getDefaultMobileParams(position, movementType),
-    };
-
+    const newMobileObject = useMobileStore.getState().addMobileObject(position);
+    if (movementType !== 'circular') {
+      useMobileStore.getState().updateMobileObject(newMobileObject.id, {
+        mobileParams: {
+          ...newMobileObject.mobileParams,
+          movementType
+        }
+      });
+      return useMobileStore.getState().getById(newMobileObject.id) || newMobileObject;
+    }
     return newMobileObject;
   }
 
@@ -38,34 +38,17 @@ export class MobileObjectManager {
     updates: Partial<Omit<MobileObject, 'id'>>,
     grids: Map<string, unknown>
   ): void {
-    // Buscar el objeto en todas las cuadrículas
-    for (const [, grid] of grids) {
-      const gridData = grid as GridData;
-      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
-      if (objectIndex !== -1) {
-        // Validar parámetros móviles si se están actualizando
-        if (updates.mobileParams) {
-          this.validateMobileParams(updates.mobileParams);
-        }
-        break;
-      }
+    if (updates.mobileParams) {
+      this.validateMobileParams(updates.mobileParams);
     }
+    useMobileStore.getState().updateMobileObject(id, updates);
   }
 
   /**
    * Elimina un objeto móvil
    */
   public removeMobileObject(id: string, grids: Map<string, unknown>): void {
-    // Buscar y eliminar el objeto de todas las cuadrículas
-    for (const [, grid] of grids) {
-      const gridData = grid as GridData;
-      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
-      if (objectIndex !== -1) {
-        const updatedObjects = gridData.mobileObjects.filter((obj: MobileObject) => obj.id !== id);
-        gridData.mobileObjects = updatedObjects;
-        break;
-      }
-    }
+    useMobileStore.getState().removeMobileObject(id);
   }
 
   /**
@@ -76,28 +59,21 @@ export class MobileObjectManager {
     position: [number, number, number],
     grids: Map<string, unknown>
   ): void {
-    // Buscar el objeto en todas las cuadrículas y actualizar su posición
-    for (const [, grid] of grids) {
-      const gridData = grid as GridData;
-      const objectIndex = gridData.mobileObjects.findIndex((obj: MobileObject) => obj.id === id);
-      if (objectIndex !== -1) {
-        const updatedObjects = [...gridData.mobileObjects];
-        updatedObjects[objectIndex] = { ...updatedObjects[objectIndex], position };
-        gridData.mobileObjects = updatedObjects;
-        break;
-      }
-    }
+    useMobileStore.getState().updateMobileObjectPosition(id, position);
   }
 
   /**
    * Busca un objeto móvil por ID en todas las cuadrículas
    */
   public findMobileObjectById(id: string, grids: Map<string, unknown>): { object: MobileObject | null, gridId: string | null } {
-    for (const [gridId, grid] of grids) {
-      const gridData = grid as GridData;
-      const object = gridData.mobileObjects.find((obj: MobileObject) => obj.id === id);
-      if (object) {
-        return { object, gridId };
+    const object = useMobileStore.getState().getById(id) || null;
+    if (object) {
+      // Intentar encontrar el gridId en las grids locales si está presente
+      for (const [gridId, grid] of grids) {
+        const gridData = grid as GridData;
+        if (gridData.mobileObjects && gridData.mobileObjects.some(obj => obj.id === id)) {
+          return { object, gridId };
+        }
       }
     }
     return { object: null, gridId: null };

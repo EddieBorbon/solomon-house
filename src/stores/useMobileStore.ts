@@ -60,6 +60,7 @@ export const useMobileStore = create<MobileState & MobileObjectActions>((set, ge
       mobileObjects: [...state.mobileObjects, newMobileObject]
     }));
 
+    return newMobileObject;
   },
 
   updateMobileObject: (id: string, updates: Partial<Omit<MobileObject, 'id'>>) => {
