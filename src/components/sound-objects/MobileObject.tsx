@@ -82,41 +82,53 @@ export const MobileObject = forwardRef<Group, MobileObjectProps>(({
     return [];
   };
 
-  // Crear geometría para la línea de activación
-  const lineGeometry = new BufferGeometry().setFromPoints([
+  // Geometrías y materiales memoizados para evitar fugas de memoria
+  const lineGeometry = React.useMemo(() => new BufferGeometry().setFromPoints([
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
-  ]);
-  const lineMaterial = new LineBasicMaterial({
+  ]), []);
+  const lineMaterial = React.useMemo(() => new LineBasicMaterial({
     color: 0x00ff88,
     transparent: true,
     opacity: 0.8,
     linewidth: 3
-  });
+  }), []);
 
   // Crear geometría para la línea de conexión
-  const connectionLineGeometry = new BufferGeometry().setFromPoints([
+  const connectionLineGeometry = React.useMemo(() => new BufferGeometry().setFromPoints([
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
-  ]);
-  const connectionLineMaterial = new LineBasicMaterial({
+  ]), []);
+  const connectionLineMaterial = React.useMemo(() => new LineBasicMaterial({
     color: 0xffffff,
     transparent: true,
     opacity: 0.5,
     linewidth: 2
-  });
+  }), []);
 
   // Crear geometría para la línea de toque
-  const touchLineGeometry = new BufferGeometry().setFromPoints([
+  const touchLineGeometry = React.useMemo(() => new BufferGeometry().setFromPoints([
     new Vector3(0, 0, 0),
     new Vector3(0, 0, 0)
-  ]);
-  const touchLineMaterial = new LineBasicMaterial({
+  ]), []);
+  const touchLineMaterial = React.useMemo(() => new LineBasicMaterial({
     color: 0xff6b6b,
     transparent: true,
     opacity: 0.8,
     linewidth: 4
-  });
+  }), []);
+
+  // Limpieza manual de recursos WebGL al desmontar el objeto móvil
+  useEffect(() => {
+    return () => {
+      lineGeometry.dispose();
+      lineMaterial.dispose();
+      connectionLineGeometry.dispose();
+      connectionLineMaterial.dispose();
+      touchLineGeometry.dispose();
+      touchLineMaterial.dispose();
+    };
+  }, [lineGeometry, lineMaterial, connectionLineGeometry, connectionLineMaterial, touchLineGeometry, touchLineMaterial]);
 
   // Función para calcular la nueva posición según el tipo de movimiento
   const calculateNewPosition = (time: number): [number, number, number] => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo, useCallback } from 'react';
+import React, { forwardRef, useRef, useMemo, useCallback, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
@@ -77,6 +77,34 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
       if (!customCode) return null;
       return evaluateCustomCode(customCode);
     }, [customCode, evaluateCustomCode]);
+
+    // Limpieza de la geometría y material personalizado para evitar leaks
+    useEffect(() => {
+      return () => {
+        if (customMesh) {
+          if (customMesh.geometry) {
+            customMesh.geometry.dispose();
+          }
+          if (customMesh.material) {
+            if (Array.isArray(customMesh.material)) {
+              customMesh.material.forEach((m) => m.dispose());
+            } else {
+              customMesh.material.dispose();
+            }
+          }
+        }
+      };
+    }, [customMesh]);
+
+    // Geometría por defecto memoizada para evitar instanciamientos en el render loop
+    const defaultBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+
+    // Limpieza de la geometría por defecto al desmontar
+    useEffect(() => {
+      return () => {
+        defaultBoxGeometry.dispose();
+      };
+    }, [defaultBoxGeometry]);
 
     // Animación sutil de rotación
     useFrame((state, delta) => {
@@ -164,7 +192,7 @@ export const SoundCustom = forwardRef<THREE.Group, SoundCustomProps>(
 
         {/* Bordes del wireframe */}
         <lineSegments>
-          <edgesGeometry attach="geometry" args={[new THREE.BoxGeometry(1, 1, 1)]} />
+          <edgesGeometry attach="geometry" args={[defaultBoxGeometry]} />
           <lineBasicMaterial color={wireframeColor} linewidth={lineWidth} />
         </lineSegments>
 

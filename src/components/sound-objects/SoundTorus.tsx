@@ -43,28 +43,16 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
     
     // Referencias para la animación
     const meshRef = useRef<THREE.Mesh>(null);
+    const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0);
     const lastTriggerTimeRef = useRef(0);
     
-    // Material con efecto de selección
-    const material = useMemo(() => {
-      const blendingMode = audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
-                          audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
-                          audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
-                          THREE.NormalBlending;
-      
-      return new THREE.MeshStandardMaterial({
-        color: audioParams.color || '#000000',
-        metalness: audioParams.metalness || 0.3,
-        roughness: audioParams.roughness || 0.4,
-        transparent: true,
-        opacity: audioParams.opacity || 0.9,
-        emissive: audioParams.emissiveColor || '#000000',
-        emissiveIntensity: audioParams.emissiveIntensity || (isSelected ? 0.3 : 0),
-        blending: blendingMode,
-        premultipliedAlpha: blendingMode === THREE.SubtractiveBlending || blendingMode === THREE.MultiplyBlending,
-      });
-    }, [isSelected, audioParams.color, audioParams.metalness, audioParams.roughness, audioParams.opacity, audioParams.blendingMode, audioParams.emissiveColor, audioParams.emissiveIntensity]);
+    const blendingMode = useMemo(() => {
+      return audioParams.blendingMode === 'AdditiveBlending' ? THREE.AdditiveBlending : 
+             audioParams.blendingMode === 'SubtractiveBlending' ? THREE.SubtractiveBlending :
+             audioParams.blendingMode === 'MultiplyBlending' ? THREE.MultiplyBlending : 
+             THREE.NormalBlending;
+    }, [audioParams.blendingMode]);
 
     // Función para manejar el clic
     const handleClick = (event: React.MouseEvent) => {
@@ -88,19 +76,17 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
           energyRef.current *= 0.95;
           
           // Solo cambiar el color/emisión sin deformar la geometría
-          if (meshRef.current.material) {
-            const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+          if (materialRef.current) {
             const intensity = energyRef.current * 0.5;
-            mat.emissiveIntensity = intensity;
+            materialRef.current.emissiveIntensity = intensity;
           }
           
           // Detener la animación cuando la energía sea muy baja
           if (energyRef.current < 0.01) {
             energyRef.current = 0;
             // Restaurar el estado original del material
-            if (meshRef.current.material) {
-              const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-              mat.emissiveIntensity = 0;
+            if (materialRef.current) {
+              materialRef.current.emissiveIntensity = 0;
             }
           }
         }
@@ -145,9 +131,20 @@ export const SoundTorus = forwardRef<THREE.Group, SoundTorusProps>(
       >
         <mesh 
           ref={meshRef} 
-          material={material}
         >
           <torusGeometry args={[0.7, 0.2, 16, 100]} />
+          <meshStandardMaterial
+            ref={materialRef}
+            color={audioParams.color || '#000000'}
+            metalness={audioParams.metalness || 0.3}
+            roughness={audioParams.roughness || 0.4}
+            transparent
+            opacity={audioParams.opacity || 0.9}
+            emissive={audioParams.emissiveColor || '#000000'}
+            emissiveIntensity={audioParams.emissiveIntensity || (isSelected ? 0.3 : 0)}
+            blending={blendingMode}
+            premultipliedAlpha={blendingMode === THREE.SubtractiveBlending || blendingMode === THREE.MultiplyBlending}
+          />
         </mesh>
         
         {/* Indicador de selección */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useMemo, useState } from 'react';
+import React, { forwardRef, useMemo, useState, useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../../state/useWorldStore';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -18,11 +18,15 @@ interface SoundSpiralProps {
   audioParams: AudioParams;
 }
 
+const blackColor = new THREE.Color(0, 0, 0);
+
 export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
   ({ id, position, rotation, scale, isSelected, audioEnabled, audioParams }, ref) => {
     const { selectEntity, triggerObjectNote } = useWorldStore();
     const [isPlaying, setIsPlaying] = useState(false);
     const [pulseTime, setPulseTime] = useState(0);
+    const tempColor = useRef(new THREE.Color());
+    const tempEmissiveColor = useRef(new THREE.Color());
 
     // Auto-activación con callback para activar animaciones
     useAutoTrigger({ 
@@ -73,6 +77,16 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
       }
       
       return positions;
+    }, [sampleCount]);
+
+    // Colores base de la espiral memoizados para evitar instanciaciones constantes
+    const baseColors = useMemo(() => {
+      const colors: THREE.Color[] = [];
+      for (let i = 0; i < sampleCount; i++) {
+        const hue = (i / sampleCount) * 0.3 + 0.6; // Azul a cian
+        colors.push(new THREE.Color().setHSL(hue, 0.7, 0.5));
+      }
+      return colors;
     }, [sampleCount]);
 
     // Manejar clic en el objeto
@@ -134,19 +148,15 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
       }
     });
 
-    // Calcular colores para las cajas
+    // Calcular colores para las cajas utilizando refs o colores base memoizados
     const getBoxColor = (index: number, isPulsing: boolean) => {
       if (isPulsing) {
         // Color de pulso basado en el tiempo
         const pulseIntensity = Math.sin(pulseTime * 10) * 0.5 + 0.5;
-        return new THREE.Color(0.2 + pulseIntensity * 0.8, 0.8, 0.8 + pulseIntensity * 0.2);
+        return tempColor.current.setRGB(0.2 + pulseIntensity * 0.8, 0.8, 0.8 + pulseIntensity * 0.2);
       }
       
-      // Color base con variación por índice
-      const hue = (index / sampleCount) * 0.3 + 0.6; // Azul a cian
-      const saturation = 0.7;
-      const lightness = 0.5;
-      return new THREE.Color().setHSL(hue, saturation, lightness);
+      return baseColors[index] || baseColors[0];
     };
 
     // Calcular escala para las cajas
@@ -179,7 +189,7 @@ export const SoundSpiral = forwardRef<THREE.Group, SoundSpiralProps>(
               <boxGeometry args={[1, 1, 1]} />
               <meshStandardMaterial
                 color={color}
-                emissive={isPulsing ? color.clone().multiplyScalar(0.3) : new THREE.Color(0, 0, 0)}
+                emissive={isPulsing ? tempEmissiveColor.current.copy(color).multiplyScalar(0.3) : blackColor}
                 metalness={0.3}
                 roughness={0.7}
                 transparent

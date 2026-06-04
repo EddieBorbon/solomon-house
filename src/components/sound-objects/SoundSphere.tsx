@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo } from 'react';
+import React, { forwardRef, useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -21,6 +21,7 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
+    const tempColor = useRef(new THREE.Color()); // Evitar instanciaciones en cada frame
     const { 
       selectEntity, 
       triggerObjectAttackRelease, 
@@ -51,6 +52,13 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     const sphereGeometry = useMemo(() => {
       return new THREE.SphereGeometry(0.7, 32, 32);
     }, []);
+
+    // Limpieza de recursos WebGL al desmontar
+    useEffect(() => {
+      return () => {
+        sphereGeometry.dispose();
+      };
+    }, [sphereGeometry]);
 
     // Manejador para clic corto (trigger)
     const handleClick = (event: React.MouseEvent) => {
@@ -106,9 +114,8 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
         
         // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const baseColor = new THREE.Color(audioParams.color || '#8b5cf6');
-        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
-        materialRef.current.color.copy(intensifiedColor);
+        tempColor.current.set(audioParams.color || '#8b5cf6').multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(tempColor.current);
         
         // Emisión intensa durante el clic
         materialRef.current.emissiveIntensity = intensity * 0.8;

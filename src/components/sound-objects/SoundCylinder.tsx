@@ -23,6 +23,7 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de clic
+    const tempColor = useRef(new THREE.Color()); // Evitar instanciaciones en cada frame
     const { selectEntity, triggerObjectNote } = useWorldStore();
 
     // Auto-activación con callback para activar animaciones
@@ -86,9 +87,8 @@ export const SoundCylinder = forwardRef<THREE.Group, SoundCylinderProps>(
         
         // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const baseColor = new THREE.Color(audioParams.color || '#22c55e');
-        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
-        materialRef.current.color.copy(intensifiedColor);
+        tempColor.current.set(audioParams.color || '#22c55e').multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(tempColor.current);
         
         // Emisión intensa durante el clic
         materialRef.current.emissiveIntensity = intensity * 0.6;

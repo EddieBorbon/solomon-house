@@ -27,6 +27,7 @@ export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<THREE.MeshStandardMaterial>(null);
     const energyRef = useRef(0); // Para la animación de golpe percusivo
+    const tempColor = useRef(new THREE.Color()); // Evitar instanciaciones en cada frame
     
     const { triggerObjectNote, selectEntity, triggerObjectAttackRelease } = useWorldStore();
 
@@ -73,9 +74,8 @@ export const SoundCone = forwardRef<SoundConeRef, SoundConeProps>(
         
         // Cambiar el color basado en la energía (intensificar el color base)
         const intensity = energyRef.current;
-        const baseColor = new THREE.Color(audioParams.color || '#ff6b35');
-        const intensifiedColor = baseColor.clone().multiplyScalar(1 + intensity * 0.3);
-        materialRef.current.color.copy(intensifiedColor);
+        tempColor.current.set(audioParams.color || '#ff6b35').multiplyScalar(1 + intensity * 0.3);
+        materialRef.current.color.copy(tempColor.current);
         
         // Emisión basada en la energía
         materialRef.current.emissiveIntensity = intensity * 0.5;

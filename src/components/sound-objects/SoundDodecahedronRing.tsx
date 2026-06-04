@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useRef, useMemo, useCallback } from 'react';
+import React, { forwardRef, useRef, useMemo, useCallback, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { type AudioParams } from '../../lib/AudioManager';
@@ -21,6 +21,7 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const groupRef = useRef<THREE.Group>(null);
     const materialRefs = useRef<THREE.MeshStandardMaterial[]>([]);
     const energyRef = useRef(0); // Para la animación de clic
+    const tempColor = useRef(new THREE.Color()); // Evitar instanciaciones en cada frame
     const { selectEntity, triggerObjectAttackRelease } = useWorldStore();
 
     // Auto-activación con callback para activar animaciones
@@ -49,6 +50,13 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
     const dodecahedronGeometry = useMemo(() => {
       return new THREE.DodecahedronGeometry(0.3, 0);
     }, []);
+
+    // Limpieza de recursos WebGL al desmontar
+    useEffect(() => {
+      return () => {
+        dodecahedronGeometry.dispose();
+      };
+    }, [dodecahedronGeometry]);
 
     // Función para manejar clic y disparar nota
     const handleClick = useCallback((event: React.MouseEvent) => {
@@ -83,11 +91,11 @@ export const SoundDodecahedronRing = forwardRef<THREE.Group, SoundDodecahedronRi
         
         // Cambiar el color de todos los dodecaedros basado en la energía
         const intensity = energyRef.current;
-        const pinkColor = new THREE.Color(0.9 + intensity * 0.1, 0.3 + intensity * 0.2, 0.7 + intensity * 0.3);
+        tempColor.current.setRGB(0.9 + intensity * 0.1, 0.3 + intensity * 0.2, 0.7 + intensity * 0.3);
         
         materialRefs.current.forEach(material => {
           if (material) {
-            material.color.copy(pinkColor);
+            material.color.copy(tempColor.current);
             material.emissiveIntensity = intensity * 0.8;
           }
         });
