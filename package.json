@@ -2,6 +2,7 @@
   "name": "solomon-house",
   "version": "0.1.0",
   "private": true,
+  "license": "AGPL-3.0-only",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,14 +10,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@csound/browser": "^7.0.0-beta31",
     "@heroicons/react": "^2.2.0",
     "@react-three/drei": "^10.7.2",
     "@react-three/fiber": "^9.3.0",
+    "@react-three/postprocessing": "^3.0.4",
+    "@react-three/xr": "^6.6.30",
     "@vitalets/google-translate-api": "^9.2.1",
     "firebase": "^12.3.0",
+    "jsfive": "^0.4.0",
     "lucide-react": "^0.544.0",
     "next": "15.5.19",
     "next-intl": "^4.3.9",
+    "postprocessing": "^6.39.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "three": "^0.179.1",
