@@ -1,0 +1,19 @@
+{
+  "name": "solomon-house-signaling",
+  "version": "0.1.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "signaling-server.mjs",
+  "scripts": {
+    "start": "node signaling-server.mjs",
+    "start:storage": "node storage-server.mjs",
+    "start:lan": "node lan-mode.mjs",
+    "discover": "node lan-mode.mjs --discover",
+    "start:webtransport": "node webtransport-server.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "@fails-components/webtransport": "^1.6.3"
+  }
+}
