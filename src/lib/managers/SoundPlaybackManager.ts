@@ -670,14 +670,14 @@ export class SoundPlaybackManager {
     }
 
     // Solo ejecutar en el cliente (navegador), no durante SSR
-    if (typeof window === 'undefined' || !Tone || !Tone.Transport) {
+    if (typeof window === 'undefined' || !Tone || !Tone.getTransport()) {
       // Valor por defecto en caso de SSR
       return 1;
     }
 
     // Convertir notación musical a segundos
-    const tempo = Tone.Transport.bpm.value;
-    // const timeSignature = Tone.Transport.timeSignature; // Not used currently
+    const tempo = Tone.getTransport().bpm.value;
+    // const timeSignature = Tone.getTransport().timeSignature; // Not used currently
 
     // Simplificar: asumir 4/4 y convertir notación básica
     const noteValues: { [key: string]: number } = {

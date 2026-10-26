@@ -571,7 +571,7 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
               {/* TransformControls apunta al grupo auxiliar */}
               <TransformControls
                 key={`${selectedEntityId}-${transformMode}`}
-                object={gizmoRef?.current || undefined}
+                object={(gizmoRef?.current as unknown as import('three').Object3D) || undefined}
                 mode={transformMode}
                 rotation={[0, 0, 0]}
                 scale={selectedEntity.scale}
@@ -619,7 +619,7 @@ export function SceneContentNew({ orbitControlsRef, config = {} }: SceneContentP
         return (
           <TransformControls
             key={`${selectedEntityId}-${transformMode}`}
-            object={entityRef.current}
+            object={entityRef.current as unknown as import('three').Object3D}
             mode={transformMode}
             position={worldPosition}
             rotation={[0, 0, 0]}

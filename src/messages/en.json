@@ -893,5 +893,65 @@
     "down": "Down",
     "up": "Up",
     "createGridAtPosition": "Create grid at specified position"
+  },
+  "curriculum": {
+    "title": "Decalogue of the Sound Architect",
+    "subtitle": "Ten progressive lessons with micro-challenges verified on the canvas.",
+    "lessonLabel": "Lesson",
+    "challengeLabel": "Challenge",
+    "verify": "Verify on the canvas",
+    "done": "✅ Challenge completed",
+    "notDone": "Not yet — keep trying",
+    "progress": "Progress",
+    "l1": {
+      "title": "Listen before you build",
+      "lesson": "All sound architecture begins with listening: before placing anything, inhabit the room and attend to what already sounds.",
+      "challenge": "Start the room audio and listen for a moment with headphones."
+    },
+    "l2": {
+      "title": "Space is a score",
+      "lesson": "In Solomon's House, position writes music: where you place something matters as much as what you place.",
+      "challenge": "Place your first sound object on the canvas."
+    },
+    "l3": {
+      "title": "Every object is an instrument",
+      "lesson": "Visual form and synthesis engine are one: different geometries call for different timbres.",
+      "challenge": "Make at least two different object types coexist."
+    },
+    "l4": {
+      "title": "Height is register",
+      "lesson": "The vertical axis is the musical register: high pitches rise, low ones weigh toward the ground.",
+      "challenge": "Take a high-pitched object (above 660 Hz) above height 2."
+    },
+    "l5": {
+      "title": "Distance is dynamics",
+      "lesson": "Moving away from a source is a decrescendo: distance attenuation is your dynamic regulator.",
+      "challenge": "Place an object more than 8 units from the center and hear it fade."
+    },
+    "l6": {
+      "title": "Silence also composes",
+      "lesson": "A balanced texture breathes: if one frequency band dominates, the mix becomes a wall.",
+      "challenge": "Keep at least 3 objects with no band (low/mid/high) holding more than 60%."
+    },
+    "l7": {
+      "title": "Movement is phrasing",
+      "lesson": "Trajectories are musical phrases: an orbiting object articulates the time of the space.",
+      "challenge": "Create a mobile object and watch it travel the room."
+    },
+    "l8": {
+      "title": "Zones transform",
+      "lesson": "Effect zones are the variable acoustics of the building: reverbs, echoes and filters that tint whatever crosses them.",
+      "challenge": "Create an effect zone and let a sound pass through it."
+    },
+    "l9": {
+      "title": "We build with others",
+      "lesson": "The canvas is collective: the work emerges from mutual listening among simultaneous architects.",
+      "challenge": "Connect to the global world and share the room."
+    },
+    "l10": {
+      "title": "The work remains open",
+      "lesson": "A sound sculpture is never closed: it is saved, exported as a score, reinterpreted and opened again.",
+      "challenge": "Save your world as a project, or complete the spatial listening exam."
+    }
   }
 }

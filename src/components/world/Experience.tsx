@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import { XR, createXRStore } from '@react-three/xr';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { SceneContent } from './SceneContent';
 import { useCameraControls } from '../../hooks/useCameraControls';
@@ -11,12 +12,23 @@ import * as THREE from 'three';
 import { useAudioListener } from '../../hooks/useAudioListener';
 import { audioManager } from '../../lib/AudioManager';
 import { useGlobalWorldSync } from '../../hooks/useGlobalWorldSync';
+import { usePeerSync } from '../../hooks/usePeerSync';
+import { getHeadTrackingForward } from '../../lib/audio/headTracking';
+import { TrajectoryPredictor } from '../../lib/agents/TrajectoryPredictor';
+import { PostProcessing } from './PostProcessing';
 import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAudioContext } from '../../hooks/useAudioContext';
+
+/**
+ * Almacén WebXR (roadmap 3.3): gestiona la sesión inmersiva VR/AR con
+ * controladores y seguimiento de manos por defecto. Vive a nivel de módulo
+ * para que la UI (VRToggle) pueda iniciar la sesión desde fuera del Canvas.
+ */
+export const xrStore = createXRStore();
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {
@@ -31,10 +43,15 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
 
   // Vector para almacenar la dirección de la cámara (evitar recrearlo en cada frame)
   const forwardVector = useRef(new THREE.Vector3());
+  const headForwardVector = useRef(new THREE.Vector3());
+  // Predictor de trayectorias (roadmap 6.5): anticipa el movimiento del
+  // oyente para preparar las transiciones espaciales con antelación
+  const trajectoryPredictor = useRef(new TrajectoryPredictor());
+  const predictedPosition = useRef(new THREE.Vector3());
   const lastCameraPosition = useRef<THREE.Vector3 | null>(null);
   const targetVector = useRef(new THREE.Vector3());
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera, clock }) => {
     if (orbitControlsRef.current) {
       // Actualizar el target de OrbitControls según la selección
       let targetPosition: THREE.Vector3;
@@ -103,9 +120,20 @@ function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: Reac
       
       // Calcular el vector "hacia adelante" de la cámara
       camera.getWorldDirection(forwardVector.current);
-      
-      // Actualizar el listener de audio con la nueva posición y orientación
-      audioManager.updateListener(position, forwardVector.current);
+
+      // Head tracking (roadmap 4.5): si está activo, la orientación física
+      // del dispositivo móvil sustituye a la de la cámara para la
+      // espacialización binaural.
+      const headForward = getHeadTrackingForward(headForwardVector.current);
+
+      // Predicción de trayectoria (roadmap 6.5): el listener se adelanta
+      // ~120ms en la dirección de marcha estimada, preparando las
+      // transiciones de zonas de efectos antes de que el oyente llegue.
+      trajectoryPredictor.current.update(position, clock.elapsedTime);
+      trajectoryPredictor.current.predict(0.12, predictedPosition.current);
+
+      // Actualizar el listener de audio con la posición anticipada y la orientación
+      audioManager.updateListener(predictedPosition.current, headForward ?? forwardVector.current);
       
       // Rastrear posición de cámara para el tutorial (paso 7)
       if (isActive && currentStep === 6) {
@@ -178,6 +206,11 @@ export function Experience() {
   
   // Inicializar sincronización del mundo global solo para detectar errores de cuota
   const { error } = useGlobalWorldSync();
+
+  // Red híbrida (roadmap 1.1/1.2): flujo de posiciones por WebRTC P2P
+  // cuando hay servidor de señalización configurado; Firebase queda para
+  // autenticación, metadatos y persistencia.
+  usePeerSync();
   
   // Detectar errores de cuota
   React.useEffect(() => {
@@ -241,6 +274,8 @@ export function Experience() {
           }
         }}
       >
+        {/* Soporte WebXR (roadmap 3.3): sesión inmersiva VR/AR */}
+        <XR store={xrStore}>
         {/* Controlador de cámara WASD */}
         <CameraControllerInternal orbitControlsRef={orbitControlsRef} />
         
@@ -336,6 +371,10 @@ export function Experience() {
 
         {/* Contenido de la escena */}
         <SceneContent orbitControlsRef={orbitControlsRef} />
+
+        {/* Post-procesamiento (bloom/viñeta), desactivable para 60 FPS */}
+        <PostProcessing />
+        </XR>
       </Canvas>
     </div>
   );

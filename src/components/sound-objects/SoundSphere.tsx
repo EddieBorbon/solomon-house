@@ -48,17 +48,26 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
       enabled: true
     });
     
-    // Crear geometría de esfera con más detalle
-    const sphereGeometry = useMemo(() => {
-      return new THREE.SphereGeometry(0.7, 32, 32);
-    }, []);
+    // Nivel de detalle dinámico (roadmap 3.5): tres resoluciones de la
+    // misma esfera, conmutadas según la distancia a la cámara para
+    // conservar recursos de GPU en escenas densas.
+    const lodGeometries = useMemo(
+      () => [
+        new THREE.SphereGeometry(0.7, 32, 32), // cerca
+        new THREE.SphereGeometry(0.7, 16, 12), // media distancia
+        new THREE.SphereGeometry(0.7, 8, 6), // lejos
+      ],
+      []
+    );
+    const sphereGeometry = lodGeometries[0];
+    const worldPosition = useRef(new THREE.Vector3());
 
-    // Limpieza de recursos WebGL al desmontar
+    // Limpieza de recursos WebGL al desmontar (roadmap 3.1)
     useEffect(() => {
       return () => {
-        sphereGeometry.dispose();
+        lodGeometries.forEach((geometry) => geometry.dispose());
       };
-    }, [sphereGeometry]);
+    }, [lodGeometries]);
 
     // Manejador para clic corto (trigger)
     const handleClick = (event: React.MouseEvent) => {
@@ -94,6 +103,14 @@ export const SoundSphere = forwardRef<THREE.Group, SoundSphereProps>(
     // Animación del clic/gate y efectos de audio
     useFrame((state, delta) => {
       if (!meshRef.current || !materialRef.current || !audioParams) return;
+
+      // LOD por distancia a cámara (roadmap 3.5)
+      meshRef.current.getWorldPosition(worldPosition.current);
+      const cameraDistance = state.camera.position.distanceTo(worldPosition.current);
+      const lodLevel = cameraDistance < 15 ? 0 : cameraDistance < 35 ? 1 : 2;
+      if (meshRef.current.geometry !== lodGeometries[lodLevel]) {
+        meshRef.current.geometry = lodGeometries[lodLevel];
+      }
 
       // Decaer la energía del clic/gate
       if (energyRef.current > 0) {

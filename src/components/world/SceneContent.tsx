@@ -9,6 +9,8 @@ import { CameraController } from './CameraController';
 import { SoundObjectsRenderer } from './SoundObjectsRenderer';
 import { MobileObjectsRenderer } from './MobileObjectsRenderer';
 import { EffectZonesRenderer } from './EffectZonesRenderer';
+import { InfluenceGuides } from './InfluenceGuides';
+import { AudioReactiveAuras } from './AudioReactiveAuras';
 import { useEffectZoneDetection } from '../../hooks/useEffectZoneDetection';
 import { useEmergencyCameraControls } from '../../hooks/useEmergencyCameraControls';
 import { audioManager } from '../../lib/AudioManager';
@@ -348,7 +350,11 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
       </mesh>
 
       {/* Renderizado de objetos sonoros, móviles y zonas de efectos */}
-      <SoundObjectsRenderer entityRefs={entityRefs} />
+      <SoundObjectsRenderer
+        entityRefs={entityRefs}
+        isDragging={isDragging}
+        draggingEntityId={draggingEntityIdRef.current}
+      />
       <MobileObjectsRenderer
         entityRefs={entityRefs}
         isDragging={isDragging}
@@ -522,7 +528,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           return (
             <TransformControls
               key={`${selectedEntityId}-${transformMode}-${forceRender}`}
-              object={objectRef?.current || undefined}
+              object={(objectRef?.current as unknown as import("three").Object3D) || undefined}
               mode={transformMode}
               position={worldPosition}
               rotation={[0, 0, 0]}
@@ -652,7 +658,7 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
         return (
           <TransformControls
             key={`${selectedEntityId}-${transformMode}-${forceRender}`}
-            object={objectRef?.current || undefined}
+            object={(objectRef?.current as unknown as import("three").Object3D) || undefined}
             mode={transformMode}
             position={worldPosition}
             // No aplicar la rotación del objeto al gizmo para que se mantenga alineado con la vista
@@ -791,6 +797,12 @@ export function SceneContent({ orbitControlsRef }: SceneContentProps) {
           </mesh>
         </group>
       )}
+
+      {/* Notaciones visuales en tiempo real: anillos de influencia sonora */}
+      <InfluenceGuides />
+
+      {/* Auras con shader reactivo al análisis espectral FFT */}
+      <AudioReactiveAuras />
 
       {/* Indicador de cámara bloqueada */}
       {showCameraBlockedIndicator && (

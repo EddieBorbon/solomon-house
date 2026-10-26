@@ -6,7 +6,54 @@ import { SpatialAudioManager, SpatialAudioConfig, ListenerState } from './manage
 import { AudioContextManager, AudioContextState, AudioContextConfig } from './managers/AudioContextManager';
 import { SoundPlaybackManager, PlaybackState, PlaybackConfig } from './managers/SoundPlaybackManager';
 import { ParameterManager, ParameterUpdateResult, ParameterConfig } from './managers/ParameterManager';
+import { VoiceAllocator } from './managers/VoiceAllocator';
+import { SofaSpatializer } from './audio/sofa/SofaSpatializer';
+import { type HrirSet } from './audio/sofa/sofaLoader';
+import { NativeVoice, audioParamsToNative, type NativeWaveform } from './audio/native/NativeVoice';
+import { runEngineComparison } from './audio/native/engineBenchmark';
+import { csoundEngine } from './audio/csound/CsoundEngine';
 import { type EffectZone } from '../state/useWorldStore';
+
+/**
+ * Motor de audio nativo opt-in (roadmap 2.1.c): con
+ * NEXT_PUBLIC_AUDIO_ENGINE=native, los tipos de síntesis simple se crean
+ * con nodos puros de la Web Audio API (NativeVoice) en lugar de Tone.js.
+ * La síntesis compleja (FM, Duo, Metal, Poly, Sampler…) sigue en Tone
+ * durante la transición.
+ */
+// Motor por defecto: Web Audio nativo (roadmap 2.1, migración completa).
+// Escape: NEXT_PUBLIC_AUDIO_ENGINE=tone fuerza el motor Tone.js heredado.
+const AUDIO_ENGINE = process.env.NEXT_PUBLIC_AUDIO_ENGINE ?? 'native';
+const NATIVE_ENGINE_ENABLED = AUDIO_ENGINE === 'native';
+// Todos los tipos de objeto sonoro tienen modelo de síntesis nativo
+const NATIVE_ENGINE_TYPES = new Set<SoundObjectType>([
+  'cube', 'sphere', 'cylinder', 'cone', 'pyramid',
+  'icosahedron', 'plane', 'torus', 'dodecahedronRing', 'spiral',
+]);
+
+/** Modelo de síntesis nativo por tipo de objeto (réplica del synth Tone). */
+const NATIVE_MODEL_BY_TYPE: Record<string, import('./audio/native/NativeVoice').NativeSynthModel> = {
+  cube: 'am',
+  sphere: 'fm',
+  cylinder: 'duo',
+  cone: 'membrane',
+  pyramid: 'mono',
+  icosahedron: 'metal',
+  plane: 'noise',
+  torus: 'pluck',
+  dodecahedronRing: 'poly',
+  spiral: 'sampler',
+};
+
+/**
+ * Motor Csound WASM opt-in (roadmap 2.3.c): con
+ * NEXT_PUBLIC_AUDIO_ENGINE=csound, los tipos simples se sintetizan con la
+ * orquesta de Csound (FM + filtro Moog) controlada por canales vinculados
+ * a la frecuencia y la posición 3D. Carga perezosa (~6 MB) solo bajo esta
+ * bandera; el resto sigue en Tone.
+ */
+const CSOUND_ENGINE_ENABLED = AUDIO_ENGINE === 'csound';
+const CSOUND_ENGINE_TYPES = new Set<SoundObjectType>(['cube']);
 
 // Type for effect parameters
 export type EffectParams = EffectZone['effectParams'];
@@ -25,6 +72,11 @@ export class AudioManager {
   private audioContextManager: AudioContextManager;
   private soundPlaybackManager: SoundPlaybackManager;
   private parameterManager: ParameterManager;
+  private voiceAllocator: VoiceAllocator;
+  private sofaSpatializer: SofaSpatializer;
+  private customHrtfEnabled = false;
+  /** Voces del motor nativo (2.1.c), paralelas a soundSources de Tone */
+  private nativeVoices: Map<string, NativeVoice> = new Map();
 
   private constructor() {
     // Constructor privado para Singleton
@@ -34,6 +86,10 @@ export class AudioManager {
     this.audioContextManager = new AudioContextManager();
     this.soundPlaybackManager = new SoundPlaybackManager();
     this.parameterManager = new ParameterManager();
+    this.voiceAllocator = new VoiceAllocator();
+    this.sofaSpatializer = new SofaSpatializer(() =>
+      this.spatialAudioManager.getSpatialConfig()
+    );
 
     // Registrar el AudioManager como listener de limpieza del contexto
     this.audioContextManager.onCleanup(() => {
@@ -57,8 +113,13 @@ export class AudioManager {
     // Crear sends para todas las fuentes de sonido existentes
     const effectData = this.effectManager.getGlobalEffect(effectId);
     if (effectData) {
+      const effectInput = effectData.effectNode.input.input;
       this.soundSources.forEach((source, sourceId) => {
-        this.addEffectSendToSource(sourceId, effectId, effectData.effectNode.input.input);
+        this.addEffectSendToSource(sourceId, effectId, effectInput);
+      });
+      // Motor nativo (2.1.d): sends desde las voces nativas al mismo efecto
+      this.nativeVoices.forEach((voice) => {
+        voice.addEffectSend(effectId, effectInput as unknown as AudioNode);
       });
     }
   }
@@ -165,6 +226,11 @@ export class AudioManager {
         // Manejo silencioso de errores
       }
     });
+    // Motor nativo (2.1.d): retirar el send de cada voz nativa
+    this.nativeVoices.forEach((voice) => {
+      voice.removeEffectSend(effectId);
+      voice.setDryGain(1.0);
+    });
   }
 
   /**
@@ -262,6 +328,11 @@ export class AudioManager {
       this.effectManager.cleanup();
       this.spatialAudioManager.cleanup();
       this.soundPlaybackManager.cleanup();
+      this.sofaSpatializer.detachAll();
+
+      // Liberar las voces del motor nativo (2.1.c / 2.5)
+      this.nativeVoices.forEach((voice) => voice.dispose());
+      this.nativeVoices.clear();
 
       // Limpiar el Map de send amounts
       this.lastSendAmounts.clear();
@@ -285,7 +356,62 @@ export class AudioManager {
     params: AudioParams,
     position: [number, number, number]
   ): void {
-    if (this.soundSources.has(id)) return;
+    if (this.soundSources.has(id) || this.nativeVoices.has(id) || csoundEngine.hasVoice(id)) return;
+
+    // Motor Csound WASM opt-in (2.3.c): orquesta FM controlada por canales
+    if (CSOUND_ENGINE_ENABLED && CSOUND_ENGINE_TYPES.has(type)) {
+      this.allocateVoice();
+      csoundEngine
+        .createVoice(
+          id,
+          {
+            frequency: params.frequency || 440,
+            volume: params.volume ?? 0.5,
+            harmonicity: params.harmonicity ?? 1.5,
+          },
+          position
+        )
+        .then(() => console.log(`🎛️ Csound: voz creada para ${id} (${type})`))
+        .catch((error) => console.error(`❌ Csound: error creando voz ${id}:`, error));
+      return;
+    }
+
+    // Motor nativo (2.1): un modelo de síntesis por tipo de objeto
+    if (NATIVE_ENGINE_ENABLED && NATIVE_ENGINE_TYPES.has(type)) {
+      try {
+        const model = NATIVE_MODEL_BY_TYPE[type] ?? 'am';
+        const basicWaveforms: NativeWaveform[] = ['sine', 'square', 'triangle', 'sawtooth'];
+        const waveform = basicWaveforms.includes(params.waveform as NativeWaveform)
+          ? (params.waveform as NativeWaveform)
+          : 'sine';
+        const voice = new NativeVoice(
+          {
+            frequency: params.frequency || 440,
+            waveform,
+            volume: params.volume ?? 0.5,
+            model,
+            // Armonicidad por defecto para los modelos modulados (AM/FM)
+            harmonicity: params.harmonicity ?? (model === 'fm' ? 2 : model === 'am' ? 3 : 0),
+            // Muestra del usuario para el modelo sampler (objeto espiral, 2.7)
+            sampleUrl: params.urls?.C4,
+            ...audioParamsToNative(params),
+          },
+          position
+        );
+        this.nativeVoices.set(id, voice);
+
+        // Conectar la voz a los efectos globales existentes (2.1.d)
+        this.effectManager.getAllGlobalEffects().forEach((effectData, effectId) => {
+          voice.addEffectSend(effectId, effectData.effectNode.input.input as unknown as AudioNode);
+        });
+        this.updateNativeVoiceEffectMixing(id, position);
+
+        console.log(`🔈 Motor nativo: voz creada para ${id} (${type})`);
+      } catch (error) {
+        console.error(`❌ Motor nativo: error creando voz ${id}:`, error);
+      }
+      return;
+    }
 
     try {
       const soundSource = this.soundSourceFactory.createSoundSource(
@@ -298,8 +424,76 @@ export class AudioManager {
 
       this.soundSources.set(id, soundSource);
       this.updateSoundEffectMixing(id, position);
-    } catch {
+
+      // Si hay un perfil HRTF personalizado activo, enrutar la nueva fuente
+      // por convolución binaural en lugar del PannerNode estándar
+      if (this.customHrtfEnabled) {
+        this.routeSourceThroughCustomHrtf(id, soundSource, position);
+      }
+    } catch (error) {
+      console.error(`❌ AudioManager: Error creando fuente de sonido ${id}:`, error);
     }
+  }
+
+  /**
+   * Re-enruta una fuente por el espacializador SOFA (roadmap 4.2):
+   * silencia el camino del Panner3D estándar y conecta
+   * `synth → convolución binaural → dryGain`.
+   */
+  private routeSourceThroughCustomHrtf(
+    id: string,
+    source: SoundSource,
+    position: [number, number, number]
+  ): void {
+    try {
+      source.panner.disconnect();
+      this.sofaSpatializer.attach(id, source.synth, source.dryGain, position);
+    } catch {
+      // Fuente en proceso de liberación
+    }
+  }
+
+  /**
+   * Activa la espacialización con un perfil HRTF personalizado SOFA
+   * (roadmap 4.1-4.3), re-enrutando todas las fuentes existentes.
+   */
+  public enableCustomHrtf(set: HrirSet): void {
+    this.sofaSpatializer.setHrirSet(set);
+
+    if (!this.customHrtfEnabled) {
+      this.customHrtfEnabled = true;
+      this.soundSources.forEach((source, id) => {
+        if (!this.sofaSpatializer.hasSource(id)) {
+          this.routeSourceThroughCustomHrtf(id, source, this.getSoundSourcePosition(source));
+        }
+      });
+    }
+  }
+
+  /**
+   * Desactiva el perfil personalizado y restaura el PannerNode HRTF
+   * estandarizado del navegador en todas las fuentes.
+   */
+  public disableCustomHrtf(): void {
+    if (!this.customHrtfEnabled) return;
+    this.customHrtfEnabled = false;
+    this.sofaSpatializer.detachAll();
+
+    this.soundSources.forEach((source) => {
+      try {
+        source.panner.connect(source.dryGain);
+      } catch {
+        // Fuente en proceso de liberación
+      }
+    });
+  }
+
+  public isCustomHrtfEnabled(): boolean {
+    return this.customHrtfEnabled;
+  }
+
+  public getCustomHrtfProfileName(): string | null {
+    return this.sofaSpatializer.getHrirSet()?.name ?? null;
   }
 
   /**
@@ -307,6 +501,20 @@ export class AudioManager {
    */
   public removeSoundSource(id: string): void {
     console.log('🎵 AudioManager: removeSoundSource called', id);
+
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      csoundEngine.removeVoice(id).catch(() => {});
+      return;
+    }
+
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.dispose();
+      this.nativeVoices.delete(id);
+      return;
+    }
 
     const source = this.soundSources.get(id);
     if (!source) {
@@ -328,6 +536,7 @@ export class AudioManager {
 
       // Limpiar todas las conexiones
       console.log('🔧 AudioManager: Cleaning up connections');
+      this.sofaSpatializer.detach(id);
       this.cleanupSourceEffectConnections(id);
       source.panner.disconnect();
       source.dryGain.disconnect();
@@ -359,13 +568,66 @@ export class AudioManager {
   }
 
   /**
+   * Aplica la política de voces (roadmap 2.4): si el presupuesto de voces
+   * del dispositivo está agotado, roba (detiene) las voces más antiguas
+   * antes de admitir una nueva.
+   */
+  private allocateVoice(): void {
+    const activeVoices = Array.from(this.soundPlaybackManager.getPlayingSounds()).map((id) => ({
+      id,
+      startTime: this.soundPlaybackManager.getPlaybackState(id)?.startTime ?? 0,
+    }));
+
+    // Incluir las voces nativas activas en el presupuesto (2.1.d / 2.4)
+    this.nativeVoices.forEach((voice, id) => {
+      if (voice.isPlaying()) {
+        activeVoices.push({ id, startTime: voice.getStartTime() });
+      }
+    });
+
+    const toSteal = this.voiceAllocator.requestVoice(activeVoices);
+    for (const stolenId of toSteal) {
+      const stolenNative = this.nativeVoices.get(stolenId);
+      if (stolenNative) {
+        console.warn(`🎛️ VoiceAllocator: robando voz nativa ${stolenId} (límite: ${this.voiceAllocator.getConfig().maxVoices})`);
+        stolenNative.stop();
+        continue;
+      }
+      const stolenSource = this.soundSources.get(stolenId);
+      if (stolenSource) {
+        console.warn(`🎛️ VoiceAllocator: robando voz ${stolenId} (límite: ${this.voiceAllocator.getConfig().maxVoices})`);
+        this.soundPlaybackManager.stopSound(stolenId, stolenSource);
+      }
+    }
+  }
+
+  /**
    * Inicia el sonido continuo de una fuente (completamente independiente de las interacciones de clic)
    */
   public startContinuousSound(id: string, params: AudioParams): void {
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      this.allocateVoice();
+      csoundEngine.updateParams(id, audioParamsToNative(params)).catch(() => {});
+      csoundEngine.start(id).catch(() => {});
+      return;
+    }
+
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      this.allocateVoice();
+      nativeVoice.updateParams(audioParamsToNative(params));
+      nativeVoice.startContinuous();
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return;
     }
+
+    this.allocateVoice();
 
     this.soundPlaybackManager.startContinuousSound(
       id,
@@ -379,10 +641,29 @@ export class AudioManager {
    * Inicia el sonido de una fuente (para gate y sonidos temporales)
    */
   public startSound(id: string, params: AudioParams): void {
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      this.allocateVoice();
+      csoundEngine.updateParams(id, audioParamsToNative(params)).catch(() => {});
+      csoundEngine.start(id).catch(() => {});
+      return;
+    }
+
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      this.allocateVoice();
+      nativeVoice.updateParams(audioParamsToNative(params));
+      nativeVoice.startContinuous();
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return;
     }
+
+    this.allocateVoice();
 
     this.soundPlaybackManager.startSound(
       id,
@@ -396,6 +677,19 @@ export class AudioManager {
    * Detiene el sonido de una fuente
    */
   public stopSound(id: string): void {
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      csoundEngine.stop(id).catch(() => {});
+      return;
+    }
+
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.stop();
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return;
@@ -408,6 +702,14 @@ export class AudioManager {
    * Dispara una nota percusiva (especialmente para MembraneSynth y Sampler)
    */
   public triggerNoteAttack(id: string, params: AudioParams): void {
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.updateParams(audioParamsToNative(params));
+      nativeVoice.triggerAttackRelease(params.duration ?? 0.5);
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return;
@@ -426,6 +728,14 @@ export class AudioManager {
    * Este método funciona universalmente con todos los tipos de sintetizadores
    */
   public triggerAttackRelease(id: string, params: AudioParams): void {
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.updateParams(audioParamsToNative(params));
+      nativeVoice.triggerAttackRelease(params.duration ?? 0.5);
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return;
@@ -443,6 +753,13 @@ export class AudioManager {
    * Modula temporalmente un sonido continuo para simular una colisión o interacción
    */
   public triggerDroneInteraction(id: string): void {
+    // Motor nativo (2.1.c): realce breve de la envolvente
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.pulse();
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       console.log(`[AudioManager] No target source found for ${id} for drone interaction.`);
@@ -473,6 +790,25 @@ export class AudioManager {
    * Actualiza los parámetros de sonido de una fuente
    */
   public updateSoundParams(id: string, params: Partial<AudioParams>): ParameterUpdateResult {
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      const csParams = audioParamsToNative(params);
+      csoundEngine.updateParams(id, csParams).catch(() => {});
+      return { success: true, updatedParams: Object.keys(csParams), errors: [] };
+    }
+
+    // Motor nativo (2.1.c)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      const nativeParams = audioParamsToNative(params);
+      nativeVoice.updateParams(nativeParams);
+      return {
+        success: true,
+        updatedParams: Object.keys(nativeParams),
+        errors: []
+      };
+    }
+
     const source = this.soundSources.get(id);
     if (!source) {
       return {
@@ -504,6 +840,42 @@ export class AudioManager {
       const soundPosition = this.getSoundSourcePosition(source);
       this.updateSoundEffectMixing(soundId, soundPosition);
     });
+    // Motor nativo (2.1.d)
+    this.nativeVoices.forEach((voice, soundId) => {
+      this.updateNativeVoiceEffectMixing(soundId, voice.getPosition());
+    });
+  }
+
+  /**
+   * Mezcla húmeda/seca por proximidad para una voz nativa (2.1.d),
+   * espejo de `updateSoundEffectMixing` para el motor Tone.
+   */
+  private updateNativeVoiceEffectMixing(
+    soundId: string,
+    soundPosition: [number, number, number]
+  ): void {
+    const voice = this.nativeVoices.get(soundId);
+    if (!voice) return;
+
+    try {
+      const globalEffects = this.effectManager.getAllGlobalEffects();
+      let maxIntensity = 0;
+
+      globalEffects.forEach((effectData, effectId) => {
+        const effectRadius = this.getEffectZoneRadius(effectId);
+        const effectIntensity = this.spatialAudioManager.calculateEffectIntensity(
+          soundPosition,
+          effectData.position,
+          effectRadius
+        );
+        voice.setEffectSendGain(effectId, effectIntensity);
+        maxIntensity = Math.max(maxIntensity, effectIntensity);
+      });
+
+      // La señal seca decrece según el envío húmedo más fuerte
+      voice.setDryGain(1.0 - maxIntensity);
+    } catch {
+    }
   }
 
   /**
@@ -518,12 +890,31 @@ export class AudioManager {
    * Actualiza la posición 3D de una fuente de sonido
    */
   public updateSoundPosition(id: string, position: [number, number, number]): void {
+    // Motor Csound (2.3.c)
+    if (csoundEngine.hasVoice(id)) {
+      csoundEngine.setPosition(id, position).catch(() => {});
+      return;
+    }
+
+    // Motor nativo (2.1.c / 2.1.d)
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) {
+      nativeVoice.setPosition(position);
+      this.updateNativeVoiceEffectMixing(id, position);
+      return;
+    }
+
     const source = this.soundSources.get(id);
     if (!source) return;
 
     try {
       // Actualizar la posición del panner usando el SpatialAudioManager
       this.spatialAudioManager.updatePannerPosition(source.panner, position);
+
+      // Mantener sincronizada la convolución binaural personalizada (4.2)
+      if (this.customHrtfEnabled) {
+        this.sofaSpatializer.updateSourcePosition(id, position);
+      }
 
       // Actualizar la mezcla de efectos basada en la nueva posición
       this.updateSoundEffectMixing(id, position);
@@ -591,12 +982,53 @@ export class AudioManager {
    */
   public updateListener(position: THREE.Vector3, forward: THREE.Vector3): void {
     this.spatialAudioManager.updateListener(position, forward);
+
+    if (this.customHrtfEnabled) {
+      this.sofaSpatializer.updateListener(
+        [position.x, position.y, position.z],
+        [forward.x, forward.y, forward.z]
+      );
+    }
+  }
+
+  /**
+   * Aplica la calibración acústica del usuario (roadmap 4.4) tanto a la
+   * configuración espacial global (futuras fuentes) como a los panners de
+   * todas las fuentes existentes.
+   */
+  public applySpatialCalibration(config: Partial<SpatialAudioConfig>): void {
+    this.spatialAudioManager.updateSpatialConfig(config);
+
+    this.soundSources.forEach((source) => {
+      try {
+        if (config.rolloffFactor !== undefined) {
+          source.panner.rolloffFactor = config.rolloffFactor;
+        }
+        if (config.refDistance !== undefined) {
+          source.panner.refDistance = config.refDistance;
+        }
+        if (config.maxDistance !== undefined) {
+          source.panner.maxDistance = config.maxDistance;
+        }
+      } catch {
+        // Panner ya liberado
+      }
+    });
+  }
+
+  /**
+   * Obtiene la configuración espacial vigente (roadmap 4.4)
+   */
+  public getSpatialConfig(): SpatialAudioConfig {
+    return this.spatialAudioManager.getSpatialConfig();
   }
 
   /**
    * Obtiene el estado de una fuente de sonido
    */
   public getSoundSourceState(id: string): boolean {
+    if (this.nativeVoices.has(id) || csoundEngine.hasVoice(id)) return true;
+
     const source = this.soundSources.get(id);
     if (!source) return false;
 
@@ -608,6 +1040,9 @@ export class AudioManager {
    * Verifica si una fuente de sonido está activamente sonando
    */
   public isSoundPlaying(id: string): boolean {
+    const nativeVoice = this.nativeVoices.get(id);
+    if (nativeVoice) return nativeVoice.isPlaying();
+
     return this.soundPlaybackManager.isSoundPlaying(id);
   }
 
@@ -634,7 +1069,7 @@ export class AudioManager {
       };
     }
     return {
-      contextState: Tone.context.state,
+      contextState: Tone.getContext().state,
       soundSourcesCount: this.soundSources.size,
       soundSourceIds: Array.from(this.soundSources.keys()),
       contextDebugInfo: this.audioContextManager.getDebugInfo(),
@@ -716,6 +1151,13 @@ export class AudioManager {
   }
 
   /**
+   * Mide la latencia real del hardware de audio del cliente (roadmap 2.8)
+   */
+  public getMeasuredLatency(): { baseLatency: number | null; outputLatency: number | null } {
+    return this.audioContextManager.getMeasuredLatency();
+  }
+
+  /**
    * Verifica si el contexto está en un estado válido para operaciones de audio
    */
   public isContextValid(): boolean {
@@ -784,6 +1226,36 @@ export class AudioManager {
    */
   public getParameterConfig(): ParameterConfig {
     return this.parameterManager.getConfig();
+  }
+
+  /**
+   * Ajusta el límite de voces simultáneas (roadmap 2.4)
+   */
+  public setMaxVoices(maxVoices: number): void {
+    this.voiceAllocator.updateConfig({ maxVoices });
+  }
+
+  /**
+   * Obtiene el estado del despachador de voces (roadmap 2.4)
+   */
+  public getVoiceAllocatorInfo(): { maxVoices: number; stolenCount: number } {
+    return this.voiceAllocator.getDebugInfo();
+  }
+
+  /**
+   * Ejecuta la validación A/B entre el motor nativo y Tone.js (roadmap
+   * 2.1.e) y reporta latencia de hardware, coste de construcción y huella
+   * de grafo de cada motor.
+   */
+  public runEngineComparison(voices: number = 24) {
+    return runEngineComparison(voices);
+  }
+
+  /** Indica qué motor de audio está activo (roadmap 2.1 / 2.3). */
+  public getActiveEngine(): 'native' | 'csound' | 'tone' {
+    if (CSOUND_ENGINE_ENABLED) return 'csound';
+    if (NATIVE_ENGINE_ENABLED) return 'native';
+    return 'tone';
   }
 
   /**

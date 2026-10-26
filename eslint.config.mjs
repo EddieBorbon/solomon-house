@@ -19,6 +19,7 @@ const eslintConfig = [
       "build/**/*",
       "dist/**/*",
       "src/scripts/**/*",
+      "next-env.d.ts",
       "cleanup-firestore.js",
       "limpiar-firestore.js",
       "limpiar-firestore-v2.js"

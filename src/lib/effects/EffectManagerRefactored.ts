@@ -153,7 +153,7 @@ export class EffectManagerRefactored implements IEffectManager {
         });
         
         // Conectar efecto -> panner -> destination
-        effectNode.chain(effectPanner, Tone.Destination);
+        effectNode.chain(effectPanner, Tone.getDestination());
         
         // Almacenar tanto el nodo del efecto como su panner y posición
         this.globalEffects.set(effectId, { effectNode, panner: effectPanner, position: position });

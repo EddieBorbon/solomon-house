@@ -39,17 +39,23 @@ export class AudioContextManager {
     }
 
     try {
-      // Configurar el contexto con los parámetros especificados
-      // Nota: sampleRate no se puede cambiar después de la creación del contexto
-      
-      // Nota: lookAhead no es una propiedad configurable en Tone.Transport
-      
-      // Nota: updateInterval no es una propiedad configurable en Tone.Transport
+      // Aplicar la configuración de baja latencia al contexto real (roadmap 2.8).
+      // El latencyHint solo puede fijarse al crear el contexto, por lo que se
+      // crea un contexto propio de Tone y se establece como contexto global
+      // antes de que se construya cualquier nodo de audio.
+      if (Tone.getContext().state !== 'running') {
+        const lowLatencyContext = new Tone.Context({
+          latencyHint: this.contextConfig.latencyHint,
+          lookAhead: this.contextConfig.lookAhead ?? 0.05,
+          updateInterval: this.contextConfig.updateInterval ?? 0.025
+        });
+        Tone.setContext(lowLatencyContext);
+      }
 
       console.log('AudioContext inicializado:', {
         latencyHint: this.contextConfig.latencyHint,
-        sampleRate: Tone.context.sampleRate,
-        contextState: Tone.context.state
+        sampleRate: Tone.getContext().sampleRate,
+        contextState: Tone.getContext().state
       });
 
       // Configurar el contexto para evitar suspensión automática
@@ -76,26 +82,26 @@ export class AudioContextManager {
 
     try {
       // Verificar que Tone está disponible antes de usarlo
-      if (!Tone || !Tone.context || !Tone.Transport) {
+      if (!Tone || !Tone.getContext() || !Tone.getTransport()) {
         console.warn('🎵 AudioContextManager: Tone.js no está disponible');
         return;
       }
 
       // Configurar el contexto para que no se suspenda automáticamente
-      if (Tone.context.state === 'suspended') {
+      if (Tone.getContext().state === 'suspended') {
         console.log('🎵 AudioContextManager: Contexto suspendido, intentando reanudar...');
         Tone.start();
       }
 
       // Configurar el Transport para mantener el tiempo activo
-      if (Tone.Transport.state !== 'started') {
-        Tone.Transport.start();
+      if (Tone.getTransport().state !== 'started') {
+        Tone.getTransport().start();
       }
 
       console.log('🎵 AudioContextManager: Contexto configurado para persistencia:', {
-        contextState: Tone.context.state,
-        transportState: Tone.Transport.state,
-        sampleRate: Tone.context.sampleRate
+        contextState: Tone.getContext().state,
+        transportState: Tone.getTransport().state,
+        sampleRate: Tone.getContext().sampleRate
       });
 
     } catch (error) {
@@ -113,7 +119,7 @@ export class AudioContextManager {
     }
 
     try {
-      Tone.context.on('statechange', (newState) => {
+      Tone.getContext().on('statechange', (newState) => {
         
         // Notificar a todos los listeners registrados
         this.stateChangeListeners.forEach(listener => {
@@ -153,7 +159,7 @@ export class AudioContextManager {
         // Event listener para cuando la página vuelva a tener foco (sin limpieza)
         window.addEventListener('focus', () => {
           // Opcional: podríamos reanudar el contexto si está suspendido
-          if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'suspended') {
+          if (typeof Tone !== 'undefined' && Tone.getContext() && Tone.getContext().state === 'suspended') {
             console.log('🎵 AudioContextManager: Página recuperó el foco, reanudando contexto de audio');
             this.resumeContext();
           }
@@ -167,7 +173,7 @@ export class AudioContextManager {
           } else {
             // Página visible de nuevo
             console.log('🎵 AudioContextManager: Página visible de nuevo');
-            if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'suspended') {
+            if (typeof Tone !== 'undefined' && Tone.getContext() && Tone.getContext().state === 'suspended') {
               this.resumeContext();
             }
           }
@@ -213,7 +219,7 @@ export class AudioContextManager {
     }
 
     try {
-      if (Tone.context.state !== 'running') {
+      if (Tone.getContext().state !== 'running') {
         
         await Tone.start();
         this.isContextStarted = true;
@@ -237,11 +243,14 @@ export class AudioContextManager {
     }
 
     try {
-      if (Tone.context.state === 'running') {
-        
-        // Solo cambiar el estado interno, no hay método suspend en Tone
+      if (Tone.getContext().state === 'running') {
+        // Suspender el contexto nativo subyacente para liberar el hilo de audio
+        const raw = Tone.getContext().rawContext as AudioContext;
+        if (typeof raw.suspend === 'function') {
+          await raw.suspend();
+        }
         this.isContextStarted = false;
-        
+
         return true;
       } else {
         return true;
@@ -261,7 +270,7 @@ export class AudioContextManager {
     }
 
     try {
-      if (Tone.context.state === 'suspended') {
+      if (Tone.getContext().state === 'suspended') {
         
         // Reiniciar el contexto ya que no hay método resume en Tone
         await this.startContext();
@@ -280,11 +289,26 @@ export class AudioContextManager {
    * Cierra el contexto de audio
    */
   public async closeContext(): Promise<boolean> {
+    // Solo ejecutar en el cliente (navegador), no durante SSR
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     try {
-      
-      // Solo cambiar el estado interno, no hay método close en Tone
+      // Liberación explícita de recursos (roadmap 2.5): notificar a los
+      // listeners para que desconecten sus grafos y cerrar el contexto
+      // nativo, liberando el hilo de audio del sistema operativo.
+      this.triggerCleanup();
+
+      if (Tone.getContext().state !== 'closed') {
+        const raw = Tone.getContext().rawContext as AudioContext;
+        if (typeof raw.close === 'function') {
+          await raw.close();
+        }
+      }
+
       this.isContextStarted = false;
-      
+
       return true;
     } catch {
       return false;
@@ -298,7 +322,7 @@ export class AudioContextManager {
     if (typeof window === 'undefined') {
       return false;
     }
-    return Tone.context.state === 'running';
+    return Tone.getContext().state === 'running';
   }
 
   /**
@@ -329,10 +353,31 @@ export class AudioContextManager {
     }
     return {
       isRunning: this.isContextRunning(),
-      state: Tone.context.state,
-      sampleRate: Tone.context.sampleRate,
-      latencyHint: String(Tone.context.latencyHint)
+      state: Tone.getContext().state,
+      sampleRate: Tone.getContext().sampleRate,
+      latencyHint: String(Tone.getContext().latencyHint)
     };
+  }
+
+  /**
+   * Mide la latencia real del hardware de audio del cliente (roadmap 2.8).
+   * baseLatency: latencia de procesamiento del contexto (buffer interno).
+   * outputLatency: latencia estimada hasta la salida física (DAC/altavoces).
+   * Ambos valores se expresan en segundos.
+   */
+  public getMeasuredLatency(): { baseLatency: number | null; outputLatency: number | null } {
+    if (typeof window === 'undefined') {
+      return { baseLatency: null, outputLatency: null };
+    }
+    try {
+      const raw = Tone.getContext().rawContext as AudioContext;
+      return {
+        baseLatency: typeof raw.baseLatency === 'number' ? raw.baseLatency : null,
+        outputLatency: typeof raw.outputLatency === 'number' ? raw.outputLatency : null
+      };
+    } catch {
+      return { baseLatency: null, outputLatency: null };
+    }
   }
 
   /**
@@ -353,10 +398,10 @@ export class AudioContextManager {
       };
     }
     return {
-      contextState: Tone.context.state,
+      contextState: Tone.getContext().state,
       isContextStarted: this.isContextStarted,
-      sampleRate: Tone.context.sampleRate,
-      latencyHint: String(Tone.context.latencyHint)
+      sampleRate: Tone.getContext().sampleRate,
+      latencyHint: String(Tone.getContext().latencyHint)
     };
   }
 
@@ -416,7 +461,7 @@ export class AudioContextManager {
     if (typeof window === 'undefined') {
       return false;
     }
-    return Tone.context.state === 'running' && this.isContextStarted;
+    return Tone.getContext().state === 'running' && this.isContextStarted;
   }
 
   /**

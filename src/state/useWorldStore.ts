@@ -11,6 +11,7 @@ import { useWorldSettingsStore } from './useWorldSettingsStore';
 import { useSelectionStore } from '../stores/useSelectionStore';
 import { useAdminAuthStore } from './useAdminAuthStore';
 import { useRealtimeSyncStore } from './useRealtimeSyncStore';
+import { isObjectTypeAllowed, isEffectTypeAllowed, getCurrentLevel } from '../lib/pedagogy/parametricLevels';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
@@ -349,13 +350,19 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
   // Acción para añadir un nuevo objeto - Delegada al WorldStoreFacade
   addObject: (type: SoundObjectType, position: [number, number, number]) => {
     const state = get();
-    
+
     // Verificar si la edición está permitida
     if (!get().canEdit()) {
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
-    
+
+    // Restricción pedagógica por nivel paramétrico (roadmap 8.1)
+    if (!isObjectTypeAllowed(type)) {
+      alert(`El nivel ${getCurrentLevel().name} no permite objetos de tipo "${type}".`);
+      return;
+    }
+
     const activeGridId = state.activeGridId;
     if (!activeGridId) {
       return;
@@ -527,7 +534,13 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
-    
+
+    // Restricción pedagógica por nivel paramétrico (roadmap 8.1)
+    if (!isEffectTypeAllowed(type)) {
+      alert(`El nivel ${getCurrentLevel().name} no permite zonas de efecto "${type}".`);
+      return;
+    }
+
     const activeGridId = state.activeGridId;
     if (!activeGridId) {
       return;

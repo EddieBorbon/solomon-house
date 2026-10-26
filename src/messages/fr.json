@@ -893,5 +893,65 @@
     "down": "Bas",
     "up": "Haut",
     "createGridAtPosition": "Créer une grille à la position spécifiée"
+  },
+  "curriculum": {
+    "title": "Décalogue de l'architecte sonore",
+    "subtitle": "Dix leçons progressives avec micro-défis vérifiés sur la toile.",
+    "lessonLabel": "Leçon",
+    "challengeLabel": "Défi",
+    "verify": "Vérifier sur la toile",
+    "done": "✅ Défi réussi",
+    "notDone": "Pas encore — continue",
+    "progress": "Progression",
+    "l1": {
+      "title": "Écoute avant de construire",
+      "lesson": "Toute architecture sonore commence par l'écoute : avant de placer quoi que ce soit, habite la salle et prête attention à ce qui sonne déjà.",
+      "challenge": "Démarre l'audio de la salle et écoute un instant au casque."
+    },
+    "l2": {
+      "title": "L'espace est partition",
+      "lesson": "Dans la Maison de Salomon, la position écrit la musique : où tu places compte autant que ce que tu places.",
+      "challenge": "Place ton premier objet sonore sur la toile."
+    },
+    "l3": {
+      "title": "Chaque objet est un instrument",
+      "lesson": "Forme visuelle et moteur de synthèse ne font qu'un : des géométries différentes appellent des timbres différents.",
+      "challenge": "Fais coexister au moins deux types d'objets différents."
+    },
+    "l4": {
+      "title": "La hauteur est registre",
+      "lesson": "L'axe vertical est le registre musical : l'aigu s'élève, le grave pèse vers le sol.",
+      "challenge": "Porte un objet aigu (plus de 660 Hz) au-dessus de la hauteur 2."
+    },
+    "l5": {
+      "title": "La distance est dynamique",
+      "lesson": "S'éloigner d'une source est un decrescendo : l'atténuation par la distance est ton régulateur dynamique.",
+      "challenge": "Place un objet à plus de 8 unités du centre et écoute-le s'estomper."
+    },
+    "l6": {
+      "title": "Le silence compose aussi",
+      "lesson": "Une texture équilibrée respire : si une bande de fréquences domine, le mixage devient un mur.",
+      "challenge": "Garde au moins 3 objets sans qu'aucune bande (grave/médium/aigu) ne dépasse 60 %."
+    },
+    "l7": {
+      "title": "Le mouvement est phrasé",
+      "lesson": "Les trajectoires sont des phrases musicales : un objet en orbite articule le temps de l'espace.",
+      "challenge": "Crée un objet mobile et regarde-le parcourir la salle."
+    },
+    "l8": {
+      "title": "Les zones transforment",
+      "lesson": "Les zones d'effet sont l'acoustique variable de l'édifice : réverbérations, échos et filtres qui teintent ce qui les traverse.",
+      "challenge": "Crée une zone d'effet et fais-y passer un son."
+    },
+    "l9": {
+      "title": "On construit avec les autres",
+      "lesson": "La toile est collective : l'œuvre émerge de l'écoute mutuelle entre architectes simultanés.",
+      "challenge": "Connecte-toi au monde global et partage la salle."
+    },
+    "l10": {
+      "title": "L'œuvre reste ouverte",
+      "lesson": "Une sculpture sonore ne se clôt jamais : elle se sauvegarde, s'exporte en partition, se réinterprète et se rouvre.",
+      "challenge": "Sauvegarde ton monde comme projet, ou termine l'examen d'écoute spatiale."
+    }
   }
 }

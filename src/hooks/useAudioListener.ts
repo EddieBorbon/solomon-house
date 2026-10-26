@@ -6,20 +6,20 @@ export function useAudioListener() {
   
   useEffect(() => {
     // Solo ejecutar en el cliente (navegador), no durante SSR
-    if (typeof window === 'undefined' || !Tone || !Tone.context) {
+    if (typeof window === 'undefined' || !Tone || !Tone.getContext()) {
       return;
     }
 
     try {
       // Verificar que el contexto de audio esté funcionando
-      if (Tone.context.state !== 'running') {
+      if (Tone.getContext().state !== 'running') {
         return;
       }
 
       // Configurar el listener global de Tone.js para espacialización 3D
       
       // Configurar parámetros del listener global (solo propiedades disponibles)
-      Tone.Listener.set({
+      Tone.getListener().set({
         forwardX: 0,
         forwardY: 0,
         forwardZ: -1, // Mirar hacia adelante por defecto
@@ -29,12 +29,12 @@ export function useAudioListener() {
       });
 
       console.log('Audio Context Info:', {
-        contextState: Tone.context.state,
-        sampleRate: Tone.context.sampleRate,
-        latencyHint: Tone.context.latencyHint,
+        contextState: Tone.getContext().state,
+        sampleRate: Tone.getContext().sampleRate,
+        latencyHint: Tone.getContext().latencyHint,
         listenerConfig: {
-          forward: [Tone.Listener.forwardX.value, Tone.Listener.forwardY.value, Tone.Listener.forwardZ.value],
-          up: [Tone.Listener.upX.value, Tone.Listener.upY.value, Tone.Listener.upZ.value]
+          forward: [Tone.getListener().forwardX.value, Tone.getListener().forwardY.value, Tone.getListener().forwardZ.value],
+          up: [Tone.getListener().upX.value, Tone.getListener().upY.value, Tone.getListener().upZ.value]
         }
       });
 

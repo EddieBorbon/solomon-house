@@ -782,10 +782,7 @@
     "editionLocked": "EDICIÓN BLOQUEADA",
     "editionUnlocked": "EDICIÓN DESBLOQUEADA",
     "unlockDialogTitle": "DESBLOQUEAR EDICIÓN",
-    "adminPassword": "Contraseña de Administrador",
     "enterPassword": "Ingresa la contraseña",
-    "unlockSuccess": "Edición desbloqueada correctamente.",
-    "wrongPassword": "Contraseña incorrecta.",
     "editionLockedMessage": "La edición está bloqueada. Ingresa la contraseña de administrador para editar.",
     "projectNotFound": "Proyecto no encontrado",
     "gridNotFound": "Cuadrícula no encontrada"
@@ -1023,6 +1020,66 @@
       "filterSustain": "Nivel de sostenimiento del filtro. Controla el nivel mantenido mientras el filtro está activo.",
       "filterRelease": "Tiempo de liberación del filtro. Controla qué tan rápido se desactiva el filtro.",
       "resonanceQ": "Factor Q de resonancia del filtro. Controla la intensidad del pico en la frecuencia de corte."
+    }
+  },
+  "curriculum": {
+    "title": "Decálogo del Arquitecto Sonoro",
+    "subtitle": "Diez lecciones progresivas con micro-desafíos que se verifican en el lienzo.",
+    "lessonLabel": "Lección",
+    "challengeLabel": "Desafío",
+    "verify": "Verificar en el lienzo",
+    "done": "✅ Desafío superado",
+    "notDone": "Aún no se cumple — sigue intentando",
+    "progress": "Progreso",
+    "l1": {
+      "title": "Escucha antes de construir",
+      "lesson": "Toda arquitectura sonora comienza con la escucha: antes de colocar nada, habita la sala y atiende a lo que ya suena.",
+      "challenge": "Inicia el audio de la sala y escucha un momento con auriculares."
+    },
+    "l2": {
+      "title": "El espacio es partitura",
+      "lesson": "En La Casa de Salomón la posición escribe música: dónde colocas algo es tan importante como qué colocas.",
+      "challenge": "Coloca tu primer objeto sonoro en el lienzo."
+    },
+    "l3": {
+      "title": "Cada objeto es un instrumento",
+      "lesson": "La forma visual y el motor de síntesis son una sola cosa: geometrías distintas piden timbres distintos.",
+      "challenge": "Haz convivir al menos dos tipos de objeto diferentes."
+    },
+    "l4": {
+      "title": "La altura es registro",
+      "lesson": "El eje vertical es el registro musical: lo agudo asciende, lo grave pesa hacia el suelo.",
+      "challenge": "Lleva un objeto agudo (más de 660 Hz) por encima de la altura 2."
+    },
+    "l5": {
+      "title": "La distancia es dinámica",
+      "lesson": "Alejarse de una fuente es un decrescendo: la atenuación por distancia es tu regulador dinámico.",
+      "challenge": "Sitúa un objeto a más de 8 unidades del centro y escucha cómo se desvanece."
+    },
+    "l6": {
+      "title": "El silencio también compone",
+      "lesson": "Una textura equilibrada respira: si una banda de frecuencia domina, la mezcla se vuelve muro.",
+      "challenge": "Mantén al menos 3 objetos sin que ninguna banda (grave/media/aguda) concentre más del 60%."
+    },
+    "l7": {
+      "title": "El movimiento es fraseo",
+      "lesson": "Las trayectorias son frases musicales: un objeto que orbita articula el tiempo del espacio.",
+      "challenge": "Crea un objeto móvil y obsérvalo recorrer la sala."
+    },
+    "l8": {
+      "title": "Las zonas transforman",
+      "lesson": "Las zonas de efecto son la acústica variable del edificio: reverberos, ecos y filtros que tiñen lo que las atraviesa.",
+      "challenge": "Crea una zona de efecto y haz pasar un sonido por ella."
+    },
+    "l9": {
+      "title": "Se construye con otros",
+      "lesson": "El lienzo es colectivo: la obra emerge de la escucha mutua entre arquitectos simultáneos.",
+      "challenge": "Conéctate al mundo global y comparte la sala."
+    },
+    "l10": {
+      "title": "La obra permanece abierta",
+      "lesson": "Una escultura sonora nunca se clausura: se guarda, se exporta como partitura, se reinterpreta y se vuelve a abrir.",
+      "challenge": "Guarda tu mundo como proyecto, o completa el examen de escucha espacial."
     }
   }
 }

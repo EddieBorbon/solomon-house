@@ -195,7 +195,9 @@ export class SoundSourceFactory {
     // CAMINO SECO: synth -> panner -> dryGain -> Destination
     synth.connect(panner);
     panner.connect(dryGain);
-    dryGain.connect(Tone.Destination);
+    // Tone.Destination es una constante congelada al importar Tone; con el
+    // contexto de baja latencia (2.8) hay que resolver el destino dinámicamente
+    dryGain.connect(Tone.getDestination());
 
     // CAMINO MOJADO: synth -> effectSend -> globalEffect -> Destination
     globalEffects.forEach((effectData, effectId) => {

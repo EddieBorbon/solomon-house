@@ -64,19 +64,19 @@ export class SpatialAudioManager {
   public updateListener(position: THREE.Vector3, forward: THREE.Vector3): void {
     try {
       // Actualizar la posición del oyente
-      Tone.Listener.positionX.value = position.x;
-      Tone.Listener.positionY.value = position.y;
-      Tone.Listener.positionZ.value = position.z;
+      Tone.getListener().positionX.value = position.x;
+      Tone.getListener().positionY.value = position.y;
+      Tone.getListener().positionZ.value = position.z;
       
       // Actualizar la orientación del oyente (hacia dónde mira)
-      Tone.Listener.forwardX.value = forward.x;
-      Tone.Listener.forwardY.value = forward.y;
-      Tone.Listener.forwardZ.value = forward.z;
+      Tone.getListener().forwardX.value = forward.x;
+      Tone.getListener().forwardY.value = forward.y;
+      Tone.getListener().forwardZ.value = forward.z;
       
       // Configurar el vector "arriba" del oyente (normalmente Y positivo)
-      Tone.Listener.upX.value = 0;
-      Tone.Listener.upY.value = 1;
-      Tone.Listener.upZ.value = 0;
+      Tone.getListener().upX.value = 0;
+      Tone.getListener().upY.value = 1;
+      Tone.getListener().upZ.value = 0;
       
       // Actualizar el estado interno
       this.listenerState.position.copy(position);

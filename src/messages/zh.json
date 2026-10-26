@@ -454,17 +454,6 @@
     "burmese": "缅甸语"
   },
   "codeEditor": {
-    "examples": "示例",
-    "basic": "基础",
-    "intermediate": "中级",
-    "advanced": "高级",
-    "cancel": "取消",
-    "saveAndExecute": "保存并执行",
-    "tonePlaceholder": "在此输入您的javascript代码...",
-    "threePlaceholder": "在此输入您的webgl代码...",
-    "toneApi": "Tone.js Audio API",
-    "threeApi": "Three.js WebGL",
-    "examplesTitle": "示例",
     "programmingCustom": "自定义编程",
     "programShape": "编程形状_THREE_JS",
     "programSynthesis": "编程合成_TONE_JS",
@@ -832,7 +821,6 @@
     "filterEnvelope": "滤波器包络",
     "filterBaseFrequency": "滤波器基础频率",
     "filterOctaves": "滤波器八度",
-    "resonanceQ": "共振Q",
     "harmonicity": "谐波性",
     "modulationIndex": "调制指数",
     "modulationEnvelope": "调制包络",
@@ -856,11 +844,64 @@
     "noEntitySelected": "未选择实体",
     "clickObjectOrZoneToEdit": "在3D世界中点击声音对象或效果区域以选择并编辑其参数。"
   },
-  "codeEditor": {
-    "programmingCustom": "自定义编程",
-    "programShape": "编程形状_THREE_JS",
-    "programSynthesis": "编程合成_TONE_JS",
-    "editorFormaTitle": "形状编辑器_THREE_JS",
-    "editorSintesisTitle": "合成编辑器_TONE_JS"
+  "curriculum": {
+    "title": "声音建筑师十诫",
+    "subtitle": "十节循序渐进的课程，微挑战在画布上自动验证。",
+    "lessonLabel": "课程",
+    "challengeLabel": "挑战",
+    "verify": "在画布上验证",
+    "done": "✅ 挑战完成",
+    "notDone": "尚未达成——继续努力",
+    "progress": "进度",
+    "l1": {
+      "title": "先聆听，后建造",
+      "lesson": "一切声音建筑始于聆听：在放置任何东西之前，先栖居于厅堂，倾听已有的声响。",
+      "challenge": "启动厅堂音频，戴上耳机聆听片刻。"
+    },
+    "l2": {
+      "title": "空间即乐谱",
+      "lesson": "在所罗门之家，位置书写音乐：放在哪里与放什么同样重要。",
+      "challenge": "在画布上放置你的第一个声音物体。"
+    },
+    "l3": {
+      "title": "每个物体都是乐器",
+      "lesson": "视觉形态与合成引擎合二为一：不同的几何体呼唤不同的音色。",
+      "challenge": "让至少两种不同类型的物体共存。"
+    },
+    "l4": {
+      "title": "高度即音区",
+      "lesson": "垂直轴是音乐音区：高音上升，低音沉向大地。",
+      "challenge": "将一个高音物体（高于 660 Hz）抬升到高度 2 以上。"
+    },
+    "l5": {
+      "title": "距离即力度",
+      "lesson": "远离声源即渐弱：距离衰减是你的力度调节器。",
+      "challenge": "把一个物体放到距中心 8 个单位以外，听它渐渐消逝。"
+    },
+    "l6": {
+      "title": "静默亦在作曲",
+      "lesson": "均衡的织体会呼吸：若某一频段独大，混音便成了墙。",
+      "challenge": "保持至少 3 个物体，且任一频段（低/中/高）不超过 60%。"
+    },
+    "l7": {
+      "title": "运动即乐句",
+      "lesson": "轨迹是音乐乐句：环绕的物体为空间标记时间。",
+      "challenge": "创建一个移动物体，看它巡游厅堂。"
+    },
+    "l8": {
+      "title": "区域施以变形",
+      "lesson": "效果区域是建筑的可变声学：混响、回声与滤波为穿越其中的声音着色。",
+      "challenge": "创建一个效果区域，让声音穿过它。"
+    },
+    "l9": {
+      "title": "与他人共建",
+      "lesson": "画布是集体的：作品诞生于同时在场的建筑师们的相互聆听。",
+      "challenge": "连接到全球世界，与他人共享厅堂。"
+    },
+    "l10": {
+      "title": "作品永远开放",
+      "lesson": "声音雕塑从不封闭：它被保存、导出为乐谱、被重新诠释、再次开启。",
+      "challenge": "将你的世界保存为项目，或完成空间聆听测验。"
+    }
   }
 }
