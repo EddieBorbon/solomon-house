@@ -42,3 +42,8 @@ next-env.d.ts
 
 # documentation
 docs/
+
+# Dependencias en subcarpetas (p. ej. server/)
+node_modules/
+# Configuración local de herramientas
+.claude/
