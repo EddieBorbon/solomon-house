@@ -1,24 +1,14 @@
 "use client";
 
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
-// Modo revisión: oculta autoría, créditos institucionales y logos para la
-// evaluación ciega de artículos. Se activa con NEXT_PUBLIC_MODO_REVISION=true
-// o al abrir la plataforma desde un dominio que contenga "revision"
-// (dominio asignado a la rama modo-revision en el mismo proyecto de Vercel).
-const MODO_REVISION_ENV = process.env.NEXT_PUBLIC_MODO_REVISION === 'true';
-
-function useModoRevision(): boolean | null {
-  // null mientras no se conoce el dominio: los créditos no se muestran hasta saberlo
-  const [modo, setModo] = useState<boolean | null>(MODO_REVISION_ENV ? true : null);
-  useEffect(() => {
-    if (!MODO_REVISION_ENV) setModo(window.location.hostname.includes('revision'));
-  }, []);
-  return modo;
-}
+// Modo revisión: oculta autoría, créditos institucionales y logos mientras
+// los artículos sobre la plataforma están en evaluación ciega. Está activo
+// por defecto; para volver a mostrar los créditos, definir
+// NEXT_PUBLIC_MOSTRAR_CREDITOS=true en Vercel y volver a desplegar.
+const MODO_REVISION = process.env.NEXT_PUBLIC_MOSTRAR_CREDITOS !== 'true';
 
 interface LoadingScreenProps {
   variant?: 'initial' | 'scene' | 'audio';
@@ -28,9 +18,6 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: LoadingScreenProps) {
   const { t } = useLanguage();
-  const modoRevision = useModoRevision();
-  // Créditos visibles solo cuando se confirma que no es el dominio de revisión
-  const MODO_REVISION = modoRevision !== false;
 
   const getContent = () => {
     switch (variant) {
