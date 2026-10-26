@@ -1,0 +1,74 @@
+# La Casa de Salomón — stack autohospedable (roadmap 7.1 y 7.2)
+# Levanta toda la plataforma con un solo comando:
+#   docker compose up --build
+#
+# Para soberanía total (sin Firebase), exporta antes:
+#   NEXT_PUBLIC_STORAGE_BACKEND=selfhosted
+#   NEXT_PUBLIC_STORAGE_URL=http://localhost:3003
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # URL pública del servidor de señalización vista desde el navegador
+        - NEXT_PUBLIC_SIGNALING_URL=${NEXT_PUBLIC_SIGNALING_URL:-ws://localhost:3001}
+        # Backend de almacenamiento (firebase | selfhosted) y su URL pública
+        - NEXT_PUBLIC_STORAGE_BACKEND=${NEXT_PUBLIC_STORAGE_BACKEND:-firebase}
+        - NEXT_PUBLIC_STORAGE_URL=${NEXT_PUBLIC_STORAGE_URL:-http://localhost:3003}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Servidor de señalización WebRTC (roadmap 1.3): empareja a los usuarios
+  # de una sala para que abran conexiones P2P de baja latencia (roadmap 1.2).
+  signaling:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - SIGNALING_PORT=3001
+    restart: unless-stopped
+
+  # Base de datos local autohospedada (roadmap 7.2): SQLite + REST + WebSocket,
+  # sustituye a Firebase cuando NEXT_PUBLIC_STORAGE_BACKEND=selfhosted.
+  storage:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: ["node", "storage-server.mjs"]
+    ports:
+      - "3003:3003"
+    environment:
+      - STORAGE_PORT=3003
+      - STORAGE_DB=/data/solomon-house.db
+    volumes:
+      - storage-data:/data
+    restart: unless-stopped
+
+  # Relay WebTransport HTTP/3 (roadmap 1.4): transporte alternativo al
+  # WebRTC P2P para clientes tras NAT simétrica. Requiere certificado TLS
+  # montado en /certs (ver server/WEBTRANSPORT.md). Perfil opcional.
+  webtransport:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: ["node", "webtransport-server.mjs"]
+    profiles: ["webtransport"]
+    ports:
+      - "4433:4433/udp"
+    environment:
+      - WT_PORT=4433
+      - WT_CERT=/certs/cert.pem
+      - WT_KEY=/certs/key.pem
+    volumes:
+      - ./server/certs:/certs:ro
+    restart: unless-stopped
+
+volumes:
+  storage-data:

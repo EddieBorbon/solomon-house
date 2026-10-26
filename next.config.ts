@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Salida autocontenida para despliegue en contenedores (Docker)
+  output: "standalone",
   experimental: {
     optimizePackageImports: ['@react-three/fiber', '@react-three/drei', 'three'],
   },
