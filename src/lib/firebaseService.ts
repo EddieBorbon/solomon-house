@@ -41,6 +41,14 @@ export interface GlobalWorldDoc {
   version: number; // Para manejo de conflictos
 }
 
+/** Metadatos de galería para residencias artísticas virtuales (roadmap 8.5) */
+export interface GalleryMetadata {
+  artist: string;
+  statement: string;
+  publishedAt: string; // ISO 8601
+  visits: number;
+}
+
 export interface FirebaseProject {
   id: string;
   name: string;
@@ -48,6 +56,7 @@ export interface FirebaseProject {
   grids: FirebaseGrid[];
   activeGridId: string | null;
   isLocked?: boolean; // Estado de bloqueo individual del proyecto
+  gallery?: GalleryMetadata; // Presente solo en cuartos publicados como galería (8.5)
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -579,5 +588,24 @@ export class FirebaseService {
   }
 }
 
-// Instancia singleton
-export const firebaseService = FirebaseService.getInstance();
+import { SelfHostedService } from './storage/SelfHostedService';
+
+/**
+ * Backend de almacenamiento intercambiable (roadmap 7.2): con
+ * NEXT_PUBLIC_STORAGE_BACKEND=selfhosted toda la plataforma usa la base
+ * de datos local de código abierto (server/storage-server.mjs) en lugar
+ * de Firebase, sin cambios en el resto del código. Ambas implementaciones
+ * comparten la misma interfaz pública.
+ */
+export type StorageService = FirebaseService | SelfHostedService;
+
+const useSelfHosted = process.env.NEXT_PUBLIC_STORAGE_BACKEND === 'selfhosted';
+
+// Instancia singleton del backend activo
+export const firebaseService: StorageService = useSelfHosted
+  ? new SelfHostedService()
+  : FirebaseService.getInstance();
+
+if (useSelfHosted && typeof window !== 'undefined') {
+  console.log('💾 Almacenamiento: backend autohospedado activo (soberanía tecnológica, 7.2)');
+}
