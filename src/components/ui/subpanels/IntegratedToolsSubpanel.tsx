@@ -18,6 +18,7 @@ import { exportGraphicScore } from '../../../lib/score/graphicScore';
 import { importTopologicalScoreFromFile } from '../../../lib/score/scoreInterpreter';
 import { importSessionFromFileForReplay } from '../../../lib/session/sessionReplay';
 import { xrStore } from '../../world/Experience';
+import { useFutureProjectionStore } from '../../../lib/future/futureProjection';
 
 export function IntegratedToolsSubpanel() {
   const { activeModal, toggleModal } = useUIPanelStore();
@@ -29,6 +30,41 @@ export function IntegratedToolsSubpanel() {
   const agents = useAgentCompanionStore((s) => s.agents);
   const isRecording = useSessionRecorderStore((s) => s.isRecording);
   const sessionTimerRunning = useExpandedScoreStore((s) => s.sessionTimerRunning);
+  const passthroughArEnabled = useFutureProjectionStore((s) => s.passthroughArEnabled);
+
+  const handleEnterVR = async () => {
+    try {
+      const supported =
+        typeof navigator !== 'undefined' &&
+        'xr' in navigator &&
+        (await navigator.xr?.isSessionSupported('immersive-vr'));
+      if (supported) {
+        await xrStore.enterVR();
+      } else {
+        toggleModal('future_e8');
+      }
+    } catch {
+      toggleModal('future_e8');
+    }
+  };
+
+  const handleEnterAR = async () => {
+    const next = !passthroughArEnabled;
+    useFutureProjectionStore.setState({ passthroughArEnabled: next });
+    if (next) {
+      try {
+        const supported =
+          typeof navigator !== 'undefined' &&
+          'xr' in navigator &&
+          (await navigator.xr?.isSessionSupported('immersive-ar'));
+        if (supported) {
+          await xrStore.enterAR();
+        }
+      } catch {
+        // Permanece en modo Passthrough AR WebGL transparente
+      }
+    }
+  };
 
   const [pedagogyOpen, setPedagogyOpen] = useState(true);
   const [audioOpen, setAudioOpen] = useState(true);
@@ -240,16 +276,20 @@ export function IntegratedToolsSubpanel() {
 
             <div className="grid grid-cols-2 gap-1 mb-1">
               <button
-                onClick={() => xrStore.enterVR().catch(() => {})}
+                onClick={handleEnterVR}
                 className="px-2 py-1 border border-violet-500/40 bg-violet-950/20 font-mono text-[10px] text-violet-200 hover:bg-violet-900/40"
               >
                 🥽 Modo WebXR VR
               </button>
               <button
-                onClick={() => xrStore.enterAR().catch(() => {})}
-                className="px-2 py-1 border border-fuchsia-500/40 bg-fuchsia-950/20 font-mono text-[10px] text-fuchsia-200 hover:bg-fuchsia-900/40"
+                onClick={handleEnterAR}
+                className={`px-2 py-1 border font-mono text-[10px] transition-colors ${
+                  passthroughArEnabled
+                    ? 'border-fuchsia-400 bg-fuchsia-950/60 text-fuchsia-200 font-bold'
+                    : 'border-fuchsia-500/40 bg-fuchsia-950/20 text-fuchsia-200 hover:bg-fuchsia-900/40'
+                }`}
               >
-                📲 Passthrough AR
+                📲 AR: {passthroughArEnabled ? 'ACTIVO' : 'OFF'}
               </button>
             </div>
 

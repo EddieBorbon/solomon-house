@@ -26,11 +26,22 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAudioContext } from '../../hooks/useAudioContext';
 
 /**
- * Almacén WebXR (roadmap 3.3): gestiona la sesión inmersiva VR/AR con
- * controladores y seguimiento de manos por defecto. Vive a nivel de módulo
- * para que la UI (VRToggle) pueda iniciar la sesión desde fuera del Canvas.
+ * Compatibilidad Three.js r173+ con dependencias (@iwer / WebXR / postprocessing)
+ * que esperan `Material.prototype.onBuild` (eliminado en three >= 0.173).
  */
-export const xrStore = createXRStore();
+if (
+  typeof THREE.Material !== 'undefined' &&
+  typeof (THREE.Material.prototype as unknown as { onBuild?: () => void }).onBuild !== 'function'
+) {
+  (THREE.Material.prototype as unknown as { onBuild: () => void }).onBuild = function () {};
+}
+
+/**
+ * Almacén WebXR (roadmap 3.3): gestiona la sesión inmersiva VR/AR con
+ * controladores y seguimiento de manos por defecto. Se desactiva el emulador
+ * `@iwer` (`emulate: false`) para evitar que inyecte una segunda instancia de Three.js (0.165.0).
+ */
+export const xrStore = createXRStore({ emulate: false });
 
 // Componente interno para manejar los controles de cámara y audio espacializado
 function CameraControllerInternal({ orbitControlsRef }: { orbitControlsRef: React.RefObject<OrbitControlsImpl | null> }) {

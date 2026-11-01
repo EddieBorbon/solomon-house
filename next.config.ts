@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Salida autocontenida para despliegue en contenedores (Docker)
@@ -6,7 +7,22 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['@react-three/fiber', '@react-three/drei', 'three'],
   },
-  transpilePackages: ['tone', 'standardized-audio-context'],
+  transpilePackages: [
+    'tone',
+    'standardized-audio-context',
+    'three',
+    '@react-three/fiber',
+    '@react-three/drei',
+    '@react-three/xr',
+  ],
+  webpack: (config) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      three: path.resolve(process.cwd(), 'node_modules/three'),
+    };
+    return config;
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

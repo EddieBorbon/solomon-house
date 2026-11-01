@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
-import { Html, Line } from '@react-three/drei';
+import { Html } from '@react-three/drei';
 import {
   useFutureProjectionStore,
   updateLocalMixedRealityPresence,
@@ -92,18 +92,11 @@ export function XrAndSiteSpecificLayer3D() {
               <meshBasicMaterial color="#e879f9" transparent opacity={0.85} side={2} />
             </mesh>
 
-            {/* Línea vertical de anclaje físico suelo -> escultura sonora */}
-            <Line
-              points={[
-                [0, -ay + 0.02, 0],
-                [0, 0, 0],
-              ]}
-              color="#e879f9"
-              lineWidth={1.5}
-              dashed
-              dashSize={0.15}
-              gapSize={0.1}
-            />
+            {/* Haz vertical de anclaje físico suelo -> escultura sonora */}
+            <mesh position={[0, -ay / 2, 0]}>
+              <cylinderGeometry args={[0.015, 0.015, Math.max(0.05, Math.abs(ay)), 8]} />
+              <meshBasicMaterial color="#e879f9" transparent opacity={0.65} />
+            </mesh>
 
             {/* Nodo de ancla interactivo */}
             <mesh

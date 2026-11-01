@@ -170,19 +170,51 @@ export function FutureProjectionPanel() {
                 </span>
                 <div className="flex gap-1">
                   <button
-                    onClick={() => xrStore.enterVR().catch(() => notify('Visor WebXR VR no detectado en este navegador.'))}
+                    onClick={async () => {
+                      try {
+                        const supported =
+                          typeof navigator !== 'undefined' &&
+                          'xr' in navigator &&
+                          (await navigator.xr?.isSessionSupported('immersive-vr'));
+                        if (supported) {
+                          await xrStore.enterVR();
+                        } else {
+                          notify('Visor WebXR VR no detectado en este navegador.');
+                        }
+                      } catch {
+                        notify('Visor WebXR VR no detectado en este navegador.');
+                      }
+                    }}
                     className="rounded border border-violet-500/50 bg-violet-950/40 px-2 py-0.5 font-mono text-[10px] text-violet-200 hover:bg-violet-800/50"
                   >
                     🥽 Entrar VR
                   </button>
                   <button
-                    onClick={() => xrStore.enterAR().catch(() => {
-                      useFutureProjectionStore.setState({ passthroughArEnabled: true });
-                      notify('Fondo Passthrough AR activado en el lienzo 3D.');
-                    })}
+                    onClick={async () => {
+                      const next = !store.passthroughArEnabled;
+                      useFutureProjectionStore.setState({ passthroughArEnabled: next });
+                      notify(
+                        next
+                          ? 'Fondo Passthrough AR activado en el lienzo 3D.'
+                          : 'Fondo Passthrough AR desactivado.'
+                      );
+                      if (next) {
+                        try {
+                          const supported =
+                            typeof navigator !== 'undefined' &&
+                            'xr' in navigator &&
+                            (await navigator.xr?.isSessionSupported('immersive-ar'));
+                          if (supported) {
+                            await xrStore.enterAR();
+                          }
+                        } catch {
+                          // Permanece en modo Passthrough WebGL transparente
+                        }
+                      }
+                    }}
                     className="rounded border border-fuchsia-500/50 bg-fuchsia-950/40 px-2 py-0.5 font-mono text-[10px] text-fuchsia-200 hover:bg-fuchsia-800/50"
                   >
-                    📲 Entrar AR
+                    📲 {store.passthroughArEnabled ? 'Salir AR' : 'Entrar AR'}
                   </button>
                 </div>
               </div>
