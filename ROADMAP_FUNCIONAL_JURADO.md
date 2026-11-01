@@ -33,12 +33,12 @@ Relación con los otros roadmaps:
 | **E1** | Registro y análisis de sesiones | SE · GC · GG | 🔴 Crítica (alimenta la tesis) | 22 | 22 |
 | **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 20 |
 | **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 13 |
-| **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 0 |
+| **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 12 |
 | **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 0 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 0 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **55** |
+| **TOTAL** | | | | **126** | **67** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -219,24 +219,24 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 ### E4.1 · Un agente que escucha y responde
 
-- [ ] **E4.1.1** Perfiles de comportamiento del agente: imitar, contrastar, sostener, callar y provocar.
-- [ ] **E4.1.2** Respuesta a gestos humanos, no solo a la densidad global (por ejemplo: alguien acelera y el agente responde).
-- [ ] **E4.1.3** Memoria corta del agente: retoma un motivo que alguien tocó minutos antes.
-- [ ] **E4.1.4** Usar `TrajectoryPredictor` para anticipar adónde va una persona y preparar material allí.
+- [x] **E4.1.1** Perfiles de comportamiento del agente: imitar, contrastar, sostener, callar y provocar. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`AgentBehaviorProfile`, `AGENT_PROFILE_LABELS`)
+- [x] **E4.1.2** Respuesta a gestos humanos, no solo a la densidad global (por ejemplo: alguien acelera y el agente responde). ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`recentHumanGestureRatePerMin`, `gestureBoost`)
+- [x] **E4.1.3** Memoria corta del agente: retoma un motivo que alguien tocó minutos antes. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`shortTermMotifMemory`, `actImitate`)
+- [x] **E4.1.4** Usar `TrajectoryPredictor` para anticipar adónde va una persona y preparar material allí. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`feedParticipantPosition`, `actProvoke`)
 
 ### E4.2 · Transparencia y control
 
-- [ ] **E4.2.1** Visualizar las intenciones del agente ("voy a contrastar la banda grave").
-- [ ] **E4.2.2** Controles de agencia: cuánto interviene y en qué capas (relación con E2.2).
-- [ ] **E4.2.3** Registrar cada acción del agente con su autoría para la analítica de E1.3.6.
+- [x] **E4.2.1** Visualizar las intenciones del agente ("voy a contrastar la banda grave"). ✅ 2026-11-02 — `src/components/ui/SonicGardenerToggle.tsx` (`currentIntention`)
+- [x] **E4.2.2** Controles de agencia: cuánto interviene y en qué capas (relación con E2.2). ✅ 2026-11-02 — `src/components/ui/SonicGardenerToggle.tsx` (`interventionRate`, `allowedLayers`)
+- [x] **E4.2.3** Registrar cada acción del agente con su autoría para la analítica de E1.3.6. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`withSessionAuthor('agent', ..., agent.id)`)
 
 ### E4.3 · Agencia distribuida
 
-- [ ] **E4.3.1** Varios agentes con personalidades distintas en la misma sala.
-- [ ] **E4.3.2** Que un agente adopte las reglas de la partitura de E2 (turnos, fases).
-- [ ] **E4.3.3** Modo "ensamble mínimo": una persona con dos agentes, para practicar en solitario.
-- [ ] **E4.3.4** Agente director: propone cambios de fase o de nivel según el estado de la sala.
-- [ ] **E4.3.5** Sesiones comparativas con y sin agente, medidas con E1, como material de tesis o artículo.
+- [x] **E4.3.1** Varios agentes con personalidades distintas en la misma sala. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`DEFAULT_AGENTS`, `tickAll`)
+- [x] **E4.3.2** Que un agente adopte las reglas de la partitura de E2 (turnos, fases). ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`respectScoreRulesE2`)
+- [x] **E4.3.3** Modo "ensamble mínimo": una persona con dos agentes, para practicar en solitario. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`enableMinimumEnsembleMode`)
+- [x] **E4.3.4** Agente director: propone cambios de fase o de nivel según el estado de la sala. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`evaluateDirectorProposal`, `applyDirectorProposal`)
+- [x] **E4.3.5** Sesiones comparativas con y sin agente, medidas con E1, como material de tesis o artículo. ✅ 2026-11-02 — `src/lib/agents/SonicGardener.ts` (`captureComparativeSessionSnapshot`, `exportComparativeAgencyReportJson`)
 
 ---
 
@@ -414,3 +414,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 - 2026-11-02: **Etapa E1 completada (22/22 tareas)**: grabador `.casa.json` v2 con JSON Schema, consentimiento explícito y anonimización; grabación de bus maestro WAV/OGG y binaural; reproductor temporal con marcadores de investigación; analítica musicológica automática y fichas comparativas de los tres casos de estudio (Moscú, Diáspora, China); telemetría continua con comparación TCP (Firebase) vs UDP (WebRTC); y visualizaciones SVG (mapa de calor espacial, diagrama topológico por fases y partitura gráfica temporal).
 - 2026-11-02: **Etapa E2 completada (20/20 tareas)**: protocolo de partitura expandida con 5 roles y matriz de permisos, asignación en vivo desde `TutorDashboard`, balizas 3D de rol/capa en la escena, propiedad y cesión de objetos, modos síncrono, por turnos y cadáver exquisito sonoro asíncrono, bloqueo de parámetros, temporizador con 4 fases y auto-archivado en E1, retos compositivos por nivel N1–N4 evaluados con E1.3, plantillas compartibles ("partituras de juego"), tipos de sala, temporadas y micro-redes de afinidad.
 - 2026-11-02: **Etapa E3 completada (13/13 tareas)**: documentación explícita forma geométrica → familia tímbrica (`OBJECT_TIMBRAL_LOGIC`), aplicación automática de mapeos al crear objetos, tres presets de lógica por sala (`structural`, `gestural`, `symbolic`), animación visual de amplitud y envolvente ataque/decaimiento en todos los objetos, firmas visuales derivadas del efecto acústico en `EffectZone`, inspector en vivo "¿Por qué suena así?", leyenda flotante de sala, modo acusmático experimental, prueba perceptual interactiva con tasa de acierto vs. azar `1/N` e integración en `.casa.json`.
+- 2026-11-02: **Etapa E4 completada (12/12 tareas)**: 5 perfiles de comportamiento (`imitate`, `contrast`, `sustain`, `silence`, `provoke`), respuesta a la aceleración gestual humana, memoria corta de motivos humanos (1–5 min), anticipación espacial con `TrajectoryPredictor`, visualización en vivo de intenciones del agente, controles de nivel de agencia y filtro de capas E2.2, autoría por instancia de agente en E1.3.6, soporte multi-agente con personalidades distintas, adopción de turnos y fases de E2, modo "Ensamble Mínimo" (1 humano + 2 agentes), Agente Director de fases/niveles y estudio comparativo exportable Con Agente vs. Sin Agente.
