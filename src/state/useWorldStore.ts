@@ -276,8 +276,8 @@ export interface WorldActions {
   // Acciones para bloqueo de edición con admin
   canEdit: () => boolean; // Verificar si la edición está permitida
   lockEditing: () => void;
-  unlockEditing: (password: string) => boolean; // Retorna true si la contraseña es correcta
-  authenticateAdmin: (password: string) => boolean; // Retorna true si la contraseña es correcta
+  unlockEditing: () => Promise<boolean>; // Login de admin con Google; resuelve true si es el admin
+  authenticateAdmin: () => Promise<boolean>; // Login de admin con Google; resuelve true si es el admin
   
   // Acciones para objetos móviles
   addMobileObject: (position: [number, number, number]) => void;
@@ -651,14 +651,14 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     useAdminAuthStore.getState().lockEditing();
   },
   
-  // Acción para desbloquear la edición con contraseña
-  unlockEditing: (password: string) => {
-    return useAdminAuthStore.getState().unlockEditing(password);
+  // Acción para desbloquear la edición (login de admin con Google)
+  unlockEditing: () => {
+    return useAdminAuthStore.getState().unlockEditing();
   },
   
-  // Acción para autenticar como admin con contraseña
-  authenticateAdmin: (password: string) => {
-    return useAdminAuthStore.getState().authenticateAdmin(password);
+  // Acción para autenticar como admin (login con Google)
+  authenticateAdmin: () => {
+    return useAdminAuthStore.getState().authenticateAdmin();
   },
 
   refreshAllEffects: () => {

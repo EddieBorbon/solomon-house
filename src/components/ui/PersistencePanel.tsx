@@ -20,11 +20,9 @@ export function PersistencePanel() {
   const [showLoadDialog, setShowLoadDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
   const [showAdminDialog, setShowAdminDialog] = useState(false);
   const [adminDialogAction, setAdminDialogAction] = useState<'lock' | 'unlock' | 'delete' | null>(null);
   const [adminDialogProjectId, setAdminDialogProjectId] = useState<string | null>(null);
-  const [adminDialogPassword, setAdminDialogPassword] = useState('');
 
   const { grids, currentProjectId, setCurrentProjectId, isEditingLocked, isAdminAuthenticated, unlockEditing, setGlobalWorldConnected } = useWorldStore();
   const { isConnected } = useRealtimeSync(currentProjectId);
@@ -199,6 +197,16 @@ export function PersistencePanel() {
     return totalObjects;
   };
 
+  const handleUnlockEditing = async () => {
+    const success = await unlockEditing();
+    if (success) {
+      setShowUnlockDialog(false);
+      alert(t('persistence.unlockSuccess'));
+    } else {
+      alert(t('persistence.adminNotAuthorized'));
+    }
+  };
+
   const handleAdminAction = async () => {
     if (!adminDialogProjectId || !adminDialogAction) return;
 
@@ -207,11 +215,11 @@ export function PersistencePanel() {
       let success = false;
 
       if (adminDialogAction === 'lock') {
-        success = await persistenceService.lockProject(adminDialogProjectId, adminDialogPassword);
+        success = await persistenceService.lockProject(adminDialogProjectId);
       } else if (adminDialogAction === 'unlock') {
-        success = await persistenceService.unlockProject(adminDialogProjectId, adminDialogPassword);
+        success = await persistenceService.unlockProject(adminDialogProjectId);
       } else if (adminDialogAction === 'delete') {
-        success = await persistenceService.deleteProjectWithPassword(adminDialogProjectId, adminDialogPassword);
+        success = await persistenceService.deleteProjectAsAdmin(adminDialogProjectId);
       }
 
       if (success) {
@@ -225,7 +233,6 @@ export function PersistencePanel() {
         setShowAdminDialog(false);
         setAdminDialogAction(null);
         setAdminDialogProjectId(null);
-        setAdminDialogPassword('');
 
         alert(
           adminDialogAction === 'lock' ? t('persistence.projectLockedSuccessfully') :
@@ -233,8 +240,7 @@ export function PersistencePanel() {
               t('persistence.projectDeletedSuccessfully')
         );
       } else {
-        alert(t('persistence.wrongPassword'));
-        setAdminDialogPassword('');
+        alert(t('persistence.adminNotAuthorized'));
       }
     } catch (error) {
       alert(t('persistence.errorPerformingAction'));
@@ -458,8 +464,7 @@ export function PersistencePanel() {
                                   onClick={() => {
                                     setAdminDialogAction(project.isLocked ? 'unlock' : 'lock');
                                     setAdminDialogProjectId(project.id);
-                                    setAdminDialogPassword('');
-                                    setShowAdminDialog(true);
+                                                                setShowAdminDialog(true);
                                   }}
                                   className={`relative border px-1 py-0.5 text-xs font-mono tracking-wider transition-all duration-300 group ${project.isLocked
                                     ? 'border-yellow-500 text-yellow-400 hover:bg-yellow-500 hover:text-black'
@@ -474,8 +479,7 @@ export function PersistencePanel() {
                                   onClick={() => {
                                     setAdminDialogAction('delete');
                                     setAdminDialogProjectId(project.id);
-                                    setAdminDialogPassword('');
-                                    setShowAdminDialog(true);
+                                                                setShowAdminDialog(true);
                                   }}
                                   className="relative border border-red-500 px-1 py-0.5 text-red-400 hover:bg-red-500 hover:text-black transition-all duration-300 group text-xs"
                                   title={t('persistence.deleteProjectTooltip')}
@@ -564,7 +568,7 @@ export function PersistencePanel() {
               </div>
             )}
 
-            {/* Diálogo para desbloquear edición con contraseña */}
+            {/* Diálogo para desbloquear edición (login de admin con Google) */}
             {showUnlockDialog && (
               <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="relative bg-black border border-white p-6 w-80">
@@ -577,43 +581,12 @@ export function PersistencePanel() {
                   <h3 className="text-sm font-mono font-bold text-white tracking-wider mb-4">{t('persistence.unlockEditingTitle')}</h3>
 
                   <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">{t('persistence.adminPassword')}</label>
-                      <input
-                        type="password"
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            const success = unlockEditing(adminPassword);
-                            if (success) {
-                              setShowUnlockDialog(false);
-                              setAdminPassword('');
-                              alert(t('persistence.unlockSuccess'));
-                            } else {
-                              alert(t('persistence.wrongPassword'));
-                              setAdminPassword('');
-                            }
-                          }
-                        }}
-                        className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                        placeholder={t('persistence.passwordPlaceholder')}
-                        autoFocus
-                      />
-                    </div>
+                    <p className="text-xs text-gray-400 font-mono">{t('persistence.adminGoogleNote')}</p>
 
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
-                          const success = unlockEditing(adminPassword);
-                          if (success) {
-                            setShowUnlockDialog(false);
-                            setAdminPassword('');
-                            alert(t('persistence.unlockSuccess'));
-                          } else {
-                            alert(t('persistence.wrongPassword'));
-                            setAdminPassword('');
-                          }
+                          handleUnlockEditing();
                         }}
                         className="relative flex-1 border border-white px-3 py-2 text-white hover:bg-white hover:text-black transition-all duration-300 group"
                       >
@@ -623,7 +596,6 @@ export function PersistencePanel() {
                       <button
                         onClick={() => {
                           setShowUnlockDialog(false);
-                          setAdminPassword('');
                         }}
                         className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group"
                       >
@@ -653,24 +625,7 @@ export function PersistencePanel() {
                   </h3>
 
                   <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs text-gray-400 mb-1 font-mono tracking-wider">
-                        {t('persistence.adminPassword')}
-                      </label>
-                      <input
-                        type="password"
-                        value={adminDialogPassword}
-                        onChange={(e) => setAdminDialogPassword(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleAdminAction();
-                          }
-                        }}
-                        className="w-full px-2 py-1 bg-black text-white border border-gray-600 focus:border-white focus:outline-none text-sm font-mono"
-                        placeholder={t('persistence.passwordPlaceholder')}
-                        autoFocus
-                      />
-                    </div>
+                    <p className="text-xs text-gray-400 font-mono">{t('persistence.adminGoogleNote')}</p>
 
                     {adminDialogAction === 'delete' && (
                       <div className="p-2 border border-red-500 bg-red-500/10">
@@ -698,8 +653,7 @@ export function PersistencePanel() {
                           setShowAdminDialog(false);
                           setAdminDialogAction(null);
                           setAdminDialogProjectId(null);
-                          setAdminDialogPassword('');
-                        }}
+                                          }}
                         className="relative flex-1 border border-gray-600 px-3 py-2 text-gray-400 hover:border-white hover:text-white transition-all duration-300 group text-xs font-mono tracking-wider"
                       >
                         <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300 pointer-events-none"></div>

@@ -680,6 +680,8 @@
     "unlockSuccess": "Editing unlocked successfully.",
     "unlockEditingTitle": "UNLOCK EDITING",
     "adminPassword": "Administrator Password",
+    "adminGoogleNote": "Sign in with the administrator's Google account.",
+    "adminNotAuthorized": "Only the administrator account can do this.",
     "passwordPlaceholder": "Enter the password",
     "unlock": "UNLOCK",
     "lock": "LOCK",

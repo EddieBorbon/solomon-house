@@ -4,7 +4,7 @@ FROM node:22-alpine
 WORKDIR /app
 COPY package.json ./
 RUN npm install --omit=dev
-COPY signaling-server.mjs storage-server.mjs ./
+COPY signaling-server.mjs storage-server.mjs security.mjs ./
 # Directorio de datos del almacenamiento (7.2), escribible por el usuario node
 RUN mkdir -p /data && chown node:node /data
 EXPOSE 3001 3003

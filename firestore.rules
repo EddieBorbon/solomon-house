@@ -1,0 +1,121 @@
+rules_version = '2';
+
+// Reglas de Firestore — La Casa de Salomón
+//
+// Admin: cuenta de Google verificada definida abajo (misma que
+// src/lib/adminAuth.ts). El resto de usuarios son anónimos y pueden
+// colaborar en el mundo global y en proyectos no bloqueados.
+//
+// Antes de cambiar estas reglas, pruébalas con el emulador:
+//   firebase emulators:start --only firestore
+// Desplegar: firebase deploy --only firestore:rules
+// La consola de Firebase guarda el historial y permite volver atrás.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'eddieyogar@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isShortString(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    function isVector3(value) {
+      return value is list && value.size() == 3;
+    }
+
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // Proyectos guardados (incluye cuartos publicados en galería)
+    match /projects/{projectId} {
+
+      function isLocked() {
+        return resource.data.get('isLocked', false) == true;
+      }
+
+      function hasValidShape() {
+        return isShortString(request.resource.data.name, 200)
+          && (!('description' in request.resource.data)
+              || isShortString(request.resource.data.description, 5000))
+          && (!('grids' in request.resource.data)
+              || (request.resource.data.grids is list
+                  && request.resource.data.grids.size() <= 200));
+      }
+
+      // Un visitante de galería solo puede sumar 1 al contador de visitas
+      function isGalleryVisit() {
+        return 'gallery' in resource.data
+          && changedKeys().hasOnly(['gallery', 'updatedAt'])
+          && request.resource.data.gallery.diff(resource.data.gallery).affectedKeys().hasOnly(['visits'])
+          && request.resource.data.gallery.visits == resource.data.gallery.get('visits', 0) + 1;
+      }
+
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly(
+                         ['name', 'description', 'grids', 'activeGridId', 'isLocked',
+                          'gallery', 'createdAt', 'updatedAt'])
+                    && request.resource.data.grids is list
+                    && hasValidShape()
+                    && (request.resource.data.get('isLocked', false) != true || isAdmin());
+
+      // Bloquear/desbloquear y editar proyectos bloqueados: solo admin.
+      // Sin hasOnly en update: documentos antiguos pueden tener campos legacy.
+      allow update: if isAdmin()
+                    || isGalleryVisit()
+                    || (!isLocked()
+                        && !changedKeys().hasAny(['isLocked'])
+                        && hasValidShape());
+
+      allow delete: if isAdmin();
+    }
+
+    // Cuadrículas sueltas
+    match /grids/{gridId} {
+      allow read: if true;
+
+      allow create, update: if isVector3(request.resource.data.coordinates)
+                            && isVector3(request.resource.data.position)
+                            && request.resource.data.objects is list
+                            && request.resource.data.objects.size() <= 500
+                            && request.resource.data.mobileObjects is list
+                            && request.resource.data.mobileObjects.size() <= 200
+                            && request.resource.data.effectZones is list
+                            && request.resource.data.effectZones.size() <= 200;
+
+      allow delete: if isAdmin();
+    }
+
+    // Mundo global compartido: un único documento 'main', abierto a colaborar
+    match /globalWorldState/{docId} {
+      allow read: if docId == 'main';
+
+      allow create, update: if docId == 'main'
+                            && request.resource.data.objects is list
+                            && request.resource.data.objects.size() <= 1000
+                            && request.resource.data.effectZones is list
+                            && request.resource.data.effectZones.size() <= 300
+                            && request.resource.data.mobileObjects is list
+                            && request.resource.data.mobileObjects.size() <= 300;
+
+      allow delete: if false;
+    }
+
+    // Mundos sembrados por los scripts de src/scripts
+    match /worlds/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Todo lo demás, cerrado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

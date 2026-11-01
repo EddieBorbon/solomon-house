@@ -33,6 +33,7 @@ services:
       - "3001:3001"
     environment:
       - SIGNALING_PORT=3001
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
     restart: unless-stopped
 
   # Base de datos local autohospedada (roadmap 7.2): SQLite + REST + WebSocket,
@@ -47,6 +48,7 @@ services:
     environment:
       - STORAGE_PORT=3003
       - STORAGE_DB=/data/solomon-house.db
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
     volumes:
       - storage-data:/data
     restart: unless-stopped

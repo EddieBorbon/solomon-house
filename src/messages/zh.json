@@ -659,6 +659,8 @@
     "unlockSuccess": "已成功解除编辑锁定。",
     "unlockEditingTitle": "解锁编辑",
     "adminPassword": "管理员密码",
+    "adminGoogleNote": "请使用管理员的 Google 账号登录。",
+    "adminNotAuthorized": "只有管理员账号可以执行此操作。",
     "passwordPlaceholder": "请输入密码",
     "unlock": "解锁",
     "lock": "锁定",

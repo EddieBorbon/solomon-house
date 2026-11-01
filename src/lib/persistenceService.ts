@@ -1,4 +1,5 @@
 import { firebaseService, type FirebaseProject, type FirebaseGrid } from './firebaseService';
+import { signInAsAdmin } from './adminAuth';
 import type { Grid, SoundObject, MobileObject, EffectZone, WorldState, WorldActions } from '../state/useWorldStore';
 import { Timestamp } from 'firebase/firestore';
 import type { UseBoundStore, StoreApi } from 'zustand';
@@ -470,10 +471,9 @@ export class PersistenceService {
     }
   }
 
-  // Bloquear un proyecto individual (requiere contraseña de admin)
-  async lockProject(projectId: string, password: string): Promise<boolean> {
-    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
-    if (password !== ADMIN_PASSWORD) {
+  // Bloquear un proyecto individual (requiere login de admin; firestore.rules lo exige)
+  async lockProject(projectId: string): Promise<boolean> {
+    if (!(await signInAsAdmin())) {
       return false;
     }
 
@@ -485,10 +485,9 @@ export class PersistenceService {
     }
   }
 
-  // Desbloquear un proyecto individual (requiere contraseña de admin)
-  async unlockProject(projectId: string, password: string): Promise<boolean> {
-    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
-    if (password !== ADMIN_PASSWORD) {
+  // Desbloquear un proyecto individual (requiere login de admin; firestore.rules lo exige)
+  async unlockProject(projectId: string): Promise<boolean> {
+    if (!(await signInAsAdmin())) {
       return false;
     }
 
@@ -500,10 +499,9 @@ export class PersistenceService {
     }
   }
 
-  // Eliminar un proyecto con contraseña de admin
-  async deleteProjectWithPassword(projectId: string, password: string): Promise<boolean> {
-    const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
-    if (password !== ADMIN_PASSWORD) {
+  // Eliminar un proyecto como admin (requiere login; firestore.rules lo exige)
+  async deleteProjectAsAdmin(projectId: string): Promise<boolean> {
+    if (!(await signInAsAdmin())) {
       return false;
     }
 

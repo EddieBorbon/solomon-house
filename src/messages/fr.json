@@ -680,6 +680,8 @@
     "unlockSuccess": "Édition déverrouillée avec succès.",
     "unlockEditingTitle": "DÉVERROUILLER_L'ÉDITION",
     "adminPassword": "Mot de passe administrateur",
+    "adminGoogleNote": "Connectez-vous avec le compte Google de l'administrateur.",
+    "adminNotAuthorized": "Seul le compte administrateur peut faire cela.",
     "passwordPlaceholder": "Entrez le mot de passe",
     "unlock": "DÉVERROUILLER",
     "lock": "VERROUILLER",

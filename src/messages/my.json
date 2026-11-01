@@ -680,6 +680,8 @@
     "unlockSuccess": "တည်းဖြတ်ခ ဖွင့်လှစ်ပြီးပါပြီ။",
     "unlockEditingTitle": "တည်းဖြတ်ခ ဖွင့်ရန်",
     "adminPassword": "အုပ်ချုပ်ရေး စကားဝှက်",
+    "adminGoogleNote": "စီမံခန့်ခွဲသူ၏ Google အကောင့်ဖြင့် ဝင်ရောက်ပါ။",
+    "adminNotAuthorized": "စီမံခန့်ခွဲသူ အကောင့်သာ ဤအရာကို လုပ်ဆောင်နိုင်သည်။",
     "passwordPlaceholder": "စကားဝှက်ကို ရိုက်ထည့်ပါ",
     "unlock": "ဖွင့်လှစ်ရန်",
     "lock": "လော့ခ်ချရန်",

@@ -27,9 +27,18 @@ import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { WebSocketServer } from 'ws';
+import { corsOriginFor, isOriginAllowed, clientIp, createRateLimiter } from './security.mjs';
 
 const PORT = Number(process.env.STORAGE_PORT || 3003);
 const DB_PATH = process.env.STORAGE_DB || './data/solomon-house.db';
+
+// Límites anti-abuso
+const MAX_BODY_BYTES = Number(process.env.STORAGE_MAX_BODY || 5 * 1024 * 1024); // 5 MB por documento
+const MAX_WS_PAYLOAD_BYTES = 16 * 1024;
+const NAME_PATTERN = /^[A-Za-z0-9_-]{1,128}$/; // colecciones e ids
+// Generosos: un aula tras NAT comparte IP y el mundo global sincroniza cada ~500 ms
+const requestLimiter = createRateLimiter({ max: Number(process.env.STORAGE_RATE_REQUESTS || 3000), windowMs: 60_000 }); // por IP
+const writeLimiter = createRateLimiter({ max: Number(process.env.STORAGE_RATE_WRITES || 1200), windowMs: 60_000 }); // escrituras por IP
 
 mkdirSync(dirname(DB_PATH), { recursive: true });
 const db = new DatabaseSync(DB_PATH);
@@ -77,7 +86,11 @@ function deleteDocument(collection, id) {
 // ---------------------------------------------------------------- WebSocket
 
 const server = http.createServer(handleRequest);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({
+  server,
+  maxPayload: MAX_WS_PAYLOAD_BYTES,
+  verifyClient: ({ origin }) => isOriginAllowed(origin),
+});
 
 /** ws → Set<"col" | "col/id"> */
 const subscriptions = new Map();
@@ -90,6 +103,9 @@ wss.on('connection', (socket) => {
     try {
       message = JSON.parse(raw.toString());
     } catch {
+      return;
+    }
+    if (!NAME_PATTERN.test(message.collection) || (message.id && !NAME_PATTERN.test(message.id))) {
       return;
     }
     if (message.type === 'subscribe' && typeof message.collection === 'string') {
@@ -139,21 +155,37 @@ function broadcast(collection, id, data) {
 
 // --------------------------------------------------------------------- HTTP
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+function corsHeaders(req) {
+  const allowOrigin = corsOriginFor(req.headers.origin);
+  if (!allowOrigin) return {};
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    Vary: 'Origin',
+  };
+}
 
-function sendJson(res, status, body) {
-  res.writeHead(status, { 'Content-Type': 'application/json', ...CORS_HEADERS });
+function sendJson(req, res, status, body) {
+  res.writeHead(status, { 'Content-Type': 'application/json', ...corsHeaders(req) });
   res.end(JSON.stringify(body));
 }
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', (chunk) => chunks.push(chunk));
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > MAX_BODY_BYTES) {
+        // Descartar el resto sin cortar el socket, para poder responder 413
+        req.removeAllListeners('data');
+        req.resume();
+        reject(Object.assign(new Error('Documento demasiado grande'), { status: 413 }));
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
       try {
         resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : {});
@@ -167,8 +199,21 @@ function readBody(req) {
 
 async function handleRequest(req, res) {
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, CORS_HEADERS);
+    res.writeHead(204, corsHeaders(req));
     res.end();
+    return;
+  }
+
+  // Con ALLOWED_ORIGINS definido, el navegador de otros orígenes queda fuera
+  if (req.headers.origin && !isOriginAllowed(req.headers.origin)) {
+    sendJson(req, res, 403, { error: 'Origen no permitido' });
+    return;
+  }
+
+  const ip = clientIp(req);
+  const isWrite = req.method !== 'GET';
+  if (!requestLimiter.hit(ip) || (isWrite && !writeLimiter.hit(ip))) {
+    sendJson(req, res, 429, { error: 'Demasiadas peticiones' });
     return;
   }
 
@@ -176,45 +221,49 @@ async function handleRequest(req, res) {
   const parts = url.pathname.split('/').filter(Boolean); // ['api', col, id?]
 
   if (parts[0] !== 'api' || parts.length < 2 || parts.length > 3) {
-    sendJson(res, 404, { error: 'Ruta no encontrada' });
+    sendJson(req, res, 404, { error: 'Ruta no encontrada' });
     return;
   }
 
   const [, collection, id] = parts;
+  if (!NAME_PATTERN.test(collection) || (id !== undefined && !NAME_PATTERN.test(id))) {
+    sendJson(req, res, 400, { error: 'Nombre de colección o id no válido' });
+    return;
+  }
 
   try {
     if (req.method === 'GET' && !id) {
-      sendJson(res, 200, listDocuments(collection));
+      sendJson(req, res, 200, listDocuments(collection));
     } else if (req.method === 'GET') {
       const data = getDocument(collection, id);
-      if (data) sendJson(res, 200, data);
-      else sendJson(res, 404, { error: 'Documento no encontrado' });
+      if (data) sendJson(req, res, 200, data);
+      else sendJson(req, res, 404, { error: 'Documento no encontrado' });
     } else if (req.method === 'POST' && !id) {
       const body = await readBody(req);
       const newId = crypto.randomUUID();
       putDocument(collection, newId, body);
-      sendJson(res, 201, { id: newId });
+      sendJson(req, res, 201, { id: newId });
     } else if (req.method === 'PUT' && id) {
       const body = await readBody(req);
       putDocument(collection, id, body);
-      sendJson(res, 200, { ok: true });
+      sendJson(req, res, 200, { ok: true });
     } else if (req.method === 'PATCH' && id) {
       const body = await readBody(req);
       const current = getDocument(collection, id);
       if (!current) {
-        sendJson(res, 404, { error: 'Documento no encontrado' });
+        sendJson(req, res, 404, { error: 'Documento no encontrado' });
         return;
       }
       putDocument(collection, id, { ...current, ...body });
-      sendJson(res, 200, { ok: true });
+      sendJson(req, res, 200, { ok: true });
     } else if (req.method === 'DELETE' && id) {
       deleteDocument(collection, id);
-      sendJson(res, 200, { ok: true });
+      sendJson(req, res, 200, { ok: true });
     } else {
-      sendJson(res, 405, { error: 'Método no permitido' });
+      sendJson(req, res, 405, { error: 'Método no permitido' });
     }
   } catch (error) {
-    sendJson(res, 400, { error: String(error?.message || error) });
+    sendJson(req, res, error?.status || 400, { error: String(error?.message || error) });
   }
 }
 

@@ -24,13 +24,35 @@
 
 import { WebSocketServer } from 'ws';
 import { randomUUID } from 'node:crypto';
+import { isOriginAllowed, clientIp, createRateLimiter } from './security.mjs';
 
 const PORT = Number(process.env.SIGNALING_PORT || 3001);
 
 /** roomId -> Map<peerId, ws> */
 const rooms = new Map();
 
-const wss = new WebSocketServer({ port: PORT });
+// Límites anti-abuso: la señalización solo transporta SDP/ICE, mensajes pequeños
+const MAX_PAYLOAD_BYTES = 64 * 1024;
+const MAX_ROOM_ID_LENGTH = 128;
+const MAX_PEERS_PER_ROOM = Number(process.env.SIGNALING_MAX_PEERS || 32);
+const MAX_CONNECTIONS_PER_IP = Number(process.env.SIGNALING_MAX_CONN_PER_IP || 20);
+
+// Mensajes por socket: 200 cada 10 s (de sobra para negociar varias conexiones)
+const messageLimiter = createRateLimiter({ max: 200, windowMs: 10_000 });
+/** ip -> número de conexiones abiertas */
+const connectionsByIp = new Map();
+
+const wss = new WebSocketServer({
+  port: PORT,
+  maxPayload: MAX_PAYLOAD_BYTES,
+  verifyClient: ({ origin, req }, done) => {
+    if (!isOriginAllowed(origin)) return done(false, 403, 'Origen no permitido');
+    if ((connectionsByIp.get(clientIp(req)) || 0) >= MAX_CONNECTIONS_PER_IP) {
+      return done(false, 429, 'Demasiadas conexiones');
+    }
+    done(true);
+  },
+});
 
 function send(ws, message) {
   if (ws.readyState === ws.OPEN) {
@@ -64,15 +86,28 @@ function leaveRoom(ws) {
   ws.roomId = null;
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
   ws.peerId = randomUUID();
   ws.isAlive = true;
+
+  const ip = clientIp(req);
+  connectionsByIp.set(ip, (connectionsByIp.get(ip) || 0) + 1);
+  ws.on('close', () => {
+    const remaining = (connectionsByIp.get(ip) || 1) - 1;
+    if (remaining <= 0) connectionsByIp.delete(ip);
+    else connectionsByIp.set(ip, remaining);
+  });
 
   ws.on('pong', () => {
     ws.isAlive = true;
   });
 
   ws.on('message', (data) => {
+    if (!messageLimiter.hit(ws.peerId)) {
+      ws.close(1008, 'Demasiados mensajes');
+      return;
+    }
+
     let message;
     try {
       message = JSON.parse(data.toString());
@@ -82,7 +117,15 @@ wss.on('connection', (ws) => {
 
     switch (message.type) {
       case 'join': {
-        if (typeof message.roomId !== 'string' || !message.roomId) return;
+        if (
+          typeof message.roomId !== 'string' ||
+          !message.roomId ||
+          message.roomId.length > MAX_ROOM_ID_LENGTH
+        ) return;
+        if ((rooms.get(message.roomId)?.size || 0) >= MAX_PEERS_PER_ROOM) {
+          send(ws, { type: 'error', error: 'room-full' });
+          return;
+        }
 
         // Salir de la sala anterior si la hubiera
         leaveRoom(ws);

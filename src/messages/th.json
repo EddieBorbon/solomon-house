@@ -680,6 +680,8 @@
     "unlockSuccess": "ปลดล็อกการแก้ไขเรียบร้อย",
     "unlockEditingTitle": "ปลดล็อกการแก้ไข",
     "adminPassword": "รหัสผ่านผู้ดูแล",
+    "adminGoogleNote": "ลงชื่อเข้าใช้ด้วยบัญชี Google ของผู้ดูแล",
+    "adminNotAuthorized": "เฉพาะบัญชีผู้ดูแลเท่านั้นที่ทำสิ่งนี้ได้",
     "passwordPlaceholder": "กรุณากรอกรหัสผ่าน",
     "unlock": "ปลดล็อก",
     "lock": "ล็อก",

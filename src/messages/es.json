@@ -751,6 +751,8 @@
     "unlockSuccess": "Edición desbloqueada correctamente.",
     "unlockEditingTitle": "DESBLOQUEAR EDICIÓN",
     "adminPassword": "Contraseña de Administrador",
+    "adminGoogleNote": "Inicia sesión con la cuenta de Google del administrador.",
+    "adminNotAuthorized": "Solo la cuenta de administrador puede hacer esto.",
     "passwordPlaceholder": "Ingresa la contraseña",
     "unlock": "DESBLOQUEAR",
     "lock": "BLOQUEAR",

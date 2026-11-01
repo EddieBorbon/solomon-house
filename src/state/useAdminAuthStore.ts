@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useWorldStore } from './useWorldStore';
+import { onAdminChange, signInAsAdmin } from '../lib/adminAuth';
 
 export interface AdminAuthState {
   isEditingLocked: boolean;
@@ -9,11 +10,9 @@ export interface AdminAuthState {
 export interface AdminAuthActions {
   canEdit: () => boolean;
   lockEditing: () => void;
-  unlockEditing: (password: string) => boolean;
-  authenticateAdmin: (password: string) => boolean;
+  unlockEditing: () => Promise<boolean>;
+  authenticateAdmin: () => Promise<boolean>;
 }
-
-const ADMIN_PASSWORD = '%3D27eaf[}V]3]';
 
 export const useAdminAuthStore = create<AdminAuthState & AdminAuthActions>((set, get) => ({
   // Estado inicial
@@ -37,23 +36,35 @@ export const useAdminAuthStore = create<AdminAuthState & AdminAuthActions>((set,
     return true;
   },
 
+  // Bloquea la edición local; la sesión de Google sigue abierta y
+  // unlockEditing la reutiliza sin volver a pedir login
   lockEditing: () => {
     set({ isEditingLocked: true, isAdminAuthenticated: false });
   },
 
-  unlockEditing: (password: string) => {
-    if (password === ADMIN_PASSWORD) {
+  // Login de admin con Google (Firebase Auth); ver src/lib/adminAuth.ts
+  unlockEditing: async () => {
+    const ok = await signInAsAdmin();
+    if (ok) {
       set({ isEditingLocked: false, isAdminAuthenticated: true });
-      return true;
     }
-    return false;
+    return ok;
   },
 
-  authenticateAdmin: (password: string) => {
-    if (password === ADMIN_PASSWORD) {
+  authenticateAdmin: async () => {
+    const ok = await signInAsAdmin();
+    if (ok) {
       set({ isAdminAuthenticated: true });
-      return true;
     }
-    return false;
+    return ok;
   },
 }));
+
+// Si la sesión de Firebase se cierra o expira, retirar los permisos de admin
+if (typeof window !== 'undefined') {
+  onAdminChange((isAdmin) => {
+    if (!isAdmin && useAdminAuthStore.getState().isAdminAuthenticated) {
+      useAdminAuthStore.setState({ isAdminAuthenticated: false });
+    }
+  });
+}

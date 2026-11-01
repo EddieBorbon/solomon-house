@@ -1,11 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { firebaseService } from '../../../lib/firebaseService';
 import { v4 as uuidv4 } from 'uuid';
 import { Timestamp } from 'firebase/firestore';
 import type { FirebaseGrid } from '../../../lib/firebaseService';
 import type { SoundObject, MobileObject, EffectZone } from '../../../state/useWorldStore';
+import { isAdminRequest } from '../../../lib/server/verifyAdmin';
 
-export async function GET() {
+// POST + ID token del admin: este endpoint escribe en Firestore, así que no
+// debe poder dispararlo cualquiera con un simple GET (ni un crawler).
+// Cliente: fetch(url, { method: 'POST', headers: { Authorization: `Bearer ${await getAdminIdToken()}` } })
+export async function POST(request: NextRequest) {
+    if (!(await isAdminRequest(request))) {
+        return NextResponse.json({ success: false, error: 'No autorizado' }, { status: 401 });
+    }
+
     try {
         // Escultura 2: El Aleph Acusmático
         const objects: SoundObject[] = [];
