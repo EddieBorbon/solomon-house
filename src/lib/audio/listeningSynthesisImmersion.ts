@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import * as Tone from 'tone';
 import {
-  useWorldStore,
   type SoundObject,
   type SoundObjectType,
 } from '../../state/useWorldStore';

@@ -955,5 +955,15 @@
       "lesson": "Une sculpture sonore ne se clôt jamais : elle se sauvegarde, s'exporte en partition, se réinterprète et se rouvre.",
       "challenge": "Sauvegarde ton monde comme projet, ou termine l'examen d'écoute spatiale."
     }
+  },
+  "juryRoadmap": {
+    "sessionResearch": "Enregistrement et Analyse Musicologique (E1)",
+    "expandedScore": "Partition Élargie et Rôles Sociaux (E2)",
+    "visualSonicCoherence": "Cohérence Visuelle-Sonore (E3)",
+    "companionAgents": "Agents Co-Interprètes et Agence Distribuée (E4)",
+    "listeningAndHrtf": "Écoute Active, Synthèse DSP et HRTF (E5)",
+    "curationAndArchive": "Curation, Archive Publique et Mode Concert (E6)",
+    "communityAndLiveCoding": "Évaluation Collective, Live Coding et Souveraineté (E7)",
+    "futureProjection": "Projection Future : XR, IA, Fédération et Pédagogie (E8)"
   }
 }

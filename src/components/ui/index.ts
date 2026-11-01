@@ -8,6 +8,7 @@ export { ScoreExportButton } from './ScoreExportButton';
 export { SessionResearchPanel } from './SessionResearchPanel';
 export { ExpandedScorePanel } from './ExpandedScorePanel';
 export { VisualSonicCoherencePanel } from './VisualSonicCoherencePanel';
+export { CommunityInteroperabilityPanel } from './CommunityInteroperabilityPanel';
 export { AcousticCalibrator } from './AcousticCalibrator';
 export { HrtfProfileManager } from './HrtfProfileManager';
 export { MappingEditor } from './MappingEditor';

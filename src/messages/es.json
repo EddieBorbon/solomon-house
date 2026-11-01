@@ -1083,5 +1083,15 @@
       "lesson": "Una escultura sonora nunca se clausura: se guarda, se exporta como partitura, se reinterpreta y se vuelve a abrir.",
       "challenge": "Guarda tu mundo como proyecto, o completa el examen de escucha espacial."
     }
+  },
+  "juryRoadmap": {
+    "sessionResearch": "Investigación y Análisis de Sesión (E1)",
+    "expandedScore": "Partitura Expandida y Roles (E2)",
+    "visualSonicCoherence": "Coherencia Visual-Sonora (E3)",
+    "companionAgents": "Compañero de Ejecución y Agencia (E4)",
+    "listeningAndHrtf": "Escucha Activa, DSP y HRTF (E5)",
+    "curationAndArchive": "Curaduría, Archivo y Concierto (E6)",
+    "communityAndLiveCoding": "Evaluación Colectiva, Live Coding y Soberanía (E7)",
+    "futureProjection": "Proyección XR, IA, Federación y Pedagogía (E8)"
   }
 }

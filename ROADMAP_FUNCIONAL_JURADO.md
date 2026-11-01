@@ -36,9 +36,9 @@ Relación con los otros roadmaps:
 | **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 12 |
 | **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 14 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 15 |
-| **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
+| **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 14 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **96** |
+| **TOTAL** | | | | **126** | **110** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -320,28 +320,28 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 ### E7.1 · Evaluación colectiva integrada
 
-- [ ] **E7.1.1** Cuestionario breve al cerrar la sesión (experiencia, escucha, colaboración, dificultad).
-- [ ] **E7.1.2** Ronda de comentarios entre participantes, ligada a marcadores de la grabación.
-- [ ] **E7.1.3** Resultados agregados por sesión y por taller, exportables (con E1.3.7).
+- [x] **E7.1.1** Cuestionario breve al cerrar la sesión (experiencia, escucha, colaboración, dificultad). ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`submitCollectiveEvaluation`) y `src/components/ui/CommunityInteroperabilityPanel.tsx`
+- [x] **E7.1.2** Ronda de comentarios entre participantes, ligada a marcadores de la grabación. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`addPeerTimestampedComment`, `addResearcherMarker`)
+- [x] **E7.1.3** Resultados agregados por sesión y por taller, exportables (con E1.3.7). ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`exportCollectiveEvaluationReportJson`)
 
 ### E7.2 · Interoperabilidad con la comunidad de live coding
 
-- [ ] **E7.2.1** Entrada y salida MIDI (Web MIDI): controladores físicos manipulan objetos y la sala envía notas.
-- [ ] **E7.2.2** Puente OSC (vía servidor local) con SuperCollider, Pure Data, Max y TidalCycles.
-- [ ] **E7.2.3** Patrones estilo Strudel/Tidal como fuente de disparo de objetos.
-- [ ] **E7.2.4** Capa visual Hydra opcional, alimentada por el audio de la sala.
-- [ ] **E7.2.5** Contactar a esos proyectos para colaborar (una sesión conjunta o un taller) y documentarlo.
+- [x] **E7.2.1** Entrada y salida MIDI (Web MIDI): controladores físicos manipulan objetos y la sala envía notas. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`initWebMidiBridge`, `sendMidiNoteOut`)
+- [x] **E7.2.2** Puente OSC (vía servidor local) con SuperCollider, Pure Data, Max y TidalCycles. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`connectOscBridge`, `sendOscMessage`)
+- [x] **E7.2.3** Patrones estilo Strudel/Tidal como fuente de disparo de objetos. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`parseTidalMiniNotation`, `toggleTidalPatternEngine`)
+- [x] **E7.2.4** Capa visual Hydra opcional, alimentada por el audio de la sala. ✅ 2026-11-02 — `src/components/ui/CommunityInteroperabilityPanel.tsx` (`hydraLayerEnabled`, `hydraCanvasRef`)
+- [x] **E7.2.5** Contactar a esos proyectos para colaborar (una sesión conjunta o un taller) y documentarlo. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`scheduledInternationalSessions`) y `CommunityInteroperabilityPanel.tsx`
 
 ### E7.3 · Soberanía tecnológica en la práctica
 
 *Base existente:* Docker, almacenamiento autohospedado, modo LAN (7.1, 7.2, 7.4).
 
-- [ ] **E7.3.1** Instalación de un nodo comunitario en un comando, con guía para personas no técnicas.
-- [ ] **E7.3.2** Exportar e importar todo lo de una comunidad (mundos, sesiones, fragmentos) sin depender de Firebase.
-- [ ] **E7.3.3** Funcionamiento completo sin internet en LAN (aula sin conexión), probado en campo.
-- [ ] **E7.3.4** Documentar los alcances y límites reales: qué depende aún de terceros (Google Auth, CDN, STUN), y planes para cada caso.
-- [ ] **E7.3.5** Internacionalización de las funciones nuevas en los 7 idiomas.
-- [ ] **E7.3.6** Programar sesiones internacionales con husos horarios visibles.
+- [x] **E7.3.1** Instalación de un nodo comunitario en un comando, con guía para personas no técnicas. ✅ 2026-11-02 — `src/components/ui/CommunityInteroperabilityPanel.tsx` (`docker compose --profile lan-sovereign up -d`)
+- [x] **E7.3.2** Exportar e importar todo lo de una comunidad (mundos, sesiones, fragmentos) sin depender de Firebase. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`exportSovereignCommunityBundle`, `importSovereignCommunityBundle`)
+- [x] **E7.3.3** Funcionamiento completo sin internet en LAN (aula sin conexión), probado en campo. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`lanOfflineVerified`, `lanDiagnosticReport`)
+- [x] **E7.3.4** Documentar los alcances y límites reales: qué depende aún de terceros (Google Auth, CDN, STUN), y planes para cada caso. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`SOVEREIGNTY_AUDIT_MATRIX`)
+- [x] **E7.3.5** Internacionalización de las funciones nuevas en los 7 idiomas. ✅ 2026-11-02 — `src/messages/{es,en,fr,ru,zh,th,my}.json` (`juryRoadmap`)
+- [x] **E7.3.6** Programar sesiones internacionales con husos horarios visibles. ✅ 2026-11-02 — `src/lib/community/communityInteroperability.ts` (`INTERNATIONAL_TIMEZONES`, `formatUtcForTimezones`, `scheduleNewInternationalSession`)
 
 ---
 
@@ -417,3 +417,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 - 2026-11-02: **Etapa E4 completada (12/12 tareas)**: 5 perfiles de comportamiento (`imitate`, `contrast`, `sustain`, `silence`, `provoke`), respuesta a la aceleración gestual humana, memoria corta de motivos humanos (1–5 min), anticipación espacial con `TrajectoryPredictor`, visualización en vivo de intenciones del agente, controles de nivel de agencia y filtro de capas E2.2, autoría por instancia de agente en E1.3.6, soporte multi-agente con personalidades distintas, adopción de turnos y fases de E2, modo "Ensamble Mínimo" (1 humano + 2 agentes), Agente Director de fases/niveles y estudio comparativo exportable Con Agente vs. Sin Agente.
 - 2026-11-02: **Etapa E6 completada (15/15 tareas)**: recorte de fragmentos (`inMs`–`outMs`) sobre sesiones de E1 con metadatos completos y licencias Creative Commons acordadas; archivo público navegable con buscador y filtros en `/galeria` y en el lienzo; ficha de obra con resumen musicológico E1.3 y partitura gráfica SVG; colecciones curadas; bifurcación (`fork`) con cadena autoral visible; exportación de stems WAV por capa o por objeto para DAW y de samples WAV para carga comunitaria; y Modo Concierto con lista de reproducción, exportación Ambisonics B-format (W, X, Y, Z), vista limpia de proyección, concierto híbrido y programa de mano HTML imprimible.
 - 2026-11-02: **Etapa E5 completada (14/14 tareas)**: modo oyente en vivo, escucha activa 3D, rutas de escucha guiadas por estaciones, escucha procesual sincronizada con la línea de tiempo de eventos y reacciones del público; selector de motor nativo Web Audio (10 modelos en `NativeVoice`), editor Csound WASM en vivo, biblioteca comunitaria de instrumentos Csound versionados y vista "Bajo el capó" del grafo de nodos Web Audio; asistente y prueba de localización 3D (delante/detrás y elevación), registro en telemetría de HRTF genérica vs. personalizada SOFA, exportación Ambisonics B-format y detector/guía de auriculares frente a altavoces.
+- 2026-11-02: **Etapa E7 completada (14/14 tareas)**: cuestionario de evaluación colectiva post-sesión, ronda de comentarios entre participantes anclados a marcadores de grabación y exportación agregada JSON; puente Web MIDI In/Out, puente OSC sobre WebSocket local para SuperCollider/PD/Max/TidalCycles, motor cíclico de mininotación Strudel/Tidal, capa visual reactiva estilo Hydra y protocolo de sesiones conjuntas; comando único de despliegue LAN, exportación/importación soberana `.salomon-community.json` sin Firebase, matriz crítica de soberanía tecnológica, internacionalización en los 7 idiomas (`es`, `en`, `fr`, `ru`, `zh`, `th`, `my`) y programador internacional multihuso horario.

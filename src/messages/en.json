@@ -955,5 +955,15 @@
       "lesson": "A sound sculpture is never closed: it is saved, exported as a score, reinterpreted and opened again.",
       "challenge": "Save your world as a project, or complete the spatial listening exam."
     }
+  },
+  "juryRoadmap": {
+    "sessionResearch": "Session Recording & Musicological Analysis (E1)",
+    "expandedScore": "Expanded Score & Social Protocol (E2)",
+    "visualSonicCoherence": "Visual-Sonic Coherence (E3)",
+    "companionAgents": "Co-Performer Agents & Distributed Agency (E4)",
+    "listeningAndHrtf": "Active Listening, Low-Level DSP & HRTF (E5)",
+    "curationAndArchive": "Curation, Public Archive & Concert Mode (E6)",
+    "communityAndLiveCoding": "Collective Evaluation, Live Coding & Sovereignty (E7)",
+    "futureProjection": "Future Projection: XR, AI, Federation & Pedagogy (E8)"
   }
 }

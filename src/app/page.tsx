@@ -11,6 +11,7 @@ import { ScoreExportButton } from '../components/ui/ScoreExportButton';
 import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
 import { ExpandedScorePanel } from '../components/ui/ExpandedScorePanel';
 import { VisualSonicCoherencePanel } from '../components/ui/VisualSonicCoherencePanel';
+import { CommunityInteroperabilityPanel } from '../components/ui/CommunityInteroperabilityPanel';
 import { AcousticCalibrator } from '../components/ui/AcousticCalibrator';
 import { HrtfProfileManager } from '../components/ui/HrtfProfileManager';
 import { MappingEditor } from '../components/ui/MappingEditor';
@@ -107,6 +108,9 @@ export default function Home() {
 
         {/* Coherencia Visual-Sonora y Prueba Perceptual (Etapa E3) */}
         <VisualSonicCoherencePanel />
+
+        {/* Evaluación Colectiva, Live Coding y Soberanía Tecnológica (Etapa E7) */}
+        <CommunityInteroperabilityPanel />
 
         {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />

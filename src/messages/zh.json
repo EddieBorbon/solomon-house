@@ -905,5 +905,15 @@
       "lesson": "声音雕塑从不封闭：它被保存、导出为乐谱、被重新诠释、再次开启。",
       "challenge": "将你的世界保存为项目，或完成空间聆听测验。"
     }
+  },
+  "juryRoadmap": {
+    "sessionResearch": "会话记录与音乐学分析 (E1)",
+    "expandedScore": "扩展乐谱与社会协作角色 (E2)",
+    "visualSonicCoherence": "视听一致性与映射逻辑 (E3)",
+    "companionAgents": "协同演奏智能体与分布式能动性 (E4)",
+    "listeningAndHrtf": "主动聆听、底层合成与个性化 HRTF (E5)",
+    "curationAndArchive": "策展、公共档案与音乐会模式 (E6)",
+    "communityAndLiveCoding": "集体评估、现场编码互操作性与技术主权 (E7)",
+    "futureProjection": "未来展望：扩展现实、AI、联邦网络与教学法 (E8)"
   }
 }

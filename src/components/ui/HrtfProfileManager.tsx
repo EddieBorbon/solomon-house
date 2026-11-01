@@ -64,7 +64,6 @@ export function HrtfProfileManager() {
 
   // Campos para publicar instrumento Csound comunitario (E5.2.3)
   const [csNewName, setCsNewName] = useState('');
-  const [csNewAuthor, setCsNewAuthor] = useState('Comunidad');
   const [csNewVersion, setCsNewVersion] = useState('1.1.0');
 
   const e5State = useListeningImmersionStore();
@@ -440,7 +439,7 @@ export function HrtfProfileManager() {
                     onClick={() => {
                       publishCommunityCsoundInstrument(
                         csNewName,
-                        csNewAuthor,
+                        'Comunidad',
                         csNewVersion,
                         'Instrumento compartido en la biblioteca comunitaria'
                       );
