@@ -6,6 +6,7 @@ export { FPSDisplay } from './FPSDisplay';
 export { LatencyMonitor } from './LatencyMonitor';
 export { ScoreExportButton } from './ScoreExportButton';
 export { SessionResearchPanel } from './SessionResearchPanel';
+export { ExpandedScorePanel } from './ExpandedScorePanel';
 export { AcousticCalibrator } from './AcousticCalibrator';
 export { HrtfProfileManager } from './HrtfProfileManager';
 export { MappingEditor } from './MappingEditor';

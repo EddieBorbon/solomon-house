@@ -10,6 +10,14 @@ import {
 } from '../../lib/pedagogy/sessionMetrics';
 import { BANDS } from '../../lib/agents/accompaniment';
 import { getCurrentLevel } from '../../lib/pedagogy/parametricLevels';
+import {
+  useExpandedScoreStore,
+  assignParticipantRole,
+  assignParticipantLayer,
+  ROLE_VISUAL_COLORS,
+  type RoomRole,
+} from '../../lib/score/expandedScoreProtocol';
+import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
 
 /**
  * Panel de Control del Tutor (roadmap 8.2).
@@ -57,6 +65,7 @@ export function TutorDashboard() {
   const [open, setOpen] = useState(false);
   const [, forceTick] = useState(0);
   const metrics = useTutorMetricsStore();
+  const expandedScore = useExpandedScoreStore();
 
   // Recolector activo durante toda la sesión; reloj del panel cada segundo
   useEffect(() => {
@@ -182,6 +191,53 @@ export function TutorDashboard() {
               >
                 ⬇ Informe JSON
               </button>
+            </div>
+          </div>
+
+          {/* Asignación de roles y capas en vivo por la moderación (E2.1.3) */}
+          <div className="space-y-1.5 pt-2 border-t border-white/10">
+            <p className="text-xs text-emerald-300 font-bold">
+              Roles y capas en vivo (Moderación E2.1.3)
+            </p>
+            <div className="space-y-1">
+              {expandedScore.participants.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between gap-1 bg-white/5 px-2 py-1 rounded text-[10px]"
+                >
+                  <span
+                    className="truncate w-24 font-bold"
+                    style={{ color: ROLE_VISUAL_COLORS[p.role] }}
+                  >
+                    ● {p.alias}
+                  </span>
+                  <select
+                    value={p.role}
+                    onChange={(e) =>
+                      assignParticipantRole(p.id, e.target.value as RoomRole)
+                    }
+                    className="bg-black/70 border border-white/15 rounded px-1 py-0.5 text-gray-200"
+                  >
+                    <option value="moderator">Moderación</option>
+                    <option value="composer">Composición</option>
+                    <option value="performer">Interpretación</option>
+                    <option value="listener">Escucha</option>
+                    <option value="curator">Curaduría</option>
+                  </select>
+                  <select
+                    value={p.layer}
+                    onChange={(e) =>
+                      assignParticipantLayer(p.id, e.target.value as CompositionalLayer)
+                    }
+                    className="bg-black/70 border border-white/15 rounded px-1 py-0.5 text-gray-200"
+                  >
+                    <option value="texture">Textura</option>
+                    <option value="gesture">Gesto</option>
+                    <option value="spatial">Espacio</option>
+                    <option value="general">General</option>
+                  </select>
+                </div>
+              ))}
             </div>
           </div>
         </div>

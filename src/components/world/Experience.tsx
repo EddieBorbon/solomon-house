@@ -16,6 +16,7 @@ import { usePeerSync } from '../../hooks/usePeerSync';
 import { getHeadTrackingForward } from '../../lib/audio/headTracking';
 import { TrajectoryPredictor } from '../../lib/agents/TrajectoryPredictor';
 import { PostProcessing } from './PostProcessing';
+import { ParticipantRoleIndicators3D } from './ParticipantRoleIndicators3D';
 import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
@@ -371,6 +372,9 @@ export function Experience() {
 
         {/* Contenido de la escena */}
         <SceneContent orbitControlsRef={orbitControlsRef} />
+
+        {/* Balizas 3D de roles y capas por participante (Etapa E2.1.4) */}
+        <ParticipantRoleIndicators3D />
 
         {/* Post-procesamiento (bloom/viñeta), desactivable para 60 FPS */}
         <PostProcessing />

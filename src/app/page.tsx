@@ -9,6 +9,7 @@ import { LoadingScreen } from '../components/ui/LoadingScreen';
 import { LatencyMonitor } from '../components/ui/LatencyMonitor';
 import { ScoreExportButton } from '../components/ui/ScoreExportButton';
 import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
+import { ExpandedScorePanel } from '../components/ui/ExpandedScorePanel';
 import { AcousticCalibrator } from '../components/ui/AcousticCalibrator';
 import { HrtfProfileManager } from '../components/ui/HrtfProfileManager';
 import { MappingEditor } from '../components/ui/MappingEditor';
@@ -99,6 +100,9 @@ export default function Home() {
 
         {/* Registro, replay, analítica musicológica, telemetría y SVG (Etapa E1) */}
         <SessionResearchPanel />
+
+        {/* Protocolo de Partitura Expandida (Etapa E2) */}
+        <ExpandedScorePanel />
 
         {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />

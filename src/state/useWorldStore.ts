@@ -11,7 +11,13 @@ import { useWorldSettingsStore } from './useWorldSettingsStore';
 import { useSelectionStore } from '../stores/useSelectionStore';
 import { useAdminAuthStore } from './useAdminAuthStore';
 import { useRealtimeSyncStore } from './useRealtimeSyncStore';
-import { isObjectTypeAllowed, isEffectTypeAllowed, getCurrentLevel } from '../lib/pedagogy/parametricLevels';
+import { isObjectTypeAllowed, isEffectTypeAllowed, getCurrentLevel, isWithinLevelDensityLimit } from '../lib/pedagogy/parametricLevels';
+import {
+  getActivePermissions,
+  registerObjectOwner,
+  canControlObjectByOwnership,
+  useExpandedScoreStore,
+} from '../lib/score/expandedScoreProtocol';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
@@ -357,6 +363,12 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return;
     }
 
+    // Permisos del protocolo de partitura expandida (E2.1.2, E2.2.4, E2.2.5, E2.3.2)
+    if (!getActivePermissions().canCreate) {
+      alert('Tu rol actual, turno o fase de sesión no permite crear nuevos objetos sonoros.');
+      return;
+    }
+
     // Restricción pedagógica por nivel paramétrico (roadmap 8.1)
     if (!isObjectTypeAllowed(type)) {
       alert(`El nivel ${getCurrentLevel().name} no permite objetos de tipo "${type}".`);
@@ -368,8 +380,15 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       return;
     }
 
+    const activeGrid = state.grids.get(activeGridId);
+    if (activeGrid && !isWithinLevelDensityLimit(activeGrid.objects.length)) {
+      alert(`Límite de densidad alcanzado para ${getCurrentLevel().name} (máx. ${getCurrentLevel().maxObjectsDensity} objetos).`);
+      return;
+    }
+
     // Crear objeto usando el facade
     const newObject = worldStoreFacade.createObject(type, position, activeGridId);
+    registerObjectOwner(newObject.id);
     
     // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
     if (state.globalWorldConnected && !state.currentProjectId) {
@@ -426,15 +445,41 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
       alert('La edición está bloqueada. Ingresa la contraseña de administrador para editar.');
       return;
     }
+
+    const perms = getActivePermissions();
+    if (updates.position && !perms.canMove) {
+      return;
+    }
+    if (updates.audioParams && !perms.canEditSynth) {
+      return;
+    }
+    if (!canControlObjectByOwnership(id)) {
+      return;
+    }
+
+    const locks = useExpandedScoreStore.getState().parameterLocks;
+    const filteredUpdates = { ...updates };
+    if (locks.position && filteredUpdates.position) {
+      delete filteredUpdates.position;
+    }
+    if (locks.scale && filteredUpdates.scale) {
+      delete filteredUpdates.scale;
+    }
+    if (filteredUpdates.audioParams) {
+      const nextAudio = { ...filteredUpdates.audioParams };
+      if (locks.frequency) delete (nextAudio as Partial<typeof nextAudio>).frequency;
+      if (locks.timbre) delete (nextAudio as Partial<typeof nextAudio>).waveform;
+      filteredUpdates.audioParams = nextAudio;
+    }
     
     // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
     if (state.globalWorldConnected && !state.currentProjectId) {
-      get().updateGlobalSoundObject(id, updates);
+      get().updateGlobalSoundObject(id, filteredUpdates);
     } else {
       const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
       if (gridId) {
         // Actualizar objeto usando el facade
-        worldStoreFacade.updateObject(id, updates, gridId);
+        worldStoreFacade.updateObject(id, filteredUpdates, gridId);
         
         // Si hay un proyecto cargado, sincronizar cambios con Firebase
         if (state.currentProjectId) {

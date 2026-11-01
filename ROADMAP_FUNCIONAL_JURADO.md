@@ -31,14 +31,14 @@ Relación con los otros roadmaps:
 | Etapa | Tema | Jurado | Prioridad | Tareas | Hechas |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **E1** | Registro y análisis de sesiones | SE · GC · GG | 🔴 Crítica (alimenta la tesis) | 22 | 22 |
-| **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 0 |
+| **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 20 |
 | **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 0 |
 | **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 0 |
 | **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 0 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 0 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **22** |
+| **TOTAL** | | | | **126** | **42** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -136,40 +136,40 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 ### E2.1 · Roles y permisos
 
-- [ ] **E2.1.1** Roles por sala: moderación, composición, interpretación, escucha y curaduría.
-- [ ] **E2.1.2** Matriz de permisos por rol (crear, mover, editar síntesis, efectos, grabar).
-- [ ] **E2.1.3** La moderación asigna y cambia roles en vivo. Integrar con `TutorDashboard`.
-- [ ] **E2.1.4** Indicador visual del rol de cada participante en la escena.
+- [x] **E2.1.1** Roles por sala: moderación, composición, interpretación, escucha y curaduría. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts`
+- [x] **E2.1.2** Matriz de permisos por rol (crear, mover, editar síntesis, efectos, grabar). ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`ROLE_PERMISSIONS`), `src/state/useWorldStore.ts`
+- [x] **E2.1.3** La moderación asigna y cambia roles en vivo. Integrar con `TutorDashboard`. ✅ 2026-11-02 — `src/components/ui/TutorDashboard.tsx`, `src/components/ui/ExpandedScorePanel.tsx`
+- [x] **E2.1.4** Indicador visual del rol de cada participante en la escena. ✅ 2026-11-02 — `src/components/world/ParticipantRoleIndicators3D.tsx`
 
 ### E2.2 · Capas, turnos y modos de colaboración
 
-- [ ] **E2.2.1** Capas compositivas (por ejemplo: fondo/textura, gesto/ritmo, espacio/móviles) asignables a participantes.
-- [ ] **E2.2.2** Propiedad de objetos: quien crea un objeto lo controla, con opción de cederlo.
-- [ ] **E2.2.3** Modo **síncrono** (todos a la vez), que es el actual.
-- [ ] **E2.2.4** Modo **por turnos**: ronda con duración por turno y cola de participantes.
-- [ ] **E2.2.5** Modo **asíncrono**: cada persona deja una capa y la siguiente la escucha antes de intervenir (cadáver exquisito sonoro).
-- [ ] **E2.2.6** Parámetros abiertos o bloqueados por la moderación para cada sesión (grados de libertad explícitos).
+- [x] **E2.2.1** Capas compositivas (por ejemplo: fondo/textura, gesto/ritmo, espacio/móviles) asignables a participantes. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`assignParticipantLayer`)
+- [x] **E2.2.2** Propiedad de objetos: quien crea un objeto lo controla, con opción de cederlo. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`registerObjectOwner`, `transferObjectOwnership`), `src/state/useWorldStore.ts`
+- [x] **E2.2.3** Modo **síncrono** (todos a la vez), que es el actual. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts`
+- [x] **E2.2.4** Modo **por turnos**: ronda con duración por turno y cola de participantes. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`advanceTurn`, `turnRemainingSec`)
+- [x] **E2.2.5** Modo **asíncrono**: cada persona deja una capa y la siguiente la escucha antes de intervenir (cadáver exquisito sonoro). ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`commitAsyncExquisiteCorpseLayer`, `markAsyncLayerListened`)
+- [x] **E2.2.6** Parámetros abiertos o bloqueados por la moderación para cada sesión (grados de libertad explícitos). ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`ParameterFreedomLocks`), `src/state/useWorldStore.ts`
 
 ### E2.3 · Sesiones con forma temporal
 
-- [ ] **E2.3.1** Duraciones preestablecidas (10, 15, 30 min y libre) con cuenta regresiva visible.
-- [ ] **E2.3.2** Fases dentro de una sesión (experimentación → consolidación → producción → presentación) con cambios automáticos de reglas.
-- [ ] **E2.3.3** Plantillas de sesión ("partituras de juego") que guardan roles, capas, niveles y fases, y se pueden compartir.
-- [ ] **E2.3.4** Al terminar, la sesión se archiva sola con el grabador de E1.
+- [x] **E2.3.1** Duraciones preestablecidas (10, 15, 30 min y libre) con cuenta regresiva visible. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts`, `src/components/ui/ExpandedScorePanel.tsx`
+- [x] **E2.3.2** Fases dentro de una sesión (experimentación → consolidación → producción → presentación) con cambios automáticos de reglas. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`PHASE_DESCRIPTIONS`, `startTimedSession`)
+- [x] **E2.3.3** Plantillas de sesión ("partituras de juego") que guardan roles, capas, niveles y fases, y se pueden compartir. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`BUILTIN_GAME_SCORE_TEMPLATES`, `exportCurrentGameScoreTemplate`)
+- [x] **E2.3.4** Al terminar, la sesión se archiva sola con el grabador de E1. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`stopTimedSession`)
 
 ### E2.4 · Niveles como recorrido
 
 *Base existente:* `src/lib/pedagogy/parametricLevels.ts` (N1–N4).
 
-- [ ] **E2.4.1** Restricciones por nivel en tempo, registro, densidad máxima y duración, además de las herramientas actuales.
-- [ ] **E2.4.2** Retos por nivel, con un objetivo compositivo y un criterio de cumplimiento medido con E1.3.
-- [ ] **E2.4.3** Progreso por participante y desbloqueo del siguiente nivel.
+- [x] **E2.4.1** Restricciones por nivel en tempo, registro, densidad máxima y duración, además de las herramientas actuales. ✅ 2026-11-02 — `src/lib/pedagogy/parametricLevels.ts` (`tempoRangeBpm`, `maxObjectsDensity`, `recommendedDurationMin`)
+- [x] **E2.4.2** Retos por nivel, con un objetivo compositivo y un criterio de cumplimiento medido con E1.3. ✅ 2026-11-02 — `src/lib/pedagogy/parametricLevels.ts` (`evaluateLevelChallenge`)
+- [x] **E2.4.3** Progreso por participante y desbloqueo del siguiente nivel. ✅ 2026-11-02 — `src/lib/pedagogy/parametricLevels.ts` (`unlockNextLevel`, `completedChallenges`)
 
 ### E2.5 · Modelos de participación
 
-- [ ] **E2.5.1** Tipos de sala: abierta, por invitación (enlace) y ensamble cerrado (dúo, trío, cuarteto).
-- [ ] **E2.5.2** Convocatorias y temporadas: calendario de sesiones con inscripción y cupo.
-- [ ] **E2.5.3** Micro-redes de afinidad: grupos persistentes con historial de sesiones.
+- [x] **E2.5.1** Tipos de sala: abierta, por invitación (enlace) y ensamble cerrado (dúo, trío, cuarteto). ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`ROOM_CAPACITY_BY_TYPE`)
+- [x] **E2.5.2** Convocatorias y temporadas: calendario de sesiones con inscripción y cupo. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`seasonCalls`, `toggleSeasonCallEnrollment`)
+- [x] **E2.5.3** Micro-redes de afinidad: grupos persistentes con historial de sesiones. ✅ 2026-11-02 — `src/lib/score/expandedScoreProtocol.ts` (`affinityGroups`, `createAffinityGroup`)
 
 **Hecho cuando:** una sesión de taller puede correr de principio a fin (roles → fases → grabación) sin intervención técnica.
 
@@ -412,3 +412,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 - 2026-11-01: Roadmap funcional creado a partir del plan compilado del jurado y de los pendientes del roadmap técnico.
 - 2026-11-02: **Etapa E1 completada (22/22 tareas)**: grabador `.casa.json` v2 con JSON Schema, consentimiento explícito y anonimización; grabación de bus maestro WAV/OGG y binaural; reproductor temporal con marcadores de investigación; analítica musicológica automática y fichas comparativas de los tres casos de estudio (Moscú, Diáspora, China); telemetría continua con comparación TCP (Firebase) vs UDP (WebRTC); y visualizaciones SVG (mapa de calor espacial, diagrama topológico por fases y partitura gráfica temporal).
+- 2026-11-02: **Etapa E2 completada (20/20 tareas)**: protocolo de partitura expandida con 5 roles y matriz de permisos, asignación en vivo desde `TutorDashboard`, balizas 3D de rol/capa en la escena, propiedad y cesión de objetos, modos síncrono, por turnos y cadáver exquisito sonoro asíncrono, bloqueo de parámetros, temporizador con 4 fases y auto-archivado en E1, retos compositivos por nivel N1–N4 evaluados con E1.3, plantillas compartibles ("partituras de juego"), tipos de sala, temporadas y micro-redes de afinidad.
