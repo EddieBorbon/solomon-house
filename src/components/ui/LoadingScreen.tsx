@@ -4,6 +4,12 @@ import Image from 'next/image';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { LanguageSelector } from './LanguageSelector';
 
+// Modo revisión: oculta autoría, créditos institucionales y logos mientras
+// los artículos sobre la plataforma están en evaluación ciega. Está activo
+// por defecto; para volver a mostrar los créditos, definir
+// NEXT_PUBLIC_MOSTRAR_CREDITOS=true en Vercel y volver a desplegar.
+const MODO_REVISION = process.env.NEXT_PUBLIC_MOSTRAR_CREDITOS !== 'true';
+
 interface LoadingScreenProps {
   variant?: 'initial' | 'scene' | 'audio';
   onStart?: () => void;
@@ -12,7 +18,7 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: LoadingScreenProps) {
   const { t } = useLanguage();
-  
+
   const getContent = () => {
     switch (variant) {
       case 'initial':
@@ -72,17 +78,19 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-sm z-50 p-4 sm:p-6 lg:p-8">
       {/* Background image */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="relative w-full h-full">
-          <Image 
-            src="/backgrounds/Minculturas_Patrones-02.png" 
-            alt={t('loading.backgroundPattern')} 
-            fill
-            className="object-cover"
-            priority
-          />
+      {!MODO_REVISION && (
+        <div className="absolute inset-0 opacity-5">
+          <div className="relative w-full h-full">
+            <Image
+              src="/backgrounds/Minculturas_Patrones-02.png"
+              alt={t('loading.backgroundPattern')}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
         </div>
-      </div>
+      )}
       
       {/* Main content container with border */}
       <div className="relative w-full h-full border border-white flex flex-col items-center justify-center">
@@ -184,6 +192,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
             {/* Academic Information */}
             <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-600">
               {/* Project Information */}
+              {!MODO_REVISION && (
               <div className="text-center space-y-1 sm:space-y-2">
                 <p className="text-xs font-mono text-gray-300 tracking-wider">
                   {t('loading.project')}
@@ -222,9 +231,10 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                   </p>
                 </div>
               </div>
+              )}
 
               {/* Logos - Todos en una sola fila horizontal */}
-              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
+              <div className={MODO_REVISION ? '' : 'mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700'}>
                 <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 lg:gap-6">
                   {/* Logo Principal */}
                   <div className="text-center">
@@ -239,6 +249,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     </div>
                   </div>
 
+                  {!MODO_REVISION && (<>
                   {/* Mincultura Distintivos */}
                   <div className="text-center">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
@@ -309,13 +320,14 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                     <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex items-center justify-center logo-container">
                       <Image 
                         src="/logos/logoNanjing.svg" 
-                        alt={t('loading.nanjingLogo')} 
+                        alt={t('loading.nanjingLogo')}
                         width={128}
                         height={128}
                         className="w-full h-full object-contain opacity-90"
                       />
                     </div>
                   </div>
+                  </>)}
                 </div>
               </div>
 
@@ -325,6 +337,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
               </div>
 
               {/* Mención del Apoyo del Ministerio de las Culturas, las Artes y los Saberes */}
+              {!MODO_REVISION && (
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-700">
                 <div className="text-center space-y-2 px-2 sm:px-4">
                   <p className="text-xs font-mono text-gray-400 tracking-wider break-words overflow-wrap-anywhere">
@@ -344,6 +357,7 @@ export function LoadingScreen({ variant = 'initial', onStart, onSkipTutorial }: 
                   </p>
                 </div>
               </div>
+              )}
             </div>
 
           </div>

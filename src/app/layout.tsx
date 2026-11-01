@@ -14,7 +14,7 @@ const nunitoSans = localFont({
   display: "swap",
 });
 
-const siteUrl = "https://salomonhouse.space";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://salomonhouse.space";
 const ogImage = "/opengraph-image";
 
 export const metadata: Metadata = {
