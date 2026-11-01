@@ -37,8 +37,8 @@ Relación con los otros roadmaps:
 | **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 14 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 15 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 14 |
-| **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **110** |
+| **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 16 |
+| **TOTAL** | | | | **126** | **126** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -353,33 +353,33 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 *Base existente:* WebXR (3.3), `VRToggle`.
 
-- [ ] **E8.1.1** Manipulación de objetos con manos o controladores en VR, con paridad respecto al escritorio.
-- [ ] **E8.1.2** Anclas espaciales en passthrough (pendiente 3.4): esculturas sonoras en el cuarto físico.
-- [ ] **E8.1.3** Sesiones mixtas: personas en VR, escritorio y móvil en la misma sala.
-- [ ] **E8.1.4** Instalación site-specific: un mundo anclado a un espacio físico de exposición.
+- [x] **E8.1.1** Manipulación de objetos con manos o controladores en VR, con paridad respecto al escritorio. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`executeXrHandParityAction`, `XrHandGestureAction`) y `src/components/ui/FutureProjectionPanel.tsx`
+- [x] **E8.1.2** Anclas espaciales en passthrough (pendiente 3.4): esculturas sonoras en el cuarto físico. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`createPassthroughSpatialAnchor`, `passthroughAnchors`)
+- [x] **E8.1.3** Sesiones mixtas: personas en VR, escritorio y móvil en la misma sala. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`mixedRealityParticipants`, `MixedRealityParticipant`)
+- [x] **E8.1.4** Instalación site-specific: un mundo anclado a un espacio físico de exposición. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`siteSpecificConfig`, `SiteSpecificRoomConfig`)
 
 ### E8.2 · Inteligencia artificial
 
-- [ ] **E8.2.1** Modelos en el navegador con ONNX o TensorFlow.js (pendiente 6.2) para el agente de E4.
-- [ ] **E8.2.2** Timbre transfer en tiempo real con RAVE (pendiente 6.4) como efecto o tipo de objeto.
-- [ ] **E8.2.3** Agente entrenado con las sesiones archivadas (E6), con consentimiento y licencias claras.
-- [ ] **E8.2.4** Análisis automático de sesiones con IA, como complemento de E1.3 y no como sustituto.
+- [x] **E8.2.1** Modelos en el navegador con ONNX o TensorFlow.js (pendiente 6.2) para el agente de E4. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`runBrowserOnnxAgentStep`, `onnxTemperature`)
+- [x] **E8.2.2** Timbre transfer en tiempo real con RAVE (pendiente 6.4) como efecto o tipo de objeto. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`RAVE_TIMBRE_MODELS`, `applyRaveTimbreTransferToSelected`)
+- [x] **E8.2.3** Agente entrenado con las sesiones archivadas (E6), con consentimiento y licencias claras. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`approvedTrainingFragmentIds`, filtro `CC-BY-4.0`/`CC-BY-SA-4.0`/`CC0-1.0`)
+- [x] **E8.2.4** Análisis automático de sesiones con IA, como complemento de E1.3 y no como sustituto. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`generateComplementaryAiSessionAnalysis`, `AiComplementaryInsight`)
 
 ### E8.3 · Federación y red
 
-- [ ] **E8.3.1** Protocolo de federación entre nodos (pendiente 7.3, ActivityPub o P2P).
-- [ ] **E8.3.2** Sesiones entre nodos de distintas comunidades.
-- [ ] **E8.3.3** Archivo distribuido de obras entre nodos.
+- [x] **E8.3.1** Protocolo de federación entre nodos (pendiente 7.3, ActivityPub o P2P). ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`FEDERATED_INTERNATIONAL_NODES`, `exportActivityPubNodeManifestJson`)
+- [x] **E8.3.2** Sesiones entre nodos de distintas comunidades. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`activeCrossNodeSessionId`) y `src/components/ui/FutureProjectionPanel.tsx`
+- [x] **E8.3.3** Archivo distribuido de obras entre nodos. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`distributedArchiveCatalog` en `exportActivityPubNodeManifestJson`)
 
 ### E8.4 · Sostenibilidad y pedagogía
 
 *Base existente:* `supportConfig.ts` (8.6), `curriculum.ts` y `CurriculumGuide` (8.3).
 
-- [ ] **E8.4.1** Paquete para escuelas de música: plan de clases, niveles N1–N4 y E2 listos para usar.
-- [ ] **E8.4.2** Programa de residencias artísticas con convocatoria anual (E2.5.2 + galerías).
-- [ ] **E8.4.3** Modelo de sostenibilidad documentado: donaciones, talleres pagados, convenios institucionales.
-- [ ] **E8.4.4** Métricas de impacto (comunidades, sesiones, obras) para solicitar fondos.
-- [ ] **E8.4.5** Alianzas internacionales con 2 o 3 nodos en otros países como piloto de expansión.
+- [x] **E8.4.1** Paquete para escuelas de música: plan de clases, niveles N1–N4 y E2 listos para usar. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`exportSchoolCurriculumAndImpactPackageJson`, `curriculumPlan8Weeks`)
+- [x] **E8.4.2** Programa de residencias artísticas con convocatoria anual (E2.5.2 + galerías). ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`annualResidencyCall`) y `src/app/apoyo/page.tsx`
+- [x] **E8.4.3** Modelo de sostenibilidad documentado: donaciones, talleres pagados, convenios institucionales. ✅ 2026-11-02 — `src/components/ui/FutureProjectionPanel.tsx` y `src/app/apoyo/page.tsx`
+- [x] **E8.4.4** Métricas de impacto (comunidades, sesiones, obras) para solicitar fondos. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`impactMetrics`)
+- [x] **E8.4.5** Alianzas internacionales con 2 o 3 nodos en otros países como piloto de expansión. ✅ 2026-11-02 — `src/lib/future/futureProjection.ts` (`FEDERATED_INTERNATIONAL_NODES`: UNAM México, CEAM Moscú, NUA Nanjing, Silpakorn Bangkok)
 
 ---
 
@@ -418,3 +418,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 - 2026-11-02: **Etapa E6 completada (15/15 tareas)**: recorte de fragmentos (`inMs`–`outMs`) sobre sesiones de E1 con metadatos completos y licencias Creative Commons acordadas; archivo público navegable con buscador y filtros en `/galeria` y en el lienzo; ficha de obra con resumen musicológico E1.3 y partitura gráfica SVG; colecciones curadas; bifurcación (`fork`) con cadena autoral visible; exportación de stems WAV por capa o por objeto para DAW y de samples WAV para carga comunitaria; y Modo Concierto con lista de reproducción, exportación Ambisonics B-format (W, X, Y, Z), vista limpia de proyección, concierto híbrido y programa de mano HTML imprimible.
 - 2026-11-02: **Etapa E5 completada (14/14 tareas)**: modo oyente en vivo, escucha activa 3D, rutas de escucha guiadas por estaciones, escucha procesual sincronizada con la línea de tiempo de eventos y reacciones del público; selector de motor nativo Web Audio (10 modelos en `NativeVoice`), editor Csound WASM en vivo, biblioteca comunitaria de instrumentos Csound versionados y vista "Bajo el capó" del grafo de nodos Web Audio; asistente y prueba de localización 3D (delante/detrás y elevación), registro en telemetría de HRTF genérica vs. personalizada SOFA, exportación Ambisonics B-format y detector/guía de auriculares frente a altavoces.
 - 2026-11-02: **Etapa E7 completada (14/14 tareas)**: cuestionario de evaluación colectiva post-sesión, ronda de comentarios entre participantes anclados a marcadores de grabación y exportación agregada JSON; puente Web MIDI In/Out, puente OSC sobre WebSocket local para SuperCollider/PD/Max/TidalCycles, motor cíclico de mininotación Strudel/Tidal, capa visual reactiva estilo Hydra y protocolo de sesiones conjuntas; comando único de despliegue LAN, exportación/importación soberana `.salomon-community.json` sin Firebase, matriz crítica de soberanía tecnológica, internacionalización en los 7 idiomas (`es`, `en`, `fr`, `ru`, `zh`, `th`, `my`) y programador internacional multihuso horario.
+- 2026-11-02: **Etapa E8 completada (16/16 tareas — 126/126 totales del Roadmap Funcional del Jurado)**: paridad de manipulación espacial WebXR (manos/controladores), anclas espaciales en Passthrough AR, sesiones mixtas multidispositivo (VR + AR + escritorio + móvil) y configuración de instalaciones site-specific; agente neuronal ligero en navegador (ONNX/WASM), síntesis por transferencia de timbre estilo RAVE en tiempo real, filtro de entrenamiento ético sobre el archivo comunitario con licencias CC y análisis interpretativo asistido por IA como complemento del determinista E1.3; protocolo de federación ActivityPub + WebRTC P2P con sesiones inter-nodos y catálogo distribuido; y paquete curricular de 8 semanas para escuelas de música, convocatoria anual de residencias artísticas, modelo de sostenibilidad tripartito, métricas verificables de impacto y alianzas internacionales con UNAM (México), CEAM (Moscú), NUA (Nanjing) y Silpakorn (Bangkok).

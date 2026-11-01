@@ -7,11 +7,15 @@ import {
   SUPPORT_CONTACT,
   INFRA_COSTS,
 } from '../../lib/sustainability/supportConfig';
+import {
+  FEDERATED_INTERNATIONAL_NODES,
+  exportSchoolCurriculumAndImpactPackageJson,
+} from '../../lib/future/futureProjection';
 
 /**
- * Página de sostenibilidad (roadmap 8.6): donaciones por pasarelas no
- * extractivas, soporte técnico remunerado opcional y transparencia de
- * los costos de infraestructura.
+ * Página de sostenibilidad (roadmap 8.6 y Etapa E8.4): donaciones por pasarelas no
+ * extractivas, soporte técnico remunerado opcional, paquete para escuelas de música,
+ * residencias artísticas, métricas de impacto para fondos y alianzas internacionales.
  */
 export default function SupportPage() {
   const activeChannels = DONATION_CHANNELS.filter((channel) => channel.enabled);
@@ -96,6 +100,39 @@ export default function SupportPage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="border-t border-white/10 pt-8">
+          <h2 className="text-xl text-white mb-3">
+            Paquete para Escuelas de Música, Residencias y Alianzas (E8.4)
+          </h2>
+          <p className="text-xs text-gray-400 mb-4">
+            Programa curricular de 8 semanas (niveles N1–N4), convocatoria anual de
+            residencias artísticas telemáticas bajo licencias Creative Commons y métricas
+            verificables para solicitar fondos culturales públicos y privados.
+          </p>
+          <button
+            onClick={() => exportSchoolCurriculumAndImpactPackageJson()}
+            className="mb-4 rounded-lg bg-fuchsia-600 px-4 py-2 text-xs font-semibold text-white hover:bg-fuchsia-500 transition"
+          >
+            ⬇ Descargar Paquete Curricular e Informe de Impacto (JSON)
+          </button>
+          <div className="space-y-2">
+            {FEDERATED_INTERNATIONAL_NODES.map((node) => (
+              <div
+                key={node.id}
+                className="border border-white/10 rounded-lg p-3 text-xs flex items-center justify-between"
+              >
+                <div>
+                  <span className="text-white font-semibold">{node.institution}</span>
+                  <span className="text-gray-400 ml-2">
+                    ({node.country})
+                  </span>
+                </div>
+                <span className="text-emerald-300">{node.sharedWorksCount} obras federadas</span>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </div>

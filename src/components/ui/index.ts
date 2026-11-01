@@ -9,6 +9,7 @@ export { SessionResearchPanel } from './SessionResearchPanel';
 export { ExpandedScorePanel } from './ExpandedScorePanel';
 export { VisualSonicCoherencePanel } from './VisualSonicCoherencePanel';
 export { CommunityInteroperabilityPanel } from './CommunityInteroperabilityPanel';
+export { FutureProjectionPanel } from './FutureProjectionPanel';
 export { AcousticCalibrator } from './AcousticCalibrator';
 export { HrtfProfileManager } from './HrtfProfileManager';
 export { MappingEditor } from './MappingEditor';

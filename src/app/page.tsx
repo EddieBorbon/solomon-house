@@ -12,6 +12,7 @@ import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
 import { ExpandedScorePanel } from '../components/ui/ExpandedScorePanel';
 import { VisualSonicCoherencePanel } from '../components/ui/VisualSonicCoherencePanel';
 import { CommunityInteroperabilityPanel } from '../components/ui/CommunityInteroperabilityPanel';
+import { FutureProjectionPanel } from '../components/ui/FutureProjectionPanel';
 import { AcousticCalibrator } from '../components/ui/AcousticCalibrator';
 import { HrtfProfileManager } from '../components/ui/HrtfProfileManager';
 import { MappingEditor } from '../components/ui/MappingEditor';
@@ -111,6 +112,9 @@ export default function Home() {
 
         {/* Evaluación Colectiva, Live Coding y Soberanía Tecnológica (Etapa E7) */}
         <CommunityInteroperabilityPanel />
+
+        {/* Proyección Futura: XR Passthrough, IA RAVE/ONNX, Federación ActivityPub y Sostenibilidad (Etapa E8) */}
+        <FutureProjectionPanel />
 
         {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />
