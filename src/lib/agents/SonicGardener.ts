@@ -16,6 +16,8 @@ import { analyzeSessionMusicology } from '../session/musicologicalAnalysis';
 import {
   useExpandedScoreStore,
   setManualSessionPhase,
+  upsertRoomParticipant,
+  removeRoomParticipant,
   type SessionPhaseId,
 } from '../score/expandedScoreProtocol';
 import { TrajectoryPredictor } from './TrajectoryPredictor';
@@ -193,6 +195,28 @@ export const useAgentCompanionStore = create<AgentCompanionState>(() => ({
   predictedListenerTarget: [0, 1.5, 0],
   comparativeRuns: [],
 }));
+
+// Sincronizar en tiempo real los agentes activos con la lista de participantes de la sala (E2 / E4)
+useAgentCompanionStore.subscribe((state) => {
+  state.agents.forEach((agent, index) => {
+    if (agent.enabled) {
+      const defaultPositions: [number, number, number][] = [
+        [-3.5, 2.2, -3.5],
+        [3.5, 2.2, -3.5],
+        [0, 2.6, -4.5],
+      ];
+      upsertRoomParticipant({
+        id: agent.id,
+        alias: `${agent.name} [IA]`,
+        role: 'performer',
+        layer: agent.allowedLayers[0] ?? 'texture',
+        position3D: defaultPositions[index % defaultPositions.length],
+      });
+    } else {
+      removeRoomParticipant(agent.id);
+    }
+  });
+});
 
 const TICK_INTERVAL_MS = 6_000;
 const MAX_OWN_OBJECTS_PER_AGENT = 4;

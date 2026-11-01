@@ -18,6 +18,7 @@ import {
   type RoomRole,
 } from '../../lib/score/expandedScoreProtocol';
 import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Panel de Control del Tutor (roadmap 8.2).
@@ -62,7 +63,9 @@ function DensitySparkline({ values }: { values: number[] }) {
 }
 
 export function TutorDashboard() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'tutor';
   const [, forceTick] = useState(0);
   const metrics = useTutorMetricsStore();
   const expandedScore = useExpandedScoreStore();
@@ -80,28 +83,19 @@ export function TutorDashboard() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-16 left-4 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm transition-colors ${
-          metrics.isRecording
-            ? 'text-red-300'
-            : open
-              ? 'text-emerald-300'
-              : 'text-gray-400 hover:text-gray-200'
-        }`}
-        title="Panel del tutor: métricas de participación y grabación de grafos"
-      >
-        📊 Tutor{metrics.isRecording ? ' ●' : ''}
-      </button>
-
       {open && (
-        <div className="fixed bottom-28 left-4 w-80 max-h-[60vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg p-4 z-50 font-mono text-sm text-gray-200 space-y-4">
-          <div>
-            <h3 className="text-emerald-300 font-bold mb-1">Panel del tutor</h3>
-            <p className="text-xs text-gray-400">
-              Observación en tiempo real del lienzo colaborativo. Nivel
-              paramétrico activo: <span className="text-gray-200">{level.name}</span>.
-            </p>
+        <div className="fixed top-14 left-[21rem] w-80 max-h-[75vh] overflow-y-auto bg-black/95 border border-emerald-500/40 backdrop-blur-md rounded-xl p-4 z-50 font-mono text-sm text-gray-200 space-y-4 shadow-2xl">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-emerald-300 font-bold mb-1">Panel del tutor</h3>
+              <p className="text-xs text-gray-400">
+                Observación en tiempo real del lienzo colaborativo. Nivel
+                paramétrico activo: <span className="text-gray-200">{level.name}</span>.
+              </p>
+            </div>
+            <button onClick={closeModal} className="text-gray-400 hover:text-white px-1">
+              ✕
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">

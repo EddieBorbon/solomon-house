@@ -9,6 +9,7 @@ import {
   type ExamRound,
   type ExamGrade,
 } from '../../lib/pedagogy/audioExam';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Exámenes de Audio Psicoacústicos Gamificados (roadmap 8.4).
@@ -102,7 +103,9 @@ async function playModulationPair(
 type Stage = 'inicio' | 'ronda' | 'resultado';
 
 export function AudioExamPanel() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'exam';
   const [stage, setStage] = useState<Stage>('inicio');
   const [rounds, setRounds] = useState<ExamRound[]>([]);
   const [current, setCurrent] = useState(0);
@@ -171,25 +174,22 @@ export function AudioExamPanel() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-40 left-4 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm text-gray-400 hover:text-gray-200 transition-colors"
-        title="Examen psicoacústico: localización espacial y discriminación de modulación"
-      >
-        🎯 Examen
-      </button>
-
       {open && (
-        <div className="fixed bottom-52 left-4 w-80 bg-black/90 backdrop-blur-md rounded-lg p-4 z-50 font-mono text-sm text-gray-200 space-y-3">
-          <div>
-            <h3 className="text-orange-300 font-bold mb-1">Examen de escucha espacial</h3>
-            {stage === 'inicio' && (
-              <p className="text-xs text-gray-400">
-                {ROUNDS_PER_PHASE} rondas de localización binaural y{' '}
-                {ROUNDS_PER_PHASE} de discriminación de modulación, con
-                dificultad creciente. Usa auriculares.
-              </p>
-            )}
+        <div className="fixed top-14 left-[21rem] w-80 bg-black/95 border border-orange-500/40 backdrop-blur-md rounded-xl p-4 z-50 font-mono text-sm text-gray-200 space-y-3 shadow-2xl">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-orange-300 font-bold mb-1">Examen de escucha espacial</h3>
+              {stage === 'inicio' && (
+                <p className="text-xs text-gray-400">
+                  {ROUNDS_PER_PHASE} rondas de localización binaural y{' '}
+                  {ROUNDS_PER_PHASE} de discriminación de modulación, con
+                  dificultad creciente. Usa auriculares.
+                </p>
+              )}
+            </div>
+            <button onClick={closeModal} className="text-gray-400 hover:text-white px-1">
+              ✕
+            </button>
           </div>
 
           {stage === 'inicio' && (

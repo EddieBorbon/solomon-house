@@ -338,27 +338,6 @@ export const useExpandedScoreStore = create<ExpandedScoreState>(() => ({
       layer: 'texture',
       position3D: [0, 1.8, 3],
     },
-    {
-      id: 'P-remoto-1',
-      alias: 'Intérprete Remoto A',
-      role: 'composer',
-      layer: 'gesture',
-      position3D: [-4, 1.8, -2],
-    },
-    {
-      id: 'P-remoto-2',
-      alias: 'Intérprete Remoto B',
-      role: 'performer',
-      layer: 'spatial',
-      position3D: [4, 1.8, -2],
-    },
-    {
-      id: 'AGENTE-JARDINERO',
-      alias: 'Jardinero Sónico (IA)',
-      role: 'performer',
-      layer: 'texture',
-      position3D: [0, 2.4, -5],
-    },
   ],
   showRoleIndicatorsIn3D: true,
 
@@ -503,6 +482,28 @@ export function assignParticipantRole(participantId: string, role: RoomRole): vo
       participants,
       ...(isLocal ? { localRole: role } : {}),
     };
+  });
+}
+
+export function upsertRoomParticipant(participant: RoomParticipantProtocol): void {
+  useExpandedScoreStore.setState((state) => {
+    const exists = state.participants.some((p) => p.id === participant.id);
+    const participants = exists
+      ? state.participants.map((p) => (p.id === participant.id ? { ...p, ...participant } : p))
+      : [...state.participants, participant];
+    return { participants };
+  });
+}
+
+export function removeRoomParticipant(participantId: string): void {
+  useExpandedScoreStore.setState((state) => {
+    if (participantId === state.localParticipantId) return state;
+    const participants = state.participants.filter((p) => p.id !== participantId);
+    const activeTurnParticipantId =
+      state.activeTurnParticipantId === participantId
+        ? state.localParticipantId
+        : state.activeTurnParticipantId;
+    return { participants, activeTurnParticipantId };
   });
 }
 

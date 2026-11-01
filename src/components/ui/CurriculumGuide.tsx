@@ -8,18 +8,13 @@ import {
   loadProgress,
   saveProgress,
 } from '../../lib/pedagogy/curriculum';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
-/**
- * Guías Curriculares Interactivas (roadmap 8.3).
- *
- * Diez lecciones progresivas — una por principio del Decálogo del
- * Arquitecto Sonoro — en los siete idiomas de la plataforma, con
- * micro-desafíos que se verifican automáticamente contra el estado
- * del lienzo. El avance persiste en localStorage.
- */
 export function CurriculumGuide() {
   const { t } = useLanguage();
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'curriculum';
   const [selected, setSelected] = useState(0);
   const [progress, setProgress] = useState<boolean[]>(() => Array(LESSON_COUNT).fill(false));
   const [feedback, setFeedback] = useState<'done' | 'notDone' | null>(null);
@@ -46,23 +41,18 @@ export function CurriculumGuide() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-52 left-4 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm transition-colors ${
-          completedCount === LESSON_COUNT
-            ? 'text-emerald-300'
-            : 'text-gray-400 hover:text-gray-200'
-        }`}
-        title={t('curriculum.title')}
-      >
-        📚 {completedCount}/{LESSON_COUNT}
-      </button>
-
       {open && (
-        <div className="fixed bottom-64 left-4 w-80 max-h-[55vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg p-4 z-50 font-mono text-sm text-gray-200 space-y-3">
-          <div>
-            <h3 className="text-teal-300 font-bold mb-1">{t('curriculum.title')}</h3>
-            <p className="text-xs text-gray-400">{t('curriculum.subtitle')}</p>
+        <div className="fixed top-14 left-[21rem] w-80 max-h-[75vh] overflow-y-auto bg-black/95 border border-teal-500/40 backdrop-blur-md rounded-xl p-4 z-50 font-mono text-sm text-gray-200 space-y-3 shadow-2xl">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-teal-300 font-bold mb-1">
+                {t('curriculum.title')} ({completedCount}/{LESSON_COUNT})
+              </h3>
+              <p className="text-xs text-gray-400">{t('curriculum.subtitle')}</p>
+            </div>
+            <button onClick={closeModal} className="text-gray-400 hover:text-white px-1">
+              ✕
+            </button>
           </div>
 
           {/* Mapa de lecciones */}

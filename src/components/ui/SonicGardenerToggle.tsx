@@ -12,24 +12,12 @@ import {
   type AgentBehaviorProfile,
 } from '../../lib/agents/SonicGardener';
 import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
-/**
- * Panel y Control de Agencia Distribuida — El Sistema como Compañero de
- * Ejecución (Etapa E4 completa).
- *
- * Incluye:
- *  - Activación individual o múltiple de hasta 3 agentes con perfiles de
- *    comportamiento (`imitate`, `contrast`, `sustain`, `silence`, `provoke`) (E4.1.1, E4.3.1).
- *  - Visualización en vivo de las intenciones de cada agente (E4.2.1),
- *    memoria corta de motivos (E4.1.3), tasa de gestos humanos (E4.1.2) y
- *    trayectoria anticipada `TrajectoryPredictor` (E4.1.4).
- *  - Controles de agencia: nivel de intervención y capas permitidas (E4.2.2).
- *  - Modo "Ensamble Mínimo" (1 persona + 2 agentes para práctica solista) (E4.3.3).
- *  - Agente Director que propone cambios de fase o nivel (E4.3.4).
- *  - Comparador de sesiones Con Agente vs. Sin Agente (E4.3.5).
- */
 export function SonicGardenerToggle() {
-  const [openModal, setOpenModal] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const openModal = activeModal === 'gardener_e4';
   const [activeTab, setActiveTab] = useState<'agents' | 'director' | 'compare'>('agents');
 
   const companion = useAgentCompanionStore();
@@ -96,29 +84,8 @@ export function SonicGardenerToggle() {
 
   return (
     <>
-      <div className="fixed bottom-28 left-4 z-40 flex items-center gap-1.5">
-        <button
-          onClick={handleQuickToggle}
-          className={`bg-black/85 backdrop-blur-md rounded-lg px-3 py-2 font-mono text-xs border transition-colors ${
-            anyActive
-              ? 'border-emerald-500/60 text-emerald-300'
-              : 'border-white/10 text-gray-300 hover:text-white'
-          }`}
-          title="Activar/desactivar rápido el Jardinero Sónico"
-        >
-          🌱 {anyActive ? 'Agentes activos' : 'Jardinero'}
-        </button>
-        <button
-          onClick={() => setOpenModal(!openModal)}
-          className="bg-black/85 backdrop-blur-md rounded-lg px-2.5 py-2 font-mono text-xs border border-emerald-500/40 text-emerald-200 hover:bg-emerald-950/60"
-          title="Abrir panel de Compañero de Ejecución y Agencia Distribuida (Etapa E4)"
-        >
-          Ensamble E4 ▾
-        </button>
-      </div>
-
       {openModal && (
-        <div className="fixed bottom-40 left-4 z-50 w-[460px] max-w-[94vw] rounded-2xl border border-white/15 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
+        <div className="fixed top-14 left-[21rem] z-50 w-[460px] max-w-[94vw] rounded-2xl border border-emerald-500/40 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
@@ -128,12 +95,24 @@ export function SonicGardenerToggle() {
                 Perfiles · Memoria de motivos · Ensamble mínimo · Agente Director
               </p>
             </div>
-            <button
-              onClick={() => setOpenModal(false)}
-              className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handleQuickToggle}
+                className={`rounded-lg px-2.5 py-1 font-mono text-[10px] border transition-colors ${
+                  anyActive
+                    ? 'border-emerald-500/60 bg-emerald-950/50 text-emerald-300'
+                    : 'border-white/15 text-gray-300 hover:text-white'
+                }`}
+              >
+                🌱 {anyActive ? 'Pausar Todos' : 'Activar Jardinero'}
+              </button>
+              <button
+                onClick={closeModal}
+                className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Barra de estado de escucha del sistema (E4.1.2, E4.1.3, E4.1.4) */}

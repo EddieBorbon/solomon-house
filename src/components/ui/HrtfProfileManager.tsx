@@ -25,6 +25,7 @@ import {
 } from '../../lib/audio/listeningSynthesisImmersion';
 import { exportAmbisonicsBFormatWav } from '../../lib/residency/curationArchive';
 import { useSessionRecorderStore } from '../../lib/session/sessionRecorder';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Panel Unificado de Escucha Activa/Procesual, Síntesis de Bajo Nivel
@@ -55,7 +56,9 @@ function describe(set: HrirSet): ProfileInfo {
 }
 
 export function HrtfProfileManager() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'hrtf_e5';
   const [activeTab, setActiveTab] = useState<'listening' | 'synthesis' | 'hrtf'>('listening');
   const [profile, setProfile] = useState<ProfileInfo | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -138,20 +141,8 @@ export function HrtfProfileManager() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-4 right-28 bg-black/85 backdrop-blur-md rounded-lg px-3 py-2 z-50 font-mono text-xs border transition-colors ${
-          profile
-            ? 'border-emerald-500/50 text-emerald-300'
-            : 'border-cyan-500/40 text-cyan-200 hover:bg-cyan-950/60'
-        }`}
-        title="Escucha Activa/Procesual, Síntesis Bajo el Capó y Perfiles HRTF SOFA (Etapa E5)"
-      >
-        👂 Escucha · DSP · HRTF (E5)
-      </button>
-
       {open && (
-        <div className="fixed bottom-16 right-4 w-[480px] max-w-[95vw] bg-neutral-950/95 backdrop-blur-xl rounded-2xl border border-white/15 p-4 z-50 text-xs text-neutral-200 shadow-2xl">
+        <div className="fixed top-14 left-[21rem] w-[480px] max-w-[95vw] bg-neutral-950/95 backdrop-blur-xl rounded-2xl border border-cyan-500/40 p-4 z-50 text-xs text-neutral-200 shadow-2xl">
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
@@ -162,7 +153,7 @@ export function HrtfProfileManager() {
               </p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeModal}
               className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
             >
               ✕

@@ -6,6 +6,7 @@ import { useGridStore } from '../stores/useGridStore';
 import { audioManager } from '../lib/AudioManager';
 import { PeerNetwork, type PeerMessage } from '../lib/network/PeerNetwork';
 import { WebTransportClient } from '../lib/network/WebTransportClient';
+import { upsertRoomParticipant } from '../lib/score/expandedScoreProtocol';
 
 /**
  * Sincronización P2P de baja latencia (roadmap 1.1 y 1.2).
@@ -89,7 +90,21 @@ export function usePeerSync(): { peerCount: number; isP2PEnabled: boolean } {
           roomId: ROOM_ID,
           ...(lanMode ? { iceServers: [] } : {}),
           onPeerCountChange: (count) => setPeerCount(count + (wtClient?.getConnectedPeerCount() ?? 0)),
-          onMessage: (_fromId, message) => handleIncoming(message),
+          onMessage: (fromId, message) => {
+            if (fromId) {
+              const pos = Array.isArray(message.position) && message.position.length === 3
+                ? (message.position as [number, number, number])
+                : [0, 1.8, -2] as [number, number, number];
+              upsertRoomParticipant({
+                id: `peer-${fromId}`,
+                alias: `Par Remoto (${fromId.slice(0, 6)})`,
+                role: 'performer',
+                layer: 'spatial',
+                position3D: pos,
+              });
+            }
+            handleIncoming(message);
+          },
         })
       : null;
 

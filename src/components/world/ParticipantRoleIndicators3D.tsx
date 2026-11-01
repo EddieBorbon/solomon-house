@@ -13,14 +13,23 @@ import {
  * dentro de la escena (Roadmap Funcional Jurado E2.1.4).
  */
 export function ParticipantRoleIndicators3D() {
-  const { participants, showRoleIndicatorsIn3D, collaborationMode, activeTurnParticipantId } =
-    useExpandedScoreStore();
+  const {
+    participants,
+    localParticipantId,
+    showRoleIndicatorsIn3D,
+    collaborationMode,
+    activeTurnParticipantId,
+  } = useExpandedScoreStore();
 
   if (!showRoleIndicatorsIn3D) return null;
 
+  // Renderizar balizas 3D solo para otros participantes reales conectados o agentes activos en escena
+  const visibleParticipants = participants.filter((p) => p.id !== localParticipantId);
+  if (visibleParticipants.length === 0) return null;
+
   return (
     <group name="participant-role-indicators-3d">
-      {participants.map((p) => {
+      {visibleParticipants.map((p) => {
         const color = ROLE_VISUAL_COLORS[p.role] || '#60a5fa';
         const isCurrentTurn =
           collaborationMode === 'turn_based' && activeTurnParticipantId === p.id;

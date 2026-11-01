@@ -14,19 +14,12 @@ import {
   exportPerceptualEvaluationReport,
   type VisualSonicPresetId,
 } from '../../lib/mapping/visualSonicCoherence';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
-/**
- * Panel y Leyenda de Coherencia Visual-Sonora (Etapa E3 completa).
- *
- * Incluye:
- *  - Selector de preset de lógica visual-sonora (Estructural, Gestual, Simbólica) (E3.1.3).
- *  - Inspector en vivo "¿Por qué suena así?" del objeto seleccionado (E3.3.1).
- *  - Leyenda flotante de la sala (E3.3.2).
- *  - Modo acusmático experimental (E3.4.1).
- *  - Prueba perceptual de reconocimiento objeto–sonido y exportación JSON (E3.4.2, E3.4.3).
- */
 export function VisualSonicCoherencePanel() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'coherence_e3';
   const [activeTab, setActiveTab] = useState<'why' | 'presets' | 'perceptual'>('why');
 
   const vsState = useVisualSonicStore();
@@ -67,19 +60,10 @@ export function VisualSonicCoherencePanel() {
         </div>
       )}
 
-      {/* Botón flotante y modal E3 */}
-      <div className="fixed bottom-4 left-[390px] z-40">
-        {!open ? (
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-black/85 px-3.5 py-2 text-xs font-medium text-amber-200 shadow-lg backdrop-blur-md transition hover:border-amber-400 hover:bg-amber-950/60"
-            title="Coherencia Visual-Sonora, ¿Por qué suena así? y Prueba Perceptual (Etapa E3)"
-          >
-            <span className="h-2 w-2 rounded-full bg-amber-400" />
-            <span>Coherencia Visual-Sonora (E3)</span>
-          </button>
-        ) : (
-          <div className="w-[460px] max-w-[94vw] rounded-2xl border border-white/15 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
+      {/* Modal E3 */}
+      {open && (
+        <div className="fixed top-14 left-[21rem] z-50">
+          <div className="w-[460px] max-w-[94vw] rounded-2xl border border-amber-500/40 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
@@ -90,7 +74,7 @@ export function VisualSonicCoherencePanel() {
                 </p>
               </div>
               <button
-                onClick={() => setOpen(false)}
+                onClick={closeModal}
                 className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
               >
                 ✕
@@ -341,8 +325,8 @@ export function VisualSonicCoherencePanel() {
               </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }

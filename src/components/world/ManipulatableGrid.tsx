@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Grid } from '@react-three/drei';
+import { Grid, Html } from '@react-three/drei';
 import { useWorldStore } from '../../state/useWorldStore';
 import * as THREE from 'three';
 
@@ -20,16 +20,35 @@ interface ManipulatableGridProps {
 }
 
 export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
-  const { selectGrid, setActiveGrid } = useWorldStore();
+  const { selectGrid, setActiveGrid, activeGridId, grids, createGrid, getGridKey } = useWorldStore();
   const groupRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
+
+  const isActive = activeGridId === grid.id || Boolean(grid.isSelected);
 
   const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onSelect(grid.id);
     selectGrid(grid.id);
     setActiveGrid(grid.id); // Establecer como cuadrícula activa para crear objetos
-    
+  };
+
+  const handleSpawnAdjacent = (
+    event: { stopPropagation: () => void },
+    dx: number,
+    dz: number
+  ) => {
+    event.stopPropagation();
+    const [cx, cy, cz] = grid.coordinates;
+    const nextCoords: [number, number, number] = [cx + dx, cy, cz + dz];
+    const nextKey = getGridKey(nextCoords);
+    const size = grid.gridSize || 20;
+
+    if (!grids.has(nextKey)) {
+      createGrid([nextCoords[0] * size, nextCoords[1] * size, nextCoords[2] * size], size);
+    }
+    selectGrid(nextKey);
+    setActiveGrid(nextKey);
   };
 
   return (
@@ -166,6 +185,52 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
           />
         </mesh>
       )}
+
+      {/* Botones 3D en los 4 lados de la cuadrícula activa para crear cuadrículas adyacentes */}
+      {isActive &&
+        (
+          [
+            { label: '+Oeste', dx: -1, dz: 0, pos: [-grid.gridSize / 2 - 1.1, 0.15, 0] },
+            { label: '+Este', dx: 1, dz: 0, pos: [grid.gridSize / 2 + 1.1, 0.15, 0] },
+            { label: '+Norte', dx: 0, dz: -1, pos: [0, 0.15, -grid.gridSize / 2 - 1.1] },
+            { label: '+Sur', dx: 0, dz: 1, pos: [0, 0.15, grid.gridSize / 2 + 1.1] },
+          ] as const
+        ).map((side) => {
+          const neighborKey = getGridKey([
+            grid.coordinates[0] + side.dx,
+            grid.coordinates[1],
+            grid.coordinates[2] + side.dz,
+          ]);
+          const alreadyExists = grids.has(neighborKey);
+          if (alreadyExists) return null;
+
+          return (
+            <group key={side.label} position={side.pos as unknown as [number, number, number]}>
+              <mesh
+                onClick={(e) => handleSpawnAdjacent(e, side.dx, side.dz)}
+                onPointerOver={(e) => {
+                  e.stopPropagation();
+                  document.body.style.cursor = 'pointer';
+                }}
+                onPointerOut={(e) => {
+                  e.stopPropagation();
+                  document.body.style.cursor = 'auto';
+                }}
+              >
+                <boxGeometry args={[1.6, 0.18, 1.6]} />
+                <meshBasicMaterial color="#10b981" transparent opacity={0.75} />
+              </mesh>
+              <Html position={[0, 0.35, 0]} center distanceFactor={18}>
+                <button
+                  onClick={(e) => handleSpawnAdjacent(e, side.dx, side.dz)}
+                  className="px-1.5 py-0.5 rounded bg-emerald-950/90 border border-emerald-400 text-[9px] font-mono text-emerald-200 hover:bg-emerald-500 hover:text-black transition whitespace-nowrap shadow"
+                >
+                  {side.label}
+                </button>
+              </Html>
+            </group>
+          );
+        })}
     </group>
   );
 }

@@ -7,7 +7,6 @@ import { ParameterEditor } from '../components/ui/ParameterEditor';
 import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
 import { LatencyMonitor } from '../components/ui/LatencyMonitor';
-import { ScoreExportButton } from '../components/ui/ScoreExportButton';
 import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
 import { ExpandedScorePanel } from '../components/ui/ExpandedScorePanel';
 import { VisualSonicCoherencePanel } from '../components/ui/VisualSonicCoherencePanel';
@@ -20,12 +19,8 @@ import { TutorDashboard } from '../components/ui/TutorDashboard';
 import { GalleryPublisher } from '../components/ui/GalleryPublisher';
 import { AudioExamPanel } from '../components/ui/AudioExamPanel';
 import { CurriculumGuide } from '../components/ui/CurriculumGuide';
-import { VRToggle } from '../components/ui/VRToggle';
 import { HeadTrackingToggle } from '../components/ui/HeadTrackingToggle';
-import { LevelSelector } from '../components/ui/LevelSelector';
 import { SonicGardenerToggle } from '../components/ui/SonicGardenerToggle';
-import { NotationGuidesToggle } from '../components/ui/NotationGuidesToggle';
-import { PostProcessingToggle } from '../components/ui/PostProcessingToggle';
 import { SampleDropZone } from '../components/ui/SampleDropZone';
 import { TutorialOverlay } from '../components/tutorial/TutorialOverlay';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -98,71 +93,23 @@ export default function Home() {
         {/* Monitor de latencia de red (RTT) */}
         <LatencyMonitor />
 
-        {/* Exportación de partituras topológicas */}
-        <ScoreExportButton />
-
-        {/* Registro, replay, analítica musicológica, telemetría y SVG (Etapa E1) */}
+        {/* Modales integrados gobernados desde ControlPanel (useUIPanelStore) */}
         <SessionResearchPanel />
-
-        {/* Protocolo de Partitura Expandida (Etapa E2) */}
         <ExpandedScorePanel />
-
-        {/* Coherencia Visual-Sonora y Prueba Perceptual (Etapa E3) */}
         <VisualSonicCoherencePanel />
-
-        {/* Evaluación Colectiva, Live Coding y Soberanía Tecnológica (Etapa E7) */}
         <CommunityInteroperabilityPanel />
-
-        {/* Proyección Futura: XR Passthrough, IA RAVE/ONNX, Federación ActivityPub y Sostenibilidad (Etapa E8) */}
         <FutureProjectionPanel />
-
-        {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />
-
-        {/* Gestor de perfiles HRTF personalizados (SOFA) */}
         <HrtfProfileManager />
-
-        {/* Motor de mapeo paramétrico geometría→síntesis */}
         <MappingEditor />
-
-        {/* Panel del tutor: métricas de participación (8.2) */}
         <TutorDashboard />
-
-        {/* Publicador de galerías para residencias artísticas (8.5) */}
         <GalleryPublisher />
-
-        {/* Exámenes psicoacústicos gamificados (8.4) */}
         <AudioExamPanel />
-
-        {/* Guías curriculares del Decálogo en 7 idiomas (8.3) */}
         <CurriculumGuide />
-
-        {/* Entrada a sesión inmersiva WebXR (3.3) */}
-        <VRToggle />
-
-        {/* Sostenibilidad por donaciones y soporte remunerado (8.6) */}
-        <a
-          href="/apoyo"
-          className="fixed bottom-4 right-48 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm text-gray-400 hover:text-pink-300 transition-colors"
-          title="Sostener el proyecto: donaciones no extractivas y soporte técnico"
-        >
-          ♥ Apoyar
-        </a>
+        <SonicGardenerToggle />
 
         {/* Seguimiento de cabeza en móviles */}
         <HeadTrackingToggle />
-
-        {/* Nivel paramétrico pedagógico N1-N4 */}
-        <LevelSelector />
-
-        {/* Agente autónomo coproductor */}
-        <SonicGardenerToggle />
-
-        {/* Notaciones visuales en tiempo real */}
-        <NotationGuidesToggle />
-
-        {/* Post-procesamiento visual (bloom/viñeta) */}
-        <PostProcessingToggle />
 
         {/* Carga de samples por arrastrar y soltar (N4) */}
         <SampleDropZone />

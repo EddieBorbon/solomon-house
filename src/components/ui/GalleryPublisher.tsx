@@ -17,13 +17,12 @@ import {
   type MultichannelOutputMode,
 } from '../../lib/residency/curationArchive';
 import { importTopologicalScore } from '../../lib/score/topologicalScore';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
-/**
- * Panel de Curaduría, Archivo Público, Reapropiación y Modo Concierto
- * (Roadmap 8.5 + Etapa E6 completa).
- */
 export function GalleryPublisher() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'gallery_e6';
   const [activeTab, setActiveTab] = useState<
     'fragment' | 'archive' | 'reappropriate' | 'concert'
   >('fragment');
@@ -116,16 +115,8 @@ export function GalleryPublisher() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-16 left-4 bg-black/85 backdrop-blur-md rounded-lg px-3 py-2 z-40 font-mono text-xs border border-fuchsia-500/40 text-fuchsia-200 hover:bg-fuchsia-950/60 transition-colors"
-        title="Curaduría, Archivo Público, Reapropiación y Modo Concierto (Etapa E6)"
-      >
-        🖼 Archivo y Curaduría (E6)
-      </button>
-
       {open && (
-        <div className="fixed bottom-28 left-4 z-50 w-[490px] max-w-[95vw] rounded-2xl border border-white/15 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
+        <div className="fixed top-14 left-[21rem] z-50 w-[490px] max-w-[95vw] rounded-2xl border border-fuchsia-500/40 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
@@ -136,7 +127,7 @@ export function GalleryPublisher() {
               </p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeModal}
               className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
             >
               ✕

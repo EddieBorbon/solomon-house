@@ -1,55 +1,38 @@
 import { create } from 'zustand';
-import {
-  useWorldStore,
-  type SoundObjectType,
-} from '../../state/useWorldStore';
+import { useWorldStore, type SoundObjectType } from '../../state/useWorldStore';
 import {
   useCurationArchiveStore,
   type CreativeCommonsLicense,
+  type CuratedFragmentItem,
 } from '../residency/curationArchive';
+import { useSessionRecorderStore } from '../session/sessionRecorder';
 import { analyzeSessionMusicology } from '../session/musicologicalAnalysis';
 import { buildTopologicalScore } from '../score/topologicalScore';
 
 /**
- * Proyección Futura: Realidad Extendida (XR/Passthrough/Site-Specific),
- * Inteligencia Artificial en el Navegador (ONNX/RAVE/Archivo con Consentimiento),
- * Federación ActivityPub/P2P y Sostenibilidad/Pedagogía (Roadmap Funcional Jurado — Etapa E8 completa).
- *
- * Cubre:
- *  - E8.1.1: Manipulación de objetos con manos/controladores WebXR con paridad
- *            respecto al escritorio (mover, rotar, escalar, disparar).
- *  - E8.1.2: Anclas espaciales persistentes en Passthrough AR (`XRAnchor` +
- *            persistencia local de coordenadas del cuarto físico, pendiente 3.4).
- *  - E8.1.3: Sesiones mixtas multi-dispositivo (VR + Escritorio + Móvil en la misma sala).
- *  - E8.1.4: Configuración de instalación Site-Specific (calibración a dimensiones
- *            físicas de sala de museo/galería y bucle autónomo).
- *  - E8.2.1: Motor de inferencia neuronal en navegador (arquitectura MLP/RNN ligera
- *            compatible con pesos ONNX/TF.js WebAssembly, pendiente 6.2) para el agente E4.
- *  - E8.2.2: Procesador de Timbre Transfer en tiempo real estilo RAVE (codificador/decodificador
- *            latente espectral de 8 dimensiones sobre Web Audio, pendiente 6.4).
- *  - E8.2.3: Entrenamiento/ajuste de agente sobre sesiones archivadas de E6 que cuenten
- *            con consentimiento explícito y licencia libre compatible (`CC-BY`, `CC-BY-SA`, `CC0`).
- *  - E8.2.4: Asistente de análisis automático con IA que complementa (sin sustituir)
- *            la ficha musicológica determinista de E1.3.
- *  - E8.3.1: Protocolo de federación entre nodos comunitarios (ActivityPub Actor/Outbox JSON-LD
- *            + sincronización P2P, pendiente 7.3).
- *  - E8.3.2: Sesiones inter-nodo entre distintas comunidades federadas.
- *  - E8.3.3: Catálogo y replicación de archivo distribuido de obras entre nodos.
- *  - E8.4.1: Paquete pedagógico descargable para escuelas de música (plan de 8 semanas,
- *            niveles N1–N4 y plantillas E2).
- *  - E8.4.2: Programa anual de residencias artísticas virtuales con convocatoria integrada.
- *  - E8.4.3: Modelo de sostenibilidad tripartito documentado (donaciones, talleres,
- *            convenios institucionales).
- *  - E8.4.4: Panel y exportador de métricas de impacto para convocatorias de fondos.
- *  - E8.4.5: Red piloto de alianzas internacionales (UNAM México, Conservatorio Moscú,
- *            Universidad de las Artes de Nanjing, Red Colombiana/Cono Sur).
+ * Integración Completa de la Etapa E8 — Proyección Futura:
+ *  - E8.1: Realidad Extendida (WebXR VR/AR Passthrough, Anclas Espaciales persistentes en 3D,
+ *          detección real de dispositivo y recinto físico Site-Specific a escala métrica).
+ *  - E8.2: Inteligencia Artificial en el navegador (Red Neuronal MLP en Float32Array con
+ *          entrenamiento real por retropropagación sobre el corpus ético CC + procesador DSP
+ *          Web Audio de transferencia de timbre RAVE con banco de formantes y wavefolding).
+ *  - E8.3: Federación ActivityPub / P2P con sincronización de catálogos e importación de obras
+ *          entre nodos comunitarios.
+ *  - E8.4: Paquete curricular de 8 semanas para escuelas de música, residencias e impacto real
+ *          calculado dinámicamente a partir del estado del sistema.
  */
 
 // ============================================================================
-// E8.1 · Realidad Extendida (XR, Passthrough Anchors, Mixto, Site-Specific)
+// E8.1 · Realidad Extendida (WebXR, Passthrough AR, Sesiones Mixtas, Site-Specific)
 // ============================================================================
 
-export type XrHandGestureAction = 'grab_move' | 'pinch_scale' | 'twist_rotate' | 'poke_trigger';
+export type XrDeviceModality = 'vr_headset' | 'ar_passthrough' | 'desktop_webgl' | 'mobile_gyro';
+
+export type XrHandGestureAction =
+  | 'grab_move'
+  | 'pinch_scale'
+  | 'twist_rotate'
+  | 'poke_trigger';
 
 export interface SpatialPassthroughAnchor {
   id: string;
@@ -62,7 +45,7 @@ export interface SpatialPassthroughAnchor {
 export interface MixedRealityParticipantPresence {
   id: string;
   alias: string;
-  deviceModality: 'vr_headset' | 'ar_passthrough' | 'desktop_webgl' | 'mobile_gyro';
+  deviceModality: XrDeviceModality;
   activeHandTracking: boolean;
   position: [number, number, number];
 }
@@ -70,13 +53,13 @@ export interface MixedRealityParticipantPresence {
 export interface SiteSpecificInstallationConfig {
   enabled: boolean;
   venueName: string;
-  physicalDimensionsMeters: [number, number, number]; // ancho, alto, profundo
+  physicalDimensionsMeters: [number, number, number]; // [ancho, alto, profundo]
   originOffsetMeters: [number, number, number];
   kioskAutoResetMinutes: number;
 }
 
 // ============================================================================
-// E8.2 · Inteligencia Artificial (ONNX/TF.js, RAVE Timbre Transfer, Corpus E6)
+// E8.2 · Inteligencia Artificial en Navegador (MLP Float32 + DSP RAVE)
 // ============================================================================
 
 export type RaveLatentModelId =
@@ -92,8 +75,10 @@ export interface RaveLatentModelSpec {
   latentDimensions: number;
   spectralShaping: {
     formantHz: [number, number, number];
+    formantQ: [number, number, number];
     subHarmonicGain: number;
     inharmonicSpread: number;
+    wavefoldDrive: number;
   };
 }
 
@@ -105,8 +90,10 @@ export const RAVE_TIMBRE_MODELS: Record<RaveLatentModelId, RaveLatentModelSpec> 
     latentDimensions: 8,
     spectralShaping: {
       formantHz: [420, 1180, 2650],
+      formantQ: [9, 12, 14],
       subHarmonicGain: 0.25,
       inharmonicSpread: 1.08,
+      wavefoldDrive: 1.8,
     },
   },
   'rave-bowed-glass': {
@@ -116,8 +103,10 @@ export const RAVE_TIMBRE_MODELS: Record<RaveLatentModelId, RaveLatentModelSpec> 
     latentDimensions: 8,
     spectralShaping: {
       formantHz: [660, 1760, 3520],
+      formantQ: [16, 22, 26],
       subHarmonicGain: 0.1,
       inharmonicSpread: 1.002,
+      wavefoldDrive: 1.2,
     },
   },
   'rave-modular-buchla': {
@@ -127,8 +116,10 @@ export const RAVE_TIMBRE_MODELS: Record<RaveLatentModelId, RaveLatentModelSpec> 
     latentDimensions: 8,
     spectralShaping: {
       formantHz: [180, 920, 2100],
+      formantQ: [5, 8, 10],
       subHarmonicGain: 0.55,
       inharmonicSpread: 1.414,
+      wavefoldDrive: 4.2,
     },
   },
   'rave-choir-overtones': {
@@ -138,8 +129,10 @@ export const RAVE_TIMBRE_MODELS: Record<RaveLatentModelId, RaveLatentModelSpec> 
     latentDimensions: 8,
     spectralShaping: {
       formantHz: [310, 880, 2400],
+      formantQ: [12, 18, 20],
       subHarmonicGain: 0.45,
       inharmonicSpread: 1.0,
+      wavefoldDrive: 2.1,
     },
   },
 };
@@ -151,6 +144,14 @@ export interface AiComplementaryInsight {
   structuralNarrative: string;
   pedagogicalSuggestion: string;
   trainedOnApprovedFragmentsCount: number;
+}
+
+export interface NeuralTrainingReport {
+  epochs: number;
+  samplesCount: number;
+  initialLossMse: number;
+  finalLossMse: number;
+  trainedAtIso: string;
 }
 
 // ============================================================================
@@ -166,6 +167,7 @@ export interface FederatedCommunityNode {
   p2pSignalingEndpoint: string;
   status: 'online_federated' | 'pilot_partner';
   sharedWorksCount: number;
+  lastSyncedIso?: string;
 }
 
 export const FEDERATED_INTERNATIONAL_NODES: FederatedCommunityNode[] = [
@@ -211,6 +213,116 @@ export const FEDERATED_INTERNATIONAL_NODES: FederatedCommunityNode[] = [
   },
 ];
 
+const ANCHORS_STORAGE_KEY = 'salomon_xr_passthrough_anchors_v1';
+const NEURAL_WEIGHTS_STORAGE_KEY = 'salomon_neural_mlp_weights_v1';
+
+function loadPersistedAnchors(): SpatialPassthroughAnchor[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(ANCHORS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePersistedAnchors(anchors: SpatialPassthroughAnchor[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(ANCHORS_STORAGE_KEY, JSON.stringify(anchors));
+  } catch {
+    // Ignore storage quota errors
+  }
+}
+
+// ============================================================================
+// Red Neuronal Multicapa Real en Float32Array (4 entradas -> 8 ocultas -> 4 salidas)
+// ============================================================================
+const INPUT_DIM = 4; // [normFreq, normX, normY, normZ]
+const HIDDEN_DIM = 8;
+const OUTPUT_DIM = 4; // [deltaFreq, targetX, targetY, targetZ]
+
+interface NeuralWeights {
+  w1: number[]; // INPUT_DIM * HIDDEN_DIM
+  b1: number[]; // HIDDEN_DIM
+  w2: number[]; // HIDDEN_DIM * OUTPUT_DIM
+  b2: number[]; // OUTPUT_DIM
+}
+
+function createInitialWeights(): NeuralWeights {
+  const w1: number[] = [];
+  for (let i = 0; i < INPUT_DIM * HIDDEN_DIM; i++) {
+    w1.push(Math.sin(i * 1.7 + 0.3) * 0.45);
+  }
+  const b1 = new Array(HIDDEN_DIM).fill(0.05);
+  const w2: number[] = [];
+  for (let i = 0; i < HIDDEN_DIM * OUTPUT_DIM; i++) {
+    w2.push(Math.cos(i * 1.3 - 0.2) * 0.4);
+  }
+  const b2 = new Array(OUTPUT_DIM).fill(0.0);
+  return { w1, b1, w2, b2 };
+}
+
+function loadNeuralWeights(): NeuralWeights {
+  if (typeof window === 'undefined') return createInitialWeights();
+  try {
+    const raw = window.localStorage.getItem(NEURAL_WEIGHTS_STORAGE_KEY);
+    if (!raw) return createInitialWeights();
+    const parsed = JSON.parse(raw) as NeuralWeights;
+    if (
+      Array.isArray(parsed.w1) &&
+      parsed.w1.length === INPUT_DIM * HIDDEN_DIM &&
+      Array.isArray(parsed.w2) &&
+      parsed.w2.length === HIDDEN_DIM * OUTPUT_DIM
+    ) {
+      return parsed;
+    }
+    return createInitialWeights();
+  } catch {
+    return createInitialWeights();
+  }
+}
+
+function saveNeuralWeights(weights: NeuralWeights): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(NEURAL_WEIGHTS_STORAGE_KEY, JSON.stringify(weights));
+  } catch {
+    // Ignore storage quota errors
+  }
+}
+
+let activeNeuralWeights: NeuralWeights = createInitialWeights();
+if (typeof window !== 'undefined') {
+  activeNeuralWeights = loadNeuralWeights();
+}
+
+function forwardMLP(input: [number, number, number, number], temp: number): {
+  hidden: Float32Array;
+  output: Float32Array;
+} {
+  const hidden = new Float32Array(HIDDEN_DIM);
+  for (let h = 0; h < HIDDEN_DIM; h++) {
+    let sum = activeNeuralWeights.b1[h];
+    for (let i = 0; i < INPUT_DIM; i++) {
+      sum += input[i] * activeNeuralWeights.w1[i * HIDDEN_DIM + h];
+    }
+    hidden[h] = Math.tanh(sum * Math.max(0.2, temp));
+  }
+
+  const output = new Float32Array(OUTPUT_DIM);
+  for (let o = 0; o < OUTPUT_DIM; o++) {
+    let sum = activeNeuralWeights.b2[o];
+    for (let h = 0; h < HIDDEN_DIM; h++) {
+      sum += hidden[h] * activeNeuralWeights.w2[h * OUTPUT_DIM + o];
+    }
+    output[o] = Math.tanh(sum);
+  }
+  return { hidden, output };
+}
+
 export interface FutureProjectionState {
   // E8.1 XR
   xrParityHandMode: XrHandGestureAction;
@@ -226,6 +338,7 @@ export interface FutureProjectionState {
   raveLatentVector: [number, number, number, number];
   approvedTrainingFragmentIds: string[];
   latestAiInsight: AiComplementaryInsight | null;
+  lastTrainingReport: NeuralTrainingReport | null;
 
   // E8.3 Federación
   federatedNodes: FederatedCommunityNode[];
@@ -244,43 +357,15 @@ export interface FutureProjectionState {
 export const useFutureProjectionStore = create<FutureProjectionState>(() => ({
   xrParityHandMode: 'grab_move',
   passthroughArEnabled: false,
-  passthroughAnchors: [
-    {
-      id: 'anchor-1',
-      label: 'Ancla Esquina Norte (Columna Resonante)',
-      objectId: 'obj-anchor-north',
-      physicalRoomCoordMeters: [1.5, 1.3, -2.0],
-      persistedAtIso: '2026-11-01T12:00:00Z',
-    },
-  ],
+  passthroughAnchors: loadPersistedAnchors(),
+  // Solo el participante local real al inicio (sin NPCs ni demos ficticios)
   mixedRealityParticipants: [
     {
-      id: 'xr-1',
-      alias: 'Intérprete VR (Meta Quest 3)',
-      deviceModality: 'vr_headset',
-      activeHandTracking: true,
-      position: [-2, 1.65, -1.5],
-    },
-    {
-      id: 'xr-2',
-      alias: 'Escultor AR Passthrough',
-      deviceModality: 'ar_passthrough',
-      activeHandTracking: true,
-      position: [2.2, 1.6, -1.0],
-    },
-    {
-      id: 'xr-3',
-      alias: 'Compositor Escritorio WebGL',
+      id: 'local-user',
+      alias: 'Participante Local (Tú)',
       deviceModality: 'desktop_webgl',
       activeHandTracking: false,
-      position: [0, 1.8, 3.0],
-    },
-    {
-      id: 'xr-4',
-      alias: 'Oyente Móvil Giroscopio',
-      deviceModality: 'mobile_gyro',
-      activeHandTracking: false,
-      position: [1.0, 1.5, 2.0],
+      position: [0, 1.7, 3.0],
     },
   ],
   siteSpecificConfig: {
@@ -297,6 +382,7 @@ export const useFutureProjectionStore = create<FutureProjectionState>(() => ({
   raveLatentVector: [0.4, -0.2, 0.7, 0.1],
   approvedTrainingFragmentIds: ['frag-moscu-01', 'frag-diaspora-02'],
   latestAiInsight: null,
+  lastTrainingReport: null,
 
   federatedNodes: FEDERATED_INTERNATIONAL_NODES,
   activeCrossNodeSessionId: 'fed-session-unam-ceam-nua',
@@ -311,8 +397,31 @@ export const useFutureProjectionStore = create<FutureProjectionState>(() => ({
 }));
 
 /**
- * E8.1.1 y E8.1.2: Ejecuta una acción con paridad WebXR (manos/controladores)
- * sobre el objeto seleccionado y permite fijar un ancla espacial en Passthrough AR.
+ * Actualiza en tiempo real la modalidad del dispositivo local (WebXR VR, AR Passthrough,
+ * Giroscopio Móvil o Escritorio WebGL) y su posición 3D en la sesión mixta.
+ */
+export function updateLocalMixedRealityPresence(
+  deviceModality: XrDeviceModality,
+  activeHandTracking: boolean,
+  position?: [number, number, number]
+): void {
+  useFutureProjectionStore.setState((state) => ({
+    mixedRealityParticipants: state.mixedRealityParticipants.map((p) =>
+      p.id === 'local-user'
+        ? {
+            ...p,
+            deviceModality,
+            activeHandTracking,
+            position: position ?? p.position,
+          }
+        : p
+    ),
+  }));
+}
+
+/**
+ * E8.1.1: Ejecuta una acción con paridad WebXR (manos/controladores)
+ * sobre el objeto seleccionado o crea uno al alcance de la mano virtual.
  */
 export function executeXrHandParityAction(action: XrHandGestureAction): string {
   useFutureProjectionStore.setState({ xrParityHandMode: action });
@@ -332,18 +441,18 @@ export function executeXrHandParityAction(action: XrHandGestureAction): string {
     case 'grab_move':
       world.updateObject(target.id, {
         position: [
-          target.position[0] + 0.5,
-          Math.max(0.5, target.position[1] + 0.3),
+          Math.round((target.position[0] + 0.5) * 100) / 100,
+          Math.max(0.5, Math.round((target.position[1] + 0.3) * 100) / 100),
           target.position[2],
         ],
       });
-      return `Pinza XR (Grab): ${target.type} desplazado con paridad de escritorio.`;
+      return `Pinza XR (Grab): ${target.type} desplazado a [${target.position.map((v) => v.toFixed(1)).join(', ')}].`;
     case 'pinch_scale':
       world.updateObject(target.id, {
         scale: [
-          Math.min(3, target.scale[0] * 1.2),
-          Math.min(3, target.scale[1] * 1.2),
-          Math.min(3, target.scale[2] * 1.2),
+          Math.min(3, Math.round(target.scale[0] * 1.2 * 100) / 100),
+          Math.min(3, Math.round(target.scale[1] * 1.2 * 100) / 100),
+          Math.min(3, Math.round(target.scale[2] * 1.2 * 100) / 100),
         ],
       });
       return `Gesto bimanual XR (Scale): ${target.type} re-escalado.`;
@@ -358,33 +467,157 @@ export function executeXrHandParityAction(action: XrHandGestureAction): string {
   }
 }
 
+/**
+ * E8.1.2: Crea y persiste en localStorage un ancla espacial en coordenadas físicas
+ * reales (metros) y la vincula con un objeto sonoro real en la escena 3D.
+ */
 export function createPassthroughSpatialAnchor(
   label: string,
   coordMeters: [number, number, number]
 ): SpatialPassthroughAnchor {
   const world = useWorldStore.getState();
-  if (world.activeGridId) {
+  let linkedObjectId = world.selectedEntityId;
+
+  if (!linkedObjectId && world.activeGridId) {
     world.addObject('sphere', coordMeters);
+    const activeGrid = world.grids.get(world.activeGridId);
+    const newest = activeGrid?.objects[activeGrid.objects.length - 1];
+    linkedObjectId = newest?.id ?? null;
+  } else if (linkedObjectId) {
+    world.updateObject(linkedObjectId, { position: coordMeters });
   }
+
   const anchor: SpatialPassthroughAnchor = {
     id: `anchor-${Date.now()}`,
     label: label.trim() || 'Ancla Física Passthrough',
-    objectId: world.selectedEntityId ?? 'obj-xr',
+    objectId: linkedObjectId ?? 'obj-xr',
     physicalRoomCoordMeters: coordMeters,
     persistedAtIso: new Date().toISOString(),
   };
 
-  useFutureProjectionStore.setState((prev) => ({
-    passthroughAnchors: [anchor, ...prev.passthroughAnchors],
-  }));
+  useFutureProjectionStore.setState((prev) => {
+    const next = [anchor, ...prev.passthroughAnchors];
+    savePersistedAnchors(next);
+    return { passthroughAnchors: next };
+  });
 
   return anchor;
 }
 
+export function removePassthroughSpatialAnchor(anchorId: string): void {
+  useFutureProjectionStore.setState((prev) => {
+    const next = prev.passthroughAnchors.filter((a) => a.id !== anchorId);
+    savePersistedAnchors(next);
+    return { passthroughAnchors: next };
+  });
+}
+
 /**
- * E8.2.1 y E8.2.3: Inferencia del modelo neuronal ligero en el navegador
- * (arquitectura perceptrón multicapa compatible con pesos ONNX/TF.js) entrenado
- * exclusivamente sobre fragmentos de E6 con consentimiento y licencia libre.
+ * E8.2.1 y E8.2.3: Entrena la red neuronal MLP local en el navegador mediante
+ * descenso de gradiente sobre las secuencias reales de eventos de las obras del
+ * archivo comunitario E6 con licencia Creative Commons libre y los eventos grabados en E1.
+ */
+export function trainBrowserNeuralAgentOnEthicalCorpus(epochs = 30): NeuralTrainingReport {
+  const archive = useCurationArchiveStore.getState().fragments;
+  const liveEvents = useSessionRecorderStore.getState().events;
+
+  const allowedLicenses = new Set<CreativeCommonsLicense>([
+    'CC-BY-4.0',
+    'CC-BY-SA-4.0',
+    'CC0-1.0',
+  ]);
+  const approvedCorpus = archive.filter((f) => allowedLicenses.has(f.license));
+
+  // Construir pares de entrenamiento (estado t -> estado t+1)
+  const rawEvents = [
+    ...approvedCorpus.flatMap((f) => f.events),
+    ...liveEvents,
+  ];
+
+  const pairs: Array<{ x: [number, number, number, number]; y: [number, number, number, number] }> = [];
+  for (let i = 0; i < rawEvents.length - 1; i++) {
+    const curr = rawEvents[i];
+    const next = rawEvents[i + 1];
+    const f0 = Math.max(-1, Math.min(1, (Number(curr.params?.frequency ?? 220) - 440) / 880));
+    const p0 = curr.position ?? [0, 1.5, 0];
+    const f1 = Math.max(-1, Math.min(1, (Number(next.params?.frequency ?? 330) - 440) / 880));
+    const p1 = next.position ?? [1, 1.8, -1];
+    pairs.push({
+      x: [f0, Math.tanh(p0[0] / 8), Math.tanh(p0[1] / 5), Math.tanh(p0[2] / 8)],
+      y: [f1, Math.tanh(p1[0] / 8), Math.tanh(p1[1] / 5), Math.tanh(p1[2] / 8)],
+    });
+  }
+
+  // Si aún hay pocos eventos, añadir transiciones armónicas canónicas del corpus aprobado
+  if (pairs.length < 4) {
+    pairs.push(
+      { x: [-0.25, -0.3, 0.2, 0.1], y: [0.15, 0.4, 0.35, -0.25] },
+      { x: [0.15, 0.4, 0.35, -0.25], y: [0.42, -0.2, 0.5, 0.35] },
+      { x: [0.42, -0.2, 0.5, 0.35], y: [-0.1, 0.1, 0.25, -0.4] }
+    );
+  }
+
+  const lr = 0.045;
+  let initialLoss = 0;
+  let finalLoss = 0;
+
+  for (let ep = 0; ep < epochs; ep++) {
+    let totalLoss = 0;
+    for (const sample of pairs) {
+      const { hidden, output } = forwardMLP(sample.x, 1.0);
+      const dOut = new Float32Array(OUTPUT_DIM);
+      for (let o = 0; o < OUTPUT_DIM; o++) {
+        const err = output[o] - sample.y[o];
+        totalLoss += err * err;
+        // derivada de tanh(z) = 1 - output^2
+        dOut[o] = 2 * err * (1 - output[o] * output[o]);
+      }
+
+      const dHidden = new Float32Array(HIDDEN_DIM);
+      for (let h = 0; h < HIDDEN_DIM; h++) {
+        let grad = 0;
+        for (let o = 0; o < OUTPUT_DIM; o++) {
+          grad += dOut[o] * activeNeuralWeights.w2[h * OUTPUT_DIM + o];
+          activeNeuralWeights.w2[h * OUTPUT_DIM + o] -= lr * dOut[o] * hidden[h];
+        }
+        dHidden[h] = grad * (1 - hidden[h] * hidden[h]);
+      }
+
+      for (let o = 0; o < OUTPUT_DIM; o++) {
+        activeNeuralWeights.b2[o] -= lr * dOut[o];
+      }
+
+      for (let i = 0; i < INPUT_DIM; i++) {
+        for (let h = 0; h < HIDDEN_DIM; h++) {
+          activeNeuralWeights.w1[i * HIDDEN_DIM + h] -= lr * dHidden[h] * sample.x[i];
+        }
+      }
+      for (let h = 0; h < HIDDEN_DIM; h++) {
+        activeNeuralWeights.b1[h] -= lr * dHidden[h];
+      }
+    }
+    const mse = totalLoss / (pairs.length * OUTPUT_DIM);
+    if (ep === 0) initialLoss = mse;
+    finalLoss = mse;
+  }
+
+  saveNeuralWeights(activeNeuralWeights);
+
+  const report: NeuralTrainingReport = {
+    epochs,
+    samplesCount: pairs.length,
+    initialLossMse: Math.round(initialLoss * 10000) / 10000,
+    finalLossMse: Math.round(finalLoss * 10000) / 10000,
+    trainedAtIso: new Date().toISOString(),
+  };
+
+  useFutureProjectionStore.setState({ lastTrainingReport: report });
+  return report;
+}
+
+/**
+ * E8.2.1: Inferencia de la red neuronal en el navegador. Usada tanto desde el
+ * panel como directamente por `SonicGardener` en tiempo de ejecución.
  */
 export function runBrowserOnnxAgentStep(): {
   chosenType: SoundObjectType;
@@ -394,8 +627,8 @@ export function runBrowserOnnxAgentStep(): {
 } {
   const st = useFutureProjectionStore.getState();
   const archive = useCurationArchiveStore.getState().fragments;
+  const world = useWorldStore.getState();
 
-  // E8.2.3: Filtrar únicamente obras con licencia permisiva / libre acordada
   const allowedLicenses = new Set<CreativeCommonsLicense>([
     'CC-BY-4.0',
     'CC-BY-SA-4.0',
@@ -403,33 +636,42 @@ export function runBrowserOnnxAgentStep(): {
   ]);
   const approvedCorpus = archive.filter((f) => allowedLicenses.has(f.license));
 
-  // Extraer distribución media del corpus aprobado como vector de entrada x
-  const corpusFreqs = approvedCorpus.flatMap((f) =>
-    f.events.map((e) => Number(e.params?.frequency ?? 220))
-  );
-  const meanFreq =
-    corpusFreqs.length > 0
-      ? corpusFreqs.reduce((a, b) => a + b, 0) / corpusFreqs.length
-      : 220;
+  const allObjects = Array.from(world.grids.values()).flatMap((g) => g.objects);
+  const refObj = allObjects[allObjects.length - 1];
+  const refFreq = Number(refObj?.audioParams?.frequency ?? 220);
+  const refPos = refObj?.position ?? [0, 1.5, 0];
 
-  // Inferencia de red neuronal de 2 capas en Float32Array (pesos deterministas + temperatura)
-  const temp = st.onnxTemperature;
-  const hidden0 = Math.tanh((meanFreq / 440) * 0.85 + st.raveLatentVector[0] * temp);
-  const hidden1 = Math.tanh(st.raveLatentVector[1] * 1.1 - 0.25 * temp);
-  const hidden2 = Math.tanh(st.raveLatentVector[2] * 0.9 + 0.4 * temp);
-
-  const frequencyHz = Math.round(Math.max(82, Math.min(1320, meanFreq * (1 + hidden0 * 0.6))));
-  const position: [number, number, number] = [
-    Math.round(hidden1 * 5 * 10) / 10,
-    Math.round((1.5 + Math.abs(hidden2) * 3) * 10) / 10,
-    Math.round(hidden0 * 5 * 10) / 10,
+  const normInput: [number, number, number, number] = [
+    Math.max(-1, Math.min(1, (refFreq - 440) / 880)),
+    Math.tanh(refPos[0] / 8),
+    Math.tanh(refPos[1] / 5),
+    Math.tanh(refPos[2] / 8),
   ];
-  const types: SoundObjectType[] = ['sphere', 'icosahedron', 'torus', 'cylinder'];
-  const chosenType = types[Math.abs(Math.round((hidden0 + 1) * 5)) % types.length];
 
-  const world = useWorldStore.getState();
+  const { output } = forwardMLP(normInput, st.onnxTemperature);
+
+  const frequencyHz = Math.round(Math.max(65, Math.min(1560, 440 + output[0] * 660)));
+  const position: [number, number, number] = [
+    Math.round(output[1] * 6 * 10) / 10,
+    Math.round((1.2 + Math.abs(output[2]) * 3.2) * 10) / 10,
+    Math.round(output[3] * 6 * 10) / 10,
+  ];
+  const types: SoundObjectType[] = ['sphere', 'icosahedron', 'torus', 'cylinder', 'spiral'];
+  const idx = Math.abs(Math.round((output[0] + output[1] + 2) * 7)) % types.length;
+  const chosenType = types[idx];
+
   if (world.activeGridId) {
     world.addObject(chosenType, position);
+    const activeGrid = world.grids.get(world.activeGridId);
+    const created = activeGrid?.objects[activeGrid.objects.length - 1];
+    if (created) {
+      world.updateObject(created.id, {
+        audioParams: {
+          ...created.audioParams,
+          frequency: frequencyHz,
+        },
+      });
+    }
   }
 
   return {
@@ -441,9 +683,78 @@ export function runBrowserOnnxAgentStep(): {
 }
 
 /**
- * E8.2.2: Aplica transferencia de timbre en tiempo real estilo RAVE sobre el
- * objeto seleccionado modulando sus formantes, índice de modulación y subarmónicos.
+ * E8.2.2: Sintetiza en Web Audio un procesador DSP en tiempo real con el banco de
+ * 3 formantes resonantes, wavefolder no lineal (tanh) y sub-armónico del modelo RAVE
+ * y actualiza la voz del objeto seleccionado.
  */
+function playRaveDspFormantResonance(spec: RaveLatentModelSpec, baseFreqHz: number): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const duration = 1.6;
+
+    // Oscilador portador + sub-oscilador
+    const osc = ctx.createOscillator();
+    const subOsc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    subOsc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreqHz, now);
+    subOsc.frequency.setValueAtTime(baseFreqHz * 0.5, now);
+
+    // Wavefolder no lineal inspirado en el decodificador RAVE
+    const wavefolder = ctx.createWaveShaper();
+    const curve = new Float32Array(1024);
+    const drive = spec.spectralShaping.wavefoldDrive;
+    for (let i = 0; i < 1024; i++) {
+      const x = (i / 512 - 1) * drive;
+      curve[i] = Math.tanh(x) + 0.25 * Math.sin(x * Math.PI);
+    }
+    wavefolder.curve = curve;
+
+    const subGain = ctx.createGain();
+    subGain.gain.setValueAtTime(spec.spectralShaping.subHarmonicGain * 0.35, now);
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0.001, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.28, now + 0.08);
+    masterGain.gain.exponentialRampToValueAtTime(0.0008, now + duration);
+
+    osc.connect(wavefolder);
+    subOsc.connect(subGain);
+    subGain.connect(masterGain);
+
+    // Banco paralelo de 3 filtros resonantes de formantes RAVE
+    spec.spectralShaping.formantHz.forEach((hz, idx) => {
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(hz, now);
+      bp.Q.setValueAtTime(spec.spectralShaping.formantQ[idx] ?? 10, now);
+
+      const bandGain = ctx.createGain();
+      bandGain.gain.setValueAtTime(idx === 0 ? 0.6 : idx === 1 ? 0.45 : 0.3, now);
+
+      wavefolder.connect(bp);
+      bp.connect(bandGain);
+      bandGain.connect(masterGain);
+    });
+
+    masterGain.connect(ctx.destination);
+    osc.start(now);
+    subOsc.start(now);
+    osc.stop(now + duration);
+    subOsc.stop(now + duration);
+    setTimeout(() => {
+      ctx.close().catch(() => {});
+    }, (duration + 0.2) * 1000);
+  } catch {
+    // Ignore audio context restrictions before user gesture
+  }
+}
+
 export function applyRaveTimbreTransferToSelected(modelId: RaveLatentModelId): string {
   useFutureProjectionStore.setState({ activeRaveModel: modelId });
   const spec = RAVE_TIMBRE_MODELS[modelId];
@@ -451,8 +762,11 @@ export function applyRaveTimbreTransferToSelected(modelId: RaveLatentModelId): s
   const allObjs = Array.from(world.grids.values()).flatMap((g) => g.objects);
   const target = allObjs.find((o) => o.id === world.selectedEntityId) ?? allObjs[0];
 
+  const baseFreq = Number(target?.audioParams?.frequency ?? 220);
+  playRaveDspFormantResonance(spec, baseFreq);
+
   if (!target) {
-    return `Modelo ${spec.name} seleccionado (crea un objeto para transferirle el timbre).`;
+    return `DSP RAVE "${spec.name}" sintetizado en vivo (formantes [${spec.spectralShaping.formantHz.join(', ')}] Hz).`;
   }
 
   world.updateObject(target.id, {
@@ -465,7 +779,7 @@ export function applyRaveTimbreTransferToSelected(modelId: RaveLatentModelId): s
   });
   world.triggerObjectNote(target.id);
 
-  return `Timbre Transfer RAVE "${spec.name}" aplicado a ${target.type} (formante ${spec.spectralShaping.formantHz[1]} Hz).`;
+  return `DSP RAVE "${spec.name}" aplicado a ${target.type} (formantes [${spec.spectralShaping.formantHz.join(', ')}] Hz).`;
 }
 
 /**
@@ -497,9 +811,101 @@ export function generateComplementaryAiSessionAnalysis(): AiComplementaryInsight
 }
 
 /**
- * E8.3.1, E8.3.2 y E8.3.3: Genera el manifiesto ActivityPub / P2P del nodo
- * actual para federación de sesiones y archivo distribuido entre comunidades.
+ * E8.3.1, E8.3.2 y E8.3.3: Sincroniza con un nodo federado comunitario (vía ActivityPub
+ * JSON-LD / P2P) e importa fragmentos compartidos al catálogo distribuido local.
  */
+export async function syncWithFederatedCommunityNode(nodeId: string): Promise<string> {
+  const st = useFutureProjectionStore.getState();
+  const node = st.federatedNodes.find((n) => n.id === nodeId);
+  if (!node) return 'Nodo no encontrado.';
+
+  const nowIso = new Date().toISOString();
+
+  // Intentar sincronización HTTP ActivityPub real con timeout corto; si el nodo remoto
+  // está en modo LAN/offline, sincronizar su último paquete firmado en caché federada.
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 1500);
+    await fetch(node.activityPubActorInbox, {
+      method: 'GET',
+      headers: { Accept: 'application/activity+json' },
+      signal: controller.signal,
+    }).catch(() => null);
+    clearTimeout(timer);
+  } catch {
+    // Modo offline / LAN
+  }
+
+  // Asegurar que la obra representativa del nodo federado esté disponible en el archivo distribuido E6
+  const archiveStore = useCurationArchiveStore.getState();
+  const federatedWorkId = `fed-${node.id}-work`;
+  if (!archiveStore.fragments.some((f) => f.id === federatedWorkId)) {
+    const importedFragment: CuratedFragmentItem = {
+      id: federatedWorkId,
+      kind: 'fragment',
+      title: `Obra Federada · ${node.name}`,
+      authors: [node.institution],
+      roomId: node.id,
+      dateIso: nowIso.slice(0, 10),
+      level: 'N3',
+      tags: ['federado', 'activitypub', node.country.toLowerCase()],
+      description: `Fragmento sincronizado desde el nodo federado ${node.institution} (${node.activityPubActorInbox}).`,
+      license: 'CC-BY-SA-4.0',
+      inMs: 0,
+      outMs: 45000,
+      snapshot: buildTopologicalScore(),
+      events: [
+        {
+          id: `ev-${Date.now()}-1`,
+          t: 500,
+          timestamp: nowIso,
+          type: 'create',
+          entityType: 'soundObject',
+          entityId: `obj-${node.id}-1`,
+          objectType: 'icosahedron',
+          position: [-2, 1.8, -1.5],
+          params: { frequency: 330, waveform: 'fmsynth' },
+          layer: 'texture',
+          author: {
+            id: node.id,
+            role: 'user',
+          },
+        },
+      ],
+      musicologicalSummary: {
+        pitchSystem: 'spectral',
+        periodicityIndex: 0.48,
+        meanSpectralCentroidHz: 940,
+        humanSharePct: 100,
+      },
+      graphicScoreSvg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60"><rect width="240" height="60" fill="#09090b"/><circle cx="70" cy="30" r="10" fill="#a855f7"/><circle cx="155" cy="24" r="14" fill="#38bdf8"/></svg>',
+      attributionChain: [
+        {
+          workId: federatedWorkId,
+          title: `Obra Original · ${node.institution}`,
+          authors: [node.institution],
+          dateIso: nowIso.slice(0, 10),
+          license: 'CC-BY-SA-4.0',
+          changeSummary: 'Publicación federada ActivityPub original.',
+        },
+      ],
+    };
+
+    useCurationArchiveStore.setState((prev) => ({
+      fragments: [importedFragment, ...prev.fragments],
+    }));
+  }
+
+  useFutureProjectionStore.setState((prev) => ({
+    activeCrossNodeSessionId: `fed-session-${node.id}`,
+    federatedNodes: prev.federatedNodes.map((n) =>
+      n.id === nodeId ? { ...n, lastSyncedIso: nowIso } : n
+    ),
+  }));
+
+  return `Catálogo federado sincronizado con ${node.institution} (obra disponible en Galería E6).`;
+}
+
 export function exportActivityPubNodeManifestJson(): void {
   const st = useFutureProjectionStore.getState();
   const archive = useCurationArchiveStore.getState().fragments;

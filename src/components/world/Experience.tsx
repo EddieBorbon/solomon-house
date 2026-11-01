@@ -17,6 +17,7 @@ import { getHeadTrackingForward } from '../../lib/audio/headTracking';
 import { TrajectoryPredictor } from '../../lib/agents/TrajectoryPredictor';
 import { PostProcessing } from './PostProcessing';
 import { ParticipantRoleIndicators3D } from './ParticipantRoleIndicators3D';
+import { XrAndSiteSpecificLayer3D } from './XrAndSiteSpecificLayer3D';
 import { QuotaWarning } from '../ui/QuotaWarning';
 import { useTutorialStore } from '../../stores/useTutorialStore';
 import { useEntitySelector } from '../../hooks/useEntitySelector';
@@ -375,6 +376,9 @@ export function Experience() {
 
         {/* Balizas 3D de roles y capas por participante (Etapa E2.1.4) */}
         <ParticipantRoleIndicators3D />
+
+        {/* Capa 3D de Anclas Passthrough AR y Recinto Site-Specific (Etapa E8.1) */}
+        <XrAndSiteSpecificLayer3D />
 
         {/* Post-procesamiento (bloom/viñeta), desactivable para 60 FPS */}
         <PostProcessing />

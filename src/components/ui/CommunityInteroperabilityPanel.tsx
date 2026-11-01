@@ -17,13 +17,12 @@ import {
   formatUtcForTimezones,
   scheduleNewInternationalSession,
 } from '../../lib/community/communityInteroperability';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
-/**
- * Panel de Evaluación Colectiva, Interoperabilidad con Live Coding (MIDI, OSC,
- * Strudel/Tidal, Hydra) y Soberanía Tecnológica Real (Etapa E7 completa).
- */
 export function CommunityInteroperabilityPanel() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'community_e7';
   const [activeTab, setActiveTab] = useState<'eval' | 'livecoding' | 'sovereignty'>('eval');
 
   const commState = useCommunityInteroperabilityStore();
@@ -98,18 +97,9 @@ export function CommunityInteroperabilityPanel() {
         />
       )}
 
-      <div className="fixed bottom-4 left-[615px] z-40">
-        {!open ? (
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 rounded-xl border border-teal-500/40 bg-black/85 px-3.5 py-2 text-xs font-medium text-teal-200 shadow-lg backdrop-blur-md transition hover:border-teal-400 hover:bg-teal-950/60"
-            title="Evaluación Colectiva, Live Coding (MIDI/OSC/Tidal/Hydra) y Soberanía Tecnológica (Etapa E7)"
-          >
-            <span className="h-2 w-2 rounded-full bg-teal-400" />
-            <span>Comunidad · Live Coding · Soberanía (E7)</span>
-          </button>
-        ) : (
-          <div className="w-[500px] max-w-[95vw] rounded-2xl border border-white/15 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
+      {open && (
+        <div className="fixed top-14 left-[21rem] z-50">
+          <div className="w-[500px] max-w-[95vw] rounded-2xl border border-teal-500/40 bg-neutral-950/95 p-4 text-xs text-neutral-200 shadow-2xl backdrop-blur-xl">
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
@@ -120,7 +110,7 @@ export function CommunityInteroperabilityPanel() {
                 </p>
               </div>
               <button
-                onClick={() => setOpen(false)}
+                onClick={closeModal}
                 className="rounded-lg px-2 py-1 text-neutral-400 hover:bg-white/10 hover:text-white"
               >
                 ✕
@@ -539,8 +529,8 @@ export function CommunityInteroperabilityPanel() {
               </div>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }

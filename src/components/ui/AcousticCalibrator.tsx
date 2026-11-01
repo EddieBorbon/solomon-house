@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as Tone from 'tone';
 import { audioManager } from '../../lib/AudioManager';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Calibrador Acústico Básico (roadmap 4.4).
@@ -70,7 +71,9 @@ async function playTestTone(offset: [number, number, number]): Promise<void> {
 }
 
 export function AcousticCalibrator() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'calibrator';
   const [calibration, setCalibration] = useState<Calibration>({
     rolloffFactor: 2,
     refDistance: 1,
@@ -97,23 +100,20 @@ export function AcousticCalibrator() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed bottom-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm text-cyan-300 hover:text-cyan-100 transition-colors"
-        title="Calibrador acústico: tonos de prueba espaciales y escala del modelo de atenuación"
-      >
-        🎚 Calibrar
-      </button>
-
       {open && (
-        <div className="fixed bottom-16 right-4 w-72 bg-black/90 backdrop-blur-md rounded-lg p-4 z-50 font-mono text-sm text-gray-200 space-y-4">
-          <div>
-            <h3 className="text-cyan-300 font-bold mb-1">Calibración acústica</h3>
-            <p className="text-xs text-gray-400">
-              Usa auriculares. Reproduce cada tono y verifica que lo percibes
-              en la dirección indicada; ajusta la escala si las distancias no
-              se sienten naturales.
-            </p>
+        <div className="fixed top-14 left-[21rem] w-80 bg-black/95 border border-cyan-500/40 backdrop-blur-md rounded-xl p-4 z-50 font-mono text-sm text-gray-200 space-y-4 shadow-2xl">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-cyan-300 font-bold mb-1">Calibración acústica</h3>
+              <p className="text-xs text-gray-400">
+                Usa auriculares. Reproduce cada tono y verifica que lo percibes
+                en la dirección indicada; ajusta la escala si las distancias no
+                se sienten naturales.
+              </p>
+            </div>
+            <button onClick={closeModal} className="text-gray-400 hover:text-white px-1">
+              ✕
+            </button>
           </div>
 
           <div className="grid grid-cols-3 gap-1">

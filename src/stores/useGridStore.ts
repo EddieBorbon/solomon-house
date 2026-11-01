@@ -178,28 +178,37 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
   },
 
   // Acciones para manipulación de cuadrículas
-  createGrid: (position: [number, number, number], size: number = 10) => {
+  createGrid: (position: [number, number, number], size: number = 20) => {
     // Calcular coordenadas de cuadrícula
     const coordinates: [number, number, number] = [
-      Math.floor(position[0] / size),
-      Math.floor(position[1] / size),
-      Math.floor(position[2] / size)
+      Math.round(position[0] / size),
+      Math.round(position[1] / size),
+      Math.round(position[2] / size)
     ];
 
     // Usar coordenadas como ID en lugar de UUID
     const gridId = get().getGridKey(coordinates);
 
     set((state) => {
-      // Si la cuadrícula ya existe, no hacer nada
-      if (state.grids.has(gridId)) {
-        return state;
+      const nextGrids = new Map(state.grids);
+      nextGrids.forEach((g, id) => {
+        nextGrids.set(id, { ...g, isSelected: id === gridId });
+      });
+
+      // Si la cuadrícula ya existe, solo activarla y seleccionarla
+      if (nextGrids.has(gridId)) {
+        return {
+          grids: nextGrids,
+          activeGridId: gridId,
+          currentGridCoordinates: coordinates
+        };
       }
 
       // Crear nueva cuadrícula
       const newGrid: Grid = {
         id: gridId, // Usar coordenadas como ID
         coordinates,
-        position,
+        position: [coordinates[0] * size, coordinates[1] * size, coordinates[2] * size],
         rotation: [0, 0, 0],
         scale: [1, 1, 1],
         objects: [],
@@ -208,11 +217,13 @@ export const useGridStore = create<GridState & GridActions>((set, get) => ({
         gridSize: size,
         gridColor: '#ffffff',
         isLoaded: true,
-        isSelected: false
+        isSelected: true
       };
 
+      nextGrids.set(gridId, newGrid);
+
       return {
-        grids: new Map(state.grids.set(gridId, newGrid)),
+        grids: nextGrids,
         activeGridId: gridId, // Establecer como cuadrícula activa
         currentGridCoordinates: coordinates
       };

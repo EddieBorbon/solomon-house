@@ -43,6 +43,7 @@ import {
   exportPhaseTopologicalSvg,
   exportTemporalGraphicScoreSvg,
 } from '../../lib/session/sessionVisualizations';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Panel de Registro, Replay, Analítica Musicológica, Telemetría y
@@ -52,7 +53,9 @@ import {
 type TabId = 'recorder' | 'replay' | 'musicology' | 'telemetry' | 'visuals';
 
 export function SessionResearchPanel() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'session_e1';
   const [activeTab, setActiveTab] = useState<TabId>('recorder');
   const [recordAudioWithSession, setRecordAudioWithSession] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -120,22 +123,8 @@ export function SessionResearchPanel() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-16 left-28 bg-black/85 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-xs transition-colors border ${
-          recorder.isRecording
-            ? 'border-red-500/70 text-red-300'
-            : open
-              ? 'border-purple-400/60 text-purple-200'
-              : 'border-white/10 text-purple-300 hover:text-purple-100'
-        }`}
-        title="Etapa E1: Grabador .casa.json v2, Replay temporal, Analítica Musicológica, Telemetría y Partitura Temporal"
-      >
-        ⏺ Sesión / Tesis {recorder.isRecording ? '● REC' : ''}
-      </button>
-
       {open && (
-        <div className="fixed bottom-28 left-28 w-[440px] max-w-[92vw] max-h-[75vh] overflow-y-auto bg-slate-950/95 backdrop-blur-md border border-purple-500/30 rounded-xl p-4 z-50 font-mono text-xs text-gray-200 space-y-3 shadow-2xl">
+        <div className="fixed top-14 left-[21rem] w-[460px] max-w-[92vw] max-h-[80vh] overflow-y-auto bg-slate-950/95 backdrop-blur-md border border-purple-500/40 rounded-xl p-4 z-50 font-mono text-xs text-gray-200 space-y-3 shadow-2xl">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-purple-300 font-bold text-sm">
@@ -146,7 +135,7 @@ export function SessionResearchPanel() {
               </p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeModal}
               className="text-gray-400 hover:text-white px-2 py-1"
             >
               ✕

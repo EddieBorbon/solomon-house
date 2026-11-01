@@ -1061,9 +1061,9 @@ const syncSubStoresToWorldStore = () => {
   // Agrupar mobileObjects por cuadrícula basados en su posición
   const mobileObjectsByGrid = new Map<string, MobileObject[]>();
   mobileState.mobileObjects.forEach((obj) => {
-    const gx = Math.floor(obj.position[0] / gridSize);
-    const gy = Math.floor(obj.position[1] / gridSize);
-    const gz = Math.floor(obj.position[2] / gridSize);
+    const gx = Math.round(obj.position[0] / gridSize) || 0;
+    const gy = Math.round(obj.position[1] / gridSize) || 0;
+    const gz = Math.round(obj.position[2] / gridSize) || 0;
     const gridKey = `${gx},${gy},${gz}`;
     if (!mobileObjectsByGrid.has(gridKey)) {
       mobileObjectsByGrid.set(gridKey, []);
@@ -1074,9 +1074,9 @@ const syncSubStoresToWorldStore = () => {
   // Agrupar effectZones por cuadrícula basados en su posición
   const effectZonesByGrid = new Map<string, EffectZone[]>();
   effectState.effectZones.forEach((zone) => {
-    const gx = Math.floor(zone.position[0] / gridSize);
-    const gy = Math.floor(zone.position[1] / gridSize);
-    const gz = Math.floor(zone.position[2] / gridSize);
+    const gx = Math.round(zone.position[0] / gridSize) || 0;
+    const gy = Math.round(zone.position[1] / gridSize) || 0;
+    const gz = Math.round(zone.position[2] / gridSize) || 0;
     const gridKey = `${gx},${gy},${gz}`;
     if (!effectZonesByGrid.has(gridKey)) {
       effectZonesByGrid.set(gridKey, []);

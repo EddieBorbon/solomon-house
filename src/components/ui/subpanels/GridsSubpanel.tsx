@@ -10,30 +10,37 @@ export function GridsSubpanel() {
     activeGridId,
     grids,
     createGrid,
+    selectGrid,
+    setActiveGrid,
+    deleteGrid,
+    getGridKey,
     currentGridCoordinates,
     gridSize,
     showGrid,
-    setShowGrid
+    setShowGrid,
   } = useWorldStore();
 
   const { t } = useLanguage();
-  const [isGridsExpanded, setIsGridsExpanded] = useState(false);
-  const [newGridPosition, setNewGridPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const [isGridsExpanded, setIsGridsExpanded] = useState(true);
+  const [newGridCoords, setNewGridCoords] = useState<[number, number, number]>([1, 0, 0]);
   const [newGridSize, setNewGridSize] = useState<number>(20);
 
   const activeGrid = activeGridId ? grids.get(activeGridId) : null;
+  const allGrids = Array.from(grids.values());
 
-  const createGridAtPosition = (direction: 'north' | 'south' | 'east' | 'west' | 'up' | 'down') => {
+  const createOrSelectAdjacentGrid = (
+    direction: 'north' | 'south' | 'east' | 'west' | 'up' | 'down'
+  ) => {
     const baseCoordinates = activeGrid ? activeGrid.coordinates : currentGridCoordinates;
     const [x, y, z] = baseCoordinates;
     let newCoordinates: [number, number, number];
 
     switch (direction) {
       case 'north':
-        newCoordinates = [x, y, z + 1];
+        newCoordinates = [x, y, z - 1];
         break;
       case 'south':
-        newCoordinates = [x, y, z - 1];
+        newCoordinates = [x, y, z + 1];
         break;
       case 'east':
         newCoordinates = [x + 1, y, z];
@@ -49,18 +56,43 @@ export function GridsSubpanel() {
         break;
     }
 
+    const size = activeGrid?.gridSize || gridSize || 20;
+    const targetKey = getGridKey(newCoordinates);
+
+    if (grids.has(targetKey)) {
+      selectGrid(targetKey);
+      setActiveGrid(targetKey);
+      return;
+    }
+
     const newPosition: [number, number, number] = [
-      newCoordinates[0] * gridSize,
-      newCoordinates[1] * gridSize,
-      newCoordinates[2] * gridSize
+      newCoordinates[0] * size,
+      newCoordinates[1] * size,
+      newCoordinates[2] * size,
     ];
 
-    createGrid(newPosition, gridSize);
+    createGrid(newPosition, size);
+    selectGrid(targetKey);
+    setActiveGrid(targetKey);
   };
 
-  const createGridAtCustomPosition = () => {
-    createGrid(newGridPosition, newGridSize);
+  const createGridAtCustomCoords = () => {
+    const size = newGridSize || 20;
+    const targetKey = getGridKey(newGridCoords);
+    if (grids.has(targetKey)) {
+      selectGrid(targetKey);
+      setActiveGrid(targetKey);
+      return;
+    }
+    createGrid(
+      [newGridCoords[0] * size, newGridCoords[1] * size, newGridCoords[2] * size],
+      size
+    );
+    selectGrid(targetKey);
+    setActiveGrid(targetKey);
   };
+
+  const activeCoords = activeGrid ? activeGrid.coordinates : currentGridCoordinates;
 
   return (
     <div className="relative border border-white p-3">
@@ -72,166 +104,207 @@ export function GridsSubpanel() {
 
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xs font-mono font-bold text-white tracking-wider flex items-center gap-2">
-          <Squares2X2Icon className="w-3 h-3" />
-          {t('controls.grids')}
+          <Squares2X2Icon className="w-3.5 h-3.5 text-emerald-400" />
+          <span>{t('controls.grids')} ({allGrids.length})</span>
         </h3>
         <button
           onClick={() => setIsGridsExpanded(!isGridsExpanded)}
-          className="relative border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-          title={isGridsExpanded ? t('effects.hideGrids') : t('effects.showGrids')}
+          className="relative border border-white px-2 py-0.5 text-white hover:bg-white hover:text-black transition-all duration-300 group"
         >
-          <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-          <span className="relative text-xs font-mono tracking-wider">
+          <span className="relative text-[10px] font-mono tracking-wider">
             {isGridsExpanded ? t('controls.hide') : t('controls.show')}
           </span>
         </button>
       </div>
 
-      {/* Posición actual */}
-      <div className="mb-2 p-2 border border-gray-600 text-xs text-gray-300 font-mono">
-        <div className="space-y-1">
-          <p><span className="text-white">{t('controls.pos')}</span> ({activeGrid ? activeGrid.coordinates[0] : currentGridCoordinates[0]}, {activeGrid ? activeGrid.coordinates[1] : currentGridCoordinates[1]}, {activeGrid ? activeGrid.coordinates[2] : currentGridCoordinates[2]})</p>
-          {activeGrid && (
-            <p><span className="text-white">{t('controls.active')}</span> {activeGrid.id.slice(0, 6)}...</p>
-          )}
+      {/* Cuadrícula activa y visibilidad */}
+      <div className="mb-2 flex items-center justify-between p-2 border border-gray-700 bg-zinc-950 text-xs font-mono">
+        <div>
+          <span className="text-gray-400">Activa: </span>
+          <span className="text-emerald-400 font-bold">
+            ({activeCoords[0]}, {activeCoords[1]}, {activeCoords[2]})
+          </span>
         </div>
+        <button
+          onClick={() => setShowGrid(!showGrid)}
+          className={`px-2 py-0.5 text-[10px] border transition-colors ${
+            showGrid
+              ? 'border-emerald-400 text-emerald-300 bg-emerald-950/40'
+              : 'border-gray-600 text-gray-400'
+          }`}
+        >
+          {showGrid ? 'Visible' : 'Oculta'}
+        </button>
       </div>
 
-      {/* Control de visibilidad de cuadrícula */}
-      {activeGrid && (
-        <div className="mb-2 p-2 border border-gray-600">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-white tracking-wider">{t('controls.showGrid')}</span>
-            <button
-              onClick={() => setShowGrid(!showGrid)}
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${showGrid ? 'bg-cyan-500' : 'bg-gray-600'}`}
-              title={showGrid ? t('controls.hideGrid') : t('controls.showGrid')}
-            >
-              <div
-                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${showGrid ? 'translate-x-6' : 'translate-x-0'}`}
-              />
-            </button>
-          </div>
-        </div>
-      )}
-
       {isGridsExpanded && (
-        <div className="space-y-2">
-          {/* Crear cuadrículas adyacentes */}
-          <div className="space-y-1">
-            <div className="text-xs font-mono font-bold text-white tracking-wider">{t('controls.adjacentGrids')}</div>
+        <div className="space-y-3">
+          {/* Cruceta para crear o ir a cuadrículas a los lados */}
+          <div className="space-y-1.5">
+            <div className="text-[10px] font-mono font-bold text-emerald-300 uppercase tracking-wider">
+              + Expandir Cuadrícula a los Lados
+            </div>
 
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-3 gap-1 text-center font-mono text-[10px]">
               <button
-                onClick={() => createGridAtPosition('west')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.west')}
+                onClick={() => createOrSelectAdjacentGrid('down')}
+                className="border border-gray-700 bg-zinc-900 py-1 text-gray-300 hover:border-white hover:text-white"
+                title="Crear/Ir a cuadrícula inferior (Y - 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.west')}</span>
+                ⬇ -Y
               </button>
               <button
-                onClick={() => createGridAtPosition('east')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.east')}
+                onClick={() => createOrSelectAdjacentGrid('north')}
+                className="border border-emerald-500/60 bg-emerald-950/30 py-1 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
+                title="Crear cuadrícula al Norte (Z - 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.east')}</span>
+                ↑ +Norte
               </button>
               <button
-                onClick={() => createGridAtPosition('south')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.south')}
+                onClick={() => createOrSelectAdjacentGrid('up')}
+                className="border border-gray-700 bg-zinc-900 py-1 text-gray-300 hover:border-white hover:text-white"
+                title="Crear/Ir a cuadrícula superior (Y + 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.south')}</span>
+                ⬆ +Y
               </button>
+
               <button
-                onClick={() => createGridAtPosition('north')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.north')}
+                onClick={() => createOrSelectAdjacentGrid('west')}
+                className="border border-emerald-500/60 bg-emerald-950/30 py-1.5 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
+                title="Crear cuadrícula al Oeste / Izquierda (X - 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.north')}</span>
+                ← +Oeste
               </button>
+              <div className="border border-white/40 bg-black py-1.5 text-white font-bold flex items-center justify-center">
+                ({activeCoords[0]},{activeCoords[1]},{activeCoords[2]})
+              </div>
               <button
-                onClick={() => createGridAtPosition('down')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.down')}
+                onClick={() => createOrSelectAdjacentGrid('east')}
+                className="border border-emerald-500/60 bg-emerald-950/30 py-1.5 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
+                title="Crear cuadrícula al Este / Derecha (X + 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.down')}</span>
+                +Este →
               </button>
+
+              <div />
               <button
-                onClick={() => createGridAtPosition('up')}
-                className="relative border border-white px-1 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-                title={t('effects.up')}
+                onClick={() => createOrSelectAdjacentGrid('south')}
+                className="border border-emerald-500/60 bg-emerald-950/30 py-1 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
+                title="Crear cuadrícula al Sur (Z + 1)"
               >
-                <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-                <span className="relative text-xs font-mono tracking-wider">{t('controls.up')}</span>
+                ↓ +Sur
               </button>
+              <div />
             </div>
           </div>
 
-          {/* Crear cuadrícula personalizada */}
+          {/* Lista de cuadrículas existentes en el mundo */}
           <div className="space-y-1">
-            <div className="text-xs font-mono font-bold text-white tracking-wider">{t('controls.customGrid')}</div>
-
-            <div className="grid grid-cols-4 gap-1">
-              <div>
-                <label className="text-xs text-gray-400 block font-mono tracking-wider">X</label>
-                <input
-                  type="number"
-                  value={newGridPosition[0]}
-                  onChange={(e) => setNewGridPosition([parseInt(e.target.value) || 0, newGridPosition[1], newGridPosition[2]])}
-                  className="w-full px-1 py-1 bg-black border border-gray-600 text-white text-xs font-mono focus:border-white focus:outline-none"
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-400 block font-mono tracking-wider">Y</label>
-                <input
-                  type="number"
-                  value={newGridPosition[1]}
-                  onChange={(e) => setNewGridPosition([newGridPosition[0], parseInt(e.target.value) || 0, newGridPosition[2]])}
-                  className="w-full px-1 py-1 bg-black border border-gray-600 text-white text-xs font-mono focus:border-white focus:outline-none"
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-400 block font-mono tracking-wider">Z</label>
-                <input
-                  type="number"
-                  value={newGridPosition[2]}
-                  onChange={(e) => setNewGridPosition([newGridPosition[0], newGridPosition[1], parseInt(e.target.value) || 0])}
-                  className="w-full px-1 py-1 bg-black border border-gray-600 text-white text-xs font-mono focus:border-white focus:outline-none"
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-400 block font-mono tracking-wider">{t('controls.size')}</label>
-                <input
-                  type="number"
-                  value={newGridSize}
-                  onChange={(e) => setNewGridSize(parseInt(e.target.value) || 20)}
-                  className="w-full px-1 py-1 bg-black border border-gray-600 text-white text-xs font-mono focus:border-white focus:outline-none"
-                  placeholder="20"
-                  min="5"
-                  max="100"
-                />
-              </div>
+            <div className="text-[10px] font-mono font-bold text-gray-300 uppercase tracking-wider">
+              Cuadrículas en Escena ({allGrids.length})
             </div>
+            <div className="max-h-28 overflow-y-auto space-y-1 pr-1">
+              {allGrids.map((g) => {
+                const isAct = g.id === activeGridId;
+                const objCount =
+                  (g.objects?.length || 0) +
+                  (g.mobileObjects?.length || 0) +
+                  (g.effectZones?.length || 0);
+                return (
+                  <div
+                    key={g.id}
+                    className={`flex items-center justify-between px-2 py-1 border text-[10px] font-mono ${
+                      isAct
+                        ? 'border-emerald-400 bg-emerald-950/40 text-white'
+                        : 'border-gray-700 bg-zinc-950 text-gray-300'
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        selectGrid(g.id);
+                        setActiveGrid(g.id);
+                      }}
+                      className="flex-1 text-left hover:text-emerald-300"
+                    >
+                      <span className="font-bold">
+                        [{g.coordinates.join(', ')}]
+                      </span>{' '}
+                      <span className="text-gray-400">· {objCount} elem.</span>
+                    </button>
+                    {allGrids.length > 1 && (
+                      <button
+                        onClick={() => deleteGrid(g.id)}
+                        className="ml-2 text-red-400 hover:text-red-200 px-1"
+                        title="Eliminar esta cuadrícula"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
+          {/* Crear cuadrícula en coordenada personalizada */}
+          <div className="space-y-1 pt-1 border-t border-gray-800">
+            <div className="text-[10px] font-mono text-gray-400">
+              Coordenada personalizada (X, Y, Z) y Tamaño:
+            </div>
+            <div className="grid grid-cols-4 gap-1">
+              <input
+                type="number"
+                value={newGridCoords[0]}
+                onChange={(e) =>
+                  setNewGridCoords([
+                    parseInt(e.target.value, 10) || 0,
+                    newGridCoords[1],
+                    newGridCoords[2],
+                  ])
+                }
+                className="w-full px-1 py-0.5 bg-black border border-gray-600 text-white text-[10px] font-mono"
+                placeholder="X"
+              />
+              <input
+                type="number"
+                value={newGridCoords[1]}
+                onChange={(e) =>
+                  setNewGridCoords([
+                    newGridCoords[0],
+                    parseInt(e.target.value, 10) || 0,
+                    newGridCoords[2],
+                  ])
+                }
+                className="w-full px-1 py-0.5 bg-black border border-gray-600 text-white text-[10px] font-mono"
+                placeholder="Y"
+              />
+              <input
+                type="number"
+                value={newGridCoords[2]}
+                onChange={(e) =>
+                  setNewGridCoords([
+                    newGridCoords[0],
+                    newGridCoords[1],
+                    parseInt(e.target.value, 10) || 0,
+                  ])
+                }
+                className="w-full px-1 py-0.5 bg-black border border-gray-600 text-white text-[10px] font-mono"
+                placeholder="Z"
+              />
+              <input
+                type="number"
+                value={newGridSize}
+                onChange={(e) => setNewGridSize(parseInt(e.target.value, 10) || 20)}
+                className="w-full px-1 py-0.5 bg-black border border-gray-600 text-white text-[10px] font-mono"
+                min="5"
+                max="100"
+              />
+            </div>
             <button
-              onClick={createGridAtCustomPosition}
-              className="relative w-full border border-white px-2 py-1 text-white hover:bg-white hover:text-black transition-all duration-300 group"
-              title={t('effects.createGridAtPosition')}
+              onClick={createGridAtCustomCoords}
+              className="w-full border border-white py-1 text-[10px] font-mono text-white hover:bg-white hover:text-black transition-colors"
             >
-              <div className="absolute -inset-0.5 border border-gray-600 group-hover:border-white transition-colors duration-300"></div>
-              <span className="relative text-xs font-mono tracking-wider flex items-center justify-center space-x-1">
-                <span>🎯</span>
-                <span>{t('controls.createGridButton')}</span>
-              </span>
+              + Crear / Ir a Cuadrícula ({newGridCoords.join(', ')})
             </button>
           </div>
         </div>

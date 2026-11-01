@@ -42,6 +42,7 @@ import {
 import { analyzeSessionMusicology } from '../../lib/session/musicologicalAnalysis';
 import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Panel y HUD de la Partitura Expandida (Roadmap Funcional Jurado — Etapa E2 completa).
@@ -56,7 +57,9 @@ function formatClock(sec: number): string {
 }
 
 export function ExpandedScorePanel() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'score_e2';
   const [activeTab, setActiveTab] = useState<TabId>('roles');
   const [asyncNote, setAsyncNote] = useState('');
   const [templateName, setTemplateName] = useState('');
@@ -119,23 +122,8 @@ export function ExpandedScorePanel() {
         </div>
       )}
 
-      {/* Botón de acceso rápido a Partitura Expandida (E2) */}
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-16 left-64 bg-black/85 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-xs transition-colors border ${
-          score.sessionTimerRunning
-            ? 'border-indigo-400 text-indigo-200'
-            : open
-              ? 'border-indigo-400/60 text-indigo-200'
-              : 'border-white/10 text-indigo-300 hover:text-indigo-100'
-        }`}
-        title="Etapa E2: Protocolo de Partitura Expandida (Roles, Capas, Turnos, Fases, Retos y Temporadas)"
-      >
-        🎼 Partitura E2 {score.sessionTimerRunning ? `● ${formatClock(score.sessionRemainingSec)}` : ''}
-      </button>
-
       {open && (
-        <div className="fixed bottom-28 left-64 w-[460px] max-w-[92vw] max-h-[76vh] overflow-y-auto bg-slate-950/95 backdrop-blur-md border border-indigo-500/30 rounded-xl p-4 z-50 font-mono text-xs text-gray-200 space-y-3 shadow-2xl">
+        <div className="fixed top-14 left-[21rem] w-[480px] max-w-[92vw] max-h-[80vh] overflow-y-auto bg-slate-950/95 backdrop-blur-md border border-indigo-500/40 rounded-xl p-4 z-50 font-mono text-xs text-gray-200 space-y-3 shadow-2xl">
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-indigo-300 font-bold text-sm">
@@ -146,7 +134,7 @@ export function ExpandedScorePanel() {
               </p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeModal}
               className="text-gray-400 hover:text-white px-2 py-1"
             >
               ✕

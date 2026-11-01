@@ -11,6 +11,7 @@ import { SoundObjectsSubpanel } from './subpanels/SoundObjectsSubpanel';
 import { EffectsSubpanel } from './subpanels/EffectsSubpanel';
 import { MobileObjectsSubpanel } from './subpanels/MobileObjectsSubpanel';
 import { GridsSubpanel } from './subpanels/GridsSubpanel';
+import { IntegratedToolsSubpanel } from './subpanels/IntegratedToolsSubpanel';
 
 export function ControlPanel() {
   const {
@@ -140,10 +141,13 @@ export function ControlPanel() {
                 />
               </div>
 
-              {/* Sección de Cuadrículas */}
-              <div className="mb-4 relative opacity-30 pointer-events-none">
+              {/* Sección de Cuadrículas (Adyacentes a los lados + Selección) */}
+              <div className="mb-4 relative">
                 <GridsSubpanel />
               </div>
+
+              {/* Centro de Módulos, Tesis, Agentes, Calibración, Pedagogía y XR */}
+              <IntegratedToolsSubpanel />
 
               {/* Panel de Persistencia */}
               <div className={isTutorialActive && currentStep !== 11 ? 'opacity-30 pointer-events-none' : ''}>

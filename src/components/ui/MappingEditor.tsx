@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useWorldStore } from '../../state/useWorldStore';
 import {
@@ -21,6 +21,7 @@ import {
   evaluateCurve,
   type CurveType,
 } from '../../lib/mapping/transferCurves';
+import { useUIPanelStore } from '../../state/useUIPanelStore';
 
 /**
  * Motor de Mapeo Paramétrico Unificado — UI (roadmap 5.1 y 5.2).
@@ -244,7 +245,9 @@ function MappingRow({
 }
 
 export function MappingEditor() {
-  const [open, setOpen] = useState(false);
+  const activeModal = useUIPanelStore((s) => s.activeModal);
+  const closeModal = useUIPanelStore((s) => s.closeModal);
+  const open = activeModal === 'mapping';
   const selectedEntityId = useWorldStore((state) => state.selectedEntityId);
   const grids = useWorldStore((state) => state.grids);
   // El selector debe devolver una referencia estable: usar el array del
@@ -260,19 +263,20 @@ export function MappingEditor() {
     startMappingRuntime();
   }, []);
 
-  // Solo mostrar para objetos sonoros (no móviles ni zonas)
+  // Buscar el objeto sonoro seleccionado (o el primero de la sala)
   const selectedObject = (() => {
-    if (!selectedEntityId) return null;
-    for (const grid of grids.values()) {
-      const found = (grid.objects ?? []).find((obj) => obj?.id === selectedEntityId);
+    const allObjs = Array.from(grids.values()).flatMap((g) => g.objects ?? []);
+    if (selectedEntityId) {
+      const found = allObjs.find((obj) => obj?.id === selectedEntityId);
       if (found) return found;
     }
-    return null;
+    return allObjs[0] ?? null;
   })();
 
-  if (!selectedObject) return null;
+  if (!open) return null;
 
   const handleAdd = () => {
+    if (!selectedObject) return;
     const mapping: ParameterMapping = {
       id: uuidv4(),
       source: 'posY',
@@ -286,30 +290,31 @@ export function MappingEditor() {
       enabled: true,
     };
     addMapping(selectedObject.id, mapping);
-    setOpen(true);
   };
 
   return (
-    <>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`fixed bottom-16 right-4 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 z-50 font-mono text-sm transition-colors ${
-          mappings.length > 0 ? 'text-yellow-300' : 'text-gray-400 hover:text-gray-200'
-        }`}
-        title="Mapeo paramétrico: vincula la geometría del objeto seleccionado con su síntesis"
-      >
-        🔗 Mapeos{mappings.length > 0 ? ` (${mappings.length})` : ''}
-      </button>
+    <div className="fixed top-14 left-[21rem] w-80 max-h-[75vh] overflow-y-auto bg-black/95 border border-yellow-500/40 backdrop-blur-md rounded-xl p-4 z-50 font-mono text-sm text-gray-200 space-y-3 shadow-2xl">
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-yellow-300 font-bold mb-1">Mapeo paramétrico</h3>
+          <p className="text-xs text-gray-400">
+            Define qué parámetro geométrico del objeto controla qué parámetro
+            de síntesis mediante una curva de transferencia.
+          </p>
+        </div>
+        <button onClick={closeModal} className="text-gray-400 hover:text-white px-1">
+          ✕
+        </button>
+      </div>
 
-      {open && (
-        <div className="fixed bottom-28 right-4 w-80 max-h-[60vh] overflow-y-auto bg-black/90 backdrop-blur-md rounded-lg p-4 z-50 font-mono text-sm text-gray-200 space-y-3">
-          <div>
-            <h3 className="text-yellow-300 font-bold mb-1">Mapeo paramétrico</h3>
-            <p className="text-xs text-gray-400">
-              Define qué parámetro geométrico del objeto controla qué parámetro
-              de síntesis, mediado por una curva de transferencia. Mover,
-              escalar o rotar el objeto tocará su sonido en tiempo real.
-            </p>
+      {!selectedObject ? (
+        <p className="text-xs text-amber-300 border border-amber-500/30 rounded p-2">
+          Crea o selecciona primero un objeto sonoro en la cuadrícula para editar sus curvas de mapeo.
+        </p>
+      ) : (
+        <>
+          <div className="text-[11px] text-yellow-200 bg-yellow-950/30 border border-yellow-500/30 rounded px-2 py-1">
+            Objeto activo: <strong>{selectedObject.type}</strong> ({selectedObject.id.slice(0, 6)})
           </div>
 
           {mappings.map((mapping) => (
@@ -318,12 +323,12 @@ export function MappingEditor() {
 
           <button
             onClick={handleAdd}
-            className="w-full px-2 py-1 bg-yellow-500/20 hover:bg-yellow-500/40 rounded text-xs transition-colors"
+            className="w-full px-2 py-1.5 bg-yellow-500/20 hover:bg-yellow-500/40 rounded text-xs transition-colors"
           >
             + Añadir mapeo
           </button>
-        </div>
+        </>
       )}
-    </>
+    </div>
   );
 }
