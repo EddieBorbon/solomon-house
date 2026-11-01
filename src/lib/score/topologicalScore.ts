@@ -246,3 +246,19 @@ export function exportTopologicalScore(metadata?: TopologicalScore['metadata']):
   anchor.click();
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Carga una partitura topológica en el mundo 3D activo (E6.2.2 y E6.3.1).
+ */
+export function importTopologicalScore(score: TopologicalScore): void {
+  const state = useWorldStore.getState();
+  if (!state.activeGridId) {
+    state.createGrid([0, 0, 0], 20);
+  }
+  const sourceGrid = score.grids[0];
+  if (!sourceGrid) return;
+
+  for (const obj of sourceGrid.objects ?? []) {
+    state.addObject(obj.type, obj.position);
+  }
+}
