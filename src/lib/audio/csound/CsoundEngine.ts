@@ -200,6 +200,20 @@ export class CsoundEngine {
   public hasVoice(id: string): boolean {
     return this.slots.has(id);
   }
+
+  /**
+   * Compila código de orquesta Csound en vivo y ejecuta una línea de score (E5.2.2).
+   */
+  public async compileAndPlayLiveInstrument(orc: string, scoreLine: string): Promise<boolean> {
+    if (!(await this.init()) || !this.csound) return false;
+    try {
+      await this.csound.compileOrc(orc);
+      await this.csound.readScore(scoreLine);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 export const csoundEngine = CsoundEngine.getInstance();

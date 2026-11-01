@@ -34,11 +34,11 @@ Relación con los otros roadmaps:
 | **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 20 |
 | **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 13 |
 | **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 12 |
-| **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 0 |
+| **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 14 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 15 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **82** |
+| **TOTAL** | | | | **126** | **96** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -250,30 +250,30 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 *Base existente:* modo visitante de galería (`residency.ts`).
 
-- [ ] **E5.1.1** Rol de oyente en salas en vivo: navega y escucha sin editar, con presencia mínima visible.
-- [ ] **E5.1.2** Escucha **activa**: la persona oyente elige su recorrido, y su posición cambia lo que oye.
-- [ ] **E5.1.3** Rutas de escucha guiadas (cámara y posición predefinidas por la persona compositora).
-- [ ] **E5.1.4** Escucha **procesual**: ver la línea de tiempo de la obra mientras se escucha (con E1.2).
-- [ ] **E5.1.5** Retroalimentación ligera del público (reacciones) visible para quienes interpretan.
+- [x] **E5.1.1** Rol de oyente en salas en vivo: navega y escucha sin editar, con presencia mínima visible. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`setActiveListenerModeAndPosition`)
+- [x] **E5.1.2** Escucha **activa**: la persona oyente elige su recorrido, y su posición cambia lo que oye. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`activeListenerPosition`, `AudioListener`)
+- [x] **E5.1.3** Rutas de escucha guiadas (cámara y posición predefinidas por la persona compositora). ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`GUIDED_LISTENING_ROUTES`, `startGuidedListeningRoute`)
+- [x] **E5.1.4** Escucha **procesual**: ver la línea de tiempo de la obra mientras se escucha (con E1.2). ✅ 2026-11-02 — `src/components/ui/HrtfProfileManager.tsx` (`processualTimelineVisible`, `sessionEvents`)
+- [x] **E5.1.5** Retroalimentación ligera del público (reacciones) visible para quienes interpretan. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`sendAudienceReaction`, `audienceReactions`)
 
 ### E5.2 · Síntesis de bajo nivel al alcance de quien compone
 
 *Base existente:* motor nativo (`src/lib/audio/native/`, solo cubre AMSynth), `CsoundEngine.ts`, `CodeEditor.tsx`.
 
-- [ ] **E5.2.1** Paridad del motor nativo con todos los tipos de síntesis y decisión del motor por defecto.
-- [ ] **E5.2.2** Tipo de objeto **Csound**: instrumento definido en código y editable en vivo.
-- [ ] **E5.2.3** Biblioteca de instrumentos Csound comunitarios, que se pueden compartir y versionar.
-- [ ] **E5.2.4** Vista "bajo el capó": grafo de nodos Web Audio del objeto seleccionado (responde a la observación de abstracción de [HS]).
+- [x] **E5.2.1** Paridad del motor nativo con todos los tipos de síntesis y decisión del motor por defecto. ✅ 2026-11-02 — `src/lib/audio/native/NativeVoice.ts` (10 modelos) y `src/lib/audio/listeningSynthesisImmersion.ts` (`defaultSynthBackend`)
+- [x] **E5.2.2** Tipo de objeto **Csound**: instrumento definido en código y editable en vivo. ✅ 2026-11-02 — `src/lib/audio/csound/CsoundEngine.ts` (`compileAndPlayLiveInstrument`) y `src/lib/audio/listeningSynthesisImmersion.ts`
+- [x] **E5.2.3** Biblioteca de instrumentos Csound comunitarios, que se pueden compartir y versionar. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`COMMUNITY_CSOUND_LIBRARY`, `publishCommunityCsoundInstrument`)
+- [x] **E5.2.4** Vista "bajo el capó": grafo de nodos Web Audio del objeto seleccionado (responde a la observación de abstracción de [HS]). ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`buildUnderTheHoodWebAudioGraph`)
 
 ### E5.3 · Inmersión personalizada
 
 *Base existente:* SOFA, `SofaSpatializer`, `HrtfProfileManager`, `AcousticCalibrator`, `headTracking.ts`.
 
-- [ ] **E5.3.1** Asistente para elegir HRTF mediante una prueba perceptual corta (elegir el perfil que localiza mejor).
-- [ ] **E5.3.2** Registrar en la telemetría si cada participante usó HRTF genérica o personalizada.
-- [ ] **E5.3.3** Prueba de localización (delante/detrás, elevación) para comparar perfiles. Los datos van a la discusión de [GG].
-- [ ] **E5.3.4** Exportar Ambisonics (B-format) para salas con sistemas multicanal.
-- [ ] **E5.3.5** Guía de uso con auriculares frente a altavoces, con detección y aviso.
+- [x] **E5.3.1** Asistente para elegir HRTF mediante una prueba perceptual corta (elegir el perfil que localiza mejor). ✅ 2026-11-02 — `src/components/ui/HrtfProfileManager.tsx` y `src/lib/audio/listeningSynthesisImmersion.ts`
+- [x] **E5.3.2** Registrar en la telemetría si cada participante usó HRTF genérica o personalizada. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`hrtfMode`, `activeHrtfProfileName`)
+- [x] **E5.3.3** Prueba de localización (delante/detrás, elevación) para comparar perfiles. Los datos van a la discusión de [GG]. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`startHrtfLocalizationStimulus`, `submitHrtfLocalizationGuess`)
+- [x] **E5.3.4** Exportar Ambisonics (B-format) para salas con sistemas multicanal. ✅ 2026-11-02 — `src/lib/residency/curationArchive.ts` (`exportAmbisonicsBFormatWav`)
+- [x] **E5.3.5** Guía de uso con auriculares frente a altavoces, con detección y aviso. ✅ 2026-11-02 — `src/lib/audio/listeningSynthesisImmersion.ts` (`detectAudioOutputDevices`, `outputTransducerMode`)
 
 ---
 
@@ -416,3 +416,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 - 2026-11-02: **Etapa E3 completada (13/13 tareas)**: documentación explícita forma geométrica → familia tímbrica (`OBJECT_TIMBRAL_LOGIC`), aplicación automática de mapeos al crear objetos, tres presets de lógica por sala (`structural`, `gestural`, `symbolic`), animación visual de amplitud y envolvente ataque/decaimiento en todos los objetos, firmas visuales derivadas del efecto acústico en `EffectZone`, inspector en vivo "¿Por qué suena así?", leyenda flotante de sala, modo acusmático experimental, prueba perceptual interactiva con tasa de acierto vs. azar `1/N` e integración en `.casa.json`.
 - 2026-11-02: **Etapa E4 completada (12/12 tareas)**: 5 perfiles de comportamiento (`imitate`, `contrast`, `sustain`, `silence`, `provoke`), respuesta a la aceleración gestual humana, memoria corta de motivos humanos (1–5 min), anticipación espacial con `TrajectoryPredictor`, visualización en vivo de intenciones del agente, controles de nivel de agencia y filtro de capas E2.2, autoría por instancia de agente en E1.3.6, soporte multi-agente con personalidades distintas, adopción de turnos y fases de E2, modo "Ensamble Mínimo" (1 humano + 2 agentes), Agente Director de fases/niveles y estudio comparativo exportable Con Agente vs. Sin Agente.
 - 2026-11-02: **Etapa E6 completada (15/15 tareas)**: recorte de fragmentos (`inMs`–`outMs`) sobre sesiones de E1 con metadatos completos y licencias Creative Commons acordadas; archivo público navegable con buscador y filtros en `/galeria` y en el lienzo; ficha de obra con resumen musicológico E1.3 y partitura gráfica SVG; colecciones curadas; bifurcación (`fork`) con cadena autoral visible; exportación de stems WAV por capa o por objeto para DAW y de samples WAV para carga comunitaria; y Modo Concierto con lista de reproducción, exportación Ambisonics B-format (W, X, Y, Z), vista limpia de proyección, concierto híbrido y programa de mano HTML imprimible.
+- 2026-11-02: **Etapa E5 completada (14/14 tareas)**: modo oyente en vivo, escucha activa 3D, rutas de escucha guiadas por estaciones, escucha procesual sincronizada con la línea de tiempo de eventos y reacciones del público; selector de motor nativo Web Audio (10 modelos en `NativeVoice`), editor Csound WASM en vivo, biblioteca comunitaria de instrumentos Csound versionados y vista "Bajo el capó" del grafo de nodos Web Audio; asistente y prueba de localización 3D (delante/detrás y elevación), registro en telemetría de HRTF genérica vs. personalizada SOFA, exportación Ambisonics B-format y detector/guía de auriculares frente a altavoces.
