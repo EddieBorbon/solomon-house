@@ -18,6 +18,10 @@ import {
   canControlObjectByOwnership,
   useExpandedScoreStore,
 } from '../lib/score/expandedScoreProtocol';
+import {
+  applyDefaultMappingsForNewObject,
+  notifyObjectSoundTriggered,
+} from '../lib/mapping/visualSonicCoherence';
 
 // Tipos para los objetos de sonido
 export type SoundObjectType = 'cube' | 'sphere' | 'cylinder' | 'cone' | 'pyramid' | 'icosahedron' | 'plane' | 'torus' | 'dodecahedronRing' | 'spiral' | 'custom';
@@ -389,6 +393,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     // Crear objeto usando el facade
     const newObject = worldStoreFacade.createObject(type, position, activeGridId);
     registerObjectOwner(newObject.id);
+    applyDefaultMappingsForNewObject(newObject.id, type);
     
     // IMPORTANTE: Solo usar acciones globales si estamos en el mundo global Y NO hay un proyecto cargado
     if (state.globalWorldConnected && !state.currentProjectId) {
@@ -506,6 +511,7 @@ export const useWorldStore = create<WorldState & WorldActions>((set, get) => {
     const { gridId } = worldStoreFacade.findObjectById(id, state.grids);
     
     if (gridId) {
+      notifyObjectSoundTriggered(id);
       worldStoreFacade.triggerObjectNote(id, gridId);
     }
   },

@@ -10,6 +10,7 @@ import { LatencyMonitor } from '../components/ui/LatencyMonitor';
 import { ScoreExportButton } from '../components/ui/ScoreExportButton';
 import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
 import { ExpandedScorePanel } from '../components/ui/ExpandedScorePanel';
+import { VisualSonicCoherencePanel } from '../components/ui/VisualSonicCoherencePanel';
 import { AcousticCalibrator } from '../components/ui/AcousticCalibrator';
 import { HrtfProfileManager } from '../components/ui/HrtfProfileManager';
 import { MappingEditor } from '../components/ui/MappingEditor';
@@ -103,6 +104,9 @@ export default function Home() {
 
         {/* Protocolo de Partitura Expandida (Etapa E2) */}
         <ExpandedScorePanel />
+
+        {/* Coherencia Visual-Sonora y Prueba Perceptual (Etapa E3) */}
+        <VisualSonicCoherencePanel />
 
         {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />

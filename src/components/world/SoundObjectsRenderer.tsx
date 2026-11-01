@@ -1,9 +1,14 @@
 import React from 'react';
 import { Group } from 'three';
+import { useFrame } from '@react-three/fiber';
 import { useWorldStore, type SoundObject } from '../../state/useWorldStore';
 import { SoundObjectRegistry } from './SoundObjectRegistry';
 import { disposeObject3D } from '../../lib/three/dispose';
 import { useNetworkSmoothing } from '../../hooks/useNetworkSmoothing';
+import {
+  useVisualSonicStore,
+  submitPerceptualGuess,
+} from '../../lib/mapping/visualSonicCoherence';
 
 interface SoundObjectContainerProps {
   object: SoundObject;
@@ -15,6 +20,8 @@ interface SoundObjectContainerProps {
 const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
   ({ object, onSelect, isDragged }, ref) => {
     const { triggerObjectNote } = useWorldStore();
+    const acousmaticMode = useVisualSonicStore((s) => s.acousmaticMode);
+    const envelopeGroupRef = React.useRef<Group>(null);
 
     // GC manual de GPU (roadmap 3.1): al desmontar el contenedor (objeto
     // eliminado o salida de la sala), liberar geometrías, materiales y
@@ -35,6 +42,45 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
     // directamente y el suavizado lo devolvería a la posición vieja del store.
     useNetworkSmoothing(ref as React.RefObject<Group | null>, object.position, !isDragged);
 
+    // E3.2.1 y E3.2.3: Modulación de escala pulsante por amplitud en tiempo real
+    // y envolvente visual ataque/decaimiento al disparar cada objeto (excepto
+    // durante un ensayo perceptual activo donde no se delata cuál sonó).
+    useFrame(({ clock }) => {
+      const envNode = envelopeGroupRef.current;
+      if (!envNode) return;
+
+      const vsState = useVisualSonicStore.getState();
+      // Si hay un ensayo perceptual activo, mantener escala neutra para no revelar la respuesta
+      if (vsState.activeTrialTargetId) {
+        envNode.scale.set(1, 1, 1);
+        return;
+      }
+
+      const lastTrig = vsState.lastTriggerTimestamps[object.id] ?? 0;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const elapsedSec = Math.max(0, (now - lastTrig) / 1000);
+
+      const attack = Math.max(0.01, Number(object.audioParams?.ampAttack ?? 0.05));
+      const release = Math.max(0.08, Number(object.audioParams?.ampRelease ?? 0.6));
+      let envBoost = 0;
+      if (lastTrig > 0 && elapsedSec < attack + release) {
+        if (elapsedSec < attack) {
+          envBoost = (elapsedSec / attack) * 0.28;
+        } else {
+          const relProgress = (elapsedSec - attack) / release;
+          envBoost = Math.max(0, (1 - relProgress) * (1 - relProgress) * 0.28);
+        }
+      }
+
+      // E3.2.1: Si el objeto tiene audio continuo activo, pulsa con su amplitud
+      const continuousAmp = object.audioEnabled
+        ? Math.sin(clock.elapsedTime * 5.0) * 0.04 * Number(object.audioParams?.volume ?? 0.6)
+        : 0;
+
+      const s = 1 + envBoost + continuousAmp;
+      envNode.scale.set(s, s, s);
+    });
+
     // Posición inicial estable: el movimiento posterior lo dirige el
     // suavizado por frame, no la re-aplicación de props de R3F.
     const initialPosition = React.useRef(object.position).current;
@@ -43,6 +89,12 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
     const handleClick = React.useCallback((event: React.MouseEvent) => {
       event.stopPropagation();
       onSelect(object.id);
+
+      // E3.4.2: Si hay una prueba perceptual activa, el clic registra la respuesta
+      if (useVisualSonicStore.getState().activeTrialTargetId) {
+        submitPerceptualGuess(object.id);
+        return;
+      }
       
       // Para pirámides, el audio se maneja con onPointerDown/onPointerUp
       if (object.type === 'pyramid') {
@@ -61,18 +113,21 @@ const SoundObjectContainer = React.forwardRef<Group, SoundObjectContainerProps>(
         position={initialPosition}
         rotation={object.rotation}
         scale={object.scale}
+        visible={!acousmaticMode}
         onClick={object.type !== 'cone' ? handleClick : undefined}
       >
-        <Component
-          id={object.id}
-          position={[0, 0, 0]}
-          rotation={[0, 0, 0]}
-          scale={[1, 1, 1]}
-          isSelected={object.isSelected}
-          audioEnabled={object.audioEnabled}
-          audioParams={object.audioParams}
-          customShapeCode={object.customShapeCode}
-        />
+        <group ref={envelopeGroupRef}>
+          <Component
+            id={object.id}
+            position={[0, 0, 0]}
+            rotation={[0, 0, 0]}
+            scale={[1, 1, 1]}
+            isSelected={object.isSelected}
+            audioEnabled={object.audioEnabled}
+            audioParams={object.audioParams}
+            customShapeCode={object.customShapeCode}
+          />
+        </group>
       </group>
     );
   }

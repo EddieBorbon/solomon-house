@@ -5,6 +5,8 @@ import {
   type MobileObject,
   type EffectZone,
 } from '../../state/useWorldStore';
+import { useMappingStore, type ParameterMapping } from '../mapping/MappingEngine';
+import { useVisualSonicStore, type VisualSonicPresetId } from '../mapping/visualSonicCoherence';
 
 /**
  * Partitura Topológica — La Casa de Salomón (roadmap 5.3).
@@ -70,6 +72,8 @@ export interface TopologicalScore {
     title?: string;
     author?: string;
     description?: string;
+    visualSonicPreset?: VisualSonicPresetId;
+    parameterMappings?: Record<string, ParameterMapping[]>;
   };
   grids: TopologicalScoreGrid[];
 }
@@ -211,11 +215,17 @@ export function buildTopologicalScore(
   metadata: TopologicalScore['metadata'] = {}
 ): TopologicalScore {
   const { grids } = useWorldStore.getState();
+  const activePreset = useVisualSonicStore.getState().activePreset;
+  const mappings = useMappingStore.getState().mappings;
   return {
     format: 'solomon-house/topological-score',
     version: TOPOLOGICAL_SCORE_VERSION,
     exportedAt: new Date().toISOString(),
-    metadata,
+    metadata: {
+      visualSonicPreset: activePreset,
+      parameterMappings: mappings,
+      ...metadata,
+    },
     grids: Array.from(grids.values()).map(serializeGrid),
   };
 }

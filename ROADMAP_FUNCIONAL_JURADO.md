@@ -32,13 +32,13 @@ Relación con los otros roadmaps:
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **E1** | Registro y análisis de sesiones | SE · GC · GG | 🔴 Crítica (alimenta la tesis) | 22 | 22 |
 | **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 20 |
-| **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 0 |
+| **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 13 |
 | **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 0 |
 | **E5** | Escucha, síntesis e inmersión | SE · HS · GG | 🟠 Media | 14 | 0 |
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 0 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **42** |
+| **TOTAL** | | | | **126** | **55** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -184,28 +184,28 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 
 ### E3.1 · Mapeos por defecto con lógica explícita
 
-- [ ] **E3.1.1** Definir para cada tipo de objeto una lógica base documentada. Ejemplos: tamaño → registro (más grande = más grave), altura en Y → brillo espectral, rotación → modulación, forma → familia tímbrica.
-- [ ] **E3.1.2** Aplicar esos mapeos **automáticamente al crear** un objeto, con la opción de desactivarlos o editarlos.
-- [ ] **E3.1.3** Tres presets de lógica seleccionables por sala: **estructural**, **gestual** y **simbólica**.
+- [x] **E3.1.1** Definir para cada tipo de objeto una lógica base documentada. Ejemplos: tamaño → registro (más grande = más grave), altura en Y → brillo espectral, rotación → modulación, forma → familia tímbrica. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`OBJECT_TIMBRAL_LOGIC`)
+- [x] **E3.1.2** Aplicar esos mapeos **automáticamente al crear** un objeto, con la opción de desactivarlos o editarlos. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`applyDefaultMappingsForNewObject`) y `src/state/useWorldStore.ts`
+- [x] **E3.1.3** Tres presets de lógica seleccionables por sala: **estructural**, **gestual** y **simbólica**. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`VISUAL_SONIC_PRESETS`, `setRoomVisualSonicPreset`)
 
 ### E3.2 · El sonido se ve
 
-- [ ] **E3.2.1** Amplitud → emisión y escala pulsante en todos los objetos, no solo en las auras.
-- [ ] **E3.2.2** Espectro → deformación de la geometría por shader (los armónicos deforman la superficie).
-- [ ] **E3.2.3** Envolvente (ataque y decaimiento) → animación visible del disparo.
-- [ ] **E3.2.4** Zonas de efecto con visual derivada del efecto (la reverberación difumina, el delay deja ecos visuales).
+- [x] **E3.2.1** Amplitud → emisión y escala pulsante en todos los objetos, no solo en las auras. ✅ 2026-11-02 — `src/components/world/SoundObjectsRenderer.tsx`
+- [x] **E3.2.2** Espectro → deformación de la geometría por shader (los armónicos deforman la superficie). ✅ 2026-11-02 — `src/components/world/AudioReactiveAuras.tsx`
+- [x] **E3.2.3** Envolvente (ataque y decaimiento) → animación visible del disparo. ✅ 2026-11-02 — `src/components/world/SoundObjectsRenderer.tsx` y `notifyObjectSoundTriggered`
+- [x] **E3.2.4** Zonas de efecto con visual derivada del efecto (la reverberación difumina, el delay deja ecos visuales). ✅ 2026-11-02 — `src/components/world/AudioReactiveAuras.tsx` (`EffectZoneVisualSignature`)
 
 ### E3.3 · Lógica legible
 
-- [ ] **E3.3.1** Panel "¿por qué suena así?" que explica los mapeos activos del objeto seleccionado.
-- [ ] **E3.3.2** Leyenda de la sala con la lógica visual-sonora activa.
+- [x] **E3.3.1** Panel "¿por qué suena así?" que explica los mapeos activos del objeto seleccionado. ✅ 2026-11-02 — `src/components/ui/VisualSonicCoherencePanel.tsx` (`explainWhyObjectSoundsLikeThis`)
+- [x] **E3.3.2** Leyenda de la sala con la lógica visual-sonora activa. ✅ 2026-11-02 — `src/components/ui/VisualSonicCoherencePanel.tsx` (`showRoomLegend`)
 
 ### E3.4 · Contrapunto y evaluación
 
-- [ ] **E3.4.1** Modo **acusmático experimental** que oculta las fuentes visuales, como contraste para discutir la observación de [GC].
-- [ ] **E3.4.2** Prueba perceptual en la plataforma: ¿la persona participante adivina qué objeto suena? Mide el reconocimiento de la lógica.
-- [ ] **E3.4.3** Recoger los resultados de E3.4.2 con E1 para la tesis o un artículo.
-- [ ] **E3.4.4** Guardar en la partitura topológica (`.casa.json`) la lógica de mapeo usada en cada sesión.
+- [x] **E3.4.1** Modo **acusmático experimental** que oculta las fuentes visuales, como contraste para discutir la observación de [GC]. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`acousmaticMode`) y `SoundObjectsRenderer.tsx`
+- [x] **E3.4.2** Prueba perceptual en la plataforma: ¿la persona participante adivina qué objeto suena? Mide el reconocimiento de la lógica. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`startPerceptualTrial`, `submitPerceptualGuess`)
+- [x] **E3.4.3** Recoger los resultados de E3.4.2 con E1 para la tesis o un artículo. ✅ 2026-11-02 — `src/lib/mapping/visualSonicCoherence.ts` (`exportPerceptualEvaluationReport` + `recordSessionEvent`)
+- [x] **E3.4.4** Guardar en la partitura topológica (`.casa.json`) la lógica de mapeo usada en cada sesión. ✅ 2026-11-02 — `src/lib/score/topologicalScore.ts` (`visualSonicPreset`, `parameterMappings`)
 
 **Hecho cuando:** en la prueba E3.4.2, la mayoría reconoce la relación objeto-sonido mejor que al azar.
 
@@ -413,3 +413,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 - 2026-11-01: Roadmap funcional creado a partir del plan compilado del jurado y de los pendientes del roadmap técnico.
 - 2026-11-02: **Etapa E1 completada (22/22 tareas)**: grabador `.casa.json` v2 con JSON Schema, consentimiento explícito y anonimización; grabación de bus maestro WAV/OGG y binaural; reproductor temporal con marcadores de investigación; analítica musicológica automática y fichas comparativas de los tres casos de estudio (Moscú, Diáspora, China); telemetría continua con comparación TCP (Firebase) vs UDP (WebRTC); y visualizaciones SVG (mapa de calor espacial, diagrama topológico por fases y partitura gráfica temporal).
 - 2026-11-02: **Etapa E2 completada (20/20 tareas)**: protocolo de partitura expandida con 5 roles y matriz de permisos, asignación en vivo desde `TutorDashboard`, balizas 3D de rol/capa en la escena, propiedad y cesión de objetos, modos síncrono, por turnos y cadáver exquisito sonoro asíncrono, bloqueo de parámetros, temporizador con 4 fases y auto-archivado en E1, retos compositivos por nivel N1–N4 evaluados con E1.3, plantillas compartibles ("partituras de juego"), tipos de sala, temporadas y micro-redes de afinidad.
+- 2026-11-02: **Etapa E3 completada (13/13 tareas)**: documentación explícita forma geométrica → familia tímbrica (`OBJECT_TIMBRAL_LOGIC`), aplicación automática de mapeos al crear objetos, tres presets de lógica por sala (`structural`, `gestural`, `symbolic`), animación visual de amplitud y envolvente ataque/decaimiento en todos los objetos, firmas visuales derivadas del efecto acústico en `EffectZone`, inspector en vivo "¿Por qué suena así?", leyenda flotante de sala, modo acusmático experimental, prueba perceptual interactiva con tasa de acierto vs. azar `1/N` e integración en `.casa.json`.
