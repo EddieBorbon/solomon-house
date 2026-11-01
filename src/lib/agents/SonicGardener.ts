@@ -1,5 +1,6 @@
 import { useWorldStore, type SoundObject, type SoundObjectType } from '../../state/useWorldStore';
 import { isObjectTypeAllowed } from '../pedagogy/parametricLevels';
+import { withSessionAuthor } from '../session/sessionRecorder';
 import {
   BANDS,
   analyzeTexture,
@@ -60,7 +61,9 @@ export class SonicGardener {
 
   public start(): void {
     if (this.timer) return;
-    this.timer = setInterval(() => this.tick(), TICK_INTERVAL_MS);
+    this.timer = setInterval(() => {
+      withSessionAuthor('agent', () => this.tick(), 'AGENTE-JARDINERO');
+    }, TICK_INTERVAL_MS);
     console.log('🌱 Jardinero Sónico: despierto, observando el lienzo');
   }
 

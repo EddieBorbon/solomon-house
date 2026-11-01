@@ -40,6 +40,7 @@ const DEFAULT_ICE_SERVERS: RTCIceServer[] = [
 ];
 
 export class PeerNetwork {
+  private static activeInstance: PeerNetwork | null = null;
   private options: PeerNetworkOptions;
   private socket: WebSocket | null = null;
   private peers: Map<string, PeerEntry> = new Map();
@@ -48,6 +49,11 @@ export class PeerNetwork {
 
   constructor(options: PeerNetworkOptions) {
     this.options = options;
+    PeerNetwork.activeInstance = this;
+  }
+
+  public static getActiveInstance(): PeerNetwork | null {
+    return PeerNetwork.activeInstance;
   }
 
   public connect(): void {
@@ -230,6 +236,34 @@ export class PeerNetwork {
     return count;
   }
 
+  /**
+   * Obtiene el RTT (ms) de cada par WebRTC activo mediante RTCPeerConnection.getStats()
+   * para la telemetría de sesión y comparación UDP vs TCP (E1.4.1 y E1.4.4).
+   */
+  public async getPeerRttStats(): Promise<{ peerId: string; rttMs: number }[]> {
+    const results: { peerId: string; rttMs: number }[] = [];
+    for (const [peerId, entry] of this.peers.entries()) {
+      try {
+        const stats = await entry.connection.getStats();
+        stats.forEach((report) => {
+          if (
+            report.type === 'candidate-pair' &&
+            report.state === 'succeeded' &&
+            typeof report.currentRoundTripTime === 'number'
+          ) {
+            results.push({
+              peerId,
+              rttMs: Math.round(report.currentRoundTripTime * 1000),
+            });
+          }
+        });
+      } catch {
+        // Ignorar errores de stats en pares cerrándose
+      }
+    }
+    return results;
+  }
+
   /** Difunde un mensaje a todos los pares conectados. */
   public broadcast(message: PeerMessage): void {
     const data = JSON.stringify(message);
@@ -252,5 +286,8 @@ export class PeerNetwork {
     }
     this.socket?.close();
     this.socket = null;
+    if (PeerNetwork.activeInstance === this) {
+      PeerNetwork.activeInstance = null;
+    }
   }
 }

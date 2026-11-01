@@ -8,6 +8,7 @@ import { TransformToolbar } from '../components/ui/TransformToolbar';
 import { LoadingScreen } from '../components/ui/LoadingScreen';
 import { LatencyMonitor } from '../components/ui/LatencyMonitor';
 import { ScoreExportButton } from '../components/ui/ScoreExportButton';
+import { SessionResearchPanel } from '../components/ui/SessionResearchPanel';
 import { AcousticCalibrator } from '../components/ui/AcousticCalibrator';
 import { HrtfProfileManager } from '../components/ui/HrtfProfileManager';
 import { MappingEditor } from '../components/ui/MappingEditor';
@@ -95,6 +96,9 @@ export default function Home() {
 
         {/* Exportación de partituras topológicas */}
         <ScoreExportButton />
+
+        {/* Registro, replay, analítica musicológica, telemetría y SVG (Etapa E1) */}
+        <SessionResearchPanel />
 
         {/* Calibrador acústico (HRTF / atenuación por distancia) */}
         <AcousticCalibrator />

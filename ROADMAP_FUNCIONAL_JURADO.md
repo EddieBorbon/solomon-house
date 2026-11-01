@@ -30,7 +30,7 @@ Relación con los otros roadmaps:
 
 | Etapa | Tema | Jurado | Prioridad | Tareas | Hechas |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **E1** | Registro y análisis de sesiones | SE · GC · GG | 🔴 Crítica (alimenta la tesis) | 22 | 0 |
+| **E1** | Registro y análisis de sesiones | SE · GC · GG | 🔴 Crítica (alimenta la tesis) | 22 | 22 |
 | **E2** | La partitura expandida dentro del software | SE | 🔴 Alta | 20 | 0 |
 | **E3** | Coherencia visual-sonora | HS · GC | 🔴 Alta | 13 | 0 |
 | **E4** | El sistema como compañero de ejecución | HS · SE | 🟠 Media-alta | 12 | 0 |
@@ -38,7 +38,7 @@ Relación con los otros roadmaps:
 | **E6** | Curaduría, archivo y reapropiación | SE | 🟠 Media | 15 | 0 |
 | **E7** | Comunidad, interoperabilidad y evaluación colectiva | GC | 🟡 Media | 14 | 0 |
 | **E8** | Proyección futura (XR, IA, federación, sostenibilidad) | SE · FUT | 🟢 Largo plazo | 16 | 0 |
-| **TOTAL** | | | | **126** | **0** |
+| **TOTAL** | | | | **126** | **22** |
 
 **Orden recomendado:** E1 → E2 → E3 → E4 → E6 → E5 → E7 → E8.
 E1 va primero porque genera los datos que faltan en la tesis: la Etapa 3.1 (análisis musicológico) y la 3.2.2 (métricas reales de rendimiento) del plan del jurado siguen abiertas.
@@ -74,11 +74,11 @@ gantt
 
 *Base existente:* `src/lib/score/topologicalScore.ts` (5.3) exporta una **instantánea**, no una línea de tiempo.
 
-- [ ] **E1.1.1** Registro de eventos con marca de tiempo: crear, mover, borrar, cambiar parámetro, entrar y salir de zona. Incluir autor (usuario, agente o tutor) y capa. **[SE]**
-- [ ] **E1.1.2** Grabación del audio maestro (MediaRecorder sobre el bus de salida) y descarga en WAV/OGG. **[SE]**
-- [ ] **E1.1.3** Grabación binaural opcional desde la posición de una persona oyente concreta. **[SE][GG]**
-- [ ] **E1.1.4** Formato de sesión `.casa.json` v2: instantánea inicial, eventos y metadatos (sala, participantes anónimos, nivel N1–N4, duración). Documentar el JSON Schema. **[SE]**
-- [ ] **E1.1.5** Consentimiento explícito antes de grabar y anonimización de participantes. **[GC]**
+- [x] **E1.1.1** Registro de eventos con marca de tiempo: crear, mover, borrar, cambiar parámetro, entrar y salir de zona. Incluir autor (usuario, agente o tutor) y capa. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts`, `src/lib/agents/SonicGardener.ts`
+- [x] **E1.1.2** Grabación del audio maestro (MediaRecorder sobre el bus de salida) y descarga en WAV/OGG. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts`
+- [x] **E1.1.3** Grabación binaural opcional desde la posición de una persona oyente concreta. **[SE][GG]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts`
+- [x] **E1.1.4** Formato de sesión `.casa.json` v2: instantánea inicial, eventos y metadatos (sala, participantes anónimos, nivel N1–N4, duración). Documentar el JSON Schema. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts` (`CASA_SESSION_V2_JSON_SCHEMA`)
+- [x] **E1.1.5** Consentimiento explícito antes de grabar y anonimización de participantes. **[GC]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts` (`anonymizeParticipantId`, `setConsentGranted`)
 
 **Hecho cuando:** una sesión de 15 min con 3 participantes produce un `.casa.json` y un audio que se pueden reabrir.
 
@@ -86,9 +86,9 @@ gantt
 
 *Base existente:* `src/lib/score/scoreInterpreter.ts` (5.5) recrea una instantánea estática.
 
-- [ ] **E1.2.1** Reproducir una sesión grabada en el tiempo, con play, pausa, velocidad y barra de desplazamiento.
-- [ ] **E1.2.2** Navegar en 3D libremente mientras se reproduce la sesión.
-- [ ] **E1.2.3** Marcadores y anotaciones del investigador sobre la línea de tiempo, exportables.
+- [x] **E1.2.1** Reproducir una sesión grabada en el tiempo, con play, pausa, velocidad y barra de desplazamiento. ✅ 2026-11-02 — `src/lib/session/sessionReplay.ts`, `src/components/ui/SessionResearchPanel.tsx`
+- [x] **E1.2.2** Navegar en 3D libremente mientras se reproduce la sesión. ✅ 2026-11-02 — `src/lib/session/sessionReplay.ts`
+- [x] **E1.2.3** Marcadores y anotaciones del investigador sobre la línea de tiempo, exportables. ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts`, `src/lib/session/sessionReplay.ts`
 
 **Hecho cuando:** se puede volver a escuchar y anotar un caso de estudio sin el grupo original.
 
@@ -96,13 +96,13 @@ gantt
 
 *Base existente:* `src/lib/pedagogy/sessionMetrics.ts` mide densidad por banda, objetos y tiempo.
 
-- [ ] **E1.3.1** Duración total, duración por fase y tiempo activo de cada participante. **[SE]**
-- [ ] **E1.3.2** Sistema de alturas: histograma de frecuencias → clasificación tonal, modal, microtonal, espectral o indeterminada (proximidad a la escala temperada y a la serie armónica). **[SE]**
-- [ ] **E1.3.3** Organización rítmica: intervalos de auto-disparo, periodicidad frente a irregularidad, densidad de eventos por minuto. **[SE]**
-- [ ] **E1.3.4** Tratamiento tímbrico: distribución por tipo de síntesis y de efecto, centroide espectral a lo largo del tiempo. **[SE]**
-- [ ] **E1.3.5** Densidad textural en el tiempo (curva), no solo como promedio. **[SE]**
-- [ ] **E1.3.6** Proporción de intervención humana frente a algorítmica (Jardinero Sónico, auto-disparo y mapeos). **[SE][HS]**
-- [ ] **E1.3.7** Exportar CSV/JSON listos para la tesis y comparar varias sesiones lado a lado (Moscú, Diáspora, China). **[SE][GC]**
+- [x] **E1.3.1** Duración total, duración por fase y tiempo activo de cada participante. **[SE]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.2** Sistema de alturas: histograma de frecuencias → clasificación tonal, modal, microtonal, espectral o indeterminada (proximidad a la escala temperada y a la serie armónica). **[SE]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.3** Organización rítmica: intervalos de auto-disparo, periodicidad frente a irregularidad, densidad de eventos por minuto. **[SE]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.4** Tratamiento tímbrico: distribución por tipo de síntesis y de efecto, centroide espectral a lo largo del tiempo. **[SE]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.5** Densidad textural en el tiempo (curva), no solo como promedio. **[SE]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.6** Proporción de intervención humana frente a algorítmica (Jardinero Sónico, auto-disparo y mapeos). **[SE][HS]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts`
+- [x] **E1.3.7** Exportar CSV/JSON listos para la tesis y comparar varias sesiones lado a lado (Moscú, Diáspora, China). **[SE][GC]** ✅ 2026-11-02 — `src/lib/session/musicologicalAnalysis.ts` (`THESIS_CASE_STUDY_BENCHMARKS`, `exportMusicologicalComparison`)
 
 **Hecho cuando:** los tres casos de estudio tienen ficha musicológica comparativa → se cierra la Etapa 3.1 del plan del jurado.
 
@@ -110,10 +110,10 @@ gantt
 
 *Base existente:* `LatencyMonitor`, `FPSDisplay`, `engineBenchmark.ts`.
 
-- [ ] **E1.4.1** Registro continuo de RTT por par (WebRTC y Firebase), FPS, carga del AudioContext, memoria y número de voces activas. **[GG][SE]**
-- [ ] **E1.4.2** Etiqueta de región aproximada por participante (país), sin datos personales, para medir sesiones internacionales. **[SE]**
-- [ ] **E1.4.3** Informe técnico por sesión con percentiles p50/p95 de latencia y dispositivos usados. **[SE]**
-- [ ] **E1.4.4** Comparación TCP (Firebase) frente a UDP (WebRTC) con datos reales de campo. **[GG]**
+- [x] **E1.4.1** Registro continuo de RTT por par (WebRTC y Firebase), FPS, carga del AudioContext, memoria y número de voces activas. **[GG][SE]** ✅ 2026-11-02 — `src/lib/session/sessionTelemetry.ts`, `src/lib/network/PeerNetwork.ts`
+- [x] **E1.4.2** Etiqueta de región aproximada por participante (país), sin datos personales, para medir sesiones internacionales. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionRecorder.ts` (`inferAnonymousRegionCode`), `src/lib/session/sessionTelemetry.ts`
+- [x] **E1.4.3** Informe técnico por sesión con percentiles p50/p95 de latencia y dispositivos usados. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionTelemetry.ts`
+- [x] **E1.4.4** Comparación TCP (Firebase) frente a UDP (WebRTC) con datos reales de campo. **[GG]** ✅ 2026-11-02 — `src/lib/session/sessionTelemetry.ts` (`TransportComparisonReport`)
 
 **Hecho cuando:** existe al menos una sesión internacional medida → se cierra la Etapa 3.2.2 del plan del jurado.
 
@@ -121,9 +121,9 @@ gantt
 
 *Base existente:* `src/lib/score/graphicScore.ts` (5.4).
 
-- [ ] **E1.5.1** Mapa de calor de la distribución espacial de objetos y recorridos. **[SE]**
-- [ ] **E1.5.2** Diagrama topológico animado o por fases para cada caso de estudio. **[SE]**
-- [ ] **E1.5.3** Partitura gráfica temporal (eje = tiempo) exportable en SVG para la tesis y artículos.
+- [x] **E1.5.1** Mapa de calor de la distribución espacial de objetos y recorridos. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionVisualizations.ts` (`generateSpatialHeatmapSvg`)
+- [x] **E1.5.2** Diagrama topológico animado o por fases para cada caso de estudio. **[SE]** ✅ 2026-11-02 — `src/lib/session/sessionVisualizations.ts` (`generatePhaseTopologicalSvg`)
+- [x] **E1.5.3** Partitura gráfica temporal (eje = tiempo) exportable en SVG para la tesis y artículos. ✅ 2026-11-02 — `src/lib/session/sessionVisualizations.ts` (`generateTemporalGraphicScoreSvg`)
 
 ---
 
@@ -411,3 +411,4 @@ En la tesis esto ya está **redactado** (2026-06-05). Esta etapa lo **implementa
 ## Bitácora
 
 - 2026-11-01: Roadmap funcional creado a partir del plan compilado del jurado y de los pendientes del roadmap técnico.
+- 2026-11-02: **Etapa E1 completada (22/22 tareas)**: grabador `.casa.json` v2 con JSON Schema, consentimiento explícito y anonimización; grabación de bus maestro WAV/OGG y binaural; reproductor temporal con marcadores de investigación; analítica musicológica automática y fichas comparativas de los tres casos de estudio (Moscú, Diáspora, China); telemetría continua con comparación TCP (Firebase) vs UDP (WebRTC); y visualizaciones SVG (mapa de calor espacial, diagrama topológico por fases y partitura gráfica temporal).

@@ -4,12 +4,14 @@ import { useRef } from 'react';
 import { exportTopologicalScore } from '../../lib/score/topologicalScore';
 import { exportGraphicScore } from '../../lib/score/graphicScore';
 import { importTopologicalScoreFromFile } from '../../lib/score/scoreInterpreter';
+import { exportCasaSessionV2 } from '../../lib/session/sessionRecorder';
+import { importSessionFromFileForReplay } from '../../lib/session/sessionReplay';
 
 /**
- * Barra de partituras topológicas:
- *  - exportación JSON de la sesión (roadmap 5.3),
+ * Barra de partituras topológicas y sesiones .casa.json v2:
+ *  - exportación JSON de la sesión (roadmap 5.3 y E1.1.4 .casa.json v2),
  *  - exportación como partitura gráfica vectorial SVG (roadmap 5.4),
- *  - importación/reproducción offline de sesiones pasadas (roadmap 5.5).
+ *  - importación/reproducción offline de sesiones pasadas (roadmap 5.5 y E1.2).
  */
 export function ScoreExportButton() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -20,9 +22,13 @@ export function ScoreExportButton() {
     if (!file) return;
 
     try {
-      await importTopologicalScoreFromFile(file);
-    } catch (error) {
-      alert(error instanceof Error ? error.message : 'Error al importar la partitura.');
+      await importSessionFromFileForReplay(file);
+    } catch {
+      try {
+        await importTopologicalScoreFromFile(file);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Error al importar la partitura.');
+      }
     }
   };
 
@@ -32,9 +38,16 @@ export function ScoreExportButton() {
   return (
     <div className="fixed bottom-4 left-28 bg-black/80 backdrop-blur-sm rounded-lg px-1 py-1 z-50 font-mono text-sm flex gap-1">
       <button
+        onClick={() => exportCasaSessionV2()}
+        className={buttonClass}
+        title="Exportar la sesión completa como .casa.json v2 (instantánea + eventos temporales)"
+      >
+        ⬇ .casa
+      </button>
+      <button
         onClick={() => exportTopologicalScore()}
         className={buttonClass}
-        title="Exportar la sesión como partitura topológica (JSON)"
+        title="Exportar la instantánea actual como partitura topológica (JSON v1)"
       >
         ⬇ JSON
       </button>
@@ -48,14 +61,14 @@ export function ScoreExportButton() {
       <button
         onClick={() => fileInputRef.current?.click()}
         className={buttonClass}
-        title="Cargar una partitura topológica y recrear la sesión (offline)"
+        title="Cargar una sesión .casa.json v2 o partitura topológica v1 (offline)"
       >
         ⬆ Cargar
       </button>
       <input
         ref={fileInputRef}
         type="file"
-        accept="application/json,.json"
+        accept="application/json,.json,.casa.json"
         className="hidden"
         onChange={handleImport}
       />

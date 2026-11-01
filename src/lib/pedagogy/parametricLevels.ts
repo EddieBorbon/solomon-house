@@ -11,9 +11,11 @@ import { type SoundObjectType, type EffectZone } from '../../state/useWorldStore
  */
 
 export type ParametricLevel = 1 | 2 | 3 | 4;
+export type LevelId = 'N1' | 'N2' | 'N3' | 'N4';
 export type EffectType = EffectZone['type'];
 
 export interface LevelDefinition {
+  id: LevelId;
   level: ParametricLevel;
   name: string;
   description: string;
@@ -31,6 +33,7 @@ export interface LevelDefinition {
 
 export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
   1: {
+    id: 'N1',
     level: 1,
     name: 'N1 · Iniciación',
     description:
@@ -42,6 +45,7 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
     allowCustomCode: false,
   },
   2: {
+    id: 'N2',
     level: 2,
     name: 'N2 · Exploración',
     description:
@@ -53,6 +57,7 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
     allowCustomCode: false,
   },
   3: {
+    id: 'N3',
     level: 3,
     name: 'N3 · Composición Avanzada',
     description:
@@ -67,6 +72,7 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
     allowCustomCode: false,
   },
   4: {
+    id: 'N4',
     level: 4,
     name: 'N4 · Experimental Abierto',
     description:
