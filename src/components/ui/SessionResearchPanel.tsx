@@ -44,6 +44,7 @@ import {
   exportTemporalGraphicScoreSvg,
 } from '../../lib/session/sessionVisualizations';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * Panel de Registro, Replay, Analítica Musicológica, Telemetría y
@@ -53,6 +54,7 @@ import { useUIPanelStore } from '../../state/useUIPanelStore';
 type TabId = 'recorder' | 'replay' | 'musicology' | 'telemetry' | 'visuals';
 
 export function SessionResearchPanel() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'session_e1';
@@ -128,10 +130,10 @@ export function SessionResearchPanel() {
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-purple-300 font-bold text-sm">
-                Grabar Audio, Repetir Sesión y Estadísticas
+                {t('modals.sessionTitle')}
               </h3>
               <p className="text-[11px] text-gray-400">
-                Graba tu sesión en WAV, vuelve a escucharla paso a paso o descarga dibujos
+                {t('modals.sessionSubtitle')}
               </p>
             </div>
             <button
@@ -143,7 +145,7 @@ export function SessionResearchPanel() {
           </div>
 
           <div className="rounded-lg bg-purple-950/30 border border-purple-500/30 p-2 text-[10px] text-purple-100 leading-snug">
-            💡 <strong>¿Cómo usar esta ventana?</strong> En <strong>Grabar</strong> puedes guardar el audio y todo lo que mueves en la escena. En <strong>Repetir</strong> puedes volver a reproducir una sesión guardada.
+            💡 {t('modals.sessionHelp')}
           </div>
 
           {statusMessage && (

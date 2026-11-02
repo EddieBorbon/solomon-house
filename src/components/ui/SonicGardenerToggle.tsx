@@ -13,8 +13,10 @@ import {
 } from '../../lib/agents/SonicGardener';
 import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function SonicGardenerToggle() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const openModal = activeModal === 'gardener_e4';
@@ -89,10 +91,10 @@ export function SonicGardenerToggle() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Músicos Acompañantes Automáticos (Jardineros Sónicos)
+                {t('modals.gardenerTitle')}
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Configura cómo te acompañan, si imitan tus ideas o hacen contrapunto
+                {t('modals.gardenerSubtitle')}
               </p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -104,7 +106,7 @@ export function SonicGardenerToggle() {
                     : 'border-white/15 text-gray-300 hover:text-white'
                 }`}
               >
-                🌱 {anyActive ? 'Pausar Todos' : 'Encender Acompañante'}
+                🌱 {anyActive ? t('integratedTools.companionOn') : t('integratedTools.companionOff')}
               </button>
               <button
                 onClick={closeModal}
@@ -116,7 +118,7 @@ export function SonicGardenerToggle() {
           </div>
 
           <div className="mb-3 rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2 text-[10px] text-emerald-100 leading-snug">
-            💡 <strong>¿Cómo funciona?</strong> Al activar un Jardinero, este escucha las notas y figuras que pones en el mapa y cada pocos segundos añade o mueve sus propias figuras para acompañarte.
+            💡 {t('modals.gardenerHelp')}
           </div>
 
           {/* Barra de estado de escucha del sistema */}

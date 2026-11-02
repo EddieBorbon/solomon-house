@@ -18,8 +18,10 @@ import {
   scheduleNewInternationalSession,
 } from '../../lib/community/communityInteroperability';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function CommunityInteroperabilityPanel() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'community_e7';
@@ -103,10 +105,10 @@ export function CommunityInteroperabilityPanel() {
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  Ritmos por Texto, Control MIDI/OSC y Red Local
+                  {t('modals.communityTitle')}
                 </h3>
                 <p className="text-[11px] text-neutral-400">
-                  Opiniones del grupo · Teclados MIDI / SuperCollider · Funcionamiento sin internet
+                  {t('modals.communitySubtitle')}
                 </p>
               </div>
               <button
@@ -118,7 +120,7 @@ export function CommunityInteroperabilityPanel() {
             </div>
 
             <div className="mb-3 rounded-lg bg-teal-950/30 border border-teal-500/30 p-2 text-[10px] text-teal-100 leading-snug">
-              💡 <strong>¿Para qué sirve?</strong> Conecta controladores MIDI, envía señales a programas como SuperCollider o Max, escribe patrones rítmicos de texto o descarga un paquete para trabajar sin internet.
+              💡 {t('modals.communityHelp')}
             </div>
 
             {/* Pestañas */}

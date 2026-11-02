@@ -26,6 +26,7 @@ import {
 import { exportAmbisonicsBFormatWav } from '../../lib/residency/curationArchive';
 import { useSessionRecorderStore } from '../../lib/session/sessionRecorder';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * Panel Unificado de Escucha Activa/Procesual, Síntesis de Bajo Nivel
@@ -56,6 +57,7 @@ function describe(set: HrirSet): ProfileInfo {
 }
 
 export function HrtfProfileManager() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'hrtf_e5';
@@ -146,10 +148,10 @@ export function HrtfProfileManager() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Sonido 3D para Audífonos e Instrumentos Físicos
+                {t('modals.hrtfTitle')}
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Recorridos de escucha · Cuerdas y vientos (Csound) · Perfil de oído 3D
+                {t('modals.hrtfSubtitle')}
               </p>
             </div>
             <button
@@ -161,7 +163,7 @@ export function HrtfProfileManager() {
           </div>
 
           <div className="mb-3 rounded-lg bg-cyan-950/30 border border-cyan-500/30 p-2 text-[10px] text-cyan-100 leading-snug">
-            💡 <strong>¿Para qué sirve?</strong> Aquí puedes activar paseos automáticos de cámara para solo escuchar, tocar instrumentos de cuerda/viento o ajustar cómo suenan los audífonos en 3D.
+            💡 {t('modals.hrtfHelp')}
           </div>
 
           {/* Pestañas */}

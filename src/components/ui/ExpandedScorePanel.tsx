@@ -43,6 +43,7 @@ import { analyzeSessionMusicology } from '../../lib/session/musicologicalAnalysi
 import { type CompositionalLayer } from '../../lib/session/sessionRecorder';
 import { useWorldStore } from '../../state/useWorldStore';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 /**
  * Panel y HUD de la Partitura Expandida (Roadmap Funcional Jurado — Etapa E2 completa).
@@ -57,6 +58,7 @@ function formatClock(sec: number): string {
 }
 
 export function ExpandedScorePanel() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'score_e2';
@@ -127,10 +129,10 @@ export function ExpandedScorePanel() {
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-indigo-300 font-bold text-sm">
-                Organización de Sesión en Grupo (Roles, Turnos y Reloj)
+                {t('modals.scoreTitle')}
               </h3>
               <p className="text-[11px] text-gray-400">
-                Coordina quién toca cada parte, organiza turnos o inicia un reloj de ensayo
+                {t('modals.scoreSubtitle')}
               </p>
             </div>
             <button
@@ -142,7 +144,7 @@ export function ExpandedScorePanel() {
           </div>
 
           <div className="rounded-lg bg-indigo-950/30 border border-indigo-500/30 p-2 text-[10px] text-indigo-100 leading-snug">
-            💡 <strong>¿Cómo usar esta ventana?</strong> Elige tu rol en la sala, define si todos tocan al mismo tiempo o por turnos, o activa el reloj para dividir tu sesión en fases.
+            💡 {t('modals.scoreHelp')}
           </div>
 
           {/* Pestañas */}

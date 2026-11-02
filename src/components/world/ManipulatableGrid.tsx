@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { Grid, Html } from '@react-three/drei';
 import { useWorldStore } from '../../state/useWorldStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 import * as THREE from 'three';
 
 interface ManipulatableGridProps {
@@ -21,6 +22,7 @@ interface ManipulatableGridProps {
 
 export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
   const { selectGrid, setActiveGrid, activeGridId, grids, createGrid, getGridKey } = useWorldStore();
+  const { t } = useLanguage();
   const groupRef = useRef<THREE.Group>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -190,10 +192,10 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       {isActive &&
         (
           [
-            { label: '+Oeste', dx: -1, dz: 0, pos: [-grid.gridSize / 2 - 1.1, 0.15, 0] },
-            { label: '+Este', dx: 1, dz: 0, pos: [grid.gridSize / 2 + 1.1, 0.15, 0] },
-            { label: '+Norte', dx: 0, dz: -1, pos: [0, 0.15, -grid.gridSize / 2 - 1.1] },
-            { label: '+Sur', dx: 0, dz: 1, pos: [0, 0.15, grid.gridSize / 2 + 1.1] },
+            { label: t('gridsSubpanel.west'), dx: -1, dz: 0, pos: [-grid.gridSize / 2 - 1.1, 0.15, 0] },
+            { label: t('gridsSubpanel.east'), dx: 1, dz: 0, pos: [grid.gridSize / 2 + 1.1, 0.15, 0] },
+            { label: t('gridsSubpanel.north'), dx: 0, dz: -1, pos: [0, 0.15, -grid.gridSize / 2 - 1.1] },
+            { label: t('gridsSubpanel.south'), dx: 0, dz: 1, pos: [0, 0.15, grid.gridSize / 2 + 1.1] },
           ] as const
         ).map((side) => {
           const neighborKey = getGridKey([

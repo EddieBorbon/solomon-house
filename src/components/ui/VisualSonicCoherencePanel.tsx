@@ -15,8 +15,10 @@ import {
   type VisualSonicPresetId,
 } from '../../lib/mapping/visualSonicCoherence';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function VisualSonicCoherencePanel() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'coherence_e3';
@@ -67,10 +69,10 @@ export function VisualSonicCoherencePanel() {
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  Relación entre Forma, Color y Sonido
+                  {t('modals.coherenceTitle')}
                 </h3>
                 <p className="text-[11px] text-neutral-400">
-                  Descubre por qué cada figura suena distinto o escucha a ciegas
+                  {t('modals.coherenceSubtitle')}
                 </p>
               </div>
               <button
@@ -82,7 +84,7 @@ export function VisualSonicCoherencePanel() {
             </div>
 
             <div className="mb-3 rounded-lg bg-amber-950/30 border border-amber-500/30 p-2 text-[10px] text-amber-100 leading-snug">
-              💡 <strong>¿Qué es esto?</strong> Cada figura geométrica tiene su propio instrumento (por ejemplo, la esfera es suave y el icosaedro es metálico). Aquí puedes ver qué hace cada una o activar el <strong>Modo a Ciegas (Acusmático)</strong> para ocultar las figuras y guiarte solo por el oído.
+              💡 {t('modals.coherenceHelp')}
             </div>
 
             {/* Controles rápidos de barra superior */}

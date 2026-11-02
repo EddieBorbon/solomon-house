@@ -19,9 +19,11 @@ import {
 } from '@/lib/future/futureProjection';
 import { useCurationArchiveStore } from '@/lib/residency/curationArchive';
 import { useUIPanelStore } from '@/state/useUIPanelStore';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { xrStore } from '../world/Experience';
 
 export function FutureProjectionPanel() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const isOpen = activeModal === 'future_e8';
@@ -95,10 +97,10 @@ export function FutureProjectionPanel() {
       <div className="mb-3 flex items-center justify-between border-b border-zinc-800 pb-2">
         <div>
           <h3 className="font-mono text-sm font-bold text-fuchsia-300">
-            Medidas de Salón Real, Transformación de Timbres y Red de Escuelas
+            {t('modals.futureTitle')}
           </h3>
           <p className="text-[11px] text-zinc-400">
-            Anclas en espacio físico, timbres acústicos resonantes y conexión entre escuelas
+            {t('modals.futureSubtitle')}
           </p>
         </div>
         <button
@@ -110,7 +112,7 @@ export function FutureProjectionPanel() {
       </div>
 
       <div className="mb-3 rounded-lg bg-fuchsia-950/30 border border-fuchsia-500/30 p-2 text-[10px] text-fuchsia-100 leading-snug">
-        💡 <strong>¿Cómo usar esta ventana?</strong> En <strong>Salón Físico 3D</strong> puedes dibujar las medidas en metros de un cuarto real o fijar sonidos en puntos exactos. En <strong>Timbres e IA</strong> puedes aplicar resonancias de instrumentos acústicos (violonchelo, flauta, campana) a cualquier figura.
+        💡 {t('modals.futureHelp')}
       </div>
 
       {statusMsg && (

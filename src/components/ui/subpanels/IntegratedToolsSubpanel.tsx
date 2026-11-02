@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { useUIPanelStore, type UIModalId } from '../../../state/useUIPanelStore';
 import {
   PARAMETRIC_LEVELS,
@@ -21,6 +22,7 @@ import { xrStore } from '../../world/Experience';
 import { useFutureProjectionStore } from '../../../lib/future/futureProjection';
 
 export function IntegratedToolsSubpanel() {
+  const { t } = useLanguage();
   const { activeModal, toggleModal } = useUIPanelStore();
   const { level, setLevel } = usePedagogyStore();
   const fxEnabled = usePostProcessingStore((s) => s.enabled);
@@ -38,7 +40,19 @@ export function IntegratedToolsSubpanel() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const anyAgentActive = agents.some((a) => a.enabled);
-  const currentLevelDef = PARAMETRIC_LEVELS[level];
+
+  const levelNameMap: Record<ParametricLevel, string> = {
+    1: t('integratedTools.level1Name'),
+    2: t('integratedTools.level2Name'),
+    3: t('integratedTools.level3Name'),
+    4: t('integratedTools.level4Name'),
+  };
+  const levelDescMap: Record<ParametricLevel, string> = {
+    1: t('integratedTools.level1Desc'),
+    2: t('integratedTools.level2Desc'),
+    3: t('integratedTools.level3Desc'),
+    4: t('integratedTools.level4Desc'),
+  };
 
   const handleEnterVR = async () => {
     try {
@@ -115,7 +129,7 @@ export function IntegratedToolsSubpanel() {
     >
       <div className="flex items-center justify-between text-[11px] font-bold">
         <span>{title}</span>
-        <span className="text-[10px] opacity-80">{badge ?? 'Abrir ▸'}</span>
+        <span className="text-[10px] opacity-80">{badge ?? t('integratedTools.openAction')}</span>
       </div>
       <p className="text-[10px] text-gray-400 mt-0.5 leading-snug font-normal">{subtitle}</p>
     </button>
@@ -134,13 +148,13 @@ export function IntegratedToolsSubpanel() {
 
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono font-bold text-amber-300 tracking-wider">
-            🎓 APRENDIZAJE Y ACOMPAÑANTE
+            {t('integratedTools.learningTitle')}
           </h3>
           <button
             onClick={() => setPedagogyOpen(!pedagogyOpen)}
             className="border border-white px-2 py-0.5 text-[10px] font-mono text-white hover:bg-white hover:text-black"
           >
-            {pedagogyOpen ? 'OCULTAR' : 'MOSTRAR'}
+            {pedagogyOpen ? t('controls.hide') : t('controls.show')}
           </button>
         </div>
 
@@ -149,10 +163,10 @@ export function IntegratedToolsSubpanel() {
             {/* Selector de Complejidad explicado con claridad */}
             <div className="p-2 border border-amber-500/40 bg-amber-950/20">
               <label className="block text-[11px] font-mono font-bold text-amber-300 mb-0.5">
-                ¿Cuántos controles quieres ver?
+                {t('integratedTools.howManyControls')}
               </label>
               <p className="text-[10px] font-mono text-gray-300 mb-1.5 leading-snug">
-                Elige un modo sencillo para aprender paso a paso o el estudio completo con todas las opciones:
+                {t('integratedTools.howManyControlsDesc')}
               </p>
               <select
                 value={level}
@@ -161,12 +175,12 @@ export function IntegratedToolsSubpanel() {
               >
                 {Object.values(PARAMETRIC_LEVELS).map((def) => (
                   <option key={def.level} value={def.level} className="bg-black text-amber-200">
-                    {def.name}
+                    {levelNameMap[def.level]}
                   </option>
                 ))}
               </select>
               <p className="text-[10px] font-mono text-amber-200/80 mt-1.5 leading-snug">
-                💡 {currentLevelDef.description}
+                💡 {levelDescMap[level]}
               </p>
             </div>
 
@@ -174,7 +188,7 @@ export function IntegratedToolsSubpanel() {
             <div className="p-2 border border-emerald-500/40 bg-emerald-950/15 space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono font-bold text-emerald-300">
-                  🌱 Músico Acompañante (Jardinero)
+                  {t('integratedTools.companionTitle')}
                 </span>
                 <button
                   onClick={handleToggleGardenerQuick}
@@ -184,50 +198,50 @@ export function IntegratedToolsSubpanel() {
                       : 'border-gray-600 bg-black text-gray-300 hover:border-white'
                   }`}
                 >
-                  {anyAgentActive ? 'ACTIVO (Apagar)' : 'APAGADO (Encender)'}
+                  {anyAgentActive ? t('integratedTools.companionOn') : t('integratedTools.companionOff')}
                 </button>
               </div>
               <p className="text-[10px] font-mono text-gray-400 leading-snug">
-                Escucha las figuras que pones en el mapa y crea automáticamente nuevas figuras para acompañarte (imitando o haciendo contrapunto).
+                {t('integratedTools.companionDesc')}
               </p>
               <button
                 onClick={() => toggleModal('gardener_e4')}
                 className="w-full text-left px-2 py-1 border border-emerald-500/40 bg-black/60 font-mono text-[10px] text-emerald-200 hover:bg-emerald-950/60 flex items-center justify-between"
               >
-                <span>Configurar estilo del acompañante</span>
-                <span>Abrir ▸</span>
+                <span>{t('integratedTools.companionConfig')}</span>
+                <span>{t('integratedTools.openAction')}</span>
               </button>
             </div>
 
             {renderToolItem(
               'score_e2',
-              '🎼 Roles y Turnos para Tocar en Grupo',
-              'Asigna quién lleva el ritmo, la armonía o el espacio y usa un reloj de fases para ensayar.',
-              sessionTimerRunning ? '● EN CURSO' : 'Abrir ▸',
+              t('integratedTools.rolesTitle'),
+              t('integratedTools.rolesDesc'),
+              sessionTimerRunning ? t('integratedTools.inProgress') : t('integratedTools.openAction'),
               'border-indigo-400 text-indigo-200 bg-indigo-950/50'
             )}
 
             {renderToolItem(
               'curriculum',
-              '📚 Guía de Estudio (10 Lecciones)',
-              'Explicaciones breves sobre cómo funciona el sonido en 3D, los timbres y la composición.',
-              'Leer ▸',
+              t('integratedTools.guideTitle'),
+              t('integratedTools.guideDesc'),
+              t('integratedTools.readAction'),
               'border-teal-400 text-teal-200 bg-teal-950/50'
             )}
 
             {renderToolItem(
               'exam',
-              '🎯 Entrenamiento de Oído (Juegos)',
-              'Ponte audífonos y adivina desde qué dirección suena un objeto o qué instrumento es.',
-              'Jugar ▸',
+              t('integratedTools.earTrainingTitle'),
+              t('integratedTools.earTrainingDesc'),
+              t('integratedTools.playAction'),
               'border-orange-400 text-orange-200 bg-orange-950/50'
             )}
 
             {renderToolItem(
               'tutor',
-              '📊 Mi Progreso y Estadísticas',
-              'Revisa cuántas figuras, efectos y herramientas has probado durante tu sesión.',
-              'Ver ▸',
+              t('integratedTools.progressTitle'),
+              t('integratedTools.progressDesc'),
+              t('integratedTools.viewAction'),
               'border-emerald-400 text-emerald-200 bg-emerald-950/50'
             )}
           </div>
@@ -245,13 +259,13 @@ export function IntegratedToolsSubpanel() {
 
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono font-bold text-cyan-300 tracking-wider">
-            👁️ VISTA DEL MAPA Y SONIDO 3D
+            {t('integratedTools.viewAndSoundTitle')}
           </h3>
           <button
             onClick={() => setVisualAudioOpen(!visualAudioOpen)}
             className="border border-white px-2 py-0.5 text-[10px] font-mono text-white hover:bg-white hover:text-black"
           >
-            {visualAudioOpen ? 'OCULTAR' : 'MOSTRAR'}
+            {visualAudioOpen ? t('controls.hide') : t('controls.show')}
           </button>
         </div>
 
@@ -260,15 +274,15 @@ export function IntegratedToolsSubpanel() {
             {/* Explicación clara de los controles visuales del mapa */}
             <div className="p-2 border border-gray-700 bg-zinc-950 space-y-2">
               <div className="text-[10px] font-mono font-bold text-gray-200">
-                Opciones Visuales del Mapa 3D:
+                {t('integratedTools.visualOptionsTitle')}
               </div>
 
               {/* Círculos de alcance sonoro en el suelo */}
               <div className="flex items-start justify-between gap-2 border-t border-gray-800 pt-1.5">
                 <div className="text-[10px] font-mono">
-                  <div className="text-purple-200 font-bold">〰 Círculos de Alcance en el Piso</div>
+                  <div className="text-purple-200 font-bold">{t('integratedTools.floorCirclesTitle')}</div>
                   <div className="text-gray-400 leading-snug">
-                    Dibuja anillos en el suelo debajo de cada figura para ver hasta dónde llega su sonido.
+                    {t('integratedTools.floorCirclesDesc')}
                   </div>
                 </div>
                 <button
@@ -279,16 +293,16 @@ export function IntegratedToolsSubpanel() {
                       : 'border-gray-600 bg-black text-gray-300 hover:border-white'
                   }`}
                 >
-                  {guidesEnabled ? 'VISIBLE' : 'OCULTO'}
+                  {guidesEnabled ? t('gridsSubpanel.visible').toUpperCase() : t('gridsSubpanel.hidden').toUpperCase()}
                 </button>
               </div>
 
               {/* Brillo suave y viñeta */}
               <div className="flex items-start justify-between gap-2 border-t border-gray-800 pt-1.5">
                 <div className="text-[10px] font-mono">
-                  <div className="text-amber-200 font-bold">✨ Halo de Brillo y Viñeta</div>
+                  <div className="text-amber-200 font-bold">{t('integratedTools.bloomTitle')}</div>
                   <div className="text-gray-400 leading-snug">
-                    Añade resplandor a los objetos. Mantenlo apagado si prefieres el mapa blanco totalmente nítido.
+                    {t('integratedTools.bloomDesc')}
                   </div>
                 </div>
                 <button
@@ -299,24 +313,24 @@ export function IntegratedToolsSubpanel() {
                       : 'border-gray-600 bg-black text-gray-300 hover:border-white'
                   }`}
                 >
-                  {fxEnabled ? 'ENCENDIDO' : 'APAGADO'}
+                  {fxEnabled ? t('integratedTools.on') : t('integratedTools.off')}
                 </button>
               </div>
 
               {/* Realidad Virtual (VR) y Fondo Transparente (AR) */}
               <div className="border-t border-gray-800 pt-1.5 space-y-1">
                 <div className="text-[10px] font-mono text-gray-300 font-bold">
-                  Realidad Virtual y Cámara (Opcional):
+                  {t('integratedTools.vrCameraTitle')}
                 </div>
                 <p className="text-[10px] font-mono text-gray-400 leading-snug">
-                  Usa <strong className="text-violet-200">Casco VR</strong> si tienes un visor conectado (ej. Meta Quest), o <strong className="text-fuchsia-200">Fondo Transparente</strong> para quitar el fondo blanco.
+                  {t('integratedTools.vrCameraDesc')}
                 </p>
                 <div className="grid grid-cols-2 gap-1 pt-0.5">
                   <button
                     onClick={handleEnterVR}
                     className="px-2 py-1 border border-violet-500/40 bg-violet-950/30 font-mono text-[10px] text-violet-200 hover:bg-violet-900/50"
                   >
-                    🥽 Casco VR
+                    {t('integratedTools.vrHeadset')}
                   </button>
                   <button
                     onClick={handleEnterAR}
@@ -326,7 +340,7 @@ export function IntegratedToolsSubpanel() {
                         : 'border-fuchsia-500/40 bg-fuchsia-950/30 text-fuchsia-200 hover:bg-fuchsia-900/50'
                     }`}
                   >
-                    📲 Fondo Transparente: {passthroughArEnabled ? 'SÍ' : 'NO'}
+                    {t('integratedTools.transparentBg')}: {passthroughArEnabled ? t('integratedTools.yes') : t('integratedTools.no')}
                   </button>
                 </div>
               </div>
@@ -334,29 +348,29 @@ export function IntegratedToolsSubpanel() {
 
             {renderToolItem(
               'calibrator',
-              '🎚 Probar mis Audífonos o Bocinas',
-              'Hace girar un sonido de prueba alrededor de tu cabeza para verificar izquierda, derecha y distancia.'
+              t('integratedTools.calibratorTitle'),
+              t('integratedTools.calibratorDesc')
             )}
 
             {renderToolItem(
               'hrtf_e5',
-              '👂 Ajustes de Oído 3D y Cuerdas/Vientos',
-              'Personaliza cómo escuchas el espacio en audífonos y prueba los instrumentos físicos (Csound).'
+              t('integratedTools.hrtfTitle'),
+              t('integratedTools.hrtfDesc')
             )}
 
             {renderToolItem(
               'coherence_e3',
-              '🔷 ¿Por qué cada Figura Suena Distinto?',
-              'Explora cómo la forma y el color de cada objeto cambian su timbre y haz una prueba rápida.',
-              'Ver ▸',
+              t('integratedTools.coherenceTitle'),
+              t('integratedTools.coherenceDesc'),
+              t('integratedTools.viewAction'),
               'border-amber-400 text-amber-200 bg-amber-950/50'
             )}
 
             {renderToolItem(
               'mapping',
-              '🔗 Conectar Altura o Tamaño con el Sonido',
-              'Configura reglas como: "al subir una esfera en el mapa, que su nota sea más aguda".',
-              'Configurar ▸',
+              t('integratedTools.mappingTitle'),
+              t('integratedTools.mappingDesc'),
+              t('integratedTools.configAction'),
               'border-yellow-400 text-yellow-200 bg-yellow-950/50'
             )}
           </div>
@@ -374,13 +388,13 @@ export function IntegratedToolsSubpanel() {
 
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-xs font-mono font-bold text-purple-300 tracking-wider">
-            ⏺ GRABACIÓN, GALERÍA Y CONEXIONES
+            {t('integratedTools.studioTitle')}
           </h3>
           <button
             onClick={() => setStudioOpen(!studioOpen)}
             className="border border-white px-2 py-0.5 text-[10px] font-mono text-white hover:bg-white hover:text-black"
           >
-            {studioOpen ? 'OCULTAR' : 'MOSTRAR'}
+            {studioOpen ? t('controls.hide') : t('controls.show')}
           </button>
         </div>
 
@@ -388,72 +402,68 @@ export function IntegratedToolsSubpanel() {
           <div className="space-y-2">
             {renderToolItem(
               'session_e1',
-              '⏺ Grabar Audio y Repetir Sesión',
-              'Graba todo lo que tocas en archivo de audio WAV, repite tus movimientos o descarga gráficas.',
-              isRecording ? '● GRABANDO' : 'Abrir ▸',
+              t('integratedTools.sessionTitle'),
+              t('integratedTools.sessionDesc'),
+              isRecording ? t('integratedTools.recording') : t('integratedTools.openAction'),
               'border-rose-400 text-rose-200 bg-rose-950/50'
             )}
 
             {renderToolItem(
               'gallery_e6',
-              '🏛 Publicar Obra y Modo Concierto',
-              'Guarda un fragmento en la galería pública, exporta pistas separadas o prepara un concierto.',
-              'Abrir ▸',
+              t('integratedTools.galleryTitle'),
+              t('integratedTools.galleryDesc'),
+              t('integratedTools.openAction'),
               'border-purple-400 text-purple-200 bg-purple-950/50'
             )}
 
             {renderToolItem(
               'community_e7',
-              '🤝 Ritmos por Texto y Conexión OSC',
-              'Escribe patrones rítmicos en vivo o conecta Casa Salomón con programas como SuperCollider o Max.',
-              'Abrir ▸',
+              t('integratedTools.communityTitle'),
+              t('integratedTools.communityDesc'),
+              t('integratedTools.openAction'),
               'border-emerald-400 text-emerald-200 bg-emerald-950/50'
             )}
 
             {renderToolItem(
               'future_e8',
-              '🌐 Medidas de Salón Real, Timbres IA y Escuelas',
-              'Dibuja las medidas en metros de un salón real, transforma timbres o conecta con otras escuelas.',
-              'Abrir ▸',
+              t('integratedTools.futureTitle'),
+              t('integratedTools.futureDesc'),
+              t('integratedTools.openAction'),
               'border-fuchsia-400 text-fuchsia-200 bg-fuchsia-950/50'
             )}
 
             {/* Descarga rápida de archivos de tu escena */}
             <div className="pt-2 border-t border-gray-800 space-y-1">
               <div className="text-[10px] font-mono font-bold text-gray-200">
-                Guardar o Abrir tu Mapa en tu Computadora:
+                {t('integratedTools.filesTitle')}
               </div>
               <p className="text-[10px] font-mono text-gray-400 leading-snug">
-                Descarga un archivo con tus objetos para continuar después o compartirlo:
+                {t('integratedTools.filesDesc')}
               </p>
               <div className="grid grid-cols-2 gap-1 pt-0.5">
                 <button
                   onClick={() => exportCasaSessionV2()}
                   className="px-2 py-1 border border-rose-500/40 bg-rose-950/30 text-rose-200 font-mono text-[10px] hover:bg-rose-900/50"
-                  title="Descarga la sesión completa con su historia de eventos"
                 >
-                  💾 Guardar Sesión
+                  {t('integratedTools.saveSession')}
                 </button>
                 <button
                   onClick={() => exportTopologicalScore()}
                   className="px-2 py-1 border border-cyan-500/40 bg-cyan-950/30 text-cyan-200 font-mono text-[10px] hover:bg-cyan-900/50"
-                  title="Descarga las posiciones y sonidos actuales de la escena"
                 >
-                  📄 Guardar Mapa
+                  {t('integratedTools.saveMap')}
                 </button>
                 <button
                   onClick={() => exportGraphicScore()}
                   className="px-2 py-1 border border-purple-500/40 bg-purple-950/30 text-purple-200 font-mono text-[10px] hover:bg-purple-900/50"
-                  title="Descarga un dibujo vectorial SVG de tu mapa sonoro"
                 >
-                  🎨 Dibujo SVG
+                  {t('integratedTools.drawSvg')}
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="px-2 py-1 border border-amber-500/40 bg-amber-950/30 text-amber-200 font-mono text-[10px] hover:bg-amber-900/50"
-                  title="Abre un archivo de sesión o mapa guardado previamente"
                 >
-                  📂 Abrir Archivo
+                  {t('integratedTools.openFile')}
                 </button>
               </div>
               <input
@@ -471,13 +481,13 @@ export function IntegratedToolsSubpanel() {
                 href="/galeria"
                 className="text-center px-2 py-1.5 border border-purple-500/40 bg-purple-950/20 font-mono text-[10px] text-purple-300 hover:bg-purple-900/40"
               >
-                🏛 Ver Galería Web
+                {t('integratedTools.viewWebGallery')}
               </Link>
               <Link
                 href="/apoyo"
                 className="text-center px-2 py-1.5 border border-pink-500/40 bg-pink-950/20 font-mono text-[10px] text-pink-300 hover:bg-pink-900/40"
               >
-                ♥ Apoyar Proyecto
+                {t('integratedTools.supportProject')}
               </Link>
             </div>
           </div>

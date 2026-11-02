@@ -18,8 +18,10 @@ import {
 } from '../../lib/residency/curationArchive';
 import { importTopologicalScore } from '../../lib/score/topologicalScore';
 import { useUIPanelStore } from '../../state/useUIPanelStore';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export function GalleryPublisher() {
+  const { t } = useLanguage();
   const activeModal = useUIPanelStore((s) => s.activeModal);
   const closeModal = useUIPanelStore((s) => s.closeModal);
   const open = activeModal === 'gallery_e6';
@@ -120,10 +122,10 @@ export function GalleryPublisher() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Publicar en Galería, Descargar Pistas y Modo Concierto
+                {t('modals.galleryTitle')}
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Guarda tu obra, explora piezas de otros usuarios o descarga pistas para tu DAW
+                {t('modals.gallerySubtitle')}
               </p>
             </div>
             <button
@@ -135,7 +137,7 @@ export function GalleryPublisher() {
           </div>
 
           <div className="mb-3 rounded-lg bg-fuchsia-950/30 border border-fuchsia-500/30 p-2 text-[10px] text-fuchsia-100 leading-snug">
-            💡 <strong>¿Cómo funciona?</strong> Puedes guardar un fragmento de tu sesión en la galería pública, abrir una obra existente para modificarla o exportar cada figura como pista de audio WAV separada.
+            💡 {t('modals.galleryHelp')}
           </div>
 
           {/* Pestañas */}

@@ -120,7 +120,7 @@ export function GridsSubpanel() {
       {/* Cuadrícula activa y visibilidad */}
       <div className="mb-2 flex items-center justify-between p-2 border border-gray-700 bg-zinc-950 text-xs font-mono">
         <div>
-          <span className="text-gray-400">Activa: </span>
+          <span className="text-gray-400">{t('gridsSubpanel.active')}: </span>
           <span className="text-emerald-400 font-bold">
             ({activeCoords[0]}, {activeCoords[1]}, {activeCoords[2]})
           </span>
@@ -133,7 +133,7 @@ export function GridsSubpanel() {
               : 'border-gray-600 text-gray-400'
           }`}
         >
-          {showGrid ? 'Visible' : 'Oculta'}
+          {showGrid ? t('gridsSubpanel.visible') : t('gridsSubpanel.hidden')}
         </button>
       </div>
 
@@ -142,28 +142,28 @@ export function GridsSubpanel() {
           {/* Cruceta para crear o ir a cuadrículas a los lados */}
           <div className="space-y-1.5">
             <div className="text-[10px] font-mono font-bold text-emerald-300 uppercase tracking-wider">
-              + Expandir Cuadrícula a los Lados
+              {t('gridsSubpanel.expandSides')}
             </div>
 
             <div className="grid grid-cols-3 gap-1 text-center font-mono text-[10px]">
               <button
                 onClick={() => createOrSelectAdjacentGrid('down')}
                 className="border border-gray-700 bg-zinc-900 py-1 text-gray-300 hover:border-white hover:text-white"
-                title="Crear/Ir a cuadrícula inferior (Y - 1)"
+                title="Y - 1"
               >
                 ⬇ -Y
               </button>
               <button
                 onClick={() => createOrSelectAdjacentGrid('north')}
                 className="border border-emerald-500/60 bg-emerald-950/30 py-1 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
-                title="Crear cuadrícula al Norte (Z - 1)"
+                title="Z - 1"
               >
-                ↑ +Norte
+                ↑ {t('gridsSubpanel.north')}
               </button>
               <button
                 onClick={() => createOrSelectAdjacentGrid('up')}
                 className="border border-gray-700 bg-zinc-900 py-1 text-gray-300 hover:border-white hover:text-white"
-                title="Crear/Ir a cuadrícula superior (Y + 1)"
+                title="Y + 1"
               >
                 ⬆ +Y
               </button>
@@ -171,9 +171,9 @@ export function GridsSubpanel() {
               <button
                 onClick={() => createOrSelectAdjacentGrid('west')}
                 className="border border-emerald-500/60 bg-emerald-950/30 py-1.5 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
-                title="Crear cuadrícula al Oeste / Izquierda (X - 1)"
+                title="X - 1"
               >
-                ← +Oeste
+                ← {t('gridsSubpanel.west')}
               </button>
               <div className="border border-white/40 bg-black py-1.5 text-white font-bold flex items-center justify-center">
                 ({activeCoords[0]},{activeCoords[1]},{activeCoords[2]})
@@ -181,18 +181,18 @@ export function GridsSubpanel() {
               <button
                 onClick={() => createOrSelectAdjacentGrid('east')}
                 className="border border-emerald-500/60 bg-emerald-950/30 py-1.5 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
-                title="Crear cuadrícula al Este / Derecha (X + 1)"
+                title="X + 1"
               >
-                +Este →
+                {t('gridsSubpanel.east')} →
               </button>
 
               <div />
               <button
                 onClick={() => createOrSelectAdjacentGrid('south')}
                 className="border border-emerald-500/60 bg-emerald-950/30 py-1 text-emerald-200 hover:bg-emerald-500 hover:text-black font-bold"
-                title="Crear cuadrícula al Sur (Z + 1)"
+                title="Z + 1"
               >
-                ↓ +Sur
+                ↓ {t('gridsSubpanel.south')}
               </button>
               <div />
             </div>
@@ -201,7 +201,7 @@ export function GridsSubpanel() {
           {/* Lista de cuadrículas existentes en el mundo */}
           <div className="space-y-1">
             <div className="text-[10px] font-mono font-bold text-gray-300 uppercase tracking-wider">
-              Cuadrículas en Escena ({allGrids.length})
+              {t('gridsSubpanel.gridsInScene')} ({allGrids.length})
             </div>
             <div className="max-h-28 overflow-y-auto space-y-1 pr-1">
               {allGrids.map((g) => {
@@ -229,13 +229,13 @@ export function GridsSubpanel() {
                       <span className="font-bold">
                         [{g.coordinates.join(', ')}]
                       </span>{' '}
-                      <span className="text-gray-400">· {objCount} elem.</span>
+                      <span className="text-gray-400">· {objCount} {t('gridsSubpanel.items')}</span>
                     </button>
                     {allGrids.length > 1 && (
                       <button
                         onClick={() => deleteGrid(g.id)}
                         className="ml-2 text-red-400 hover:text-red-200 px-1"
-                        title="Eliminar esta cuadrícula"
+                        title={t('gridsSubpanel.deleteGrid')}
                       >
                         ✕
                       </button>
@@ -249,7 +249,7 @@ export function GridsSubpanel() {
           {/* Crear cuadrícula en coordenada personalizada */}
           <div className="space-y-1 pt-1 border-t border-gray-800">
             <div className="text-[10px] font-mono text-gray-400">
-              Coordenada personalizada (X, Y, Z) y Tamaño:
+              {t('gridsSubpanel.customCoord')}:
             </div>
             <div className="grid grid-cols-4 gap-1">
               <input
@@ -304,7 +304,7 @@ export function GridsSubpanel() {
               onClick={createGridAtCustomCoords}
               className="w-full border border-white py-1 text-[10px] font-mono text-white hover:bg-white hover:text-black transition-colors"
             >
-              + Crear / Ir a Cuadrícula ({newGridCoords.join(', ')})
+              {t('gridsSubpanel.createOrGo')} ({newGridCoords.join(', ')})
             </button>
           </div>
         </div>
