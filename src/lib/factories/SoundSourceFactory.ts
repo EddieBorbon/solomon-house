@@ -72,16 +72,32 @@ export interface AudioParams {
   autoTriggerMax?: number; // Máximo intervalo en segundos (para modo 'random')
   autoTriggerPattern?: number[]; // Patrón rítmico: array de tiempos relativos en segundos (para modo 'pattern')
   autoTriggerPatternLoop?: boolean; // Si el patrón debe repetirse en loop (para modo 'pattern')
-  // Parámetros de movimiento
+  // Parámetros de movimiento (Roadmap M1 - M5)
   movementEnabled?: boolean; // Activar/desactivar movimiento automático
-  movementType?: 'circular' | 'polar' | 'random' | 'figure8' | 'spiral'; // Tipo de movimiento
-  movementRadius?: number; // Radio del movimiento (para circular, polar, figure8, spiral)
+  movementType?: 'circular' | 'polar' | 'random' | 'figure8' | 'spiral' | 'pendulum' | 'waypoints'; // Tipo de movimiento
+  movementRadius?: number; // Radio del movimiento (para circular, polar, figure8, spiral, pendulum)
   movementSpeed?: number; // Velocidad del movimiento
   movementAmplitude?: number; // Amplitud (para movimiento polar)
-  movementFrequency?: number; // Frecuencia (para movimiento polar)
+  movementFrequency?: number; // Frecuencia / pétalos (para movimiento polar)
   movementRandomSeed?: number; // Semilla aleatoria (para movimiento random)
   movementHeight?: number; // Altura del movimiento vertical
   movementHeightSpeed?: number; // Velocidad del movimiento vertical
+  movementAxis?: 'x' | 'y' | 'z'; // Eje principal para péndulo
+  movementPhaseOffset?: number; // Fase inicial en radianes (sincronización P2P M5)
+  // M2: Audio espacial dinámico y Doppler
+  dopplerEnabled?: boolean; // Efecto Doppler acústico al acercarse/alejarse del oyente
+  dopplerIntensity?: number; // Intensidad del efecto Doppler (0.1 - 3.0)
+  // M3: Guías visuales de órbita, estelas y fronteras de cuadrícula
+  showMovementPath?: boolean; // Mostrar línea de órbita 3D en el mapa
+  showMovementTrail?: boolean; // Mostrar estela cinética detrás de la figura
+  movementBoundaryMode?: 'free' | 'bounce'; // Cruzar libremente a cuadrículas vecinas o rebotar en bordes
+  // M4: Física musical, colisiones, pulso BPM y puntos de ruta (Waypoints)
+  triggerOnProximity?: boolean; // Disparar nota al pasar cerca de otra figura
+  proximityTriggerRadius?: number; // Distancia de activación por cruce (0.5 - 5.0 m)
+  syncMovementToBpm?: boolean; // Cuantizar velocidad al pulso musical (BPM)
+  movementBpmSubdivision?: '1n' | '2n' | '4n' | '8n'; // Subdivisión rítmica por vuelta
+  movementBpm?: number; // Tempo de referencia (40 - 240 BPM)
+  movementWaypoints?: number[]; // Pares [x1, z1, x2, z2, x3, z3] relativos al origen para modo 'waypoints'
 }
 
 // Tipos para las fuentes de sonido

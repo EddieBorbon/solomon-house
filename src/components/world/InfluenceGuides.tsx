@@ -6,6 +6,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useWorldStore } from '../../state/useWorldStore';
 import { audioManager } from '../../lib/AudioManager';
+import { getLiveObjectWorldPosition } from '../../lib/movement/soundObjectKinetics';
 
 /**
  * Notaciones Visuales en Tiempo Real (roadmap 5.6) con Renderizado
@@ -63,9 +64,11 @@ export function InfluenceGuides() {
       for (const obj of grid.objects) {
         if (index >= MAX_GUIDES) break;
 
-        const worldX = grid.position[0] + obj.position[0];
-        const worldY = grid.position[1] + obj.position[1];
-        const worldZ = grid.position[2] + obj.position[2];
+        const [worldX, worldY, worldZ] = getLiveObjectWorldPosition(obj.id, [
+          grid.position[0] + obj.position[0],
+          grid.position[1] + obj.position[1],
+          grid.position[2] + obj.position[2],
+        ]);
         const radius = influenceRadius(obj.audioParams?.volume ?? 0.6);
 
         // Los drones activos brillan con su color; los percusivos en reposo

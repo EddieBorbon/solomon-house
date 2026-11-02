@@ -3,23 +3,15 @@ import {
   type TopologicalScoreGrid,
   buildTopologicalScore,
 } from './topologicalScore';
+import { computeOrbitPreviewPoints } from '../movement/soundObjectKinetics';
+import { type AudioParams } from '../factories/SoundSourceFactory';
 
 /**
- * Generador de Partituras Gráficas Vectoriales (roadmap 5.4).
+ * Generador de Partituras Gráficas Vectoriales (roadmap 5.4 + M5).
  *
  * Convierte la partitura topológica (JSON, roadmap 5.3) en un plano
  * bidimensional anotado en SVG: una proyección cenital (plano X-Z) de cada
  * cuadrícula con simbología de audio — partitura arquitectónica expandida.
- *
- * Simbología:
- *   - Objetos sonoros: glifo según el tipo de síntesis, anotado con su
- *     frecuencia fundamental (Hz) y el radio proporcional a la escala.
- *   - Zonas de efectos: círculos punteados con el nombre del efecto;
- *     su radio refleja el alcance espacial de la zona.
- *   - Objetos móviles: trayectoria orbital indicada con círculo de guiones
- *     finos y flecha de dirección.
- *   - La altura (Y) se anota numéricamente junto a cada glifo, siguiendo la
- *     convención de cotas de los planos arquitectónicos.
  */
 
 const SVG_SIZE = 800;
@@ -64,7 +56,6 @@ function objectGlyph(type: string, radius: number, color: string): string {
     case 'spiral':
       return `<path d="M 0 0 m ${-radius} 0 a ${radius} ${radius} 0 1 1 ${radius * 2} 0 a ${radius * 0.66} ${radius * 0.66} 0 1 1 ${-radius * 1.32} 0" fill="none" stroke="${color}" stroke-width="2"/>`;
     default:
-      // sphere, cylinder, icosahedron, custom
       return `<circle r="${radius}" fill="${color}" fill-opacity="0.7" stroke="${color}"/>`;
   }
 }
@@ -117,7 +108,7 @@ function renderGrid(grid: TopologicalScoreGrid, index: number): string {
     );
   }
 
-  // Objetos sonoros: glifo + cota de altura + frecuencia
+  // Objetos sonoros: glifo + órbita cinética M5 + cota de altura + frecuencia
   for (const obj of grid.objects) {
     const cx = toX(obj.position[0]);
     const cy = toY(obj.position[2]);
@@ -126,11 +117,31 @@ function renderGrid(grid: TopologicalScoreGrid, index: number): string {
     const frequency = obj.audioParams?.frequency;
     const label = frequency ? `${Math.round(Number(frequency))} Hz` : obj.type;
 
+    // M5: Si el objeto tiene Propiedades de Movimiento activas, dibujar su curva orbital real en SVG
+    if (obj.audioParams?.movementEnabled) {
+      const orbitPts = computeOrbitPreviewPoints(
+        obj.audioParams as unknown as AudioParams,
+        obj.position,
+        64,
+        half
+      );
+      const polyAttr = orbitPts
+        .map(([px, , pz]) => `${toX(px).toFixed(1)},${toY(pz).toFixed(1)}`)
+        .join(' ');
+      parts.push(
+        `<polyline points="${polyAttr}" fill="none" stroke="${color}" stroke-width="1.4" stroke-dasharray="4 3" stroke-opacity="0.75"/>`
+      );
+    }
+
+    const movSuffix = obj.audioParams?.movementEnabled
+      ? ` · 🛸 ${String(obj.audioParams.movementType ?? 'circular')}`
+      : '';
+
     parts.push(
       `<g transform="translate(${cx},${cy})">`,
       objectGlyph(obj.type, radius, color),
       `<text y="${radius + 12}" text-anchor="middle" fill="${color}" font-size="10">${escapeXml(label)}</text>`,
-      `<text y="${radius + 23}" text-anchor="middle" fill="#64748b" font-size="8">y=${obj.position[1].toFixed(1)}${obj.audioEnabled ? ' · dron' : ''}</text>`,
+      `<text y="${radius + 23}" text-anchor="middle" fill="#64748b" font-size="8">y=${obj.position[1].toFixed(1)}${obj.audioEnabled ? ' · dron' : ''}${escapeXml(movSuffix)}</text>`,
       `</g>`
     );
   }
@@ -158,7 +169,7 @@ export function topologicalScoreToSvg(score: TopologicalScore): string {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${SVG_SIZE}" height="${height}" viewBox="0 0 ${SVG_SIZE} ${height}" font-family="monospace">`,
     `<rect width="${SVG_SIZE}" height="${height}" fill="#020617"/>`,
     `<text x="${MARGIN}" y="${MARGIN - 28}" fill="#e2e8f0" font-size="18">${escapeXml(title)}</text>`,
-    `<text x="${MARGIN}" y="${MARGIN - 10}" fill="#64748b" font-size="11">La Casa de Salomón · ${date} · proyección cenital (X-Z), cotas de altura en Y</text>`,
+    `<text x="${MARGIN}" y="${MARGIN - 10}" fill="#64748b" font-size="11">La Casa de Salomón · ${date} · proyección cenital (X-Z), cotas de altura en Y y órbitas cinéticas</text>`,
     body,
     '</svg>',
   ].join('\n');

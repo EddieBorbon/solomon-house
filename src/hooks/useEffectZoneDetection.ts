@@ -1,15 +1,16 @@
 import { useFrame } from '@react-three/fiber';
 import { useWorldStore } from '../state/useWorldStore';
 import { audioManager } from '../lib/AudioManager';
+import { getLiveObjectLocalPosition } from '../lib/movement/soundObjectKinetics';
 import * as THREE from 'three';
 
 export function useEffectZoneDetection() {
   const { grids } = useWorldStore();
   let lastDebugTime = 0;
-  
+
   // Obtener todos los objetos de todas las cuadrículas
-  const allObjects = Array.from(grids.values()).flatMap(grid => grid.objects);
-  const allEffectZones = Array.from(grids.values()).flatMap(grid => grid.effectZones);
+  const allObjects = Array.from(grids.values()).flatMap((grid) => grid.objects);
+  const allEffectZones = Array.from(grids.values()).flatMap((grid) => grid.effectZones);
 
   useFrame(() => {
     // Solo procesar si hay zonas de efectos
@@ -19,94 +20,76 @@ export function useEffectZoneDetection() {
     const now = Date.now();
     const shouldDebug = now - lastDebugTime > 2000;
 
-    // Iterar sobre cada objeto sonoro
+    // Iterar sobre cada objeto sonoro (usando su posición cinética en vivo M2)
     allObjects.forEach((soundObject) => {
+      const livePos = getLiveObjectLocalPosition(soundObject.id, soundObject.position);
       // Rastrear si el objeto está dentro de alguna zona
       let isInsideAnyZone = false;
-      
+
       // Iterar sobre cada zona de efecto
       allEffectZones.forEach((effectZone) => {
-        // DETECCIÓN DE COLISIÓN MEJORADA CON BOX3
         let isInside = false;
         let effectAmount = 0.0;
 
         if (effectZone.shape === 'sphere') {
-          // Para zonas esféricas: usar Sphere con radio basado en scale
           const zoneRadius = effectZone.scale[0];
           const zoneCenter = new THREE.Vector3(...effectZone.position);
-          const objectPoint = new THREE.Vector3(...soundObject.position);
-          
+          const objectPoint = new THREE.Vector3(...livePos);
+
           const distance = zoneCenter.distanceTo(objectPoint);
           isInside = distance <= zoneRadius;
-          
-          // CALCULAR AMOUNT VARIABLE para transiciones suaves
+
           if (isInside) {
-            // El amount varía de 1 (centro) a 0 (borde)
-            effectAmount = Math.max(0, Math.min(1, 1 - (distance / zoneRadius)));
-            isInsideAnyZone = true; // Marcar que está dentro de al menos una zona
+            effectAmount = Math.max(0, Math.min(1, 1 - distance / zoneRadius));
+            isInsideAnyZone = true;
           }
-          
         } else if (effectZone.shape === 'cube') {
-          // Para zonas cúbicas: usar Box3 con rotación y escala
-          const zoneSize = effectZone.scale[0]; // Asumir escala uniforme
+          const zoneSize = effectZone.scale[0];
           const zoneBox = new THREE.Box3();
-          
-          // Crear geometría de caja centrada en la posición de la zona
+
           zoneBox.setFromCenterAndSize(
             new THREE.Vector3(...effectZone.position),
             new THREE.Vector3(zoneSize, zoneSize, zoneSize)
           );
-          
-          // Aplicar rotación si es necesaria
-          if (effectZone.rotation && (effectZone.rotation[0] !== 0 || effectZone.rotation[1] !== 0 || effectZone.rotation[2] !== 0)) {
+
+          if (
+            effectZone.rotation &&
+            (effectZone.rotation[0] !== 0 ||
+              effectZone.rotation[1] !== 0 ||
+              effectZone.rotation[2] !== 0)
+          ) {
             const rotationMatrix = new THREE.Matrix4();
             rotationMatrix.makeRotationFromEuler(new THREE.Euler(...effectZone.rotation));
             zoneBox.applyMatrix4(rotationMatrix);
           }
-          
-          const objectPoint = new THREE.Vector3(...soundObject.position);
+
+          const objectPoint = new THREE.Vector3(...livePos);
           isInside = zoneBox.containsPoint(objectPoint);
-          
-          // Para cajas, calcular amount basado en la distancia al centro
+
           if (isInside) {
             const zoneCenter = new THREE.Vector3(...effectZone.position);
             const distance = zoneCenter.distanceTo(objectPoint);
-            const maxDistance = zoneSize * 0.5; // Radio desde el centro al borde
-            effectAmount = Math.max(0, Math.min(1, 1 - (distance / maxDistance)));
-            isInsideAnyZone = true; // Marcar que está dentro de al menos una zona
+            const maxDistance = zoneSize * 0.5;
+            effectAmount = Math.max(0, Math.min(1, 1 - distance / maxDistance));
+            isInsideAnyZone = true;
           }
         }
 
-        if (shouldDebug) {
-          // const zoneType = effectZone.shape;
-          // const zoneRadius = effectZone.scale[0];
-          // const objectPoint = new THREE.Vector3(...soundObject.position);
-          // const zoneCenter = new THREE.Vector3(...effectZone.position);
-          // const distance = zoneCenter.distanceTo(objectPoint);
-          
-        }
-
-        // APLICAR EFECTO CON AMOUNT VARIABLE para transiciones suaves
-        // Solo intentar establecer el efecto si el EffectSend existe
         try {
           if (audioManager.hasEffectSend(soundObject.id, effectZone.id)) {
             if (isInside) {
-              // Objeto está dentro de la zona - aplicar efecto con amount variable
               audioManager.setEffectSendAmount(soundObject.id, effectZone.id, effectAmount);
             } else {
-              // Objeto está fuera de la zona - remover efecto completamente
               audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
             }
           }
         } catch {
-          // Silenciar errores de EffectSend no encontrado (puede ser normal durante inicialización)
+          // Silenciar errores de EffectSend durante inicialización
         }
       });
 
-      // IMPORTANTE: Si el objeto no está dentro de ninguna zona, asegurar que todos los efectos estén desconectados
       if (!isInsideAnyZone && allEffectZones.length > 0) {
         allEffectZones.forEach((effectZone) => {
-          // Solo desconectar si el EffectSend existe
           try {
             if (audioManager.hasEffectSend(soundObject.id, effectZone.id)) {
               audioManager.setEffectSendAmount(soundObject.id, effectZone.id, 0.0);
@@ -115,9 +98,6 @@ export function useEffectZoneDetection() {
             // Silenciar errores de EffectSend no encontrado
           }
         });
-        
-        if (shouldDebug) {
-        }
       }
     });
 
