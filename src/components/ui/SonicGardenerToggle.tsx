@@ -89,10 +89,10 @@ export function SonicGardenerToggle() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Compañero de Ejecución y Agencia Distribuida (E4)
+                Músicos Acompañantes Automáticos (Jardineros Sónicos)
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Perfiles · Memoria de motivos · Ensamble mínimo · Agente Director
+                Configura cómo te acompañan, si imitan tus ideas o hacen contrapunto
               </p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -104,7 +104,7 @@ export function SonicGardenerToggle() {
                     : 'border-white/15 text-gray-300 hover:text-white'
                 }`}
               >
-                🌱 {anyActive ? 'Pausar Todos' : 'Activar Jardinero'}
+                🌱 {anyActive ? 'Pausar Todos' : 'Encender Acompañante'}
               </button>
               <button
                 onClick={closeModal}
@@ -115,29 +115,33 @@ export function SonicGardenerToggle() {
             </div>
           </div>
 
-          {/* Barra de estado de escucha del sistema (E4.1.2, E4.1.3, E4.1.4) */}
+          <div className="mb-3 rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2 text-[10px] text-emerald-100 leading-snug">
+            💡 <strong>¿Cómo funciona?</strong> Al activar un Jardinero, este escucha las notas y figuras que pones en el mapa y cada pocos segundos añade o mueve sus propias figuras para acompañarte.
+          </div>
+
+          {/* Barra de estado de escucha del sistema */}
           <div className="mb-3 grid grid-cols-3 gap-2 rounded-xl border border-white/10 bg-white/5 p-2 text-center text-[10px]">
             <div>
-              <div className="text-neutral-400">Gestos humanos (E4.1.2)</div>
+              <div className="text-neutral-400">Tu actividad reciente</div>
               <div className="font-mono font-semibold text-emerald-300">
-                {companion.recentHumanGestureRatePerMin} / min
+                {companion.recentHumanGestureRatePerMin} acciones/min
               </div>
             </div>
             <div>
-              <div className="text-neutral-400">Memoria corta (E4.1.3)</div>
+              <div className="text-neutral-400">Ideas tuyas recordadas</div>
               <div className="font-mono font-semibold text-amber-300">
                 {companion.shortTermMotifMemory.length} motivos
               </div>
             </div>
             <div>
-              <div className="text-neutral-400">Predicción (E4.1.4)</div>
+              <div className="text-neutral-400">Hacia dónde caminas</div>
               <div className="font-mono font-semibold text-cyan-300">
                 [{companion.predictedListenerTarget.join(', ')}]
               </div>
             </div>
           </div>
 
-          {/* Botón de Ensamble Mínimo (E4.3.3) y Reglas E2 (E4.3.2) */}
+          {/* Botón de Ensamble Mínimo y Reglas */}
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <button
               onClick={() =>
@@ -150,8 +154,8 @@ export function SonicGardenerToggle() {
               }`}
             >
               {companion.minimumEnsembleMode
-                ? 'Modo Ensamble Mínimo (1+2): ACTIVO'
-                : 'Activar Ensamble Mínimo (1 humano + 2 agentes)'}
+                ? 'Modo Trío (Tú + 2 Acompañantes): ACTIVO'
+                : 'Activar Modo Trío (Tú + 2 Acompañantes)'}
             </button>
 
             <label className="flex items-center gap-1.5 text-[11px] text-neutral-300">
@@ -164,7 +168,7 @@ export function SonicGardenerToggle() {
                   })
                 }
               />
-              <span>Adoptar reglas E2 (turnos/fases)</span>
+              <span>Respetar turnos de la sala</span>
             </label>
           </div>
 
@@ -172,9 +176,9 @@ export function SonicGardenerToggle() {
           <div className="mb-3 flex gap-1 rounded-lg bg-white/5 p-1">
             {(
               [
-                ['agents', 'Agentes e Intenciones'],
-                ['director', 'Agente Director'],
-                ['compare', 'Comparativa E1/E4'],
+                ['agents', 'Acompañantes'],
+                ['director', 'Sugerencias'],
+                ['compare', 'Comparar Sesiones'],
               ] as const
             ).map(([id, label]) => (
               <button
@@ -217,16 +221,16 @@ export function SonicGardenerToggle() {
                     </button>
                   </div>
 
-                  {/* Intención declarada en vivo (E4.2.1) */}
+                  {/* Intención declarada en vivo */}
                   <div className="mt-1.5 rounded bg-black/50 px-2 py-1 text-[10px] text-emerald-200">
-                    <strong>Intención (E4.2.1):</strong> {agent.currentIntention}
+                    <strong>Qué está haciendo:</strong> {agent.currentIntention}
                   </div>
 
-                  {/* Selector de perfil (E4.1.1) */}
+                  {/* Selector de perfil */}
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <div>
                       <label className="block text-[10px] text-neutral-400">
-                        Perfil (E4.1.1)
+                        Estilo musical
                       </label>
                       <select
                         value={agent.profile}
@@ -246,7 +250,7 @@ export function SonicGardenerToggle() {
                     </div>
                     <div>
                       <label className="block text-[10px] text-neutral-400">
-                        Intervención (E4.2.2): {Math.round(agent.interventionRate * 100)}%
+                        Frecuencia de acción: {Math.round(agent.interventionRate * 100)}%
                       </label>
                       <input
                         type="range"
@@ -262,7 +266,7 @@ export function SonicGardenerToggle() {
                     </div>
                   </div>
 
-                  {/* Capas compositivas permitidas (E4.2.2 / E2.2) */}
+                  {/* Capas compositivas permitidas */}
                   <div className="mt-2 flex flex-wrap items-center gap-1">
                     <span className="text-[10px] text-neutral-400 mr-1">Capas:</span>
                     {(['texture', 'gesture', 'spatial', 'general'] as CompositionalLayer[]).map(
@@ -289,7 +293,7 @@ export function SonicGardenerToggle() {
             </div>
           )}
 
-          {/* PESTAÑA 2: AGENTE DIRECTOR (E4.3.4) */}
+          {/* PESTAÑA 2: AGENTE DIRECTOR */}
           {activeTab === 'director' && (
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               <div className="flex items-center justify-between">
@@ -315,8 +319,7 @@ export function SonicGardenerToggle() {
 
               {companion.directorProposals.length === 0 ? (
                 <p className="text-[11px] text-neutral-400">
-                  El Agente Director observará el crecimiento del ensamble y propondrá
-                  transiciones de fase (E2.3) o desbloqueos de nivel (N1–N4).
+                  El Director observará cuántos objetos hay en la sala y te sugerirá cuándo pasar a la siguiente etapa o activar más herramientas.
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -329,8 +332,8 @@ export function SonicGardenerToggle() {
                       <div className="mt-2 flex items-center justify-between">
                         <span className="text-[10px] text-neutral-400">
                           {prop.suggestedPhase
-                            ? `Fase sugerida: ${prop.suggestedPhase.toUpperCase()}`
-                            : `Nivel sugerido: N${prop.suggestedLevel}`}
+                            ? `Etapa sugerida: ${prop.suggestedPhase.toUpperCase()}`
+                            : `Modo sugerido: Modo ${prop.suggestedLevel}`}
                         </span>
                         {prop.applied ? (
                           <span className="text-[10px] font-semibold text-emerald-400">
@@ -352,12 +355,11 @@ export function SonicGardenerToggle() {
             </div>
           )}
 
-          {/* PESTAÑA 3: COMPARATIVA CON Y SIN AGENTE (E4.3.5) */}
+          {/* PESTAÑA 3: COMPARATIVA CON Y SIN AGENTE */}
           {activeTab === 'compare' && (
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               <p className="text-[11px] text-neutral-300">
-                Registra capturas musicológicas (E1.3) de sesiones con y sin agente para
-                comparar densidad, periodicidad rítmica y balance de agencia en la tesis.
+                Guarda fotografías del estado de tu sesión cuando tocas a solas y cuando tocas con el acompañante para comparar los resultados.
               </p>
               <div className="flex gap-2">
                 <button
@@ -406,7 +408,7 @@ export function SonicGardenerToggle() {
                 disabled={companion.comparativeRuns.length === 0}
                 className="w-full rounded-lg border border-emerald-500/40 bg-emerald-950/50 py-1.5 text-[11px] font-medium text-emerald-200 hover:bg-emerald-900/60 disabled:opacity-40"
               >
-                Exportar estudio comparativo JSON para tesis (E4.3.5)
+                Descargar comparativa (JSON)
               </button>
             </div>
           )}

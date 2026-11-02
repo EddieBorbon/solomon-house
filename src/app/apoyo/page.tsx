@@ -13,7 +13,7 @@ import {
 } from '../../lib/future/futureProjection';
 
 /**
- * Página de sostenibilidad (roadmap 8.6 y Etapa E8.4): donaciones por pasarelas no
+ * Página de sostenibilidad (roadmap 8.6 y Etapa): donaciones por pasarelas no
  * extractivas, soporte técnico remunerado opcional, paquete para escuelas de música,
  * residencias artísticas, métricas de impacto para fondos y alianzas internacionales.
  */
@@ -104,7 +104,7 @@ export default function SupportPage() {
 
         <section className="border-t border-white/10 pt-8">
           <h2 className="text-xl text-white mb-3">
-            Paquete para Escuelas de Música, Residencias y Alianzas (E8.4)
+            Paquete para Escuelas de Música, Residencias y Alianzas
           </h2>
           <p className="text-xs text-gray-400 mb-4">
             Programa curricular de 8 semanas (niveles N1–N4), convocatoria anual de

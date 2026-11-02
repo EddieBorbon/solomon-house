@@ -58,18 +58,18 @@ export function ManipulatableGrid({ grid, onSelect }: ManipulatableGridProps) {
       rotation={grid.rotation || [0, 0, 0]}
       scale={grid.scale || [1, 1, 1]}
     >
-      {/* Cuadrícula con líneas usando Grid de drei - más visible */}
+      {/* Cuadrícula con líneas nítidas de alto contraste sobre el mapa blanco */}
       <Grid
         args={[grid.gridSize, grid.gridSize]}
         position={[0, 0, 0]}
         cellSize={1}
-        cellThickness={grid.isSelected ? 1.2 : isHovered ? 1.0 : 0.8}
-        cellColor={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#888888'}
+        cellThickness={isActive ? 1.0 : isHovered ? 1.0 : 0.75}
+        cellColor={isActive ? '#4b5563' : isHovered ? '#b45309' : '#888888'}
         sectionSize={5}
-        sectionThickness={grid.isSelected ? 2.5 : isHovered ? 2.0 : 1.5}
-        sectionColor={grid.isSelected ? '#00ff88' : isHovered ? '#ffaa00' : '#aaaaaa'}
-        fadeDistance={50}
-        fadeStrength={1}
+        sectionThickness={isActive ? 2.0 : isHovered ? 1.8 : 1.3}
+        sectionColor={isActive ? '#065f46' : isHovered ? '#d97706' : '#555555'}
+        fadeDistance={90}
+        fadeStrength={0.6}
         followCamera={false}
         infiniteGrid={false}
       />

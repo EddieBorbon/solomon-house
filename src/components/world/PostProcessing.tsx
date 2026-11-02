@@ -5,12 +5,12 @@ import { create } from 'zustand';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 
 /**
- * Post-procesamiento Visual Optimizado (roadmap 3.7).
+ * Post-procesamiento Visual Opcional (Brillo suave y viñeta de cámara).
  *
- * Bloom (resalta las emisiones de los drones activos y las auras FFT) y
- * viñeta sutil. Desactivable manualmente para garantizar 60 FPS estables
- * en dispositivos móviles o con gráficos integrados: por defecto solo se
- * activa en pantallas grandes (heurística de escritorio).
+ * Desactivado por defecto para mantener máxima nitidez (MSAA nativo) sobre el
+ * mapa blanco (#f0f0f0) y 60 FPS estables. Cuando la persona usuaria lo activa,
+ * utiliza `multisampling={4}` y un umbral de luminancia alto (`0.98`) para no
+ * difuminar el fondo claro ni las líneas de la cuadrícula.
  */
 
 interface PostProcessingState {
@@ -18,16 +18,8 @@ interface PostProcessingState {
   toggle: () => void;
 }
 
-function defaultEnabled(): boolean {
-  if (typeof window === 'undefined') return false;
-  // Heurística: activar solo en escritorio con suficientes núcleos
-  const isDesktop = window.innerWidth > 1024;
-  const hasCores = (navigator.hardwareConcurrency || 4) >= 4;
-  return isDesktop && hasCores;
-}
-
 export const usePostProcessingStore = create<PostProcessingState>((set) => ({
-  enabled: defaultEnabled(),
+  enabled: false,
   toggle: () => set((state) => ({ enabled: !state.enabled })),
 }));
 
@@ -37,14 +29,14 @@ export function PostProcessing() {
   if (!enabled) return null;
 
   return (
-    <EffectComposer multisampling={0}>
+    <EffectComposer multisampling={4}>
       <Bloom
-        intensity={0.55}
-        luminanceThreshold={0.45}
-        luminanceSmoothing={0.3}
+        intensity={0.25}
+        luminanceThreshold={0.98}
+        luminanceSmoothing={0.2}
         mipmapBlur
       />
-      <Vignette eskil={false} offset={0.18} darkness={0.65} />
+      <Vignette eskil={false} offset={0.2} darkness={0.35} />
     </EffectComposer>
   );
 }

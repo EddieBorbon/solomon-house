@@ -278,7 +278,7 @@ export function Experience() {
           gl.shadowMap.enabled = true;
           gl.shadowMap.type = 2; // PCFSoftShadowMap
           gl.toneMapping = 2; // ACESFilmicToneMapping
-          gl.toneMappingExposure = 1.2;
+          gl.toneMappingExposure = 1.0;
           gl.outputColorSpace = 'srgb';
           
           // Guardar referencia a la cámara

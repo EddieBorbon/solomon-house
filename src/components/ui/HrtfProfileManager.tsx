@@ -65,7 +65,7 @@ export function HrtfProfileManager() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Campos para publicar instrumento Csound comunitario (E5.2.3)
+  // Campos para publicar instrumento Csound comunitario
   const [csNewName, setCsNewName] = useState('');
   const [csNewVersion, setCsNewVersion] = useState('1.1.0');
 
@@ -106,7 +106,7 @@ export function HrtfProfileManager() {
       const set = parseSofa(buffer, file.name);
       audioManager.enableCustomHrtf(set);
       setProfile(describe(set));
-      setStatus(`Perfil SOFA "${file.name}" activo (registrado en telemetría E5.3.2)`);
+      setStatus(`Perfil SOFA "${file.name}" activo (registrado en telemetría)`);
       useListeningImmersionStore.setState({
         hrtfMode: 'custom_sofa',
         activeHrtfProfileName: file.name,
@@ -146,10 +146,10 @@ export function HrtfProfileManager() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Escucha, Síntesis de Bajo Nivel e Inmersión (E5)
+                Sonido 3D para Audífonos e Instrumentos Físicos
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Modo Oyente · Grafo Web Audio &quot;Bajo el capó&quot; · Csound WASM · HRTF SOFA
+                Recorridos de escucha · Cuerdas y vientos (Csound) · Perfil de oído 3D
               </p>
             </div>
             <button
@@ -160,13 +160,17 @@ export function HrtfProfileManager() {
             </button>
           </div>
 
+          <div className="mb-3 rounded-lg bg-cyan-950/30 border border-cyan-500/30 p-2 text-[10px] text-cyan-100 leading-snug">
+            💡 <strong>¿Para qué sirve?</strong> Aquí puedes activar paseos automáticos de cámara para solo escuchar, tocar instrumentos de cuerda/viento o ajustar cómo suenan los audífonos en 3D.
+          </div>
+
           {/* Pestañas */}
           <div className="mb-3 flex gap-1 rounded-lg bg-white/5 p-1">
             {(
               [
-                ['listening', 'E5.1 Modo Escucha'],
-                ['synthesis', 'E5.2 Bajo el Capó / Csound'],
-                ['hrtf', 'E5.3 Inmersión HRTF'],
+                ['listening', 'Modo Oyente'],
+                ['synthesis', 'Cuerdas y Vientos'],
+                ['hrtf', 'Audífonos 3D'],
               ] as const
             ).map(([id, label]) => (
               <button
@@ -183,13 +187,13 @@ export function HrtfProfileManager() {
             ))}
           </div>
 
-          {/* PESTAÑA 1: MODO ESCUCHA ACTIVA, GUIADA, PROCESUAL Y REACCIONES (E5.1.1–E5.1.5) */}
+          {/* PESTAÑA 1: MODO ESCUCHA ACTIVA, GUIADA, PROCESUAL Y REACCIONES */}
           {activeTab === 'listening' && (
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               <div className="flex items-center justify-between rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-2.5">
                 <div>
                   <div className="font-semibold text-cyan-200">
-                    Modo Oyente en Vivo (E5.1.1 y E5.1.2)
+                    Modo Oyente en Vivo
                   </div>
                   <div className="text-[10px] text-neutral-300">
                     Posición binaural actual: [
@@ -213,10 +217,10 @@ export function HrtfProfileManager() {
                 </button>
               </div>
 
-              {/* Rutas de escucha guiadas (E5.1.3) */}
+              {/* Rutas de escucha guiadas */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-1.5">
                 <div className="font-semibold text-white">
-                  Rutas de Escucha Guiadas por el Compositor (E5.1.3)
+                  Rutas de Escucha Guiadas por el Compositor
                 </div>
                 {GUIDED_LISTENING_ROUTES.map((route) => {
                   const isActive = e5State.activeGuidedRouteId === route.id;
@@ -251,11 +255,11 @@ export function HrtfProfileManager() {
                 })}
               </div>
 
-              {/* Escucha procesual (E5.1.4) */}
+              {/* Escucha procesual */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-semibold text-white">
-                    Escucha Procesual — Línea de Tiempo en Vivo (E5.1.4)
+                    Escucha Procesual — Línea de Tiempo en Vivo
                   </span>
                   <span className="font-mono text-[10px] text-cyan-300">
                     {sessionEvents.length} eventos
@@ -277,10 +281,10 @@ export function HrtfProfileManager() {
                 </div>
               </div>
 
-              {/* Retroalimentación ligera del público (E5.1.5) */}
+              {/* Retroalimentación ligera del público */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5">
                 <div className="font-semibold text-white mb-1.5">
-                  Reacciones del Público hacia Intérpretes (E5.1.5)
+                  Reacciones del Público hacia Intérpretes
                 </div>
                 <div className="grid grid-cols-4 gap-1.5">
                   {(
@@ -310,12 +314,12 @@ export function HrtfProfileManager() {
             </div>
           )}
 
-          {/* PESTAÑA 2: SÍNTESIS DE BAJO NIVEL, GRAFO WEB AUDIO Y CSOUND (E5.2.1–E5.2.4) */}
+          {/* PESTAÑA 2: SÍNTESIS DE BAJO NIVEL, GRAFO WEB AUDIO Y CSOUND */}
           {activeTab === 'synthesis' && (
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               <div>
                 <label className="block text-[10px] text-neutral-400">
-                  Motor de Síntesis Activo por Defecto (E5.2.1 — Paridad 10 modelos NativeVoice)
+                  Motor de Síntesis Activo por Defecto
                 </label>
                 <select
                   value={e5State.defaultSynthBackend}
@@ -336,10 +340,10 @@ export function HrtfProfileManager() {
                 </select>
               </div>
 
-              {/* Vista "Bajo el capó": Grafo de nodos Web Audio (E5.2.4) */}
+              {/* Vista "Bajo el capó": Grafo de nodos Web Audio */}
               <div className="rounded-xl border border-cyan-500/30 bg-black/70 p-2.5">
                 <div className="font-semibold text-cyan-300 mb-1.5">
-                  Vista &quot;Bajo el Capó&quot; — Grafo de Nodos Web Audio (E5.2.4)
+                  Vista &quot;Bajo el Capó&quot; — Grafo de Nodos Web Audio
                 </div>
                 <div className="flex flex-wrap items-center gap-1 text-[10px]">
                   {webAudioGraph.nodes.map((node, i) => (
@@ -356,11 +360,11 @@ export function HrtfProfileManager() {
                 </div>
               </div>
 
-              {/* Biblioteca comunitaria e Instrumento Csound en vivo (E5.2.2 y E5.2.3) */}
+              {/* Biblioteca comunitaria e Instrumento Csound en vivo */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-amber-300">
-                    Instrumento Csound Editable en Vivo y Biblioteca (E5.2.2 / E5.2.3)
+                    Instrumento Csound Editable en Vivo y Biblioteca
                   </span>
                 </div>
                 <select
@@ -412,7 +416,7 @@ export function HrtfProfileManager() {
                   </button>
                 </div>
 
-                {/* Publicar versión en biblioteca comunitaria (E5.2.3) */}
+                {/* Publicar versión en biblioteca comunitaria */}
                 <div className="flex gap-1.5 pt-1">
                   <input
                     placeholder="Nombre del instrumento..."
@@ -445,14 +449,14 @@ export function HrtfProfileManager() {
             </div>
           )}
 
-          {/* PESTAÑA 3: INMERSIÓN PERSONALIZADA HRTF, LOCALIZACIÓN Y AURICULARES (E5.3.1–E5.3.5) */}
+          {/* PESTAÑA 3: INMERSIÓN PERSONALIZADA HRTF, LOCALIZACIÓN Y AURICULARES */}
           {activeTab === 'hrtf' && (
             <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-              {/* Guía y detección Auriculares vs. Altavoces (E5.3.5) */}
+              {/* Guía y detección Auriculares vs. Altavoces */}
               <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-2.5 text-[10px]">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-amber-300">
-                    Guía de Transductor Acústico (E5.3.5):{' '}
+                    Guía de Transductor Acústico:{' '}
                     {e5State.outputTransducerMode === 'headphones'
                       ? '🎧 Auriculares recomendados'
                       : '🔊 Altavoces / Multicanal'}
@@ -475,15 +479,15 @@ export function HrtfProfileManager() {
                   Dispositivo detectado: <span className="font-mono">{e5State.detectedAudioOutputLabel}</span>.{' '}
                   {e5State.outputTransducerMode === 'headphones'
                     ? 'Usa auriculares sin cancelación espacial externa para evitar conos de confusión binaural.'
-                    : 'En altavoces se recomienda desactivar HRTF binaural o exportar Ambisonics B-format (E5.3.4).'}
+                    : 'En altavoces se recomienda desactivar HRTF binaural o exportar Ambisonics B-format.'}
                 </div>
               </div>
 
-              {/* Carga de archivo SOFA y estado en telemetría (E5.3.1 y E5.3.2) */}
+              {/* Carga de archivo SOFA y estado en telemetría */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-emerald-300">
-                    Perfil HRTF Activo (E5.3.2): {e5State.activeHrtfProfileName}
+                    Perfil HRTF Activo: {e5State.activeHrtfProfileName}
                   </span>
                   <span className="rounded bg-black/50 px-1.5 py-0.5 font-mono text-[9px]">
                     {e5State.hrtfMode}
@@ -536,11 +540,11 @@ export function HrtfProfileManager() {
                 </div>
               </div>
 
-              {/* Prueba de localización delante/detrás y elevación (E5.3.1 y E5.3.3 — Observación de Gracida [GG]) */}
+              {/* Prueba de localización delante/detrás y elevación */}
               <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-2.5 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-cyan-200">
-                    Asistente y Prueba de Localización 3D (Delante/Detrás y Elevación — E5.3.3)
+                    Asistente y Prueba de Localización 3D (Delante/Detrás y Elevación)
                   </span>
                   <button
                     onClick={() => startHrtfLocalizationStimulus()}
@@ -580,12 +584,12 @@ export function HrtfProfileManager() {
                 </div>
               </div>
 
-              {/* Exportar Ambisonics B-format (E5.3.4) */}
+              {/* Exportar Ambisonics B-format */}
               <button
                 onClick={() => exportAmbisonicsBFormatWav()}
                 className="w-full rounded-lg border border-emerald-500/40 bg-emerald-950/50 py-1.5 text-[11px] font-medium text-emerald-200 hover:bg-emerald-900/60"
               >
-                Exportar Ambisonics B-Format FOA (4 canales W, X, Y, Z) — E5.3.4
+                Exportar Ambisonics B-Format FOA (4 canales W, X, Y, Z)
               </button>
             </div>
           )}

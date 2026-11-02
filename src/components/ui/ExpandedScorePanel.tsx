@@ -81,7 +81,7 @@ export function ExpandedScorePanel() {
 
   return (
     <>
-      {/* HUD Superior de Forma Temporal, Fase y Turno (E2.2.4, E2.3.1, E2.3.2) */}
+      {/* HUD Superior de Forma Temporal, Fase y Turno */}
       {(score.sessionTimerRunning || score.collaborationMode !== 'synchronous') && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/40 rounded-full px-4 py-1.5 z-40 font-mono text-xs text-gray-100 flex items-center gap-3 shadow-lg">
           <span
@@ -127,10 +127,10 @@ export function ExpandedScorePanel() {
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-indigo-300 font-bold text-sm">
-                La Partitura Expandida en el Software (E2)
+                Organización de Sesión en Grupo (Roles, Turnos y Reloj)
               </h3>
               <p className="text-[11px] text-gray-400">
-                Roles, capas, turnos, fases temporales, niveles y temporadas
+                Coordina quién toca cada parte, organiza turnos o inicia un reloj de ensayo
               </p>
             </div>
             <button
@@ -141,15 +141,19 @@ export function ExpandedScorePanel() {
             </button>
           </div>
 
-          {/* Pestañas E2.1 – E2.5 */}
+          <div className="rounded-lg bg-indigo-950/30 border border-indigo-500/30 p-2 text-[10px] text-indigo-100 leading-snug">
+            💡 <strong>¿Cómo usar esta ventana?</strong> Elige tu rol en la sala, define si todos tocan al mismo tiempo o por turnos, o activa el reloj para dividir tu sesión en fases.
+          </div>
+
+          {/* Pestañas */}
           <div className="grid grid-cols-5 gap-1 bg-black/50 p-1 rounded-lg">
             {(
               [
-                ['roles', 'E2.1 Roles'],
-                ['modes', 'E2.2 Modos'],
-                ['temporal', 'E2.3 Fases'],
-                ['levels', 'E2.4 Retos'],
-                ['community', 'E2.5 Redes'],
+                ['roles', 'Roles'],
+                ['modes', 'Turnos'],
+                ['temporal', 'Reloj'],
+                ['levels', 'Retos'],
+                ['community', 'Salas'],
               ] as [TabId, string][]
             ).map(([id, label]) => (
               <button
@@ -167,14 +171,14 @@ export function ExpandedScorePanel() {
           </div>
 
           {/* ============================================================== */}
-          {/* E2.1 · ROLES Y PERMISOS */}
+          {/* ROLES Y PERMISOS */}
           {/* ============================================================== */}
           {activeTab === 'roles' && (
             <div className="space-y-3">
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300 font-bold">
-                    Asignación de roles y capas en vivo (E2.1.1, E2.1.3)
+                    Participantes en la sala y su función musical
                   </span>
                   <label className="flex items-center gap-1.5 text-[10px] text-gray-400 cursor-pointer">
                     <input
@@ -186,7 +190,7 @@ export function ExpandedScorePanel() {
                         })
                       }
                     />
-                    Balizas 3D (E2.1.4)
+                    Mostrar indicadores en 3D
                   </label>
                 </div>
 
@@ -232,10 +236,9 @@ export function ExpandedScorePanel() {
                 </div>
               </div>
 
-              {/* Matriz de permisos del rol activo (E2.1.2) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <p className="text-gray-300 font-bold text-[11px]">
-                  Matriz de permisos efectiva ({ROLE_LABELS[score.localRole]}) (E2.1.2)
+                  Acciones permitidas para tu rol actual ({ROLE_LABELS[score.localRole]})
                 </p>
                 <div className="grid grid-cols-3 gap-1.5 text-[10px]">
                   {(
@@ -269,14 +272,13 @@ export function ExpandedScorePanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E2.2 · CAPAS, TURNOS, CADÁVER EXQUISITO Y BLOQUEO DE PARÁMETROS */}
+          {/* CAPAS, TURNOS, CADÁVER EXQUISITO Y BLOQUEO DE PARÁMETROS */}
           {/* ============================================================== */}
           {activeTab === 'modes' && (
             <div className="space-y-3">
-              {/* Selector de modo: Síncrono, Por turnos, Asíncrono (E2.2.3–E2.2.5) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-300 font-bold">
-                  Modo de colaboración (E2.2.3 – E2.2.5)
+                  ¿Cómo quieren tocar en la sala?
                 </p>
                 <div className="grid grid-cols-3 gap-1.5">
                   {(
@@ -323,8 +325,7 @@ export function ExpandedScorePanel() {
                 {score.collaborationMode === 'asynchronous' && (
                   <div className="bg-black/40 p-2 rounded space-y-2">
                     <p className="text-[10px] text-purple-200">
-                      <strong>Cadáver Exquisito Sonoro (E2.2.5):</strong> Escucha la capa
-                      anterior antes de intervenir y consolidar tu estrato.
+                      <strong>Composición por Capas (Cadáver Exquisito):</strong> Escucha la capa anterior antes de grabar la tuya.
                     </p>
                     <div className="flex gap-1.5">
                       <button
@@ -370,11 +371,10 @@ export function ExpandedScorePanel() {
                 )}
               </div>
 
-              {/* Propiedad de objetos y cesión (E2.2.2) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-300 font-bold">
-                    Propiedad de objetos (E2.2.2)
+                    Autoría de los objetos creados
                   </span>
                   <label className="flex items-center gap-1.5 text-[10px] cursor-pointer">
                     <input
@@ -417,10 +417,9 @@ export function ExpandedScorePanel() {
                 )}
               </div>
 
-              {/* Parámetros abiertos o bloqueados por la moderación (E2.2.6) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <p className="text-gray-300 font-bold">
-                  Grados de libertad / Parámetros bloqueados (E2.2.6)
+                  Bloquear o permitir cambios en ciertos controles
                 </p>
                 <div className="grid grid-cols-5 gap-1 text-[10px]">
                   {(
@@ -453,14 +452,13 @@ export function ExpandedScorePanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E2.3 · SESIONES CON FORMA TEMPORAL Y PLANTILLAS */}
+          {/* SESIONES CON FORMA TEMPORAL Y PLANTILLAS */}
           {/* ============================================================== */}
           {activeTab === 'temporal' && (
             <div className="space-y-3">
-              {/* Duración preestablecida y cuenta regresiva (E2.3.1, E2.3.4) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-300 font-bold">
-                  Duración de sesión y fases automáticas (E2.3.1, E2.3.2, E2.3.4)
+                  Reloj de sesión y etapas de ensayo
                 </p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {([10, 15, 30, 'free'] as PresetSessionDuration[]).map((dur) => (
@@ -530,10 +528,9 @@ export function ExpandedScorePanel() {
                 </div>
               </div>
 
-              {/* Plantillas de sesión ("Partituras de Juego", E2.3.3) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-300 font-bold">
-                  Plantillas de sesión ("Partituras de Juego") (E2.3.3)
+                  Plantillas listas para jugar o ensayar en grupo
                 </p>
                 <div className="space-y-1.5 max-h-32 overflow-y-auto">
                   {BUILTIN_GAME_SCORE_TEMPLATES.map((tpl) => (
@@ -577,8 +574,7 @@ export function ExpandedScorePanel() {
 
                 {score.archivedSessions.length > 0 && (
                   <p className="text-[10px] text-emerald-300">
-                    ✔ {score.archivedSessions.length} sesión(es) auto-archivada(s) al terminar
-                    (E2.3.4).
+                    ✔ {score.archivedSessions.length} sesión(es) guardada(s) automáticamente al terminar.
                   </p>
                 )}
               </div>
@@ -586,7 +582,7 @@ export function ExpandedScorePanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E2.4 · NIVELES COMO RECORRIDO Y RETOS COMPOSITIVOS */}
+          {/* NIVELES COMO RECORRIDO Y RETOS COMPOSITIVOS */}
           {/* ============================================================== */}
           {activeTab === 'levels' && (
             <div className="space-y-3">
@@ -605,7 +601,7 @@ export function ExpandedScorePanel() {
                       }`}
                     >
                       <div className="font-bold text-xs flex justify-between">
-                        <span>{def.id}</span>
+                        <span>Modo {lvl}</span>
                         {completed && <span className="text-emerald-300">★</span>}
                       </div>
                       <div className="text-[9px] text-gray-400 truncate">{def.name}</div>
@@ -614,7 +610,7 @@ export function ExpandedScorePanel() {
                 })}
               </div>
 
-              {/* Restricciones del nivel activo (E2.4.1) */}
+              {/* Restricciones del nivel activo */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <p className="text-indigo-200 font-bold">{currentLevelDef.name}</p>
                 <p className="text-[10px] text-gray-400">{currentLevelDef.description}</p>
@@ -646,11 +642,10 @@ export function ExpandedScorePanel() {
                 </div>
               </div>
 
-              {/* Reto compositivo evaluado con E1.3 y desbloqueo (E2.4.2, E2.4.3) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2 border border-indigo-500/30">
                 <div className="flex justify-between items-center">
                   <span className="text-amber-300 font-bold">
-                    🎯 Reto: {currentLevelDef.challenge.title} (E2.4.2)
+                    🎯 Reto: {currentLevelDef.challenge.title}
                   </span>
                   <span className="text-emerald-300 font-bold">
                     {challengeResult.progressPct}%
@@ -677,8 +672,8 @@ export function ExpandedScorePanel() {
                     className="bg-emerald-500/30 hover:bg-emerald-500/50 text-emerald-200 px-2.5 py-1 rounded text-[10px] font-bold"
                   >
                     {challengeResult.passed
-                      ? '🔓 Desbloquear siguiente'
-                      : 'Validar progreso (E2.4.3)'}
+                      ? '🔓 Pasar al siguiente modo'
+                      : 'Verificar avance'}
                   </button>
                 </div>
               </div>
@@ -686,14 +681,13 @@ export function ExpandedScorePanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E2.5 · MODELOS DE PARTICIPACIÓN, TEMPORADAS Y MICRO-REDES */}
+          {/* MODELOS DE PARTICIPACIÓN, TEMPORADAS Y MICRO-REDES */}
           {/* ============================================================== */}
           {activeTab === 'community' && (
             <div className="space-y-3">
-              {/* Tipos de sala (E2.5.1) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-300 font-bold">
-                  Tipo de sala y aforo (E2.5.1)
+                  Tamaño del grupo y acceso a la sala
                 </p>
                 <div className="grid grid-cols-5 gap-1 text-[10px]">
                   {(
@@ -726,10 +720,9 @@ export function ExpandedScorePanel() {
                 </p>
               </div>
 
-              {/* Convocatorias y temporadas (E2.5.2) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <p className="text-gray-300 font-bold">
-                  Convocatorias y Temporadas Activas (E2.5.2)
+                  Convocatorias y Temporadas de Ensayo
                 </p>
                 <div className="space-y-1.5 max-h-28 overflow-y-auto">
                   {score.seasonCalls.map((call) => (
@@ -758,10 +751,9 @@ export function ExpandedScorePanel() {
                 </div>
               </div>
 
-              {/* Micro-redes de afinidad (E2.5.3) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <p className="text-gray-300 font-bold">
-                  Micro-redes de Afinidad Persistentes (E2.5.3)
+                  Grupos de Práctica Frecuentes
                 </p>
                 <div className="space-y-1 max-h-24 overflow-y-auto">
                   {score.affinityGroups.map((grp) => (

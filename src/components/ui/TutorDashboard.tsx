@@ -188,10 +188,10 @@ export function TutorDashboard() {
             </div>
           </div>
 
-          {/* Asignación de roles y capas en vivo por la moderación (E2.1.3) */}
+          {/* Asignación de roles y capas en vivo por la moderación */}
           <div className="space-y-1.5 pt-2 border-t border-white/10">
             <p className="text-xs text-emerald-300 font-bold">
-              Roles y capas en vivo (Moderación E2.1.3)
+              Roles y capas en vivo
             </p>
             <div className="space-y-1">
               {expandedScore.participants.map((p) => (

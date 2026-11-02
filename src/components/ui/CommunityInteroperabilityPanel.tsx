@@ -29,7 +29,7 @@ export function CommunityInteroperabilityPanel() {
   const hydraCanvasRef = useRef<HTMLCanvasElement>(null);
   const bundleInputRef = useRef<HTMLInputElement>(null);
 
-  // Estado formulario E7.1 (Evaluación Colectiva)
+  // Estado formulario (Evaluación Colectiva)
   const [alias, setAlias] = useState('Participante Local');
   const [workshopName, setWorkshopName] = useState('Taller de Improvisación Espacial');
   const [listeningScore, setListeningScore] = useState(5);
@@ -40,13 +40,13 @@ export function CommunityInteroperabilityPanel() {
   const [commentSec, setCommentSec] = useState(15);
   const [commentText, setCommentText] = useState('');
 
-  // Estado E7.3 (Importación soberana y Husos horarios)
+  // Estado (Importación soberana y Husos horarios)
   const [bundleStatus, setBundleStatus] = useState<string | null>(null);
   const [intlTitle, setIntlTitle] = useState('');
   const [intlUtc, setIntlUtc] = useState('2026-12-15T18:00:00Z');
   const intlNode = 'Nodo UNAM – Red Sur';
 
-  // E7.2.4: Capa visual estilo Hydra reactiva al tiempo y al código de osciladores
+  //: Capa visual estilo Hydra reactiva al tiempo y al código de osciladores
   useEffect(() => {
     if (!commState.hydraLayerEnabled) return;
     const canvas = hydraCanvasRef.current;
@@ -87,7 +87,7 @@ export function CommunityInteroperabilityPanel() {
 
   return (
     <>
-      {/* Lienzo visual Hydra opcional de fondo (E7.2.4) */}
+      {/* Lienzo visual Hydra opcional de fondo */}
       {commState.hydraLayerEnabled && (
         <canvas
           ref={hydraCanvasRef}
@@ -103,10 +103,10 @@ export function CommunityInteroperabilityPanel() {
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  Evaluación Colectiva, Live Coding y Soberanía (E7)
+                  Ritmos por Texto, Control MIDI/OSC y Red Local
                 </h3>
                 <p className="text-[11px] text-neutral-400">
-                  Evaluación entre pares · MIDI/OSC/Strudel/Hydra · Nodo Soberano LAN
+                  Opiniones del grupo · Teclados MIDI / SuperCollider · Funcionamiento sin internet
                 </p>
               </div>
               <button
@@ -117,13 +117,17 @@ export function CommunityInteroperabilityPanel() {
               </button>
             </div>
 
+            <div className="mb-3 rounded-lg bg-teal-950/30 border border-teal-500/30 p-2 text-[10px] text-teal-100 leading-snug">
+              💡 <strong>¿Para qué sirve?</strong> Conecta controladores MIDI, envía señales a programas como SuperCollider o Max, escribe patrones rítmicos de texto o descarga un paquete para trabajar sin internet.
+            </div>
+
             {/* Pestañas */}
             <div className="mb-3 flex gap-1 rounded-lg bg-white/5 p-1">
               {(
                 [
-                  ['eval', 'E7.1 Evaluación Colectiva'],
-                  ['livecoding', 'E7.2 MIDI / OSC / Tidal / Hydra'],
-                  ['sovereignty', 'E7.3 Soberanía y Husos'],
+                  ['eval', 'Comentarios'],
+                  ['livecoding', 'MIDI / Ritmos'],
+                  ['sovereignty', 'Modo Sin Internet'],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -140,12 +144,12 @@ export function CommunityInteroperabilityPanel() {
               ))}
             </div>
 
-            {/* PESTAÑA 1: EVALUACIÓN COLECTIVA Y COMENTARIOS ANCLADOS (E7.1.1–E7.1.3) */}
+            {/* PESTAÑA 1: EVALUACIÓN COLECTIVA Y COMENTARIOS ANCLADOS */}
             {activeTab === 'eval' && (
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
                 <div className="rounded-xl border border-teal-500/30 bg-teal-950/20 p-2.5 space-y-2">
                   <div className="font-semibold text-teal-200">
-                    Cuestionario de Evaluación Colectiva al Cerrar Sesión (E7.1.1)
+                    Cuestionario de Evaluación Colectiva al Cerrar Sesión
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     <input
@@ -237,10 +241,10 @@ export function CommunityInteroperabilityPanel() {
                   </div>
                 </div>
 
-                {/* Ronda de comentarios entre participantes ligada a marcadores (E7.1.2) */}
+                {/* Ronda de comentarios entre participantes ligada a marcadores */}
                 <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-1.5">
                   <div className="font-semibold text-white">
-                    Ronda de Comentarios Ligada a Marcadores de Grabación (E7.1.2)
+                    Ronda de Comentarios Ligada a Marcadores de Grabación
                   </div>
                   <div className="flex gap-1.5">
                     <input
@@ -284,19 +288,19 @@ export function CommunityInteroperabilityPanel() {
                   onClick={() => exportCollectiveEvaluationReportJson()}
                   className="w-full rounded-lg border border-teal-500/40 bg-teal-950/50 py-1.5 text-[11px] font-medium text-teal-200 hover:bg-teal-900/60"
                 >
-                  Exportar Resultados Agregados por Sesión y Taller JSON (E7.1.3)
+                  Exportar Resultados Agregados por Sesión y Taller JSON
                 </button>
               </div>
             )}
 
-            {/* PESTAÑA 2: INTEROPERABILIDAD CON LIVE CODING (E7.2.1–E7.2.5) */}
+            {/* PESTAÑA 2: INTEROPERABILIDAD CON LIVE CODING */}
             {activeTab === 'livecoding' && (
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-                {/* Web MIDI y Puente OSC (E7.2.1 y E7.2.2) */}
+                {/* Web MIDI y Puente OSC */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="rounded-xl border border-white/10 bg-white/5 p-2 space-y-1">
                     <div className="font-semibold text-teal-300">
-                      Web MIDI In/Out (E7.2.1)
+                      Web MIDI In/Out
                     </div>
                     <div className="text-[10px] text-neutral-300 truncate">
                       {commState.midi.lastMessageLog}
@@ -319,7 +323,7 @@ export function CommunityInteroperabilityPanel() {
 
                   <div className="rounded-xl border border-white/10 bg-white/5 p-2 space-y-1">
                     <div className="font-semibold text-amber-300">
-                      Puente OSC SuperCollider/PD/Tidal (E7.2.2)
+                      Puente OSC SuperCollider/PD/Tidal
                     </div>
                     <div className="text-[10px] text-neutral-300 truncate">
                       {commState.osc.lastSentAddress} ({commState.osc.messagesCount} msg)
@@ -341,11 +345,11 @@ export function CommunityInteroperabilityPanel() {
                   </div>
                 </div>
 
-                {/* Patrones estilo Strudel / TidalCycles (E7.2.3) */}
+                {/* Patrones estilo Strudel / TidalCycles */}
                 <div className="rounded-xl border border-teal-500/30 bg-black/70 p-2.5 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-teal-200">
-                      Motor de Patrones Cíclicos Strudel / TidalCycles (E7.2.3)
+                      Motor de Patrones Cíclicos Strudel / TidalCycles
                     </span>
                     <span className="font-mono text-[10px] text-teal-300">
                       Paso #{commState.activeTidalStep} · {commState.tidalBpm} BPM
@@ -374,11 +378,11 @@ export function CommunityInteroperabilityPanel() {
                   </div>
                 </div>
 
-                {/* Capa visual Hydra opcional (E7.2.4) y Diálogo comunitario (E7.2.5) */}
+                {/* Capa visual Hydra opcional y Diálogo comunitario */}
                 <div className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-950/20 p-2.5 space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-fuchsia-200">
-                      Sintetizador Visual Hydra Reactivo (E7.2.4 y E7.2.5)
+                      Sintetizador Visual Hydra Reactivo
                     </span>
                     <button
                       onClick={() =>
@@ -405,7 +409,7 @@ export function CommunityInteroperabilityPanel() {
                     className="w-full rounded border border-white/15 bg-black px-2 py-1 font-mono text-[10px] text-fuchsia-300"
                   />
                   <p className="text-[10px] text-neutral-300">
-                    <strong>Protocolo de colaboración (E7.2.5):</strong> Interoperabilidad
+                    <strong>Protocolo de colaboración:</strong> Interoperabilidad
                     documentada con Hydra (Olivia Jack) y Strudel/TidalCycles (Alex McLean)
                     mediante Web MIDI, WebSocket OSC y lienzo compartido sin servidores
                     comerciales.
@@ -414,13 +418,13 @@ export function CommunityInteroperabilityPanel() {
               </div>
             )}
 
-            {/* PESTAÑA 3: SOBERANÍA TECNOLÓGICA REAL Y HUSOS HORARIOS (E7.3.1–E7.3.6) */}
+            {/* PESTAÑA 3: SOBERANÍA TECNOLÓGICA REAL Y HUSOS HORARIOS */}
             {activeTab === 'sovereignty' && (
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
-                {/* Instalación en 1 comando y LAN sin internet (E7.3.1 y E7.3.3) */}
+                {/* Instalación en 1 comando y LAN sin internet */}
                 <div className="rounded-xl border border-teal-500/30 bg-black/70 p-2.5 space-y-1">
                   <div className="font-semibold text-teal-300">
-                    Despliegue de Nodo Comunitario en 1 Comando y Modo LAN (E7.3.1 / E7.3.3)
+                    Despliegue de Nodo Comunitario en 1 Comando y Modo LAN
                   </div>
                   <code className="block rounded bg-neutral-900 px-2 py-1 font-mono text-[10px] text-emerald-300">
                     docker compose --profile lan-sovereign up -d
@@ -430,13 +434,13 @@ export function CommunityInteroperabilityPanel() {
                   </div>
                 </div>
 
-                {/* Exportar e importar comunidad completa sin Firebase (E7.3.2) */}
+                {/* Exportar e importar comunidad completa sin Firebase */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => exportSovereignCommunityBundle('Comunidad-Casa-Salomon')}
                     className="flex-1 rounded-lg bg-teal-600 py-1.5 text-[10px] font-semibold text-white hover:bg-teal-500"
                   >
-                    Exportar Comunidad sin Firebase (E7.3.2)
+                    Exportar Comunidad sin Firebase
                   </button>
                   <input
                     ref={bundleInputRef}
@@ -466,10 +470,10 @@ export function CommunityInteroperabilityPanel() {
                   </div>
                 )}
 
-                {/* Matriz crítica de alcances y límites reales de soberanía (E7.3.4) */}
+                {/* Matriz crítica de alcances y límites reales de soberanía */}
                 <div className="rounded-xl border border-white/10 bg-white/5 p-2 space-y-1">
                   <div className="font-semibold text-amber-300">
-                    Auditoría Crítica de Soberanía Tecnológica (E7.3.4 — [GC])
+                    Auditoría Crítica de Soberanía Tecnológica
                   </div>
                   {SOVEREIGNTY_AUDIT_MATRIX.map((row, idx) => (
                     <div key={idx} className="rounded bg-black/50 p-1.5 text-[10px]">
@@ -481,10 +485,10 @@ export function CommunityInteroperabilityPanel() {
                   ))}
                 </div>
 
-                {/* Programador de sesiones internacionales con husos horarios (E7.3.6) */}
+                {/* Programador de sesiones internacionales con husos horarios */}
                 <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-1.5">
                   <div className="font-semibold text-cyan-300">
-                    Calendario Internacional Multihuso Horario (E7.3.6)
+                    Calendario Internacional Multihuso Horario
                   </div>
                   {commState.scheduledInternationalSessions.map((slot) => (
                     <div key={slot.id} className="rounded bg-black/60 p-2 text-[10px]">

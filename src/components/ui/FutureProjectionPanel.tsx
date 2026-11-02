@@ -82,7 +82,7 @@ export function FutureProjectionPanel() {
 
   const handleGenerateAiAnalysis = () => {
     generateComplementaryAiSessionAnalysis();
-    notify('Análisis complementario IA generado sobre la base determinista E1.3.');
+    notify('Análisis complementario IA generado sobre la base determinista.');
   };
 
   const handleSyncNode = async (nodeId: string) => {
@@ -95,10 +95,10 @@ export function FutureProjectionPanel() {
       <div className="mb-3 flex items-center justify-between border-b border-zinc-800 pb-2">
         <div>
           <h3 className="font-mono text-sm font-bold text-fuchsia-300">
-            ETAPA E8 · INTEGRACIÓN XR, IA EN NAVEGADOR, FEDERACIÓN Y ESCUELAS
+            Medidas de Salón Real, Transformación de Timbres y Red de Escuelas
           </h3>
           <p className="text-[11px] text-zinc-400">
-            Anclas 3D Passthrough, Red MLP + DSP RAVE en Web Audio, ActivityPub P2P y Currículo
+            Anclas en espacio físico, timbres acústicos resonantes y conexión entre escuelas
           </p>
         </div>
         <button
@@ -109,13 +109,17 @@ export function FutureProjectionPanel() {
         </button>
       </div>
 
+      <div className="mb-3 rounded-lg bg-fuchsia-950/30 border border-fuchsia-500/30 p-2 text-[10px] text-fuchsia-100 leading-snug">
+        💡 <strong>¿Cómo usar esta ventana?</strong> En <strong>Salón Físico 3D</strong> puedes dibujar las medidas en metros de un cuarto real o fijar sonidos en puntos exactos. En <strong>Timbres e IA</strong> puedes aplicar resonancias de instrumentos acústicos (violonchelo, flauta, campana) a cualquier figura.
+      </div>
+
       {statusMsg && (
         <div className="mb-3 rounded border border-fuchsia-500/50 bg-fuchsia-950/40 px-2.5 py-1.5 font-mono text-[11px] text-fuchsia-200">
           {statusMsg}
         </div>
       )}
 
-      {/* Pestañas E8.1 - E8.4 */}
+      {/* Pestañas */}
       <div className="mb-3 grid grid-cols-4 gap-1 rounded-lg bg-zinc-900 p-1 font-mono text-[11px]">
         <button
           onClick={() => setActiveTab('xr')}
@@ -125,7 +129,7 @@ export function FutureProjectionPanel() {
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          E8.1 XR / Site 3D
+          Salón Físico 3D
         </button>
         <button
           onClick={() => setActiveTab('ai')}
@@ -135,7 +139,7 @@ export function FutureProjectionPanel() {
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          E8.2 IA / DSP RAVE
+          Timbres e IA
         </button>
         <button
           onClick={() => setActiveTab('federation')}
@@ -145,7 +149,7 @@ export function FutureProjectionPanel() {
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          E8.3 Federación
+          Red de Escuelas
         </button>
         <button
           onClick={() => setActiveTab('sustainability')}
@@ -155,7 +159,7 @@ export function FutureProjectionPanel() {
               : 'text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          E8.4 Pedagogía
+          Plan de Clases
         </button>
       </div>
 
@@ -166,7 +170,7 @@ export function FutureProjectionPanel() {
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.1.1 · Sesión WebXR y Paridad de Manipulación Espacial 6DoF
+                  Sesión WebXR y Paridad de Manipulación Espacial 6DoF
                 </span>
                 <div className="flex gap-1">
                   <button
@@ -246,11 +250,11 @@ export function FutureProjectionPanel() {
               </div>
             </div>
 
-            {/* E8.1.2 Passthrough AR */}
+            {/* Passthrough AR */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.1.2 · Anclas Espaciales Passthrough en Escena 3D (Persistentes)
+                  Anclas Espaciales Passthrough en Escena 3D (Persistentes)
                 </span>
                 <label className="flex items-center gap-1.5 text-[11px] cursor-pointer">
                   <input
@@ -321,10 +325,10 @@ export function FutureProjectionPanel() {
               </div>
             </div>
 
-            {/* E8.1.3 Dispositivos reales conectados en la sesión */}
+            {/* Dispositivos reales conectados en la sesión */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 font-mono font-semibold text-fuchsia-300">
-                E8.1.3 · Telemetría de Dispositivos Activos en Sala Mixta
+                Telemetría de Dispositivos Activos en Sala Mixta
               </div>
               <div className="space-y-1">
                 {store.mixedRealityParticipants.map((p) => (
@@ -347,11 +351,11 @@ export function FutureProjectionPanel() {
               </div>
             </div>
 
-            {/* E8.1.4 Instalaciones Site-Specific 3D */}
+            {/* Instalaciones Site-Specific 3D */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.1.4 · Recinto Arquitectónico 3D Site-Specific (Escala en Metros)
+                  Recinto Arquitectónico 3D Site-Specific (Escala en Metros)
                 </span>
                 <label className="flex items-center gap-1.5 text-[11px] cursor-pointer">
                   <input
@@ -394,11 +398,11 @@ export function FutureProjectionPanel() {
 
         {activeTab === 'ai' && (
           <div className="space-y-3">
-            {/* E8.2.1 y E8.2.3 Red neuronal MLP con entrenamiento real en navegador */}
+            {/* y Red neuronal MLP con entrenamiento real en navegador */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.2.1 / E8.2.3 · Red Neuronal MLP en Float32Array (Entrenamiento + Inferencia)
+                  Red Neuronal MLP en Float32Array (Entrenamiento + Inferencia)
                 </span>
                 <span className="rounded bg-emerald-950 px-1.5 py-0.5 font-mono text-[10px] text-emerald-300">
                   Pesos persistidos en navegador
@@ -443,10 +447,10 @@ export function FutureProjectionPanel() {
               )}
             </div>
 
-            {/* E8.2.2 Procesador DSP Web Audio RAVE */}
+            {/* Procesador DSP Web Audio RAVE */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 font-mono font-semibold text-fuchsia-300">
-                E8.2.2 · Procesador DSP Web Audio RAVE (Banco de Formantes + Wavefolding)
+                Procesador DSP Web Audio RAVE (Banco de Formantes + Wavefolding)
               </div>
               <div className="grid grid-cols-1 gap-1.5">
                 {(Object.keys(RAVE_TIMBRE_MODELS) as RaveLatentModelId[]).map((id) => {
@@ -475,10 +479,10 @@ export function FutureProjectionPanel() {
               </div>
             </div>
 
-            {/* E8.2.3 Corpus Ético */}
+            {/* Corpus Ético */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1 font-mono font-semibold text-fuchsia-300">
-                E8.2.3 · Corpus Ético del Archivo Comunitario ({archiveFragments.length} obras CC)
+                Corpus Ético del Archivo Comunitario ({archiveFragments.length} obras CC)
               </div>
               <div className="max-h-24 overflow-y-auto space-y-1">
                 {archiveFragments.map((f) => (
@@ -493,11 +497,11 @@ export function FutureProjectionPanel() {
               </div>
             </div>
 
-            {/* E8.2.4 Análisis asistido por IA */}
+            {/* Análisis asistido por IA */}
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.2.4 · Análisis IA Complementario al Determinista (E1.3)
+                  Análisis IA Complementario al Determinista
                 </span>
                 <button
                   onClick={handleGenerateAiAnalysis}
@@ -516,7 +520,7 @@ export function FutureProjectionPanel() {
                 </div>
               ) : (
                 <p className="text-[11px] text-zinc-400">
-                  Pulsa &ldquo;Generar Lectura&rdquo; para contrastar las métricas exactas de E1.3
+                  Pulsa &ldquo;Generar Lectura&rdquo; para contrastar las métricas exactas de
                   con una interpretación estructural asistida.
                 </p>
               )}
@@ -529,7 +533,7 @@ export function FutureProjectionPanel() {
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.3.1 / E8.3.2 / E8.3.3 · Sincronización Federada ActivityPub + P2P
+                  Sincronización Federada ActivityPub + P2P
                 </span>
                 <button
                   onClick={() => {
@@ -553,7 +557,7 @@ export function FutureProjectionPanel() {
                         onClick={() => handleSyncNode(node.id)}
                         className="rounded border border-emerald-500/50 bg-emerald-950/60 px-2 py-0.5 font-mono text-[10px] text-emerald-300 hover:bg-emerald-800/60"
                       >
-                        🔄 Sincronizar Obra al Archivo E6
+                        🔄 Traer Obra a la Galería
                       </button>
                     </div>
                     <div className="font-mono text-[10px] text-fuchsia-300">
@@ -579,7 +583,7 @@ export function FutureProjectionPanel() {
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 flex items-center justify-between">
                 <span className="font-mono font-semibold text-fuchsia-300">
-                  E8.4.1 · Paquete Curricular para Escuelas de Música (8 Semanas)
+                  Paquete Curricular para Escuelas de Música (8 Semanas)
                 </span>
                 <button
                   onClick={() => {
@@ -592,35 +596,35 @@ export function FutureProjectionPanel() {
                 </button>
               </div>
               <ul className="space-y-1 text-[11px] text-zinc-300">
-                <li>• Semanas 1–2 (N1): Morfología geométrica, envolvente y familia tímbrica.</li>
-                <li>• Semanas 3–4 (N2): Localización binaural HRTF, Doppler y turnos E2.</li>
-                <li>• Semanas 5–6 (N3): Zonas acústicas y cadáver exquisito sonoro.</li>
-                <li>• Semanas 7–8 (N4): Csound WASM en vivo, agentes E4 y curaduría E6.</li>
+                <li>• Semanas 1–2 (Modo Básico): Formas geométricas, envolvente y familia de timbres.</li>
+                <li>• Semanas 3–4 (Modo Intermedio): Sonido 3D en audífonos, movimiento y turnos en grupo.</li>
+                <li>• Semanas 5–6 (Modo Avanzado): Zonas de efectos acústicos y composición por capas.</li>
+                <li>• Semanas 7–8 (Estudio Completo): Instrumentos Csound, acompañantes automáticos y galería pública.</li>
               </ul>
             </div>
 
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5">
               <div className="mb-1.5 font-mono font-semibold text-fuchsia-300">
-                E8.4.4 · Métricas de Impacto para Fondos Culturales
+                Estadísticas de Uso y Comunidad
               </div>
               <div className="grid grid-cols-5 gap-1 text-center font-mono">
                 <div className="rounded bg-zinc-950 p-1.5">
                   <div className="text-sm font-bold text-fuchsia-300">
                     {store.federatedNodes.length}
                   </div>
-                  <div className="text-[9px] text-zinc-400">Nodos Aliados</div>
+                  <div className="text-[9px] text-zinc-400">Escuelas</div>
                 </div>
                 <div className="rounded bg-zinc-950 p-1.5">
                   <div className="text-sm font-bold text-fuchsia-300">
                     {store.impactMetrics.recordedSessionsCount}
                   </div>
-                  <div className="text-[9px] text-zinc-400">Sesiones E1</div>
+                  <div className="text-[9px] text-zinc-400">Sesiones</div>
                 </div>
                 <div className="rounded bg-zinc-950 p-1.5">
                   <div className="text-sm font-bold text-fuchsia-300">
                     {archiveFragments.length}
                   </div>
-                  <div className="text-[9px] text-zinc-400">Obras CC E6</div>
+                  <div className="text-[9px] text-zinc-400">Obras Libres</div>
                 </div>
                 <div className="rounded bg-zinc-950 p-1.5">
                   <div className="text-sm font-bold text-fuchsia-300">

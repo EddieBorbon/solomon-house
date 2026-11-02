@@ -33,7 +33,7 @@ export function VisualSonicCoherencePanel() {
 
   return (
     <>
-      {/* Leyenda flotante de la sala (E3.3.2) */}
+      {/* Leyenda flotante de la sala */}
       {vsState.showRoomLegend && (
         <div className="fixed top-20 left-4 z-30 max-w-xs rounded-xl border border-amber-500/40 bg-black/85 p-3 text-[11px] text-neutral-200 backdrop-blur-md shadow-xl">
           <div className="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
@@ -67,10 +67,10 @@ export function VisualSonicCoherencePanel() {
             <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
               <div>
                 <h3 className="text-sm font-semibold text-white">
-                  Coherencia Visual-Sonora (E3)
+                  Relación entre Forma, Color y Sonido
                 </h3>
                 <p className="text-[11px] text-neutral-400">
-                  Morfología tímbrica · ¿Por qué suena así? · Modo Acusmático
+                  Descubre por qué cada figura suena distinto o escucha a ciegas
                 </p>
               </div>
               <button
@@ -79,6 +79,10 @@ export function VisualSonicCoherencePanel() {
               >
                 ✕
               </button>
+            </div>
+
+            <div className="mb-3 rounded-lg bg-amber-950/30 border border-amber-500/30 p-2 text-[10px] text-amber-100 leading-snug">
+              💡 <strong>¿Qué es esto?</strong> Cada figura geométrica tiene su propio instrumento (por ejemplo, la esfera es suave y el icosaedro es metálico). Aquí puedes ver qué hace cada una o activar el <strong>Modo a Ciegas (Acusmático)</strong> para ocultar las figuras y guiarte solo por el oído.
             </div>
 
             {/* Controles rápidos de barra superior */}
@@ -93,7 +97,7 @@ export function VisualSonicCoherencePanel() {
                     : 'bg-white/5 text-neutral-300 hover:bg-white/10'
                 }`}
               >
-                {vsState.showRoomLegend ? 'Ocultar leyenda en sala' : 'Mostrar leyenda en sala'}
+                {vsState.showRoomLegend ? 'Ocultar resumen en pantalla' : 'Mostrar resumen en pantalla'}
               </button>
               <button
                 onClick={() =>
@@ -106,8 +110,8 @@ export function VisualSonicCoherencePanel() {
                 }`}
               >
                 {vsState.acousmaticMode
-                  ? 'Modo Acusmático: ACTIVO'
-                  : 'Activar Modo Acusmático (E3.4.1)'}
+                  ? 'Modo a Ciegas: ACTIVO'
+                  : 'Ocultar Figuras (Escucha a Ciegas)'}
               </button>
             </div>
 
@@ -134,7 +138,7 @@ export function VisualSonicCoherencePanel() {
               ))}
             </div>
 
-            {/* PESTAÑA 1: ¿POR QUÉ SUENA ASÍ? (E3.3.1) */}
+            {/* PESTAÑA 1: ¿POR QUÉ SUENA ASÍ? */}
             {activeTab === 'why' && (
               <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
                 {explanation ? (
@@ -189,12 +193,12 @@ export function VisualSonicCoherencePanel() {
               </div>
             )}
 
-            {/* PESTAÑA 2: PRESETS Y CATÁLOGO FORMA → TIMBRE (E3.1.1, E3.1.2, E3.1.3) */}
+            {/* PESTAÑA 2: PRESETS Y CATÁLOGO FORMA → TIMBRE */}
             {activeTab === 'presets' && (
               <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 <div>
                   <label className="mb-1 block text-[11px] text-neutral-400">
-                    Preset de lógica visual-sonora de la sala (E3.1.3)
+                    Estilo de relación entre forma y sonido
                   </label>
                   <select
                     value={vsState.activePreset}
@@ -222,12 +226,12 @@ export function VisualSonicCoherencePanel() {
                       })
                     }
                   />
-                  <span>Aplicar lógica por defecto al crear objetos nuevos (E3.1.2)</span>
+                  <span>Conectar automáticamente altura y tamaño al crear nuevas figuras</span>
                 </label>
 
                 <div className="space-y-1.5">
                   <div className="text-[11px] font-medium text-neutral-300">
-                    Correspondencia Forma Geométrica → Familia Tímbrica (E3.1.1)
+                    ¿Qué sonido produce cada figura geométrica?
                   </div>
                   {Object.values(OBJECT_TIMBRAL_LOGIC).map((item) => (
                     <div
@@ -244,7 +248,7 @@ export function VisualSonicCoherencePanel() {
               </div>
             )}
 
-            {/* PESTAÑA 3: PRUEBA PERCEPTUAL (E3.4.2 y E3.4.3) */}
+            {/* PESTAÑA 3: PRUEBA PERCEPTUAL */}
             {activeTab === 'perceptual' && (
               <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 <p className="text-[11px] text-neutral-300">
@@ -320,7 +324,7 @@ export function VisualSonicCoherencePanel() {
                   disabled={stats.totalTrials === 0}
                   className="w-full rounded-lg border border-emerald-500/40 bg-emerald-950/50 py-1.5 text-[11px] font-medium text-emerald-200 hover:bg-emerald-900/60 disabled:opacity-40"
                 >
-                  Exportar informe perceptual JSON para tesis (E3.4.3)
+                  Descargar resultados de la prueba (JSON)
                 </button>
               </div>
             )}

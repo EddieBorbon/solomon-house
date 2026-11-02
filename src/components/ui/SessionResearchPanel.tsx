@@ -60,7 +60,7 @@ export function SessionResearchPanel() {
   const [recordAudioWithSession, setRecordAudioWithSession] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  // Estado para nuevos marcadores en Replay (E1.2.3)
+  // Estado para nuevos marcadores en Replay
   const [markerLabel, setMarkerLabel] = useState('');
   const [markerCategory, setMarkerCategory] =
     useState<ResearcherMarker['category']>('observation');
@@ -128,10 +128,10 @@ export function SessionResearchPanel() {
           <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-purple-300 font-bold text-sm">
-                Registro y Análisis de Sesiones (E1)
+                Grabar Audio, Repetir Sesión y Estadísticas
               </h3>
               <p className="text-[11px] text-gray-400">
-                Documentación empírica, replay temporal y analítica para tesis
+                Graba tu sesión en WAV, vuelve a escucharla paso a paso o descarga dibujos
               </p>
             </div>
             <button
@@ -142,21 +142,25 @@ export function SessionResearchPanel() {
             </button>
           </div>
 
+          <div className="rounded-lg bg-purple-950/30 border border-purple-500/30 p-2 text-[10px] text-purple-100 leading-snug">
+            💡 <strong>¿Cómo usar esta ventana?</strong> En <strong>Grabar</strong> puedes guardar el audio y todo lo que mueves en la escena. En <strong>Repetir</strong> puedes volver a reproducir una sesión guardada.
+          </div>
+
           {statusMessage && (
             <div className="bg-purple-500/20 border border-purple-400/40 text-purple-200 px-3 py-1.5 rounded text-[11px]">
               {statusMessage}
             </div>
           )}
 
-          {/* Pestañas E1.1 – E1.5 */}
+          {/* Pestañas */}
           <div className="grid grid-cols-5 gap-1 bg-black/50 p-1 rounded-lg">
             {(
               [
-                ['recorder', 'E1.1 Grabar'],
-                ['replay', 'E1.2 Replay'],
-                ['musicology', 'E1.3 Música'],
-                ['telemetry', 'E1.4 Red/CPU'],
-                ['visuals', 'E1.5 SVG'],
+                ['recorder', 'Grabar'],
+                ['replay', 'Repetir'],
+                ['musicology', 'Resumen'],
+                ['telemetry', 'Rendimiento'],
+                ['visuals', 'Dibujos SVG'],
               ] as [TabId, string][]
             ).map(([id, label]) => (
               <button
@@ -174,7 +178,7 @@ export function SessionResearchPanel() {
           </div>
 
           {/* ============================================================== */}
-          {/* E1.1 · GRABADOR DE SESIÓN Y CONSENTIMIENTO */}
+          {/* GRABADOR DE SESIÓN Y CONSENTIMIENTO */}
           {/* ============================================================== */}
           {activeTab === 'recorder' && (
             <div className="space-y-3">
@@ -197,7 +201,7 @@ export function SessionResearchPanel() {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-400">Capa activa (E1.1.1)</label>
+                    <label className="block text-gray-400">Capa activa</label>
                     <select
                       value={recorder.localLayer}
                       onChange={(e) =>
@@ -216,7 +220,7 @@ export function SessionResearchPanel() {
                 </div>
               </div>
 
-              {/* Consentimiento explícito y anonimización (E1.1.5) */}
+              {/* Consentimiento explícito y anonimización */}
               <div className="bg-white/5 rounded-lg p-2.5 space-y-1.5 border border-white/10">
                 <label className="flex items-start gap-2 cursor-pointer">
                   <input
@@ -226,14 +230,14 @@ export function SessionResearchPanel() {
                     className="mt-0.5"
                   />
                   <span className="text-[11px] text-gray-300 leading-tight">
-                    <strong>Consentimiento informado (E1.1.5):</strong> Autorizo el registro de
+                    <strong>Consentimiento informado:</strong> Autorizo el registro de
                     eventos espaciales y audio para investigación artística. Los identificadores
                     se anonimizan con hash irreversible ({recorder.participants[0]?.anonymousId}).
                   </span>
                 </label>
               </div>
 
-              {/* Opciones de grabación de audio maestro y binaural (E1.1.2, E1.1.3) */}
+              {/* Opciones de grabación de audio maestro y binaural */}
               <div className="bg-white/5 rounded-lg p-2.5 space-y-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -241,7 +245,7 @@ export function SessionResearchPanel() {
                     checked={recordAudioWithSession}
                     onChange={(e) => setRecordAudioWithSession(e.target.checked)}
                   />
-                  <span>Grabar bus de audio maestro (WAV / OGG) (E1.1.2)</span>
+                  <span>Grabar bus de audio maestro (WAV / OGG)</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -250,7 +254,7 @@ export function SessionResearchPanel() {
                     checked={recorder.binauralEnabled}
                     onChange={(e) => setBinauralConfig(e.target.checked)}
                   />
-                  <span>Grabación binaural desde posición de oyente (E1.1.3)</span>
+                  <span>Grabación binaural desde posición de oyente</span>
                 </label>
 
                 {recorder.binauralEnabled && (
@@ -293,7 +297,7 @@ export function SessionResearchPanel() {
                 </button>
               </div>
 
-              {/* Exportaciones .casa.json v2, Schema, WAV y OGG (E1.1.2, E1.1.4) */}
+              {/* Exportaciones .casa.json v2, Schema, WAV y OGG */}
               <div className="grid grid-cols-2 gap-1.5 pt-1">
                 <button
                   onClick={() => exportCasaSessionV2()}
@@ -326,7 +330,7 @@ export function SessionResearchPanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E1.2 · REPRODUCTOR TEMPORAL (REPLAY) Y MARCADORES */}
+          {/* REPRODUCTOR TEMPORAL (REPLAY) Y MARCADORES */}
           {/* ============================================================== */}
           {activeTab === 'replay' && (
             <div className="space-y-3">
@@ -338,7 +342,7 @@ export function SessionResearchPanel() {
                       : 'Sin sesión cargada'}
                   </p>
                   <p className="text-[10px] text-gray-400">
-                    Navegación 3D libre activa durante el replay (E1.2.2)
+                    Navegación 3D libre activa durante el replay
                   </p>
                 </div>
                 <button
@@ -356,7 +360,7 @@ export function SessionResearchPanel() {
                 />
               </div>
 
-              {/* Controles de reproducción y barra de tiempo (E1.2.1) */}
+              {/* Controles de reproducción y barra de tiempo */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1.5">
@@ -420,10 +424,10 @@ export function SessionResearchPanel() {
                 </div>
               </div>
 
-              {/* Marcadores y anotaciones del investigador (E1.2.3) */}
+              {/* Marcadores y anotaciones del investigador */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-300 font-bold">
-                  Marcadores del investigador ({recorder.markers.length}) (E1.2.3)
+                  Marcadores del investigador ({recorder.markers.length})
                 </p>
                 <div className="grid grid-cols-3 gap-1.5">
                   <input
@@ -516,13 +520,13 @@ export function SessionResearchPanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E1.3 · ANALÍTICA MUSICOLÓGICA AUTOMÁTICA Y CASOS DE ESTUDIO */}
+          {/* ANALÍTICA MUSICOLÓGICA AUTOMÁTICA Y CASOS DE ESTUDIO */}
           {/* ============================================================== */}
           {activeTab === 'musicology' && (
             <div className="space-y-2.5">
               <div className="bg-white/5 p-2.5 rounded-lg space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Sistema de alturas (E1.3.2):</span>
+                  <span className="text-gray-400">Sistema de alturas:</span>
                   <span className="text-emerald-300 font-bold uppercase">
                     {currentMusicology.pitchSystem.classification}
                   </span>
@@ -554,7 +558,7 @@ export function SessionResearchPanel() {
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-white/5 p-2 rounded-lg space-y-1">
-                  <p className="text-gray-400 text-[10px]">Ritmo y periodicidad (E1.3.3)</p>
+                  <p className="text-gray-400 text-[10px]">Ritmo y periodicidad</p>
                   <p className="text-sky-300 font-bold">
                     {currentMusicology.rhythm.organizationLabel}
                   </p>
@@ -564,17 +568,17 @@ export function SessionResearchPanel() {
                   </p>
                 </div>
                 <div className="bg-white/5 p-2 rounded-lg space-y-1">
-                  <p className="text-gray-400 text-[10px]">Timbre y centroide (E1.3.4)</p>
+                  <p className="text-gray-400 text-[10px]">Timbre y centroide</p>
                   <p className="text-amber-300 font-bold">
                     {currentMusicology.timbre.meanSpectralCentroidHz} Hz medio
                   </p>
                   <p className="text-[10px] text-gray-400">
-                    Densidad pico: {currentMusicology.peakDensityObjects} obj (E1.3.5)
+                    Densidad pico: {currentMusicology.peakDensityObjects} obj
                   </p>
                 </div>
               </div>
 
-              {/* Intervención humana frente a algorítmica (E1.3.6) */}
+              {/* Intervención humana frente a algorítmica */}
               <div className="bg-white/5 p-2 rounded-lg space-y-1">
                 <div className="flex justify-between text-[10px]">
                   <span className="text-emerald-300">
@@ -592,10 +596,10 @@ export function SessionResearchPanel() {
                 </div>
               </div>
 
-              {/* Tabla comparativa de los 3 casos de estudio (Moscú, Diáspora, China) (E1.3.7) */}
+              {/* Tabla comparativa de los 3 casos de estudio (Moscú, Diáspora, China) */}
               <div className="bg-white/5 p-2 rounded-lg space-y-1.5">
                 <p className="text-gray-300 font-bold text-[11px]">
-                  Comparativa Casos de Estudio (Moscú · Diáspora · China) (E1.3.7)
+                  Comparativa Casos de Estudio (Moscú · Diáspora · China)
                 </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-[10px]">
@@ -655,14 +659,14 @@ export function SessionResearchPanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E1.4 · TELEMETRÍA TÉCNICA Y COMPARACIÓN TCP vs UDP */}
+          {/* TELEMETRÍA TÉCNICA Y COMPARACIÓN TCP vs UDP */}
           {/* ============================================================== */}
           {activeTab === 'telemetry' && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between bg-white/5 p-2 rounded-lg">
                 <div>
                   <span className="text-gray-400 block text-[10px]">
-                    Región anónima del participante (E1.4.2)
+                    Región anónima del participante
                   </span>
                   <span className="text-emerald-300 font-bold">{telemetry.regionCode}</span>
                 </div>
@@ -695,10 +699,10 @@ export function SessionResearchPanel() {
                 </div>
               </div>
 
-              {/* Comparación TCP (Firebase) frente a UDP (WebRTC) (E1.4.3, E1.4.4) */}
+              {/* Comparación TCP (Firebase) frente a UDP (WebRTC) */}
               <div className="bg-white/5 p-2.5 rounded-lg space-y-2">
                 <p className="text-gray-200 font-bold text-[11px]">
-                  Comparación de campo: TCP (Firebase) vs UDP (WebRTC) (E1.4.4)
+                  Comparación de campo: TCP (Firebase) vs UDP (WebRTC)
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-[10px]">
                   <div className="bg-amber-500/10 border border-amber-500/30 p-2 rounded">
@@ -738,7 +742,7 @@ export function SessionResearchPanel() {
           )}
 
           {/* ============================================================== */}
-          {/* E1.5 · VISUALIZACIONES DE SESIÓN (SVG PARA TESIS Y ARTÍCULOS) */}
+          {/* VISUALIZACIONES DE SESIÓN (SVG PARA TESIS Y ARTÍCULOS) */}
           {/* ============================================================== */}
           {activeTab === 'visuals' && (
             <div className="space-y-2.5">
@@ -755,7 +759,7 @@ export function SessionResearchPanel() {
                   className="w-full text-left bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 rounded-lg transition-colors"
                 >
                   <p className="text-amber-300 font-bold">
-                    ⬇ E1.5.1 · Mapa de Calor Espacial y Recorridos (.svg)
+                    ⬇ Mapa de Calor Espacial y Recorridos (.svg)
                   </p>
                   <p className="text-[10px] text-gray-400">
                     Densidad cenital X-Z de objetos sonoros, zonas de efectos y trayectorias.
@@ -769,7 +773,7 @@ export function SessionResearchPanel() {
                   className="w-full text-left bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 rounded-lg transition-colors"
                 >
                   <p className="text-sky-300 font-bold">
-                    ⬇ E1.5.2 · Diagrama Topológico por Fases Animado (.svg)
+                    ⬇ Diagrama Topológico por Fases Animado (.svg)
                   </p>
                   <p className="text-[10px] text-gray-400">
                     Comparativa en 4 paneles (Experimentación → Consolidación → Producción →
@@ -784,7 +788,7 @@ export function SessionResearchPanel() {
                   className="w-full text-left bg-white/5 hover:bg-white/10 border border-white/10 p-2.5 rounded-lg transition-colors"
                 >
                   <p className="text-purple-300 font-bold">
-                    ⬇ E1.5.3 · Partitura Gráfica Temporal (Eje X = Tiempo) (.svg)
+                    ⬇ Partitura Gráfica Temporal (Eje X = Tiempo) (.svg)
                   </p>
                   <p className="text-[10px] text-gray-400">
                     Frecuencia logarítmica vs. tiempo, diferenciando intervención humana,

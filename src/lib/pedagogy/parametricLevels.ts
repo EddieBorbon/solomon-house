@@ -55,9 +55,9 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
   1: {
     id: 'N1',
     level: 1,
-    name: 'N1 · Iniciación',
+    name: 'Modo 1 · Básico (Iniciación)',
     description:
-      'Solo osciladores simples, registro medio acotado, densidad controlada y sin zonas de efectos.',
+      'Para empezar paso a paso: muestra solo controles esenciales (nota, volumen y forma básica) con hasta 6 objetos y sin efectos.',
     allowedObjectTypes: ['cube', 'sphere', 'cylinder'],
     allowedEffectTypes: [],
     frequencyRange: [110, 880],
@@ -70,16 +70,16 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
       id: 'challenge-n1',
       title: 'Tríada Espacial Equilibrada',
       objective:
-        'Construir un tejido de al menos 3 fuentes en el registro medio (110–880 Hz) sin saturar la sala.',
-      criteriaDescription: 'Densidad pico ≥ 3 objetos y ≤ 6 objetos, con al menos 2 frecuencias distintas.',
+        'Colocar al menos 3 figuras sonoras en el registro medio (110–880 Hz) distribuidas en el espacio sin saturar la sala.',
+      criteriaDescription: 'Entre 3 y 6 objetos activos con al menos 2 notas (frecuencias) distintas.',
     },
   },
   2: {
     id: 'N2',
     level: 2,
-    name: 'N2 · Exploración',
+    name: 'Modo 2 · Intermedio (Espacio y Eco)',
     description:
-      'Síntesis FM y percusión de membrana activas con efectos espaciales simples (delay, reverb).',
+      'Suma síntesis FM, percusión y zonas de efectos espaciales (eco y reverberación) con hasta 12 objetos.',
     allowedObjectTypes: ['cube', 'sphere', 'cylinder', 'cone', 'plane'],
     allowedEffectTypes: ['reverb', 'feedbackDelay', 'jcReverb'],
     frequencyRange: [55, 1760],
@@ -92,16 +92,16 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
       id: 'challenge-n2',
       title: 'Diálogo Tímbrico con Espacio Reverberante',
       objective:
-        'Combinar al menos 2 familias de síntesis distintas e integrar una zona de efecto espacial.',
-      criteriaDescription: '≥ 2 tipos de síntesis activos y ≥ 1 zona de efecto en la ficha E1.3.',
+        'Combinar al menos 2 tipos de figuras distintas y colocar una zona de efecto espacial (eco o reverberación).',
+      criteriaDescription: 'Al menos 2 tipos de síntesis activos y 1 zona de efecto en la escena.',
     },
   },
   3: {
     id: 'N3',
     level: 3,
-    name: 'N3 · Composición Avanzada',
+    name: 'Modo 3 · Avanzado (Diseño Sonoro)',
     description:
-      'Todos los motores de síntesis, zonas de efectos complejas y control completo de envolventes.',
+      'Habilita todos los sintetizadores, todas las zonas de efectos y el control completo de envolventes y filtros.',
     allowedObjectTypes: [
       'cube', 'sphere', 'cylinder', 'cone', 'pyramid', 'icosahedron',
       'plane', 'torus', 'dodecahedronRing', 'spiral',
@@ -115,18 +115,18 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
     allowCustomCode: false,
     challenge: {
       id: 'challenge-n3',
-      title: 'Contrapunto Espectral y Rítmico',
+      title: 'Contrapunto de Registros (Grave, Medio y Agudo)',
       objective:
-        'Articular una textura con contraste espectral en las 3 bandas (grave, media, aguda) y organización rítmica definida.',
-      criteriaDescription: '≥ 4 frecuencias distintas, centroide entre 250 y 2500 Hz y ≥ 5 objetos en pico.',
+        'Crear una composición que combine sonidos graves, medios y agudos con ritmo definido.',
+      criteriaDescription: 'Al menos 4 notas distintas y 5 o más objetos sonando en conjunto.',
     },
   },
   4: {
     id: 'N4',
     level: 4,
-    name: 'N4 · Experimental Abierto',
+    name: 'Modo 4 · Estudio Completo (Sin Límites)',
     description:
-      'Sin restricciones: carga de samples comunitarios, síntesis granular, Csound y código personalizado.',
+      'Todas las funciones activas: permite arrastrar tus propios archivos de audio (samples), síntesis granular, Csound y hasta 36 objetos.',
     allowedObjectTypes: 'all',
     allowedEffectTypes: 'all',
     frequencyRange: [20, 20000],
@@ -137,10 +137,10 @@ export const PARAMETRIC_LEVELS: Record<ParametricLevel, LevelDefinition> = {
     allowCustomCode: true,
     challenge: {
       id: 'challenge-n4',
-      title: 'Obra Colectiva con Agencia Híbrida',
+      title: 'Obra Colectiva con Acompañante Automático',
       objective:
-        'Desarrollar una pieza telemática completa donde coexistan intervención humana y coproducción algorítmica.',
-      criteriaDescription: 'Densidad pico ≥ 6 objetos e intervención compartida humana + algorítmica.',
+        'Construir una obra completa combinando tus objetos con el acompañante automático (Jardinero Sónico).',
+      criteriaDescription: 'Al menos 6 objetos en escena e intervención conjunta con el acompañante automático.',
     },
   },
 };
@@ -172,8 +172,8 @@ export function evaluateLevelChallenge(
       passed,
       progressPct: Math.min(100, Math.round(score)),
       feedback: passed
-        ? 'Reto N1 superado: tríada espacial equilibrada en registro medio.'
-        : `Progreso N1: pico=${report.peakDensityObjects}/3 objetos, ${report.pitchSystem.distinctFrequenciesCount}/2 frecuencias.`,
+        ? 'Reto del Modo Básico superado: tríada espacial equilibrada en registro medio.'
+        : `Progreso: máximo ${report.peakDensityObjects}/3 objetos y ${report.pitchSystem.distinctFrequenciesCount}/2 notas distintas.`,
     };
   }
 
@@ -186,8 +186,8 @@ export function evaluateLevelChallenge(
       passed,
       progressPct: Math.min(100, Math.round(score)),
       feedback: passed
-        ? 'Reto N2 superado: diálogo tímbrico y zona espacial activa.'
-        : `Progreso N2: ${synthCount}/2 familias de síntesis, ${effectCount}/1 zonas de efecto.`,
+        ? 'Reto del Modo Intermedio superado: diálogo de timbres y zona de efecto espacial activa.'
+        : `Progreso: ${synthCount}/2 tipos de figuras y ${effectCount}/1 zona de efecto.`,
     };
   }
 
@@ -202,8 +202,8 @@ export function evaluateLevelChallenge(
       passed,
       progressPct: Math.min(100, Math.round(score)),
       feedback: passed
-        ? 'Reto N3 superado: contrapunto espectral y densidad articulada.'
-        : `Progreso N3: ${report.pitchSystem.distinctFrequenciesCount}/4 alturas, pico ${report.peakDensityObjects}/5 objetos.`,
+        ? 'Reto del Modo Avanzado superado: contrapunto de registros y densidad articulada.'
+        : `Progreso: ${report.pitchSystem.distinctFrequenciesCount}/4 notas distintas y ${report.peakDensityObjects}/5 objetos.`,
     };
   }
 
@@ -216,8 +216,8 @@ export function evaluateLevelChallenge(
     passed,
     progressPct: Math.min(100, Math.round(score)),
     feedback: passed
-      ? 'Reto N4 superado: obra híbrida humano-algorítmica consolidada.'
-      : `Progreso N4: pico ${report.peakDensityObjects}/6 objetos, agencia algorítmica ${report.agency.algorithmicSharePct}%.`,
+      ? 'Reto del Modo Estudio Completo superado: obra compartida con el acompañante automático.'
+      : `Progreso: ${report.peakDensityObjects}/6 objetos y participación del acompañante (${report.agency.algorithmicSharePct}%).`,
   };
 }
 

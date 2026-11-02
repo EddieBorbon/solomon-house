@@ -13,7 +13,7 @@ import {
 
 /**
  * Archivo Público Navegable de Sesiones, Fragmentos, Esculturas y Galerías
- * (Roadmap 8.5 + Etapa E6.2 / E6.3).
+ * (Roadmap 8.5 + Etapa /).
  */
 export default function GalleryIndexPage() {
   const [galleries, setGalleries] = useState<FirebaseProject[] | null>(null);
@@ -47,7 +47,7 @@ export default function GalleryIndexPage() {
       <header className="max-w-5xl mx-auto mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <h1 className="text-3xl text-white mb-2">
-            🖼 Archivo Público, Curaduría y Galerías Sonoras (E6)
+            🖼 Archivo Público, Curaduría y Galerías Sonoras
           </h1>
           <p className="text-sm text-gray-400 max-w-2xl">
             Repositorio comunitario de sesiones, fragmentos curados, colecciones y
@@ -60,7 +60,7 @@ export default function GalleryIndexPage() {
             onClick={() => downloadConcertProgramNotesHtml()}
             className="rounded-lg border border-fuchsia-500/40 bg-fuchsia-950/50 px-3.5 py-2 text-xs text-fuchsia-200 hover:bg-fuchsia-900/60"
           >
-            Descargar Programa de Mano (E6.4.5)
+            Descargar Programa de Mano
           </button>
           <Link
             href="/"
@@ -72,11 +72,11 @@ export default function GalleryIndexPage() {
       </header>
 
       <main className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Columna izquierda: Buscador, Filtros, Fragmentos y Colecciones (E6.2.1, E6.2.3) */}
+        {/* Columna izquierda: Buscador, Filtros, Fragmentos y Colecciones */}
         <section className="lg:col-span-5 space-y-6">
           <div className="rounded-xl border border-white/15 bg-black/50 p-4 space-y-3">
             <h2 className="text-sm font-bold text-fuchsia-300">
-              Explorador del Archivo Sonoro (E6.2.1)
+              Explorador del Archivo Sonoro
             </h2>
             <input
               placeholder="Buscar obra, autor, sala o etiqueta..."
@@ -134,10 +134,10 @@ export default function GalleryIndexPage() {
             </div>
           </div>
 
-          {/* Colecciones Curadas (E6.2.3) */}
+          {/* Colecciones Curadas */}
           <div className="rounded-xl border border-white/15 bg-black/50 p-4 space-y-3">
             <h2 className="text-sm font-bold text-amber-300">
-              Colecciones Curadas (E6.2.3)
+              Colecciones Curadas
             </h2>
             {archiveState.collections.map((col) => (
               <div key={col.id} className="rounded-lg border border-white/10 bg-white/5 p-3">
@@ -149,14 +149,14 @@ export default function GalleryIndexPage() {
           </div>
         </section>
 
-        {/* Columna derecha: Ficha completa de la obra, Partitura Gráfica, Ficha Musicológica y Cadena Autoral (E6.2.2, E6.3.2) */}
+        {/* Columna derecha: Ficha completa de la obra, Partitura Gráfica, Ficha Musicológica y Cadena Autoral */}
         <section className="lg:col-span-7 space-y-6">
           {activeWork && (
             <div className="rounded-xl border border-fuchsia-500/30 bg-black/70 p-6 space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <span className="text-xs text-fuchsia-400">
-                    Ficha de Obra y Análisis Musicológico (E6.2.2)
+                    Ficha de Obra y Análisis Musicológico
                   </span>
                   <h2 className="text-xl font-bold text-white mt-0.5">
                     {activeWork.title}
@@ -183,7 +183,7 @@ export default function GalleryIndexPage() {
 
               <p className="text-xs text-gray-300">{activeWork.description}</p>
 
-              {/* Resumen musicológico E1.3 */}
+              {/* Resumen musicológico */}
               <div className="grid grid-cols-4 gap-2 rounded-lg bg-white/5 p-3 text-center text-xs">
                 <div>
                   <span className="block text-[10px] text-gray-400">Sistema Alturas</span>
@@ -211,10 +211,10 @@ export default function GalleryIndexPage() {
                 </div>
               </div>
 
-              {/* Cadena Autoral Visible (E6.3.2) */}
+              {/* Cadena Autoral Visible */}
               <div className="rounded-lg border border-amber-500/30 bg-amber-950/20 p-3 text-xs">
                 <h3 className="font-bold text-amber-300 mb-1">
-                  Cadena Autoral y Linaje de Reapropiación (E6.3.2)
+                  Cadena Autoral y Linaje de Reapropiación
                 </h3>
                 <ol className="space-y-1 text-gray-300">
                   {activeWork.attributionChain.map((node, i) => (
@@ -226,10 +226,10 @@ export default function GalleryIndexPage() {
                 </ol>
               </div>
 
-              {/* Partitura Gráfica SVG (E1.5.3 / E6.2.2) */}
+              {/* Partitura Gráfica SVG */}
               <div className="space-y-1">
                 <span className="text-xs text-gray-400">
-                  Partitura Gráfica Temporal (E1.5.3 / E6.2.2):
+                  Partitura Gráfica Temporal:
                 </span>
                 <div
                   className="overflow-x-auto rounded-lg border border-white/10 bg-black p-2"

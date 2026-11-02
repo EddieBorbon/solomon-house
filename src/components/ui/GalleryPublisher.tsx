@@ -29,7 +29,7 @@ export function GalleryPublisher() {
 
   const archiveState = useCurationArchiveStore();
 
-  // Estado E6.1 (Fragmento y Galería)
+  // Estado (Fragmento y Galería)
   const [fragTitle, setFragTitle] = useState('');
   const [fragAuthors, setFragAuthors] = useState('Ensamble Local');
   const [fragTags, setFragTags] = useState('espectral, taller');
@@ -39,7 +39,7 @@ export function GalleryPublisher() {
   const [outSec, setOutSec] = useState(45);
   const [publishedUrl, setPublishedUrl] = useState<string | null>(null);
 
-  // Estado E6.2 (Archivo y Colecciones)
+  // Estado (Archivo y Colecciones)
   const [searchQuery, setSearchQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState('ALL');
   const [licenseFilter, setLicenseFilter] = useState('ALL');
@@ -48,7 +48,7 @@ export function GalleryPublisher() {
   const [colCurator, setColCurator] = useState('');
   const [colText, setColText] = useState('');
 
-  // Estado E6.3 (Fork y Atribución)
+  // Estado (Fork y Atribución)
   const [forkAuthor, setForkAuthor] = useState('Intérprete Derivado');
   const [forkChangePlan, setForkChangePlan] = useState(
     'Re-espacialización microtonal sobre la estructura original'
@@ -65,7 +65,7 @@ export function GalleryPublisher() {
     filteredItems[0] ??
     null;
 
-  // Modo Proyección para pantalla grande sin interfaz (E6.4.3)
+  // Modo Proyección para pantalla grande sin interfaz
   if (archiveState.projectionCleanViewMode) {
     return (
       <button
@@ -73,9 +73,9 @@ export function GalleryPublisher() {
           useCurationArchiveStore.setState({ projectionCleanViewMode: false })
         }
         className="fixed top-3 right-3 z-50 rounded-lg bg-black/50 px-2.5 py-1 text-[10px] text-neutral-400 hover:bg-black/90 hover:text-white"
-        title="Salir del Modo Proyección (E6.4.3)"
+        title="Salir del Modo Proyección"
       >
-        Salir de Proyección (E6.4.3)
+        Salir de Proyección
       </button>
     );
   }
@@ -120,10 +120,10 @@ export function GalleryPublisher() {
           <div className="mb-3 flex items-center justify-between border-b border-white/10 pb-2">
             <div>
               <h3 className="text-sm font-semibold text-white">
-                Curaduría, Archivo y Reapropiación (E6)
+                Publicar en Galería, Descargar Pistas y Modo Concierto
               </h3>
               <p className="text-[11px] text-neutral-400">
-                Fragmentos · Archivo público · Cadena autoral (Fork) · Modo Concierto
+                Guarda tu obra, explora piezas de otros usuarios o descarga pistas para tu DAW
               </p>
             </div>
             <button
@@ -134,13 +134,17 @@ export function GalleryPublisher() {
             </button>
           </div>
 
+          <div className="mb-3 rounded-lg bg-fuchsia-950/30 border border-fuchsia-500/30 p-2 text-[10px] text-fuchsia-100 leading-snug">
+            💡 <strong>¿Cómo funciona?</strong> Puedes guardar un fragmento de tu sesión en la galería pública, abrir una obra existente para modificarla o exportar cada figura como pista de audio WAV separada.
+          </div>
+
           {/* Pestañas */}
           <div className="mb-3 flex gap-1 rounded-lg bg-white/5 p-1">
             {(
               [
-                ['fragment', '1. Fragmentos'],
-                ['archive', '2. Archivo Público'],
-                ['reappropriate', '3. Fork y Stems'],
+                ['fragment', '1. Publicar'],
+                ['archive', '2. Galería'],
+                ['reappropriate', '3. Pistas WAV'],
                 ['concert', '4. Concierto'],
               ] as const
             ).map(([id, label]) => (
@@ -158,13 +162,13 @@ export function GalleryPublisher() {
             ))}
           </div>
 
-          {/* PESTAÑA 1: FRAGMENTOS Y LICENCIAS (E6.1.1, E6.1.2, E6.1.3) */}
+          {/* PESTAÑA 1: FRAGMENTOS Y LICENCIAS */}
           {activeTab === 'fragment' && (
             <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-[10px] text-neutral-400">
-                    Entrada In (s) — E6.1.1
+                    Entrada In (s)
                   </label>
                   <input
                     type="number"
@@ -176,7 +180,7 @@ export function GalleryPublisher() {
                 </div>
                 <div>
                   <label className="block text-[10px] text-neutral-400">
-                    Salida Out (s) — E6.1.1
+                    Salida Out (s)
                   </label>
                   <input
                     type="number"
@@ -189,7 +193,7 @@ export function GalleryPublisher() {
               </div>
 
               <input
-                placeholder="Título del fragmento u obra (E6.1.2)"
+                placeholder="Título del fragmento u obra"
                 value={fragTitle}
                 onChange={(e) => setFragTitle(e.target.value)}
                 className="w-full rounded border border-white/15 bg-black px-2.5 py-1.5 text-xs"
@@ -219,7 +223,7 @@ export function GalleryPublisher() {
 
               <div>
                 <label className="block text-[10px] text-neutral-400">
-                  Licencia Creative Commons acordada (E6.1.3)
+                  Licencia Creative Commons acordada
                 </label>
                 <select
                   value={fragLicense}
@@ -246,7 +250,7 @@ export function GalleryPublisher() {
                   onClick={handleCreateFragment}
                   className="flex-1 rounded-lg bg-fuchsia-600 py-1.5 font-semibold text-white hover:bg-fuchsia-500"
                 >
-                  Guardar fragmento en Archivo (E6.1)
+                  Guardar fragmento en Archivo
                 </button>
                 <button
                   onClick={handlePublishGallery}
@@ -263,12 +267,12 @@ export function GalleryPublisher() {
             </div>
           )}
 
-          {/* PESTAÑA 2: ARCHIVO PÚBLICO Y COLECCIONES CURADAS (E6.2.1, E6.2.2, E6.2.3) */}
+          {/* PESTAÑA 2: ARCHIVO PÚBLICO Y COLECCIONES CURADAS */}
           {activeTab === 'archive' && (
             <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
               <div className="flex gap-1.5">
                 <input
-                  placeholder="Buscar por título, autor, sala o etiqueta (E6.2.1)..."
+                  placeholder="Buscar por título, autor, sala o etiqueta..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 rounded border border-white/15 bg-black px-2 py-1 text-[11px]"
@@ -322,11 +326,11 @@ export function GalleryPublisher() {
                 ))}
               </div>
 
-              {/* Ficha de la obra seleccionada (E6.2.2) */}
+              {/* Ficha de la obra seleccionada */}
               {selectedWork && (
                 <div className="rounded-xl border border-fuchsia-500/30 bg-black/70 p-2.5 space-y-1.5">
                   <div className="font-semibold text-fuchsia-300">
-                    Ficha Musicológica (E6.2.2): {selectedWork.title}
+                    Ficha Musicológica: {selectedWork.title}
                   </div>
                   <p className="text-[10px] text-neutral-300">{selectedWork.description}</p>
                   <div className="grid grid-cols-3 gap-1 text-center text-[10px] bg-white/5 rounded p-1.5">
@@ -358,10 +362,10 @@ export function GalleryPublisher() {
                 </div>
               )}
 
-              {/* Colecciones curadas (E6.2.3) */}
+              {/* Colecciones curadas */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-1.5">
                 <div className="font-semibold text-neutral-200">
-                  Colecciones Curadas ({archiveState.collections.length}) — E6.2.3
+                  Colecciones Curadas ({archiveState.collections.length})
                 </div>
                 {archiveState.collections.map((c) => (
                   <div key={c.id} className="rounded bg-black/50 p-2 text-[10px]">
@@ -412,13 +416,13 @@ export function GalleryPublisher() {
             </div>
           )}
 
-          {/* PESTAÑA 3: REAPROPIACIÓN, FORK, CADENA AUTORAL, STEMS Y SAMPLES (E6.3.1–E6.3.4) */}
+          {/* PESTAÑA 3: REAPROPIACIÓN, FORK, CADENA AUTORAL, STEMS Y SAMPLES */}
           {activeTab === 'reappropriate' && (
             <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
               {selectedWork && (
                 <div className="rounded-xl border border-fuchsia-500/30 bg-fuchsia-950/20 p-2.5 space-y-2">
                   <div className="font-semibold text-fuchsia-200">
-                    Bifurcar (Fork) obra seleccionada (E6.3.1): {selectedWork.title}
+                    Bifurcar (Fork) obra seleccionada: {selectedWork.title}
                   </div>
                   <input
                     placeholder="Tu nombre / colectivo para la atribución"
@@ -446,10 +450,10 @@ export function GalleryPublisher() {
                     Bifurcar (Fork) hacia el lienzo activo
                   </button>
 
-                  {/* Cadena autoral visible (E6.3.2) */}
+                  {/* Cadena autoral visible */}
                   <div className="rounded bg-black/60 p-2 text-[10px]">
                     <div className="font-semibold text-amber-300 mb-1">
-                      Cadena Autoral Visible (E6.3.2):
+                      Cadena Autoral Visible:
                     </div>
                     <ol className="space-y-1 text-neutral-300">
                       {selectedWork.attributionChain.map((node, i) => (
@@ -465,10 +469,10 @@ export function GalleryPublisher() {
                 </div>
               )}
 
-              {/* Exportación de Stems DAW (E6.3.3) y Samples Comunitarios (E6.3.4) */}
+              {/* Exportación de Stems DAW y Samples Comunitarios */}
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-2">
                 <div className="font-semibold text-white">
-                  Materia Prima para DAW y Comunidad (E6.3.3 y E6.3.4)
+                  Materia Prima para DAW y Comunidad
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -492,18 +496,18 @@ export function GalleryPublisher() {
                   }
                   className="w-full rounded-lg border border-emerald-500/40 bg-emerald-950/40 py-1.5 text-[10px] font-medium text-emerald-200 hover:bg-emerald-900/50"
                 >
-                  Exportar como Sample WAV para Carga Comunitaria (E6.3.4)
+                  Exportar como Sample WAV para Carga Comunitaria
                 </button>
               </div>
             </div>
           )}
 
-          {/* PESTAÑA 4: MODO CONCIERTO, AMBISONICS Y PROGRAMA DE MANO (E6.4.1–E6.4.5) */}
+          {/* PESTAÑA 4: MODO CONCIERTO, AMBISONICS Y PROGRAMA DE MANO */}
           {activeTab === 'concert' && (
             <div className="space-y-2.5 max-h-80 overflow-y-auto pr-1">
               <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 space-y-1.5">
                 <div className="font-semibold text-fuchsia-300">
-                  Lista de Reproducción del Concierto (E6.4.1)
+                  Lista de Reproducción del Concierto
                 </div>
                 {archiveState.concertPlaylistIds.map((id, idx) => {
                   const item = archiveState.fragments.find((f) => f.id === id);
@@ -533,10 +537,10 @@ export function GalleryPublisher() {
                 })}
               </div>
 
-              {/* Salida Multicanal / Ambisonics (E6.4.2 / E5.3.4) */}
+              {/* Salida Multicanal / Ambisonics */}
               <div>
                 <label className="block text-[10px] text-neutral-400">
-                  Ruteo Espacial de Sala / Multicanal (E6.4.2)
+                  Ruteo Espacial de Sala / Multicanal
                 </label>
                 <div className="mt-1 flex gap-2">
                   <select
@@ -564,7 +568,7 @@ export function GalleryPublisher() {
                 </div>
               </div>
 
-              {/* Concierto Híbrido (E6.4.4) y Proyección (E6.4.3) */}
+              {/* Concierto Híbrido y Proyección */}
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() =>
@@ -580,7 +584,7 @@ export function GalleryPublisher() {
                 >
                   {archiveState.hybridConcertMode
                     ? `Concierto Híbrido Activo (${archiveState.hybridVenueName})`
-                    : 'Activar Modo Concierto Híbrido (E6.4.4)'}
+                    : 'Activar Modo Concierto Híbrido'}
                 </button>
                 <button
                   onClick={() =>
@@ -588,16 +592,16 @@ export function GalleryPublisher() {
                   }
                   className="rounded-lg border border-fuchsia-400/40 bg-fuchsia-950/50 px-3 py-1.5 text-[10px] font-medium text-fuchsia-200 hover:bg-fuchsia-900/60"
                 >
-                  Modo Proyección Limpia (E6.4.3)
+                  Modo Proyección Limpia
                 </button>
               </div>
 
-              {/* Programa de mano generado (E6.4.5) */}
+              {/* Programa de mano generado */}
               <button
                 onClick={() => downloadConcertProgramNotesHtml()}
                 className="w-full rounded-lg bg-fuchsia-600 py-2 text-[11px] font-semibold text-white hover:bg-fuchsia-500"
               >
-                Generar y Descargar Programa de Mano con Partitura Gráfica (E6.4.5)
+                Generar y Descargar Programa de Mano con Partitura Gráfica
               </button>
             </div>
           )}
